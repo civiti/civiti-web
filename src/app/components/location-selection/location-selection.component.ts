@@ -7,7 +7,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { CommonModule } from '@angular/common';
+import { Store } from '@ngrx/store';
+import { AppState } from '../../store/app.state';
+import * as LocationActions from '../../store/location/location.actions';
 import { MockDataService } from '../../services/mock-data.service';
+import { SanitizationService } from '../../services/sanitization.service';
 
 interface LocationData {
   counties: { id: string; name: string }[];
@@ -170,7 +174,9 @@ interface LocationData {
 export class LocationSelectionComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _router = inject(Router);
+  private _store = inject(Store<AppState>);
   private _mockDataService = inject(MockDataService);
+  private _sanitizer = inject(SanitizationService);
 
   locationData: LocationData | null = null;
   isLoading = false;
@@ -201,8 +207,17 @@ export class LocationSelectionComponent implements OnInit {
 
   onContinue(): void {
     if (this.locationForm.valid) {
-      const selectedLocation = this.locationForm.value;
-      console.log('Selected location:', selectedLocation);
+      const rawData = this.locationForm.value;
+      
+      // Sanitize values before storing
+      const selectedLocation = {
+        county: this._sanitizer.sanitizeUrlParam(rawData.county || ''),
+        city: this._sanitizer.sanitizeUrlParam(rawData.city || ''),
+        district: this._sanitizer.sanitizeUrlParam(rawData.district || '')
+      };
+      
+      // Dispatch action to store location in state
+      this._store.dispatch(LocationActions.setLocation(selectedLocation));
       
       // Store selection in session storage for consistency
       sessionStorage.setItem('civica-location', JSON.stringify(selectedLocation));

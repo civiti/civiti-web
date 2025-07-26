@@ -1,0 +1,146 @@
+<div class="email-modal-container">
+  <h2 mat-dialog-title class="text-oxford-blue font-semibold text-xl mb-4">
+    <mat-icon class="mr-2 text-orange-web">email</mat-icon>
+    Email către {{ authority?.name }}
+  </h2>
+
+  <mat-dialog-content class="max-h-96 overflow-y-auto">
+    <!-- User Details Form -->
+    <form [formGroup]="emailForm" class="space-y-4 mb-6">
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Numele tău *</mat-label>
+        <input matInput formControlName="name" placeholder="Ex: Ion Popescu">
+        <mat-icon matSuffix>person</mat-icon>
+        <mat-error *ngIf="emailForm.get('name')?.hasError('required')">
+          Numele este obligatoriu
+        </mat-error>
+        <mat-error *ngIf="emailForm.get('name')?.hasError('minlength')">
+          Numele trebuie să aibă minim 2 caractere
+        </mat-error>
+        <mat-error *ngIf="emailForm.get('name')?.hasError('invalidCharacters')">
+          Numele poate conține doar litere, spații și cratime
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Email-ul tău *</mat-label>
+        <input matInput type="email" formControlName="email" placeholder="ion.popescu@example.com">
+        <mat-icon matSuffix>email</mat-icon>
+        <mat-error *ngIf="emailForm.get('email')?.hasError('required')">
+          Email-ul este obligatoriu
+        </mat-error>
+        <mat-error *ngIf="emailForm.get('email')?.hasError('invalidEmail')">
+          Adresa de email nu este validă
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Telefon (opțional)</mat-label>
+        <input matInput type="tel" formControlName="phone" placeholder="07XXXXXXXX sau +407XXXXXXXX">
+        <mat-icon matSuffix>phone</mat-icon>
+        <mat-error *ngIf="emailForm.get('phone')?.hasError('invalidPhone')">
+          Numărul de telefon nu este valid (format: 07XXXXXXXX)
+        </mat-error>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="w-full">
+        <mat-label>Comentarii suplimentare (opțional)</mat-label>
+        <textarea 
+          matInput 
+          formControlName="additionalComments" 
+          rows="3"
+          placeholder="Adaugă orice informații suplimentare relevante..."
+          #comments>
+        </textarea>
+        <mat-hint align="end">{{ comments.value.length || 0 }}/500</mat-hint>
+        <mat-error *ngIf="emailForm.get('additionalComments')?.hasError('maxLengthTrimmed')">
+          Comentariile pot avea maxim 500 caractere
+        </mat-error>
+        <mat-error *ngIf="emailForm.get('additionalComments')?.hasError('dangerousContent')">
+          Conținutul nu este permis din motive de securitate
+        </mat-error>
+      </mat-form-field>
+    </form>
+
+    <!-- Email Preview -->
+    <div class="email-preview bg-platinum p-4 rounded-lg border">
+      <h3 class="font-semibold text-oxford-blue mb-3 flex items-center">
+        <mat-icon class="mr-2">preview</mat-icon>
+        Previzualizare Email
+      </h3>
+      
+      <!-- Email To -->
+      <div class="mb-3">
+        <div class="flex items-center justify-between">
+          <strong class="text-oxford-blue">Către:</strong>
+          <button mat-icon-button (click)="copyToClipboard(authority?.email || '')" 
+                  matTooltip="Copiază adresa email">
+            <mat-icon class="text-orange-web">content_copy</mat-icon>
+          </button>
+        </div>
+        <p class="text-sm text-oxford-blue opacity-75 mt-1">{{ authority?.email }}</p>
+      </div>
+
+      <!-- Email Subject -->
+      <div class="mb-3">
+        <div class="flex items-center justify-between">
+          <strong class="text-oxford-blue">Subiect:</strong>
+          <button mat-icon-button (click)="copyToClipboard(emailTemplate?.subject || '')" 
+                  matTooltip="Copiază subiectul">
+            <mat-icon class="text-orange-web">content_copy</mat-icon>
+          </button>
+        </div>
+        <p class="text-sm text-oxford-blue opacity-75 mt-1">{{ emailTemplate?.subject }}</p>
+      </div>
+
+      <!-- Email Body -->
+      <div class="mb-3">
+        <div class="flex items-center justify-between">
+          <strong class="text-oxford-blue">Mesaj:</strong>
+          <button mat-icon-button (click)="copyToClipboard(emailTemplate?.body || '')" 
+                  matTooltip="Copiază mesajul">
+            <mat-icon class="text-orange-web">content_copy</mat-icon>
+          </button>
+        </div>
+        <div class="email-body bg-white p-3 rounded mt-2 border max-h-64 overflow-y-auto">
+          {{ emailTemplate?.body }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Instructions -->
+    <div class="instructions mt-6 p-4 bg-orange-web-20 rounded-lg">
+      <h4 class="font-semibold text-oxford-blue mb-2">
+        <mat-icon class="mr-1 text-base">info</mat-icon>
+        Instrucțiuni:
+      </h4>
+      <ol class="text-sm text-oxford-blue space-y-1 ml-4">
+        <li>Completează formularul cu datele tale</li>
+        <li>Verifică previzualizarea email-ului</li>
+        <li>Click pe "Trimite Email" pentru a deschide clientul de email</li>
+        <li>Trimite email-ul din clientul tău</li>
+      </ol>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="flex justify-between items-center px-6 py-4 border-t">
+    <div class="text-sm text-oxford-blue opacity-75">
+      * Câmpuri obligatorii
+    </div>
+    <div class="flex gap-3">
+      <button mat-button (click)="onCancel()" class="text-oxford-blue">
+        Anulează
+      </button>
+      <button 
+        mat-raised-button 
+        color="accent" 
+        [disabled]="!emailForm.valid"
+        (click)="openEmailClient()"
+        class="btn-primary"
+      >
+        <mat-icon class="mr-2">send</mat-icon>
+        Trimite Email
+      </button>
+    </div>
+  </mat-dialog-actions>
+</div>

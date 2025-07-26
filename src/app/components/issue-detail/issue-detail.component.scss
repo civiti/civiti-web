@@ -1,0 +1,91 @@
+// Main component styles
+.space-y-6 > * + * {
+  margin-top: 1.5rem;
+}
+
+.space-y-3 > * + * {
+  margin-top: 0.75rem;
+}
+
+.space-y-4 > * + * {
+  margin-top: 1rem;
+}
+
+.email-counter-number {
+  font-size: 3rem;
+  line-height: 1;
+}
+
+.priority-urgent {
+  background-color: var(--orange-web) !important;
+  color: white !important;
+  font-weight: 700;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.animate-spin {
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.navbar {
+  background-color: var(--oxford-blue);
+}
+
+.bg-background {
+  background-color: var(--color-background);
+}
+
+.bg-orange-web-20 {
+  background-color: var(--orange-web-20);
+}
+
+.border-orange-web {
+  border-color: var(--orange-web);
+}
+
+.text-oxford-blue {
+  color: var(--oxford-blue);
+}
+
+.text-orange-web {
+  color: var(--orange-web);
+}
+
+.official-badge {
+  background-color: var(--oxford-blue);
+  color: var(--white);
+}
+
+.container {
+  max-width: 1200px;
+}
+
+button[mat-raised-button] {
+  text-transform: none;
+  font-weight: 600;
+}
+
+.btn-secondary {
+  background-color: var(--oxford-blue);
+  color: var(--white);
+
+  &:hover {
+    background-color: var(--oxford-blue-90);
+  }
+}
+
+@media (max-width: 1024px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

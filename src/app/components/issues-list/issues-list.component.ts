@@ -8,7 +8,12 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatSelectModule } from '@angular/material/select';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatToolbarModule } from '@angular/material/toolbar';
-import { MockDataService, Issue } from '../../services/mock-data.service';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import { AppState } from '../../store/app.state';
+import * as IssueActions from '../../store/issues/issue.actions';
+import * as IssueSelectors from '../../store/issues/issue.selectors';
+import { Issue } from '../../services/mock-data.service';
 
 @Component({
   selector: 'app-issues-list',
@@ -42,7 +47,7 @@ import { MockDataService, Issue } from '../../services/mock-data.service';
           <div class="flex flex-col md:flex-row gap-4 items-center">
             <div class="flex-1">
               <h2 class="text-oxford-blue font-semibold text-lg mb-2">
-                {{ totalIssues }} probleme documentate
+                {{ (totalIssues$ | async) || 0 }} probleme documentate
               </h2>
               <p class="text-oxford-blue opacity-75 text-sm">
                 Alege o problemă și ajută la rezolvarea ei prin trimiterea unui email către autorități
@@ -63,15 +68,15 @@ import { MockDataService, Issue } from '../../services/mock-data.service';
         </div>
 
         <!-- Loading State -->
-        <div *ngIf="isLoading" class="text-center py-12">
+        <div *ngIf="isLoading$ | async" class="text-center py-12">
           <mat-icon class="text-oxford-blue text-4xl mb-4 animate-spin">refresh</mat-icon>
           <p class="text-oxford-blue">Se încarcă problemele...</p>
         </div>
 
         <!-- Issues Grid -->
-        <div *ngIf="!isLoading" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div *ngIf="!(isLoading$ | async)" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <mat-card 
-            *ngFor="let issue of sortedIssues" 
+            *ngFor="let issue of issues$ | async" 
             class="issue-card cursor-pointer hover:shadow-lg transition-all duration-300"
             (click)="viewIssueDetails(issue.id)"
           >
@@ -156,7 +161,7 @@ import { MockDataService, Issue } from '../../services/mock-data.service';
         </div>
 
         <!-- Empty State -->
-        <div *ngIf="!isLoading && sortedIssues.length === 0" class="text-center py-12">
+        <div *ngIf="!(isLoading$ | async) && ((issues$ | async)?.length || 0) === 0" class="text-center py-12">
           <mat-icon class="text-oxford-blue text-6xl mb-4 opacity-50">search_off</mat-icon>
           <h3 class="text-oxford-blue text-xl font-semibold mb-2">Nu au fost găsite probleme</h3>
           <p class="text-oxford-blue opacity-75 mb-6">
@@ -179,160 +184,36 @@ import { MockDataService, Issue } from '../../services/mock-data.service';
       </div>
     </div>
   `,
-  styles: [`
-    .issue-card {
-      border: 1px solid var(--platinum);
-      transition: all 0.3s ease;
-    }
-
-    .issue-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 12px 32px rgba(20, 33, 61, 0.15);
-    }
-
-    .line-clamp-2 {
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-    }
-
-    .line-clamp-3 {
-      overflow: hidden;
-      display: -webkit-box;
-      -webkit-line-clamp: 3;
-      -webkit-box-orient: vertical;
-    }
-
-    .email-counter-number {
-      font-size: 1.5rem;
-      line-height: 1.2;
-    }
-
-    .priority-urgent {
-      background-color: var(--orange-web) !important;
-      color: white !important;
-      font-weight: 700;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; }
-      50% { opacity: 0.7; }
-    }
-
-    .animate-spin {
-      animation: spin 2s linear infinite;
-    }
-
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to { transform: rotate(360deg); }
-    }
-
-    .navbar {
-      background-color: var(--oxford-blue);
-    }
-
-    .bg-background {
-      background-color: var(--color-background);
-    }
-
-    .text-oxford-blue {
-      color: var(--oxford-blue);
-    }
-
-    .text-orange-web {
-      color: var(--orange-web);
-    }
-
-    .border-platinum {
-      border-color: var(--platinum);
-    }
-
-    .official-badge {
-      background-color: var(--oxford-blue);
-      color: var(--white);
-    }
-
-    mat-form-field {
-      font-size: 14px;
-    }
-
-    .container {
-      max-width: 1200px;
-    }
-
-    @media (max-width: 768px) {
-      .grid {
-        grid-template-columns: 1fr;
-        gap: 1rem;
-      }
-      
-      .container {
-        padding: 1rem;
-      }
-    }
-  `]
+  styleUrl: './issues-list.component.scss'
 })
 export class IssuesListComponent implements OnInit {
   private _router = inject(Router);
-  private _mockDataService = inject(MockDataService);
+  private _store = inject(Store<AppState>);
 
-  issues: Issue[] = [];
-  sortedIssues: Issue[] = [];
-  isLoading = false;
+  issues$: Observable<Issue[]>;
+  isLoading$: Observable<boolean>;
+  error$: Observable<string | null>;
+  sortBy$: Observable<string>;
+  totalIssues$: Observable<number>;
+  
   sortBy = 'date';
-  totalIssues = 0;
 
-  ngOnInit(): void {
-    this.loadIssues();
+  constructor() {
+    this.issues$ = this._store.select(IssueSelectors.selectSortedIssues);
+    this.isLoading$ = this._store.select(IssueSelectors.selectIssuesLoading);
+    this.error$ = this._store.select(IssueSelectors.selectIssuesError);
+    this.sortBy$ = this._store.select(IssueSelectors.selectSortBy);
+    this.totalIssues$ = this._store.select(IssueSelectors.selectTotal);
   }
 
-  private loadIssues(): void {
-    this.isLoading = true;
-    this._mockDataService.getIssues().subscribe({
-      next: (issues) => {
-        this.issues = issues;
-        this.totalIssues = issues.length;
-        this.applySorting();
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading issues:', error);
-        this.isLoading = false;
-      }
-    });
+  ngOnInit(): void {
+    this._store.dispatch(IssueActions.loadIssues());
   }
 
   onSortChange(): void {
-    this.applySorting();
-  }
-
-  private applySorting(): void {
-    switch (this.sortBy) {
-      case 'emails':
-        this.sortedIssues = [...this.issues].sort((a, b) => b.emailsSent - a.emailsSent);
-        break;
-      case 'urgency':
-        this.sortedIssues = [...this.issues].sort((a, b) => {
-          const urgencyA = this.getUrgencyScore(a);
-          const urgencyB = this.getUrgencyScore(b);
-          return urgencyB - urgencyA;
-        });
-        break;
-      default: // 'date'
-        this.sortedIssues = [...this.issues].sort((a, b) => 
-          new Date(b.dateCreated).getTime() - new Date(a.dateCreated).getTime()
-        );
-    }
-  }
-
-  private getUrgencyScore(issue: Issue): number {
-    // Calculate urgency based on email count and days since creation
-    const daysSince = this.getDaysSinceNumber(issue.dateCreated);
-    const emailRatio = issue.emailsSent / 100; // Normalize email count
-    return emailRatio + (daysSince / 10); // Older issues get higher urgency
+    this._store.dispatch(IssueActions.changeSortBy({ 
+      sortBy: this.sortBy as 'date' | 'emails' | 'urgency' 
+    }));
   }
 
   getUrgencyLevel(issue: Issue): 'urgent' | 'normal' {
@@ -371,6 +252,7 @@ export class IssuesListComponent implements OnInit {
   }
 
   viewIssueDetails(issueId: string): void {
+    this._store.dispatch(IssueActions.selectIssue({ id: issueId }));
     this._router.navigate(['/issue', issueId]);
   }
 

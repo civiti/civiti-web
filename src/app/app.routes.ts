@@ -1,11 +1,6 @@
 import { Routes } from '@angular/router';
 
-// Import components (will be created)
-import { LocationSelectionComponent } from './components/location-selection/location-selection.component';
-import { IssuesListComponent } from './components/issues-list/issues-list.component';
-import { IssueDetailComponent } from './components/issue-detail/issue-detail.component';
-
-// Route structure based on ux.md user journey
+// Route structure based on ux.md user journey with lazy loading
 export const routes: Routes = [
   {
     path: '',
@@ -14,17 +9,17 @@ export const routes: Routes = [
   },
   {
     path: 'location',
-    component: LocationSelectionComponent,
+    loadComponent: () => import('./components/location-selection/location-selection.component').then(m => m.LocationSelectionComponent),
     data: { animation: 'LocationPage' }
   },
   {
     path: 'issues',
-    component: IssuesListComponent,
+    loadComponent: () => import('./components/issues-list/issues-list.component').then(m => m.IssuesListComponent),
     data: { animation: 'IssuesPage' }
   },
   {
     path: 'issue/:id',
-    component: IssueDetailComponent,
+    loadComponent: () => import('./components/issue-detail/issue-detail.component').then(m => m.IssueDetailComponent),
     data: { animation: 'DetailPage' }
   },
   // Fallback route
