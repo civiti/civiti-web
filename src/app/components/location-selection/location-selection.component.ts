@@ -14,24 +14,24 @@ import { MockDataService } from '../../services/mock-data.service';
 import { SanitizationService } from '../../services/sanitization.service';
 
 interface LocationData {
-  counties: { id: string; name: string }[];
-  cities: { id: string; name: string }[];
-  districts: { id: string; name: string }[];
+    counties: { id: string; name: string }[];
+    cities: { id: string; name: string }[];
+    districts: { id: string; name: string }[];
 }
 
 @Component({
-  selector: 'app-location-selection',
-  standalone: true,
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatButtonModule,
-    MatSelectModule,
-    MatFormFieldModule,
-    MatCardModule,
-    MatIconModule,
-  ],
-  template: `
+    selector: 'app-location-selection',
+    standalone: true,
+    imports: [
+        CommonModule,
+        ReactiveFormsModule,
+        MatButtonModule,
+        MatSelectModule,
+        MatFormFieldModule,
+        MatCardModule,
+        MatIconModule,
+    ],
+    template: `
     <div class="min-h-screen bg-background flex items-center justify-center p-4">
       <mat-card class="w-full max-w-md mx-auto">
         <mat-card-header class="text-center mb-6">
@@ -67,25 +67,19 @@ interface LocationData {
             <mat-form-field appearance="outline" class="w-full">
               <mat-label class="form-label">Cartier/Sector</mat-label>
               <mat-select formControlName="district" required>
-                <mat-option 
-                  *ngFor="let district of locationData?.districts" 
-                  [value]="district.id"
-                >
-                  {{ district.name }}
-                </mat-option>
+                <mat-option value="SECTOR5">Sector 5</mat-option>
               </mat-select>
               <mat-icon matSuffix>map</mat-icon>
             </mat-form-field>
 
             <!-- Info Box -->
-            <div class="bg-orange-web-20 p-4 rounded-lg border-l-4 border-orange-web">
+            <div class="info-box bg-orange-web-20 p-4 rounded-lg border-l-4 border-orange-web">
               <div class="flex items-start">
-                <mat-icon class="text-orange-web mr-2 mt-1">info</mat-icon>
-                <div>
-                  <p class="text-sm font-semibold text-oxford-blue mb-1">Pentru MVP</p>
-                  <p class="text-xs text-oxford-blue opacity-75">
-                    Momentan aplicația funcționează doar pentru București. 
-                    Sectorul 5 conține cele mai multe probleme documentate.
+                <mat-icon class="text-orange-web">info</mat-icon>
+                <div class="info-content">
+                  <p class="info-title text-sm font-semibold text-oxford-blue">Pentru MVP</p>
+                  <p class="info-description text-xs text-oxford-blue opacity-75">
+                    Momentan aplicația funcționează doar pentru București, Sectorul 5.
                   </p>
                 </div>
               </div>
@@ -97,7 +91,7 @@ interface LocationData {
               color="accent" 
               type="submit"
               class="w-full btn-primary text-lg py-3"
-              [disabled]="locationForm.invalid || isLoading"
+              [disabled]="isLoading"
             >
               <mat-icon class="mr-2">arrow_forward</mat-icon>
               {{ isLoading ? 'Se încarcă...' : 'Continuă la Probleme' }}
@@ -114,7 +108,7 @@ interface LocationData {
       </mat-card>
     </div>
   `,
-  styles: [`
+    styles: [`
     mat-card {
       box-shadow: 0 8px 24px rgba(20, 33, 61, 0.1);
       border: 1px solid var(--platinum);
@@ -148,6 +142,41 @@ interface LocationData {
       border-color: var(--orange-web);
     }
 
+    // Fix info box layout and spacing
+    .info-box {
+      .flex {
+        gap: 12px;
+      }
+      
+      mat-icon {
+        flex-shrink: 0;
+        width: 20px;
+        height: 20px;
+        font-size: 20px;
+        line-height: 20px;
+        margin-top: 2px;
+      }
+      
+      .info-content {
+        flex: 1;
+        min-width: 0;
+        
+        p {
+          margin: 0;
+          word-wrap: break-word;
+          
+          &.info-title {
+            margin-bottom: 8px;
+            line-height: 1.4;
+          }
+          
+          &.info-description {
+            line-height: 1.5;
+          }
+        }
+      }
+    }
+
     .text-orange-web {
       color: var(--orange-web);
     }
@@ -172,56 +201,57 @@ interface LocationData {
   `]
 })
 export class LocationSelectionComponent implements OnInit {
-  private _fb = inject(FormBuilder);
-  private _router = inject(Router);
-  private _store = inject(Store<AppState>);
-  private _mockDataService = inject(MockDataService);
-  private _sanitizer = inject(SanitizationService);
+    private _fb = inject(FormBuilder);
+    private _router = inject(Router);
+    private _store = inject(Store<AppState>);
+    private _mockDataService = inject(MockDataService);
+    private _sanitizer = inject(SanitizationService);
 
-  locationData: LocationData | null = null;
-  isLoading = false;
+    locationData: LocationData | null = null;
+    isLoading = false;
 
-  locationForm = this._fb.group({
-    county: [{value: 'B', disabled: true}, Validators.required],
-    city: [{value: 'BUCURESTI', disabled: true}, Validators.required],
-    district: ['SECTOR5', Validators.required] // Pre-select Sector 5 for MVP
-  });
-
-  ngOnInit(): void {
-    this.loadLocationData();
-  }
-
-  private loadLocationData(): void {
-    this.isLoading = true;
-    this._mockDataService.getLocationData().subscribe({
-      next: (data) => {
-        this.locationData = data;
-        this.isLoading = false;
-      },
-      error: (error) => {
-        console.error('Error loading location data:', error);
-        this.isLoading = false;
-      }
+    locationForm = this._fb.group({
+        county: [{ value: 'B', disabled: true }, Validators.required],
+        city: [{ value: 'BUCURESTI', disabled: true }, Validators.required],
+        district: [{ value: 'SECTOR5', disabled: true }, Validators.required] // Only Sector 5 for MVP
     });
-  }
 
-  onContinue(): void {
-    if (this.locationForm.valid) {
-      // Use getRawValue() to include disabled form controls
-      const rawData = this.locationForm.getRawValue();
-      
-      // Sanitize values before storing
-      const selectedLocation = {
-        county: this._sanitizer.sanitizeUrlParam(rawData.county || ''),
-        city: this._sanitizer.sanitizeUrlParam(rawData.city || ''),
-        district: this._sanitizer.sanitizeUrlParam(rawData.district || '')
-      };
-      
-      // Dispatch action to store location in state (effects will handle storage)
-      this._store.dispatch(LocationActions.setLocation(selectedLocation));
-      
-      // Navigate to issues list
-      this._router.navigate(['/issues']);
+    ngOnInit(): void {
+        this.loadLocationData();
     }
-  }
+
+    private loadLocationData(): void {
+        this.isLoading = true;
+        this._mockDataService.getLocationData().subscribe({
+            next: (data) => {
+                this.locationData = data;
+                this.isLoading = false;
+            },
+            error: (error) => {
+                console.error('Error loading location data:', error);
+                this.isLoading = false;
+            }
+        });
+    }
+
+    onContinue(): void {
+        // For MVP, all fields are pre-filled and disabled, so we don't need to validate
+        // Use getRawValue() to include disabled form controls
+        const rawData = this.locationForm.getRawValue();
+
+        // Sanitize values before storing
+        const selectedLocation = {
+            county: this._sanitizer.sanitizeUrlParam(rawData.county || ''),
+            city: this._sanitizer.sanitizeUrlParam(rawData.city || ''),
+            district: this._sanitizer.sanitizeUrlParam(rawData.district || '')
+        };
+
+        console.log('Location data:', selectedLocation); // Debug log
+
+        // Dispatch action to store location in state (effects will handle storage)
+        this._store.dispatch(LocationActions.setLocation(selectedLocation));
+
+        // Navigate to issues list
+        this._router.navigate(['/issues']);
+    }
 } 

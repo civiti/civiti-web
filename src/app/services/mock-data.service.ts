@@ -184,17 +184,12 @@ export class MockDataService {
     }
   ];
 
-  // Mock location data (hardcoded for MVP)
+  // Mock location data (hardcoded for MVP - only Sector 5)
   private mockLocationData = {
     counties: [{ id: 'B', name: 'București' }],
     cities: [{ id: 'BUCURESTI', name: 'București' }],
     districts: [
-      { id: 'SECTOR1', name: 'Sector 1' },
-      { id: 'SECTOR2', name: 'Sector 2' },
-      { id: 'SECTOR3', name: 'Sector 3' },
-      { id: 'SECTOR4', name: 'Sector 4' },
-      { id: 'SECTOR5', name: 'Sector 5' },
-      { id: 'SECTOR6', name: 'Sector 6' }
+      { id: 'SECTOR5', name: 'Sector 5' }
     ]
   };
 
@@ -228,8 +223,14 @@ export class MockDataService {
 
   // Generate email template based on issue and authority
   generateEmailTemplate(issue: Issue, authority: Authority, userData: any): EmailTemplate {
-    const subject = `[URGENT] Solicitare de intervenție - ${issue.title} - Sector 5, București`;
+    const subject = `Petitie - ${issue.title}`;
     
+    // TODO: Replace with AI-generated message based on system prompt
+    // The AI service will generate the email body using:
+    // - Issue details (title, description, location, impact, desired outcome)
+    // - Authority information
+    // - User data (name, email, phone, additional comments)
+    // - System prompt tailored for each issue type/category
     const body = `Stimate reprezentant ${authority.name},
 
 Vă scriu pentru a vă aduce la cunoștință o problemă care necesită intervenția dumneavoastră urgentă în comunitatea noastră.

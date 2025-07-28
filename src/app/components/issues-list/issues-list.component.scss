@@ -1,10 +1,33 @@
 .issue-card {
   border: 1px solid var(--platinum);
-  transition: all 0.3s ease;
+  transition: box-shadow 0.3s ease; // Only animate shadow, not transform
 
   &:hover {
-    transform: translateY(-4px);
+    // Remove transform to prevent button hover flickering
     box-shadow: 0 12px 32px rgba(20, 33, 61, 0.15);
+  }
+
+  // Prevent hover conflicts with buttons
+  mat-card-actions {
+    position: relative;
+    z-index: 2;
+    margin-bottom: 8px; // Extra space to prevent hover conflicts
+
+    button {
+      transition: all 0.2s ease;
+      // Add padding to increase hover area and prevent flickering
+      margin: 4px 0;
+
+      &:hover {
+        transform: translateY(-1px); // Subtle lift effect only on button
+        box-shadow: 0 4px 12px rgba(252, 163, 17, 0.3);
+      }
+    }
+  }
+
+  // Add some padding at the bottom of the card
+  mat-card-content:last-of-type {
+    padding-bottom: 16px;
   }
 }
 
@@ -12,6 +35,7 @@
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
 }
 
@@ -19,6 +43,7 @@
   overflow: hidden;
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
 }
 
@@ -35,8 +60,15 @@
 }
 
 @keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.7; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.7;
+  }
 }
 
 .animate-spin {
@@ -44,8 +76,13 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .navbar {
@@ -86,7 +123,7 @@ mat-form-field {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .container {
     padding: 1rem;
   }

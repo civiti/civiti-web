@@ -29,14 +29,13 @@
               <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                   <h1 class="text-2xl font-bold text-oxford-blue mb-2">
-                    {{ issue.title }}
+                    <mat-chip *ngIf="getUrgencyLevel(issue) === 'urgent'" class="priority-urgent text-xs font-bold mr-2">
+                      URGENT
+                    </mat-chip>{{ issue.title }}
                   </h1>
                   <div class="flex items-center gap-3">
                     <mat-chip class="official-badge text-xs">
                       {{ getStatusText(issue.status) }}
-                    </mat-chip>
-                    <mat-chip *ngIf="getUrgencyLevel(issue) === 'urgent'" class="priority-urgent text-xs">
-                      URGENT
                     </mat-chip>
                   </div>
                 </div>
@@ -66,10 +65,11 @@
             </mat-card-header>
             <mat-card-content class="p-4">
               <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <div 
+                <a 
                   *ngFor="let photo of issue.photos; let i = index" 
-                  class="relative cursor-pointer group"
-                  (click)="openPhotoGallery(i)"
+                  [href]="getPhotoUrl(photo)"
+                  class="photo-gallery-item relative cursor-pointer group block"
+                  [attr.data-glightbox]="'title: Fotografie ' + (i + 1) + '; description: ' + issue.title"
                 >
                   <img 
                     [src]="getPhotoUrl(photo)" 
@@ -83,7 +83,7 @@
                       zoom_in
                     </mat-icon>
                   </div>
-                </div>
+                </a>
               </div>
             </mat-card-content>
           </mat-card>

@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
@@ -16,6 +16,7 @@ import * as IssueActions from '../../store/issues/issue.actions';
 import * as IssueSelectors from '../../store/issues/issue.selectors';
 import { Issue, Authority } from '../../services/mock-data.service';
 import { EmailModalComponent } from './email-modal.component';
+import GLightbox from 'glightbox';
 
 @Component({
     selector: 'app-issue-detail',
@@ -34,12 +35,13 @@ import { EmailModalComponent } from './email-modal.component';
     templateUrl: './issue-detail.component.html',
     styleUrl: './issue-detail.component.scss'
 })
-export class IssueDetailComponent implements OnInit {
+export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _route = inject(ActivatedRoute);
     private _router = inject(Router);
     private _store = inject(Store<AppState>);
     private _dialog = inject(MatDialog);
     private _imageErrorCount: Map<string, number> = new Map();
+    private _lightbox: any;
 
     issue$: Observable<Issue | null | undefined>;
     isLoading$: Observable<boolean>;
@@ -49,6 +51,13 @@ export class IssueDetailComponent implements OnInit {
         this.issue$ = this._store.select(IssueSelectors.selectSelectedIssue);
         this.isLoading$ = this._store.select(IssueSelectors.selectIssuesLoading);
         this.error$ = this._store.select(IssueSelectors.selectIssuesError);
+
+        // Reinitialize gallery when issue data changes
+        this.issue$.subscribe(issue => {
+            if (issue && this._lightbox) {
+                setTimeout(() => this.refreshGallery(), 100);
+            }
+        });
     }
 
     ngOnInit(): void {
@@ -60,9 +69,40 @@ export class IssueDetailComponent implements OnInit {
         }
     }
 
+    ngAfterViewInit(): void {
+        // Initialize GLightbox after view is ready
+        this.initializeGallery();
+    }
+
+    ngOnDestroy(): void {
+        // Clean up the lightbox instance
+        if (this._lightbox) {
+            this._lightbox.destroy();
+        }
+    }
+
+    private initializeGallery(): void {
+        // Initialize GLightbox for photo gallery
+        this._lightbox = GLightbox({
+            selector: '.photo-gallery-item',
+            touchNavigation: true,
+            loop: true,
+            autoplayVideos: false,
+            closeOnOutsideClick: true,
+            moreText: 'Vezi mai multe',
+            moreLength: 60,
+            slideEffect: 'slide',
+            skin: 'clean',
+            cssEffects: {
+                fade: { in: 'fadeIn', out: 'fadeOut' },
+                zoom: { in: 'zoomIn', out: 'zoomOut' }
+            }
+        });
+    }
+
     openEmailModal(authority: Authority, issue: Issue): void {
         const dialogRef = this._dialog.open(EmailModalComponent, {
-            width: '600px',
+            width: '800px',
             maxWidth: '90vw',
             maxHeight: '90vh',
             disableClose: false,
@@ -75,10 +115,11 @@ export class IssueDetailComponent implements OnInit {
         });
     }
 
-    openPhotoGallery(index: number): void {
-        // For now, just show a larger version of the image
-        // In a real app, this would open a proper photo gallery modal
-        console.log('Opening photo gallery at index:', index);
+    refreshGallery(): void {
+        // Refresh the lightbox after content changes
+        if (this._lightbox) {
+            this._lightbox.reload();
+        }
     }
 
     getPhotoUrl(photoPath: string): string {

@@ -88,7 +88,7 @@ export class EmailModalComponent implements OnInit {
     }
 
     private generateEmailTemplate(): void {
-        if (this.emailForm.valid && this.issue && this.authority) {
+        if (this.issue && this.authority) {
             const rawData = this.emailForm.value;
             
             // Sanitize all inputs before generating template
@@ -99,6 +99,10 @@ export class EmailModalComponent implements OnInit {
                 additionalComments: this._sanitizer.sanitizeMultilineText(rawData.additionalComments || '', 500)
             };
             
+            // TODO: Future AI Integration
+            // Call AI service to generate personalized email content
+            // this.generateAIEmailContent(this.issue, this.authority, userData);
+            
             this.emailTemplate = this._mockDataService.generateEmailTemplate(
                 this.issue,
                 this.authority,
@@ -106,6 +110,33 @@ export class EmailModalComponent implements OnInit {
             );
         }
     }
+
+    // TODO: Future AI Integration Method
+    // private async generateAIEmailContent(issue: Issue, authority: Authority, userData: any): Promise<void> {
+    //     this.isGenerating = true;
+    //     try {
+    //         // System prompt will be auto-generated based on:
+    //         // - Issue type/category
+    //         // - Authority type (primarie, politie, etc.)
+    //         // - Local regulations and procedures
+    //         // - Historical successful petition templates
+    //         
+    //         // const systemPrompt = this.generateSystemPrompt(issue, authority);
+    //         // const aiGeneratedContent = await this.aiService.generateEmailContent(
+    //         //     systemPrompt,
+    //         //     issue,
+    //         //     authority,
+    //         //     userData
+    //         // );
+    //         // this.emailTemplate = aiGeneratedContent;
+    //     } catch (error) {
+    //         console.error('AI email generation failed:', error);
+    //         // Fallback to template-based generation
+    //         this.emailTemplate = this._mockDataService.generateEmailTemplate(issue, authority, userData);
+    //     } finally {
+    //         this.isGenerating = false;
+    //     }
+    // }
     
     getErrorMessage(fieldName: string): string {
         const control = this.emailForm.get(fieldName);

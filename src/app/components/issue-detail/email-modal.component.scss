@@ -1,6 +1,33 @@
 .email-modal-container {
   width: 100%;
-  max-width: 600px;
+  max-width: 800px; // Increased from 600px for wider layout
+  min-width: 320px; // Ensure minimum width on mobile
+}
+
+// Responsive layout utilities
+.form-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.form-row .form-field-third {
+  flex: 1;
+  min-width: 200px;
+  
+  @media (max-width: 768px) {
+    flex: none;
+    min-width: auto;
+  }
+}
+
+.form-row .form-field-full {
+  flex: 1 1 100%;
 }
 
 .space-y-4 > * + * {
@@ -45,6 +72,65 @@ mat-dialog-actions {
   justify-content: space-between;
 }
 
+// Apply the same form field styling fixes as in global styles
 mat-form-field {
   margin-bottom: 8px;
+  font-family: var(--font-primary);
+  
+  // Ensure text field wrapper has proper background and borders
+  .mat-mdc-text-field-wrapper {
+    background-color: var(--color-surface);
+    
+    &.mdc-text-field--outlined {
+      // Base outline styling
+      .mdc-notched-outline__leading,
+      .mdc-notched-outline__notch,
+      .mdc-notched-outline__trailing {
+        border-color: var(--platinum);
+        border-width: 1px;
+        border-style: solid;
+      }
+      
+      // Hover state
+      &:hover:not(.mdc-text-field--focused) {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: var(--oxford-blue);
+        }
+      }
+      
+      // Focus state
+      &.mdc-text-field--focused {
+        .mdc-notched-outline__leading,
+        .mdc-notched-outline__notch,
+        .mdc-notched-outline__trailing {
+          border-color: var(--orange-web);
+          border-width: 2px;
+        }
+      }
+    }
+  }
+  
+  // Input and label styling
+  .mat-mdc-input-element {
+    color: var(--color-text);
+    font-family: var(--font-primary);
+    font-size: 16px;
+    line-height: 1.5;
+    padding: 16px 12px;
+  }
+  
+  .mat-mdc-form-field-label {
+    color: var(--oxford-blue);
+    opacity: 0.8;
+    font-family: var(--font-primary);
+  }
+  
+
+  
+  // Icon styling
+  .mat-mdc-form-field-icon-suffix mat-icon {
+    color: var(--oxford-blue);
+  }
 }

@@ -7,59 +7,67 @@
   <mat-dialog-content class="max-h-96 overflow-y-auto">
     <!-- User Details Form -->
     <form [formGroup]="emailForm" class="space-y-4 mb-6">
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Numele tău *</mat-label>
-        <input matInput formControlName="name" placeholder="Ex: Ion Popescu">
-        <mat-icon matSuffix>person</mat-icon>
-        <mat-error *ngIf="emailForm.get('name')?.hasError('required')">
-          Numele este obligatoriu
-        </mat-error>
-        <mat-error *ngIf="emailForm.get('name')?.hasError('minlength')">
-          Numele trebuie să aibă minim 2 caractere
-        </mat-error>
-        <mat-error *ngIf="emailForm.get('name')?.hasError('invalidCharacters')">
-          Numele poate conține doar litere, spații și cratime
-        </mat-error>
-      </mat-form-field>
+      <!-- Name, Email, Phone row -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field-third">
+          <mat-label>Numele tău *</mat-label>
+          <input matInput formControlName="name">
+          <mat-icon matSuffix>person</mat-icon>
+          <mat-hint>Ex: Ion Popescu</mat-hint>
+          <mat-error *ngIf="emailForm.get('name')?.hasError('required')">
+            Numele este obligatoriu
+          </mat-error>
+          <mat-error *ngIf="emailForm.get('name')?.hasError('minlength')">
+            Numele trebuie să aibă minim 2 caractere
+          </mat-error>
+          <mat-error *ngIf="emailForm.get('name')?.hasError('invalidCharacters')">
+            Numele poate conține doar litere, spații și cratime
+          </mat-error>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Email-ul tău *</mat-label>
-        <input matInput type="email" formControlName="email" placeholder="ion.popescu@example.com">
-        <mat-icon matSuffix>email</mat-icon>
-        <mat-error *ngIf="emailForm.get('email')?.hasError('required')">
-          Email-ul este obligatoriu
-        </mat-error>
-        <mat-error *ngIf="emailForm.get('email')?.hasError('invalidEmail')">
-          Adresa de email nu este validă
-        </mat-error>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="form-field-third">
+          <mat-label>Email-ul tău *</mat-label>
+          <input matInput type="email" formControlName="email">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-hint>Ex: ion.popescu&#64;example.com</mat-hint>
+          <mat-error *ngIf="emailForm.get('email')?.hasError('required')">
+            Email-ul este obligatoriu
+          </mat-error>
+          <mat-error *ngIf="emailForm.get('email')?.hasError('invalidEmail')">
+            Adresa de email nu este validă
+          </mat-error>
+        </mat-form-field>
 
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Telefon (opțional)</mat-label>
-        <input matInput type="tel" formControlName="phone" placeholder="07XXXXXXXX sau +407XXXXXXXX">
-        <mat-icon matSuffix>phone</mat-icon>
-        <mat-error *ngIf="emailForm.get('phone')?.hasError('invalidPhone')">
-          Numărul de telefon nu este valid (format: 07XXXXXXXX)
-        </mat-error>
-      </mat-form-field>
+        <mat-form-field appearance="outline" class="form-field-third">
+          <mat-label>Telefon (opțional)</mat-label>
+          <input matInput type="tel" formControlName="phone">
+          <mat-icon matSuffix>phone</mat-icon>
+          <mat-hint>Ex: 07XXXXXXXX sau +407XXXXXXXX</mat-hint>
+          <mat-error *ngIf="emailForm.get('phone')?.hasError('invalidPhone')">
+            Numărul de telefon nu este valid (format: 07XXXXXXXX)
+          </mat-error>
+        </mat-form-field>
+      </div>
 
-      <mat-form-field appearance="outline" class="w-full">
-        <mat-label>Comentarii suplimentare (opțional)</mat-label>
-        <textarea 
-          matInput 
-          formControlName="additionalComments" 
-          rows="3"
-          placeholder="Adaugă orice informații suplimentare relevante..."
-          #comments>
-        </textarea>
-        <mat-hint align="end">{{ comments.value.length || 0 }}/500</mat-hint>
-        <mat-error *ngIf="emailForm.get('additionalComments')?.hasError('maxLengthTrimmed')">
-          Comentariile pot avea maxim 500 caractere
-        </mat-error>
-        <mat-error *ngIf="emailForm.get('additionalComments')?.hasError('dangerousContent')">
-          Conținutul nu este permis din motive de securitate
-        </mat-error>
-      </mat-form-field>
+      <!-- Comments row - full width -->
+      <div class="form-row">
+        <mat-form-field appearance="outline" class="form-field-full">
+          <mat-label>Comentarii suplimentare (opțional)</mat-label>
+          <textarea 
+            matInput 
+            formControlName="additionalComments" 
+            rows="3"
+            #comments>
+          </textarea>
+          <mat-hint align="end">{{ comments.value.length || 0 }}/500</mat-hint>
+          <mat-error *ngIf="emailForm.get('additionalComments')?.hasError('maxLengthTrimmed')">
+            Comentariile pot avea maxim 500 caractere
+          </mat-error>
+          <mat-error *ngIf="emailForm.get('additionalComments')?.hasError('dangerousContent')">
+            Conținutul nu este permis din motive de securitate
+          </mat-error>
+        </mat-form-field>
+      </div>
     </form>
 
     <!-- Email Preview -->
