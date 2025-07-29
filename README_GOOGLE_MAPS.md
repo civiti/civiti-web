@@ -1,32 +1,43 @@
-# Google Maps Setup
+# Google Maps Integration
 
-## Local Development
+This project uses Google Maps to display issue locations on a map.
 
-1. Get a Google Maps API key from [Google Cloud Console](https://console.cloud.google.com/)
-2. In `src/index.html`, replace `YOUR_DEVELOPMENT_API_KEY` with your actual API key:
-   ```javascript
-   key: "YOUR_ACTUAL_API_KEY_HERE",
+## Local Development Setup
+
+1. Create a `.env` file in the project root:
    ```
-3. Start the development server: `npm start`
+   VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key_here
+   ```
 
-**Important**: Don't commit your API key! The placeholder should remain in the committed file.
+2. Run the development server:
+   ```bash
+   npm run start:dev
+   ```
 
-## Production (Vercel)
+   This will automatically inject your API key from the `.env` file.
 
-1. In your Vercel dashboard, add an environment variable:
-   - Name: `VITE_GOOGLE_MAPS_API_KEY`
-   - Value: Your Google Maps API key
+3. **Important**: Before committing, restore the placeholder:
+   ```bash
+   npm run restore-placeholder
+   ```
 
-2. The build script will automatically inject the API key during deployment
+## Production Setup (Vercel)
+
+1. In your Vercel dashboard:
+   - Go to Project Settings → Environment Variables
+   - Add `VITE_GOOGLE_MAPS_API_KEY` with your production API key
+
+2. Deploy normally - the build script will automatically inject the API key.
 
 ## How It Works
 
-- **Local**: You manually set the API key in index.html (not committed)
-- **Production**: The build script replaces the placeholder with the environment variable
-- **No complex configuration files needed!**
+- The `src/index.html` file contains a placeholder: `YOUR_DEVELOPMENT_API_KEY`
+- The `scripts/set-env.js` script replaces this placeholder with the actual API key
+- A pre-commit hook prevents accidentally committing API keys
+- The `.env` file is gitignored to keep your API key secure
 
-This approach:
-- ✅ Keeps API keys out of the repository
-- ✅ Works with Angular Google Maps v19
-- ✅ Simple to understand and maintain
-- ✅ No need to update scripts for new environment variables
+## Security
+
+- Never commit your actual API key to the repository
+- The pre-commit hook will block commits if an API key is detected
+- Always use the placeholder in committed files

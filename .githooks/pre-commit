@@ -1,0 +1,16 @@
+#!/bin/sh
+# Pre-commit hook to check for API keys in index.html
+
+if git diff --cached --name-only | grep -q "src/index.html"; then
+  if git diff --cached src/index.html | grep -q "AIza[0-9A-Za-z\-_]\+"; then
+    echo "ERROR: Google Maps API key detected in src/index.html!"
+    echo ""
+    echo "To fix this issue:"
+    echo "1. Run: npm run restore-placeholder"
+    echo "2. Stage the changes: git add src/index.html"
+    echo "3. Commit again"
+    echo ""
+    echo "This prevents accidentally committing API keys to the repository."
+    exit 1
+  fi
+fi

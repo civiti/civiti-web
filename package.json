@@ -4,6 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
+    "start:dev": "node scripts/set-env.js --dev && ng serve",
+    "restore-placeholder": "node scripts/set-env.js --restore",
     "build": "ng build && node scripts/set-env.js",
     "build:vercel": "ng build && node scripts/set-env.js",
     "watch": "ng build --watch --configuration development",
@@ -44,6 +46,7 @@
     "@types/google.maps": "^3.58.1",
     "@types/jasmine": "~5.1.4",
     "@types/node": "^22.10.2",
+    "dotenv": "^17.2.1",
     "jasmine-core": "~5.7.0",
     "karma": "~6.4.4",
     "karma-chrome-launcher": "~3.2.0",

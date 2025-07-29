@@ -111,8 +111,9 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         const issueId = this._route.snapshot.paramMap.get('id');
         if (issueId) {
             this._store.dispatch(IssueActions.loadIssue({ id: issueId }));
-            // Wait for Google Maps API to load
-            this.checkGoogleMapsLoaded().then(() => {
+            
+            // Initialize Google Maps with the new loader
+            this.initializeGoogleMaps().then(() => {
                 this.isMapLoaded = true;
                 
                 // Get issue data and geocode address
@@ -273,6 +274,21 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         this._router.navigate(['/issues']);
     }
 
+    private async initializeGoogleMaps(): Promise<void> {
+        if (!isPlatformBrowser(this._platformId)) {
+            return;
+        }
+
+        try {
+            // Wait for Google Maps to be fully loaded
+            await this.checkGoogleMapsLoaded();
+        } catch (error) {
+            console.error('Error initializing Google Maps:', error);
+            throw error;
+        }
+    }
+
+
     private checkGoogleMapsLoaded(): Promise<void> {
         return new Promise((resolve, reject) => {
             // Only check in browser
@@ -287,12 +303,25 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             const checkInterval = setInterval(() => {
                 attempts++;
                 
+                // Log the state of window.google for debugging
+                console.log(`Checking Google Maps (attempt ${attempts}/${maxAttempts}):`, {
+                    googleDefined: typeof google !== 'undefined',
+                    googleMaps: typeof google !== 'undefined' && !!google.maps,
+                    googleMapsMap: typeof google !== 'undefined' && !!google.maps?.Map
+                });
+                
                 // Check if Google Maps is loaded
                 if (typeof google !== 'undefined' && google.maps && google.maps.Map) {
                     clearInterval(checkInterval);
+                    console.log('Google Maps loaded successfully!');
                     resolve();
                 } else if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
+                    console.error('Google Maps failed to load. Final state:', {
+                        window: typeof window !== 'undefined',
+                        google: typeof google !== 'undefined' ? google : 'undefined',
+                        googleMaps: typeof google !== 'undefined' ? google.maps : 'undefined'
+                    });
                     reject(new Error('Google Maps API failed to load after 10 seconds'));
                 }
             }, 500);
