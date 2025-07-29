@@ -47,8 +47,8 @@ export class MockDataService {
       description: 'Trotuarul este grav deteriorat cu gropi mari care pun în pericol siguranța pietonilor.',
       location: {
         address: 'Strada Libertății nr. 45, Sector 5, București',
-        lat: 44.4268,
-        lng: 26.1025
+        lat: 44.4165,
+        lng: 26.0765
       },
       photos: [
         '/assets/mock-images/issue-001-main.jpg',
@@ -81,8 +81,8 @@ export class MockDataService {
       description: 'Parcul nu are iluminat funcțional, creând probleme de siguranță după lăsarea serii.',
       location: {
         address: 'Parcul Copiilor, Strada Primăverii, Sector 5',
-        lat: 44.4150,
-        lng: 26.0800
+        lat: 44.4128,
+        lng: 26.0742
       },
       photos: [
         '/assets/mock-images/issue-002-main.jpg'
@@ -114,8 +114,8 @@ export class MockDataService {
       description: 'Gunoiul s-a adunat timp de o săptămână și creează probleme de igienă și miros neplăcut.',
       location: {
         address: 'Strada Mărgeanului nr. 23-25, Sector 5, București',
-        lat: 44.4201,
-        lng: 26.0912
+        lat: 44.4098,
+        lng: 26.0823
       },
       photos: [
         '/assets/mock-images/issue-003-main.jpg',
@@ -149,8 +149,8 @@ export class MockDataService {
       description: 'Semaforul nu funcționează de 3 zile, creând probleme grave de trafic și siguranță.',
       location: {
         address: 'Intersecția Eroilor cu Păcii, Sector 5, București',
-        lat: 44.4186,
-        lng: 26.0865
+        lat: 44.4142,
+        lng: 26.0798
       },
       photos: [
         '/assets/mock-images/issue-004-main.jpg'

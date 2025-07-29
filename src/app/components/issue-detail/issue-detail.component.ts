@@ -1,6 +1,6 @@
-import { Component, inject, OnInit, OnDestroy, AfterViewInit } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, AfterViewInit, PLATFORM_ID, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
@@ -11,12 +11,14 @@ import { MatTabsModule } from '@angular/material/tabs';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { take } from 'rxjs/operators';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
 import * as IssueSelectors from '../../store/issues/issue.selectors';
 import { Issue, Authority } from '../../services/mock-data.service';
 import { EmailModalComponent } from './email-modal.component';
-import GLightbox from 'glightbox';
+import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
+import { GoogleMapsLoaderService } from '../../services/google-maps-loader.service';
 
 @Component({
     selector: 'app-issue-detail',
@@ -31,6 +33,9 @@ import GLightbox from 'glightbox';
         MatDialogModule,
         MatTabsModule,
         MatExpansionModule,
+        GoogleMap,
+        MapMarker,
+        MapInfoWindow,
     ],
     templateUrl: './issue-detail.component.html',
     styleUrl: './issue-detail.component.scss'
@@ -40,38 +45,101 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _router = inject(Router);
     private _store = inject(Store<AppState>);
     private _dialog = inject(MatDialog);
+    private _googleMapsLoader = inject(GoogleMapsLoaderService);
+    private _platformId = inject(PLATFORM_ID);
+    private _cdr = inject(ChangeDetectorRef);
     private _imageErrorCount: Map<string, number> = new Map();
     private _lightbox: any;
+    private _geocodedAddress: string | null = null;
+    
+    @ViewChild('infoWindow') infoWindow!: MapInfoWindow;
+    @ViewChild('markerElement') markerElement!: MapMarker;
 
     issue$: Observable<Issue | null | undefined>;
     isLoading$: Observable<boolean>;
     error$: Observable<string | null>;
+    
+    // Google Maps properties
+    mapOptions: any = {
+        zoom: 17, // Closer zoom for street-level view
+        mapTypeId: 'roadmap',
+        // mapId: 'DEMO_MAP_ID', // Temporarily disable mapId to test if marker appears
+        disableDefaultUI: false,
+        zoomControl: true,
+        scrollwheel: true,
+        mapTypeControl: true, // Allow switching between map/satellite
+        streetViewControl: true, // Enable street view
+        fullscreenControl: true
+    };
+    isMapLoaded = false;
+    mapLoadError = false;
+    mapCenter: any = { lat: 44.4268, lng: 26.1025 }; // Default Bucharest
+    markerPosition: any = { lat: 44.4268, lng: 26.1025 };
+    markerOptions: any = {
+        draggable: false
+    };
 
     constructor() {
         this.issue$ = this._store.select(IssueSelectors.selectSelectedIssue);
         this.isLoading$ = this._store.select(IssueSelectors.selectIssuesLoading);
         this.error$ = this._store.select(IssueSelectors.selectIssuesError);
 
-        // Reinitialize gallery when issue data changes
-        this.issue$.subscribe(issue => {
-            if (issue && this._lightbox) {
-                setTimeout(() => this.refreshGallery(), 100);
-            }
-        });
+        // Reinitialize gallery when issue data changes (only in browser)
+        if (isPlatformBrowser(this._platformId)) {
+            this.issue$.subscribe(issue => {
+                if (issue && this._lightbox) {
+                    setTimeout(() => this.refreshGallery(), 100);
+                }
+            });
+        }
     }
 
     ngOnInit(): void {
         const issueId = this._route.snapshot.paramMap.get('id');
         if (issueId) {
             this._store.dispatch(IssueActions.loadIssue({ id: issueId }));
+            // Set map as loaded immediately since Angular Google Maps handles loading
+            this.isMapLoaded = true;
+            
+            // Get issue data and geocode address
+            this.issue$.pipe(take(1)).subscribe(issue => {
+                if (issue) {
+                    // Update marker options with issue title
+                    this.markerOptions = {
+                        ...this.markerOptions,
+                        title: issue.title
+                    };
+                    // Delay geocoding to ensure map is ready
+                    setTimeout(() => {
+                        this.geocodeAddress(issue.location.address);
+                    }, 1000);
+                }
+            });
         } else {
             this.goBack();
         }
     }
 
     ngAfterViewInit(): void {
-        // Initialize GLightbox after view is ready
-        this.initializeGallery();
+        // Initialize GLightbox after view is ready (only in browser)
+        if (isPlatformBrowser(this._platformId)) {
+            this.initializeGallery();
+        }
+        
+        // Debug marker and info window elements
+        setTimeout(() => {
+            if (this.markerElement) {
+                console.log('Marker element available:', this.markerElement);
+            } else {
+                console.log('Marker element not available');
+            }
+            if (this.infoWindow) {
+                console.log('Info window available:', this.infoWindow);
+                console.log('Info window methods:', Object.getOwnPropertyNames(Object.getPrototypeOf(this.infoWindow)));
+            } else {
+                console.log('Info window not available');
+            }
+        }, 2000);
     }
 
     ngOnDestroy(): void {
@@ -81,23 +149,35 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         }
     }
 
-    private initializeGallery(): void {
-        // Initialize GLightbox for photo gallery
-        this._lightbox = GLightbox({
-            selector: '.photo-gallery-item',
-            touchNavigation: true,
-            loop: true,
-            autoplayVideos: false,
-            closeOnOutsideClick: true,
-            moreText: 'Vezi mai multe',
-            moreLength: 60,
-            slideEffect: 'slide',
-            skin: 'clean',
-            cssEffects: {
-                fade: { in: 'fadeIn', out: 'fadeOut' },
-                zoom: { in: 'zoomIn', out: 'zoomOut' }
-            }
-        });
+    private async initializeGallery(): Promise<void> {
+        // Only load GLightbox in the browser
+        if (!isPlatformBrowser(this._platformId)) {
+            return;
+        }
+
+        try {
+            // Dynamically import GLightbox to avoid SSR issues
+            const GLightbox = (await import('glightbox')).default;
+            
+            // Initialize GLightbox for photo gallery
+            this._lightbox = GLightbox({
+                selector: '.photo-gallery-item',
+                touchNavigation: true,
+                loop: true,
+                autoplayVideos: false,
+                closeOnOutsideClick: true,
+                moreText: 'Vezi mai multe',
+                moreLength: 60,
+                slideEffect: 'slide',
+                skin: 'clean',
+                cssEffects: {
+                    fade: { in: 'fadeIn', out: 'fadeOut' },
+                    zoom: { in: 'zoomIn', out: 'zoomOut' }
+                }
+            });
+        } catch (error) {
+            console.error('Error loading GLightbox:', error);
+        }
     }
 
     openEmailModal(authority: Authority, issue: Issue): void {
@@ -168,5 +248,56 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
     goBack(): void {
         this._router.navigate(['/issues']);
+    }
+
+    private geocodeAddress(address: string): void {
+        if (!isPlatformBrowser(this._platformId) || !address) {
+            return;
+        }
+
+        // Check if we've already geocoded this address
+        if (this._geocodedAddress === address) {
+            return;
+        }
+
+        const geocoder = new google.maps.Geocoder();
+        
+        geocoder.geocode({ address: address }, (results, status) => {
+            if (status === 'OK' && results && results[0]) {
+                const location = results[0].geometry.location;
+                this.mapCenter = {
+                    lat: location.lat(),
+                    lng: location.lng()
+                };
+                this.markerPosition = {
+                    lat: location.lat(),
+                    lng: location.lng()
+                };
+                // Mark this address as geocoded
+                this._geocodedAddress = address;
+                console.log(`Geocoded address "${address}" to:`, this.mapCenter);
+                console.log('Marker position updated to:', this.markerPosition);
+                
+                // Force change detection
+                this._cdr.detectChanges();
+                
+                // Info window will open on marker click instead of automatically
+            } else {
+                console.error('Geocode was not successful for the following reason:', status);
+                // Fall back to coordinates if available - use take(1) to prevent multiple subscriptions
+                this.issue$.pipe(take(1)).subscribe(issue => {
+                    if (issue && issue.location.lat && issue.location.lng) {
+                        this.mapCenter = { lat: issue.location.lat, lng: issue.location.lng };
+                        this.markerPosition = { lat: issue.location.lat, lng: issue.location.lng };
+                    }
+                });
+            }
+        });
+    }
+
+    openInfoWindow(): void {
+        if (this.infoWindow && this.markerElement) {
+            this.infoWindow.open(this.markerElement);
+        }
     }
 }
