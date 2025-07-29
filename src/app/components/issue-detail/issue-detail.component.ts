@@ -18,7 +18,6 @@ import * as IssueSelectors from '../../store/issues/issue.selectors';
 import { Issue, Authority } from '../../services/mock-data.service';
 import { EmailModalComponent } from './email-modal.component';
 import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
-import { GoogleMapsLoaderService } from '../../services/google-maps-loader.service';
 
 @Component({
     selector: 'app-issue-detail',
@@ -45,7 +44,6 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _router = inject(Router);
     private _store = inject(Store<AppState>);
     private _dialog = inject(MatDialog);
-    private _googleMapsLoader = inject(GoogleMapsLoaderService);
     private _platformId = inject(PLATFORM_ID);
     private _cdr = inject(ChangeDetectorRef);
     private _imageErrorCount: Map<string, number> = new Map();
