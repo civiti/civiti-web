@@ -119,7 +119,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 // Use filter to wait for non-null issue before taking the first value
                 this.issue$.pipe(
                     filter(issue => !!issue),
-                    take(1)
+                    take(1),
+                    takeUntil(this._destroy$)
                 ).subscribe(issue => {
                     // Update marker options with issue title
                     this.markerOptions = {
@@ -370,7 +371,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                     // Fall back to coordinates if available - use filter and take(1) to prevent multiple subscriptions
                     this.issue$.pipe(
                         filter(issue => !!issue),
-                        take(1)
+                        take(1),
+                        takeUntil(this._destroy$)
                     ).subscribe(issue => {
                         if (issue.location.lat && issue.location.lng) {
                             this.mapCenter = { lat: issue.location.lat, lng: issue.location.lng };
@@ -434,7 +436,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         // Try to use coordinates from the issue if available
         this.issue$.pipe(
             filter(issue => !!issue),
-            take(1)
+            take(1),
+            takeUntil(this._destroy$)
         ).subscribe(issue => {
             if (issue.location.lat && issue.location.lng) {
                 this.mapCenter = { lat: issue.location.lat, lng: issue.location.lng };
