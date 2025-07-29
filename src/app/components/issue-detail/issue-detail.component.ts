@@ -10,8 +10,8 @@ import { MatDialogModule, MatDialog } from '@angular/material/dialog';
 import { MatTabsModule } from '@angular/material/tabs';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { Store } from '@ngrx/store';
-import { Observable } from 'rxjs';
-import { take } from 'rxjs/operators';
+import { Observable, Subject, Subscription } from 'rxjs';
+import { take, filter, takeUntil } from 'rxjs/operators';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
 import * as IssueSelectors from '../../store/issues/issue.selectors';
@@ -49,6 +49,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _imageErrorCount: Map<string, number> = new Map();
     private _lightbox: any;
     private _geocodedAddress: string | null = null;
+    private _destroy$ = new Subject<void>();
+    private _dialogSubscription?: Subscription;
     
     @ViewChild('infoWindow') infoWindow!: MapInfoWindow;
     @ViewChild('markerElement') markerElement!: MapMarker;
@@ -84,7 +86,9 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
         // Reinitialize gallery when issue data changes (only in browser)
         if (isPlatformBrowser(this._platformId)) {
-            this.issue$.subscribe(issue => {
+            this.issue$.pipe(
+                takeUntil(this._destroy$)
+            ).subscribe(issue => {
                 if (issue && this._lightbox) {
                     setTimeout(() => this.refreshGallery(), 100);
                 }
@@ -101,16 +105,18 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 this.isMapLoaded = true;
                 
                 // Get issue data and geocode address
-                this.issue$.pipe(take(1)).subscribe(issue => {
-                    if (issue) {
-                        // Update marker options with issue title
-                        this.markerOptions = {
-                            ...this.markerOptions,
-                            title: issue.title
-                        };
-                        // Geocode the address
-                        this.geocodeAddress(issue.location.address);
-                    }
+                // Use filter to wait for non-null issue before taking the first value
+                this.issue$.pipe(
+                    filter(issue => !!issue),
+                    take(1)
+                ).subscribe(issue => {
+                    // Update marker options with issue title
+                    this.markerOptions = {
+                        ...this.markerOptions,
+                        title: issue.title
+                    };
+                    // Geocode the address
+                    this.geocodeAddress(issue.location.address);
                 });
             }).catch(error => {
                 console.error('Failed to load Google Maps:', error);
@@ -144,6 +150,15 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     ngOnDestroy(): void {
+        // Clean up subscriptions
+        this._destroy$.next();
+        this._destroy$.complete();
+        
+        // Clean up dialog subscription
+        if (this._dialogSubscription) {
+            this._dialogSubscription.unsubscribe();
+        }
+        
         // Clean up the lightbox instance
         if (this._lightbox) {
             this._lightbox.destroy();
@@ -191,7 +206,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         });
 
         // Refresh issue data after modal closes to update email count
-        dialogRef.afterClosed().subscribe(() => {
+        this._dialogSubscription = dialogRef.afterClosed().subscribe(() => {
             this._store.dispatch(IssueActions.loadIssue({ id: issue.id }));
         });
     }
@@ -295,44 +310,73 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             return;
         }
 
-        const geocoder = new google.maps.Geocoder();
-        
-        geocoder.geocode({ address: address }, (results, status) => {
-            if (status === 'OK' && results && results[0]) {
-                const location = results[0].geometry.location;
-                this.mapCenter = {
-                    lat: location.lat(),
-                    lng: location.lng()
-                };
-                this.markerPosition = {
-                    lat: location.lat(),
-                    lng: location.lng()
-                };
-                // Mark this address as geocoded
-                this._geocodedAddress = address;
-                console.log(`Geocoded address "${address}" to:`, this.mapCenter);
-                console.log('Marker position updated to:', this.markerPosition);
-                
-                // Force change detection
-                this._cdr.detectChanges();
-                
-                // Info window will open on marker click instead of automatically
-            } else {
-                console.error('Geocode was not successful for the following reason:', status);
-                // Fall back to coordinates if available - use take(1) to prevent multiple subscriptions
-                this.issue$.pipe(take(1)).subscribe(issue => {
-                    if (issue && issue.location.lat && issue.location.lng) {
-                        this.mapCenter = { lat: issue.location.lat, lng: issue.location.lng };
-                        this.markerPosition = { lat: issue.location.lat, lng: issue.location.lng };
-                    }
-                });
-            }
-        });
+        try {
+            const geocoder = new google.maps.Geocoder();
+            
+            geocoder.geocode({ address: address }, (results, status) => {
+                if (status === 'OK' && results && results[0]) {
+                    const location = results[0].geometry.location;
+                    this.mapCenter = {
+                        lat: location.lat(),
+                        lng: location.lng()
+                    };
+                    this.markerPosition = {
+                        lat: location.lat(),
+                        lng: location.lng()
+                    };
+                    // Mark this address as geocoded
+                    this._geocodedAddress = address;
+                    console.log(`Geocoded address "${address}" to:`, this.mapCenter);
+                    console.log('Marker position updated to:', this.markerPosition);
+                    
+                    // Force change detection
+                    this._cdr.detectChanges();
+                    
+                    // Info window will open on marker click instead of automatically
+                } else {
+                    const errorMessage = this.getGeocodeErrorMessage(status);
+                    console.error('Geocode was not successful:', errorMessage);
+                    
+                    // Fall back to coordinates if available - use filter and take(1) to prevent multiple subscriptions
+                    this.issue$.pipe(
+                        filter(issue => !!issue),
+                        take(1)
+                    ).subscribe(issue => {
+                        if (issue.location.lat && issue.location.lng) {
+                            this.mapCenter = { lat: issue.location.lat, lng: issue.location.lng };
+                            this.markerPosition = { lat: issue.location.lat, lng: issue.location.lng };
+                            this._cdr.detectChanges();
+                        }
+                    });
+                }
+            });
+        } catch (error) {
+            console.error('Error initializing geocoder:', error);
+            // Retry after a delay
+            setTimeout(() => this.geocodeAddress(address), 1000);
+        }
     }
 
     openInfoWindow(): void {
         if (this.infoWindow && this.markerElement) {
             this.infoWindow.open(this.markerElement);
+        }
+    }
+    
+    private getGeocodeErrorMessage(status: string): string {
+        switch (status) {
+            case 'ZERO_RESULTS':
+                return 'No results found for this address';
+            case 'OVER_QUERY_LIMIT':
+                return 'Geocoding quota exceeded';
+            case 'REQUEST_DENIED':
+                return 'Geocoding request denied - check API key configuration';
+            case 'INVALID_REQUEST':
+                return 'Invalid geocoding request';
+            case 'UNKNOWN_ERROR':
+                return 'Unknown server error occurred';
+            default:
+                return `Geocoding failed with status: ${status}`;
         }
     }
 }
