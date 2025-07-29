@@ -9,8 +9,25 @@ if (!googleMapsApiKey) {
   console.warn('Please set it in Vercel Dashboard for production deployment');
 }
 
-// Path to the environment file
+// Path to the environment files
 const envPath = path.join(__dirname, '../src/environments/environment.prod.ts');
+const envExamplePath = path.join(__dirname, '../src/environments/environment.prod.ts.example');
+
+// Create environment.prod.ts from example if it doesn't exist
+if (!fs.existsSync(envPath) && fs.existsSync(envExamplePath)) {
+  const exampleContent = fs.readFileSync(envExamplePath, 'utf8');
+  fs.writeFileSync(envPath, exampleContent, 'utf8');
+  console.log('Created environment.prod.ts from example file');
+}
+
+// Also ensure environment.ts exists for local development
+const envDevPath = path.join(__dirname, '../src/environments/environment.ts');
+const envDevExamplePath = path.join(__dirname, '../src/environments/environment.ts.example');
+if (!fs.existsSync(envDevPath) && fs.existsSync(envDevExamplePath)) {
+  const exampleContent = fs.readFileSync(envDevExamplePath, 'utf8');
+  fs.writeFileSync(envDevPath, exampleContent, 'utf8');
+  console.log('Created environment.ts from example file');
+}
 
 // Read the file
 let envContent = fs.readFileSync(envPath, 'utf8');
