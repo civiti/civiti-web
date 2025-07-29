@@ -1,4 +1,4 @@
-import { Component, inject, Inject, OnInit } from '@angular/core';
+import { Component, inject, Inject, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatDialogModule, MatDialog, MAT_DIALOG_DATA } from '@angular/material/dialog';
@@ -13,6 +13,8 @@ import * as IssueActions from '../../store/issues/issue.actions';
 import { MockDataService, Issue, Authority, EmailTemplate } from '../../services/mock-data.service';
 import { CustomValidators } from '../../validators/custom-validators';
 import { SanitizationService } from '../../services/sanitization.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 export interface EmailModalData {
     issue: Issue;
@@ -34,13 +36,14 @@ export interface EmailModalData {
     templateUrl: './email-modal.component.html',
     styleUrl: './email-modal.component.scss'
 })
-export class EmailModalComponent implements OnInit {
+export class EmailModalComponent implements OnInit, OnDestroy {
     private _fb = inject(FormBuilder);
     private _store = inject(Store<AppState>);
     private _mockDataService = inject(MockDataService);
     private _snackBar = inject(MatSnackBar);
     private _dialog = inject(MatDialog);
     private _sanitizer = inject(SanitizationService);
+    private _destroy$ = new Subject<void>();
 
     issue: Issue;
     authority: Authority;
@@ -78,9 +81,16 @@ export class EmailModalComponent implements OnInit {
         this.generateEmailTemplate();
         
         // Listen for form changes to regenerate email template
-        this.emailForm.valueChanges.subscribe(() => {
+        this.emailForm.valueChanges.pipe(
+            takeUntil(this._destroy$)
+        ).subscribe(() => {
             this.onFormChange();
         });
+    }
+    
+    ngOnDestroy(): void {
+        this._destroy$.next();
+        this._destroy$.complete();
     }
 
     onFormChange(): void {

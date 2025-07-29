@@ -4,7 +4,8 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "ng build",
+    "build": "ng build && node scripts/set-env.js",
+    "build:vercel": "ng build && node scripts/set-env.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:Civica": "node dist/Civica/server/server.mjs"
@@ -16,7 +17,7 @@
     "@angular/compiler": "^19.2.14",
     "@angular/core": "^19.2.14",
     "@angular/forms": "^19.2.14",
-    "@angular/google-maps": "^19.2.14",
+    "@angular/google-maps": "^19.2.19",
     "@angular/material": "^19.2.8",
     "@angular/platform-browser": "^19.2.14",
     "@angular/platform-server": "^19.2.14",
@@ -40,6 +41,7 @@
     "@angular/cli": "^19.2.14",
     "@angular/compiler-cli": "^19.2.14",
     "@types/express": "^5.0.1",
+    "@types/google.maps": "^3.58.1",
     "@types/jasmine": "~5.1.4",
     "@types/node": "^22.10.2",
     "jasmine-core": "~5.7.0",
