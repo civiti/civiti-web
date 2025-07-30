@@ -7,14 +7,18 @@ const googleMapsApiKey = process.env.VITE_GOOGLE_MAPS_API_KEY || '';
 console.log('Post-build HTML API key injection...');
 console.log('Current working directory:', process.cwd());
 console.log('Script directory:', __dirname);
+console.log('Is Vercel environment:', process.env.VERCEL ? 'YES' : 'NO');
+console.log('Vercel URL:', process.env.VERCEL_URL || 'not set');
 
 if (!googleMapsApiKey) {
   console.error('ERROR: VITE_GOOGLE_MAPS_API_KEY is not set!');
   console.error('Environment variables available:', Object.keys(process.env).filter(k => k.includes('GOOGLE') || k.includes('VITE')));
+  console.error('All env vars starting with V:', Object.keys(process.env).filter(k => k.startsWith('V')).sort());
   process.exit(1);
 }
 
 console.log('API key found (length):', googleMapsApiKey.length);
+console.log('First 10 chars:', googleMapsApiKey.substring(0, 10) + '...');
 
 // Simple recursive search for HTML files
 function findAndReplace(dir) {
@@ -68,6 +72,9 @@ const possibleDistDirs = [
   path.join(process.cwd(), 'dist'),
   path.join(process.cwd(), 'dist/Civica'),
   path.join(process.cwd(), 'dist/Civica/browser'),
+  '/vercel/path0/dist',
+  '/vercel/path0/dist/Civica',
+  '/vercel/path0/dist/Civica/browser',
   path.join(process.cwd(), '.vercel/output/static'),
   path.join(process.cwd(), '.vercel/output')
 ];

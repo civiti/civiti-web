@@ -4,12 +4,17 @@ const path = require('path');
 // Get the API key from environment
 const googleMapsApiKey = process.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
+console.log('Pre-build API key injection...');
+console.log('Is Vercel environment:', process.env.VERCEL ? 'YES' : 'NO');
+
 if (!googleMapsApiKey) {
   console.error('ERROR: VITE_GOOGLE_MAPS_API_KEY is not set!');
+  console.error('Environment variables available:', Object.keys(process.env).filter(k => k.includes('GOOGLE') || k.includes('VITE')));
+  console.error('All env vars starting with V:', Object.keys(process.env).filter(k => k.startsWith('V')).sort());
   process.exit(1);
 }
 
-console.log('Pre-build API key injection...');
+console.log('API key found (length):', googleMapsApiKey.length);
 
 // Update the TypeScript config file BEFORE build
 const configDir = path.join(__dirname, '../src/environments');
