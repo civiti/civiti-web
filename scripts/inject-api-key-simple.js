@@ -34,5 +34,39 @@ export const googleMapsConfig = {
 fs.writeFileSync(configPath, configContent, 'utf8');
 console.log('✓ Updated config file');
 
-// We'll need a separate post-build script for HTML files
-console.log('TypeScript config ready for build!');
+// ALSO update the source index.html BEFORE build
+// NOTE: This will be restored by the postbuild script to prevent accidental commits
+const srcIndexPath = path.join(__dirname, '../src/index.html');
+if (fs.existsSync(srcIndexPath)) {
+  console.log('Updating src/index.html (will be restored after build)...');
+  let htmlContent = fs.readFileSync(srcIndexPath, 'utf8');
+  let modified = false;
+  
+  // Replace all occurrences of the placeholder
+  if (htmlContent.includes('YOUR_DEVELOPMENT_API_KEY')) {
+    htmlContent = htmlContent.replace(/YOUR_DEVELOPMENT_API_KEY/g, googleMapsApiKey);
+    modified = true;
+    console.log('✓ Replaced API key placeholder(s) in index.html');
+  }
+  
+  // Also check and replace in the inline loader format
+  if (htmlContent.includes('key: "') && htmlContent.includes('v: "weekly"')) {
+    const keyMatch = htmlContent.match(/key: "([^"]*)"/);
+    if (keyMatch && keyMatch[1] !== googleMapsApiKey) {
+      htmlContent = htmlContent.replace(
+        /key: "[^"]*"/,
+        `key: "${googleMapsApiKey}"`
+      );
+      modified = true;
+      console.log('✓ Replaced API key in inline loader');
+    }
+  }
+  
+  if (modified) {
+    fs.writeFileSync(srcIndexPath, htmlContent, 'utf8');
+  }
+} else {
+  console.warn('Warning: src/index.html not found');
+}
+
+console.log('Pre-build injection complete!');

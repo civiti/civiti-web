@@ -26,14 +26,28 @@ function findAndReplace(dir) {
   
   const items = fs.readdirSync(dir);
   
+  // Log directory contents for debugging
+  if (dir.includes('dist') && !dir.includes('node_modules')) {
+    const htmlFiles = items.filter(item => item.endsWith('.html'));
+    console.log(`\nChecking ${dir}:`);
+    if (htmlFiles.length > 0) {
+      console.log(`  Found HTML files:`, htmlFiles);
+    } else {
+      console.log(`  No HTML files found`);
+      if (items.length <= 20) {
+        console.log(`  All files:`, items);
+      }
+    }
+  }
+  
   items.forEach(item => {
     const fullPath = path.join(dir, item);
     const stat = fs.statSync(fullPath);
     
     if (stat.isDirectory()) {
       findAndReplace(fullPath);
-    } else if (item === 'index.html') {
-      console.log(`Found: ${fullPath}`);
+    } else if (item === 'index.html' || item.endsWith('.html')) {
+      console.log(`Found HTML file: ${fullPath}`);
       let content = fs.readFileSync(fullPath, 'utf8');
       
       let modified = false;
@@ -72,9 +86,13 @@ const possibleDistDirs = [
   path.join(process.cwd(), 'dist'),
   path.join(process.cwd(), 'dist/Civica'),
   path.join(process.cwd(), 'dist/Civica/browser'),
+  path.join(process.cwd(), 'dist/Civica/server'),
   '/vercel/path0/dist',
   '/vercel/path0/dist/Civica',
   '/vercel/path0/dist/Civica/browser',
+  '/vercel/path0/dist/Civica/server',
+  '/vercel/output',
+  '/vercel/output/static',
   path.join(process.cwd(), '.vercel/output/static'),
   path.join(process.cwd(), '.vercel/output')
 ];
@@ -104,4 +122,46 @@ if (!foundAny) {
   console.error('Searched in:', possibleDistDirs);
 }
 
-console.log('HTML injection complete!');
+// ALWAYS restore the placeholder in src/index.html to avoid committing the API key
+const srcIndexPath = path.join(__dirname, '../src/index.html');
+if (fs.existsSync(srcIndexPath)) {
+  console.log('\nRestoring placeholder in src/index.html...');
+  let srcContent = fs.readFileSync(srcIndexPath, 'utf8');
+  let restored = false;
+  
+  // Replace the API key back with placeholder
+  if (googleMapsApiKey && srcContent.includes(googleMapsApiKey)) {
+    srcContent = srcContent.replace(new RegExp(googleMapsApiKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g'), 'YOUR_DEVELOPMENT_API_KEY');
+    restored = true;
+  }
+  
+  // Also ensure the inline loader format is restored
+  if (srcContent.includes('key: "') && srcContent.includes('v: "weekly"')) {
+    const keyMatch = srcContent.match(/key: "([^"]*)"/);
+    if (keyMatch && keyMatch[1] !== 'YOUR_DEVELOPMENT_API_KEY') {
+      srcContent = srcContent.replace(
+        /key: "[^"]*"/,
+        'key: "YOUR_DEVELOPMENT_API_KEY"'
+      );
+      restored = true;
+    }
+  }
+  
+  if (restored) {
+    fs.writeFileSync(srcIndexPath, srcContent, 'utf8');
+    console.log('✓ Placeholder restored in src/index.html');
+  }
+}
+
+// Also restore the TypeScript config to placeholder
+const configPath = path.join(__dirname, '../src/environments/google-maps-config.ts');
+if (fs.existsSync(configPath)) {
+  const placeholderConfig = `// This file will be replaced during build
+export const googleMapsConfig = {
+  apiKey: "YOUR_DEVELOPMENT_API_KEY"
+};`;
+  fs.writeFileSync(configPath, placeholderConfig, 'utf8');
+  console.log('✓ Placeholder restored in google-maps-config.ts');
+}
+
+console.log('\nHTML injection complete!');
