@@ -66,7 +66,7 @@ if (isDevelopment) {
   
   const configContent = `// This file is auto-generated - DO NOT COMMIT
 export const googleMapsConfig = {
-  apiKey: '${googleMapsApiKey}'
+  apiKey: ${JSON.stringify(googleMapsApiKey)}
 };`;
   fs.writeFileSync(configPath, configContent, 'utf8');
   console.log('✓ Updated google-maps-config.ts for development');
@@ -118,7 +118,7 @@ export const googleMapsConfig = {
   
   const configContent = `// This file will be replaced during build
 export const googleMapsConfig = {
-  apiKey: 'YOUR_DEVELOPMENT_API_KEY'
+  apiKey: ${JSON.stringify('YOUR_DEVELOPMENT_API_KEY')}
 };`;
   fs.writeFileSync(configPath, configContent, 'utf8');
   console.log('✓ Placeholder restored in google-maps-config.ts');

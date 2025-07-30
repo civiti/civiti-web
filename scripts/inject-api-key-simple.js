@@ -24,7 +24,7 @@ if (!fs.existsSync(configDir)) {
 console.log('Updating google-maps-config.ts...');
 const configContent = `// This file is auto-generated during build
 export const googleMapsConfig = {
-  apiKey: '${googleMapsApiKey}'
+  apiKey: ${JSON.stringify(googleMapsApiKey)}
 };`;
 fs.writeFileSync(configPath, configContent, 'utf8');
 console.log('✓ Updated config file');
