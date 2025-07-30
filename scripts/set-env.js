@@ -86,29 +86,56 @@ if (isDevelopment) {
   fs.writeFileSync(srcIndexPath, restoredContent, 'utf8');
   console.log('Placeholder restored in src/index.html');
 } else {
-  // For production builds, we need to modify the file after Angular copies it
-  const distPaths = [
-    path.join(__dirname, '../dist/Civica/browser/index.html'),
-    path.join(__dirname, '../dist/Civica/index.html'),
-    path.join(__dirname, '../dist/index.html')
-  ];
-
-  // Try to find and update the dist index.html
-  let found = false;
-  for (const distPath of distPaths) {
-    if (fs.existsSync(distPath)) {
-      let distContent = fs.readFileSync(distPath, 'utf8');
-      distContent = distContent.replace(
-        'YOUR_DEVELOPMENT_API_KEY',
-        googleMapsApiKey
-      );
-      fs.writeFileSync(distPath, distContent, 'utf8');
-      console.log(`Google Maps API key injected into ${distPath}`);
-      found = true;
+  // For production builds, find and replace in all index.html files
+  console.log('Production build mode - searching for index.html files...');
+  
+  // Recursive function to find all index.html files
+  function findIndexFiles(dir) {
+    let results = [];
+    
+    if (!fs.existsSync(dir)) {
+      return results;
     }
+    
+    const files = fs.readdirSync(dir);
+    
+    for (const file of files) {
+      const filePath = path.join(dir, file);
+      const stat = fs.statSync(filePath);
+      
+      if (stat.isDirectory()) {
+        // Recursively search subdirectories
+        results = results.concat(findIndexFiles(filePath));
+      } else if (file === 'index.html') {
+        // Only match files named exactly 'index.html'
+        results.push(filePath);
+      }
+    }
+    
+    return results;
   }
-
-  if (!found) {
-    console.log('Note: API key will be injected after the build completes');
+  
+  const distDir = path.join(__dirname, '../dist');
+  const indexFiles = findIndexFiles(distDir);
+  
+  if (indexFiles.length === 0) {
+    console.warn('No index.html files found in dist directory');
+    console.warn('This might be normal if running before the build completes');
+    return;
   }
+  
+  console.log(`Found ${indexFiles.length} index.html file(s)`);
+  
+  indexFiles.forEach(filePath => {
+    console.log(`Processing: ${filePath}`);
+    let content = fs.readFileSync(filePath, 'utf8');
+    
+    if (content.includes('YOUR_DEVELOPMENT_API_KEY')) {
+      content = content.replace(/YOUR_DEVELOPMENT_API_KEY/g, googleMapsApiKey);
+      fs.writeFileSync(filePath, content, 'utf8');
+      console.log(`✓ API key injected`);
+    } else {
+      console.log(`  - Skipped (no placeholder found)`);
+    }
+  });
 }

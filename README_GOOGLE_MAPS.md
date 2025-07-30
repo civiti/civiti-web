@@ -27,7 +27,7 @@ This project uses Google Maps to display issue locations on a map.
    - Go to Project Settings → Environment Variables
    - Add `VITE_GOOGLE_MAPS_API_KEY` with your production API key
 
-2. Deploy normally - the build script will automatically inject the API key.
+2. Deploy normally - the build script will automatically inject the API key during the build process.
 
 ## How It Works
 
