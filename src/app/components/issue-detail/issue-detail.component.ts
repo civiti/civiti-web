@@ -295,10 +295,23 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             let attempts = 0;
             const maxAttempts = 20;
 
-            const check = () => {
-                if (typeof google !== 'undefined' && google.maps) {
-                    console.log('Google Maps is ready');
-                    resolve();
+            const check = async () => {
+                if (typeof google !== 'undefined' && google.maps && google.maps.importLibrary) {
+                    console.log('Google Maps is ready, loading required libraries...');
+                    
+                    try {
+                        // Load the required libraries using importLibrary
+                        await Promise.all([
+                            google.maps.importLibrary('maps'),
+                            google.maps.importLibrary('geocoding'),
+                            google.maps.importLibrary('places')
+                        ]);
+                        console.log('All Google Maps libraries loaded successfully');
+                        resolve();
+                    } catch (error) {
+                        console.error('Failed to load Google Maps libraries:', error);
+                        reject(new Error('Failed to load Google Maps libraries'));
+                    }
                 } else if (attempts >= maxAttempts) {
                     reject(new Error('Google Maps failed to load'));
                 } else {

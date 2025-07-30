@@ -73,25 +73,34 @@ export const googleMapsConfig = {
   
   // Also update HTML as before
   let srcContent = fs.readFileSync(srcIndexPath, 'utf8');
+  let modified = false;
   
+  // Replace all occurrences of the placeholder
   if (srcContent.includes('YOUR_DEVELOPMENT_API_KEY')) {
-    const updatedContent = srcContent.replace(
+    srcContent = srcContent.replace(
       /YOUR_DEVELOPMENT_API_KEY/g,
       googleMapsApiKey
     );
-    
-    fs.writeFileSync(srcIndexPath, updatedContent, 'utf8');
-    console.log('✓ Updated src/index.html for development');
-    console.log('IMPORTANT: Remember to run "npm run restore-placeholder" before committing!');
-  } else if (srcContent.includes('key: "') && srcContent.includes('v: "weekly"')) {
-    // Handle the inline loader format
-    const updatedContent = srcContent.replace(
-      /key: "[^"]*"/,
-      `key: "${googleMapsApiKey}"`
-    );
-    
-    fs.writeFileSync(srcIndexPath, updatedContent, 'utf8');
-    console.log('✓ Updated Google Maps API key in src/index.html for development');
+    modified = true;
+    console.log('✓ Replaced API key placeholder(s) in src/index.html');
+  }
+  
+  // Also check and replace in the inline loader format
+  if (srcContent.includes('key: "') && srcContent.includes('v: "weekly"')) {
+    // Only replace if it still has placeholder or needs updating
+    const keyMatch = srcContent.match(/key: "([^"]*)"/);
+    if (keyMatch && keyMatch[1] !== googleMapsApiKey) {
+      srcContent = srcContent.replace(
+        /key: "[^"]*"/,
+        `key: "${googleMapsApiKey}"`
+      );
+      modified = true;
+      console.log('✓ Replaced API key in inline loader');
+    }
+  }
+  
+  if (modified) {
+    fs.writeFileSync(srcIndexPath, srcContent, 'utf8');
     console.log('IMPORTANT: Remember to run "npm run restore-placeholder" before committing!');
   }
 } else if (process.argv.includes('--restore')) {
@@ -207,13 +216,33 @@ export const googleMapsConfig = {
   indexFiles.forEach(filePath => {
     console.log(`Processing: ${filePath}`);
     let content = fs.readFileSync(filePath, 'utf8');
+    let modified = false;
     
+    // Replace all occurrences of the placeholder
     if (content.includes('YOUR_DEVELOPMENT_API_KEY')) {
       content = content.replace(/YOUR_DEVELOPMENT_API_KEY/g, googleMapsApiKey);
+      modified = true;
+      console.log(`  ✓ Replaced API key placeholder(s)`);
+    }
+    
+    // Also check and replace in the inline loader format
+    if (content.includes('key: "') && content.includes('v: "weekly"')) {
+      // Only replace if it still has placeholder or needs updating
+      const keyMatch = content.match(/key: "([^"]*)"/);
+      if (keyMatch && keyMatch[1] !== googleMapsApiKey) {
+        content = content.replace(
+          /key: "[^"]*"/,
+          `key: "${googleMapsApiKey}"`
+        );
+        modified = true;
+        console.log(`  ✓ Replaced API key in inline loader`);
+      }
+    }
+    
+    if (modified) {
       fs.writeFileSync(filePath, content, 'utf8');
-      console.log(`✓ API key injected`);
     } else {
-      console.log(`  - Skipped (no placeholder found)`);
+      console.log(`  - Skipped (no changes needed)`);
     }
   });
 }
