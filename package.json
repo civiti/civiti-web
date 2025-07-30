@@ -6,7 +6,7 @@
     "start": "ng serve",
     "start:dev": "node scripts/set-env.js --dev && ng serve",
     "restore-placeholder": "node scripts/set-env.js --restore",
-    "build": "ng build",
+    "build": "ng build && node scripts/set-env.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:Civica": "node dist/Civica/server/server.mjs"

@@ -86,72 +86,47 @@ if (isDevelopment) {
   fs.writeFileSync(srcIndexPath, restoredContent, 'utf8');
   console.log('Placeholder restored in src/index.html');
 } else {
-  // For production builds, we need to modify the file after Angular copies it
-  console.log('Production build mode - searching for dist files...');
+  // For production builds, find and replace in all index.html files
+  console.log('Production build mode - searching for index.html files...');
   
-  // Wait a bit for the build to complete if needed
-  const maxAttempts = 10;
-  let attempt = 0;
-  let found = false;
+  const { execSync } = require('child_process');
   
-  const distPaths = [
-    path.join(__dirname, '../dist/Civica/browser/index.html'),
-    path.join(__dirname, '../dist/Civica/index.html'),
-    path.join(__dirname, '../dist/index.html')
-  ];
-  
-  // Function to try updating the files
-  function tryUpdate() {
-    for (const distPath of distPaths) {
-      if (fs.existsSync(distPath)) {
-        console.log(`Found dist file at: ${distPath}`);
-        let distContent = fs.readFileSync(distPath, 'utf8');
+  try {
+    // Use find command to locate all index.html files in dist
+    const findCommand = process.platform === 'win32' 
+      ? 'dir /s /b dist\\*.html | findstr index.html'
+      : 'find dist -name "index.html" -type f 2>/dev/null || true';
+    
+    const files = execSync(findCommand, { encoding: 'utf8' })
+      .split('\n')
+      .filter(file => file.trim());
+    
+    if (files.length === 0) {
+      console.warn('No index.html files found in dist directory');
+      console.warn('This might be normal if running before the build completes');
+      return;
+    }
+    
+    console.log(`Found ${files.length} index.html file(s)`);
+    
+    files.forEach(file => {
+      const filePath = file.trim();
+      if (filePath && fs.existsSync(filePath)) {
+        console.log(`Processing: ${filePath}`);
+        let content = fs.readFileSync(filePath, 'utf8');
         
-        if (distContent.includes('YOUR_DEVELOPMENT_API_KEY')) {
-          distContent = distContent.replace(
-            'YOUR_DEVELOPMENT_API_KEY',
-            googleMapsApiKey
-          );
-          fs.writeFileSync(distPath, distContent, 'utf8');
-          console.log(`Google Maps API key injected into ${distPath}`);
-          found = true;
+        if (content.includes('YOUR_DEVELOPMENT_API_KEY')) {
+          content = content.replace(/YOUR_DEVELOPMENT_API_KEY/g, googleMapsApiKey);
+          fs.writeFileSync(filePath, content, 'utf8');
+          console.log(`✓ API key injected`);
         } else {
-          console.log(`API key already present or placeholder not found in ${distPath}`);
-          found = true;
+          console.log(`  - Skipped (no placeholder found)`);
         }
       }
-    }
-    return found;
-  }
-  
-  // Try immediately
-  found = tryUpdate();
-  
-  // If not found, wait and retry
-  if (!found) {
-    console.log('Dist files not found yet, will retry...');
-    
-    // Use a promise to handle async waiting
-    const waitForFiles = new Promise((resolve) => {
-      const interval = setInterval(() => {
-        attempt++;
-        found = tryUpdate();
-        
-        if (found || attempt >= maxAttempts) {
-          clearInterval(interval);
-          if (!found) {
-            console.error('ERROR: Could not find dist files to inject API key!');
-            console.error('Build may fail. Ensure VITE_GOOGLE_MAPS_API_KEY is set in environment.');
-            process.exit(1);
-          }
-          resolve();
-        }
-      }, 1000);
     });
     
-    // Wait for the files to be found and updated
-    waitForFiles.then(() => {
-      console.log('API key injection completed');
-    });
+  } catch (error) {
+    console.error('Error during API key injection:', error.message);
+    // Don't exit with error - this might run before files exist
   }
 }

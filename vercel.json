@@ -1,5 +1,5 @@
 {
-  "buildCommand": "npm run build && find dist -name 'index.html' -exec sed -i \"s/YOUR_DEVELOPMENT_API_KEY/$VITE_GOOGLE_MAPS_API_KEY/g\" {} +",
+  "buildCommand": "npm run build",
   "outputDirectory": "dist/Civica/browser",
   "framework": "angular"
 }
