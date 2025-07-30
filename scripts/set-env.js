@@ -51,40 +51,77 @@ if (!googleMapsApiKey) {
 const isDevelopment = process.argv.includes('--dev');
 
 if (isDevelopment) {
-  // For development, modify the file and keep it modified
-  console.log('Development mode detected - updating src/index.html');
+  // For development, update both HTML and TypeScript config
+  console.log('Development mode detected');
   
-  // Read the current content
+  // Update TypeScript config file
+  const configDir = path.join(__dirname, '../src/environments');
+  const configPath = path.join(configDir, 'google-maps-config.ts');
+  
+  // Ensure directory exists
+  if (!fs.existsSync(configDir)) {
+    fs.mkdirSync(configDir, { recursive: true });
+    console.log('Created environments directory');
+  }
+  
+  const configContent = `// This file is auto-generated - DO NOT COMMIT
+export const googleMapsConfig = {
+  apiKey: ${JSON.stringify(googleMapsApiKey)}
+};`;
+  fs.writeFileSync(configPath, configContent, 'utf8');
+  console.log('✓ Updated google-maps-config.ts for development');
+  
+  // Also update HTML as before
   let srcContent = fs.readFileSync(srcIndexPath, 'utf8');
   
-  // Only replace if placeholder exists
   if (srcContent.includes('YOUR_DEVELOPMENT_API_KEY')) {
-    // Replace the placeholder with the actual API key
     const updatedContent = srcContent.replace(
-      'YOUR_DEVELOPMENT_API_KEY',
+      /YOUR_DEVELOPMENT_API_KEY/g,
       googleMapsApiKey
     );
     
-    // Write it back
     fs.writeFileSync(srcIndexPath, updatedContent, 'utf8');
-    console.log('API key injected into src/index.html for development');
+    console.log('✓ Updated src/index.html for development');
     console.log('IMPORTANT: Remember to run "npm run restore-placeholder" before committing!');
-  } else {
-    console.log('API key already present in src/index.html');
   }
 } else if (process.argv.includes('--restore')) {
-  // Special mode to restore the placeholder
-  console.log('Restoring placeholder in src/index.html...');
+  // Special mode to restore the placeholders
+  console.log('Restoring placeholders...');
+  
+  // Restore HTML
   let srcContent = fs.readFileSync(srcIndexPath, 'utf8');
   
-  // Simple replacement - find any key= value and replace with placeholder
-  const restoredContent = srcContent.replace(
+  // Replace both in script tag and meta tag
+  let restoredContent = srcContent.replace(
     /key=([^&"]+)/,
     'key=YOUR_DEVELOPMENT_API_KEY'
   );
   
+  // Also restore in meta tag
+  restoredContent = restoredContent.replace(
+    /(<meta name="google-maps-api-key" content=")([^"]+)(")/,
+    '$1YOUR_DEVELOPMENT_API_KEY$3'
+  );
+  
   fs.writeFileSync(srcIndexPath, restoredContent, 'utf8');
-  console.log('Placeholder restored in src/index.html');
+  console.log('✓ Placeholder restored in src/index.html');
+  
+  // Restore TypeScript config
+  const configDir = path.join(__dirname, '../src/environments');
+  const configPath = path.join(configDir, 'google-maps-config.ts');
+  
+  // Ensure directory exists
+  if (!fs.existsSync(configDir)) {
+    fs.mkdirSync(configDir, { recursive: true });
+    console.log('Created environments directory');
+  }
+  
+  const configContent = `// This file will be replaced during build
+export const googleMapsConfig = {
+  apiKey: ${JSON.stringify('YOUR_DEVELOPMENT_API_KEY')}
+};`;
+  fs.writeFileSync(configPath, configContent, 'utf8');
+  console.log('✓ Placeholder restored in google-maps-config.ts');
 } else {
   // For production builds, find and replace in all index.html files
   console.log('Production build mode - searching for index.html files...');
@@ -129,7 +166,19 @@ if (isDevelopment) {
   for (const distDir of possibleDistDirs) {
     if (fs.existsSync(distDir)) {
       console.log(`Checking directory: ${distDir}`);
+      
+      // Debug: Show what's in the directory
+      try {
+        const items = fs.readdirSync(distDir);
+        console.log(`  Contents: ${items.join(', ')}`);
+      } catch (e) {
+        console.log(`  Could not read directory: ${e.message}`);
+      }
+      
       const found = findIndexFiles(distDir);
+      if (found.length > 0) {
+        console.log(`  Found ${found.length} index.html file(s)`);
+      }
       indexFiles = indexFiles.concat(found);
     }
   }

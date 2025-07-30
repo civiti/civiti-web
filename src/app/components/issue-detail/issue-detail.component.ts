@@ -18,6 +18,7 @@ import * as IssueSelectors from '../../store/issues/issue.selectors';
 import { Issue, Authority } from '../../services/mock-data.service';
 import { EmailModalComponent } from './email-modal.component';
 import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
+import { GoogleMapsConfigService } from '../../services/google-maps-config.service';
 
 @Component({
     selector: 'app-issue-detail',
@@ -54,6 +55,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private readonly _maxGeocodeRetries = 10;
     private _geocodeTimeoutId?: number;
     private _galleryTimeoutId?: number;
+    private readonly _googleMapsConfig = inject(GoogleMapsConfigService);
     
     @ViewChild('infoWindow') infoWindow!: MapInfoWindow;
     @ViewChild('markerElement') markerElement!: MapMarker;
@@ -280,8 +282,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         }
 
         try {
-            // Wait for Google Maps to be fully loaded
-            await this.checkGoogleMapsLoaded();
+            // Load Google Maps script dynamically
+            await this._googleMapsConfig.loadGoogleMapsScript();
         } catch (error) {
             console.error('Error initializing Google Maps:', error);
             throw error;

@@ -45,3 +45,6 @@ Thumbs.db
 .env
 .env.local
 .env.production
+
+# Google Maps config (contains API key)
+src/environments/google-maps-config.ts

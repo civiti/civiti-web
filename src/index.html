@@ -18,25 +18,8 @@
       rel="stylesheet"
       href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
     />
-    <!-- Define callbacks before loading Google Maps -->
-    <script>
-      // Initialize callback
-      window.initMap = function() {
-        console.log('Google Maps initialized via callback');
-        if (window.google && window.google.maps) {
-          console.log('Google Maps API loaded successfully');
-        }
-      };
-      
-      // Add error handling
-      window.gm_authFailure = function() {
-        console.error('Google Maps authentication failed. Please check your API key and restrictions.');
-      };
-    </script>
-    <!-- Load Google Maps after callbacks are defined -->
-    <script async defer
-      src="https://maps.googleapis.com/maps/api/js?key=YOUR_DEVELOPMENT_API_KEY&libraries=places,geocoding&callback=initMap&loading=async">
-    </script>
+    <!-- Google Maps API Key -->
+    <meta name="google-maps-api-key" content="YOUR_DEVELOPMENT_API_KEY" />
   </head>
   <body>
     <app-root></app-root>
