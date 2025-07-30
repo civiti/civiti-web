@@ -77,9 +77,9 @@ if (isDevelopment) {
   console.log('Restoring placeholder in src/index.html...');
   let srcContent = fs.readFileSync(srcIndexPath, 'utf8');
   
-  // Use a more flexible regex to find any API key
+  // Simple replacement - find any key= value and replace with placeholder
   const restoredContent = srcContent.replace(
-    /key=AIza[0-9A-Za-z\-_]+/g,
+    /key=([^&"]+)/,
     'key=YOUR_DEVELOPMENT_API_KEY'
   );
   

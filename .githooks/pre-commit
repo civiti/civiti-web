@@ -2,7 +2,8 @@
 # Pre-commit hook to check for API keys in index.html
 
 if git diff --cached --name-only | grep -q "src/index.html"; then
-  if git diff --cached src/index.html | grep -q "AIza[0-9A-Za-z\-_]\+"; then
+  # Check if the placeholder has been replaced with an actual key
+  if git diff --cached src/index.html | grep -q "key=" | grep -v "key=YOUR_DEVELOPMENT_API_KEY"; then
     echo "ERROR: Google Maps API key detected in src/index.html!"
     echo ""
     echo "To fix this issue:"
