@@ -1,6 +1,8 @@
 // Civica Theme Implementation
 // Based on Implementation.md and Colour-Scheme.md specifications
 
+@import 'tailwindcss';
+
 // Import GLightbox styles
 @import 'glightbox/dist/css/glightbox.min.css';
 
@@ -258,21 +260,23 @@ body {
     font-family: var(--font-primary);
     font-weight: 600;
   }
-  
+
   .gslide-desc {
     color: var(--oxford-blue);
     font-family: var(--font-primary);
     opacity: 0.8;
   }
-  
-  .gnext, .gprev, .gclose {
+
+  .gnext,
+  .gprev,
+  .gclose {
     color: var(--oxford-blue);
-    
+
     &:hover {
       color: var(--orange-web);
     }
   }
-  
+
   .gslide-description {
     background: var(--white);
     border-top: 3px solid var(--orange-web);
@@ -286,12 +290,13 @@ body {
   text-transform: uppercase;
   font-weight: 600;
   letter-spacing: var(--tracking-wide);
-  
-  &:hover, &:focus {
+
+  &:hover,
+  &:focus {
     background: var(--gradient-cta) !important;
     border-color: var(--orange-web) !important;
   }
-  
+
   &[disabled] {
     background-color: var(--platinum) !important;
     border-color: var(--platinum) !important;
@@ -303,7 +308,7 @@ body {
 .ant-btn-default {
   color: var(--oxford-blue) !important;
   border-color: var(--platinum) !important;
-  
+
   &:hover {
     color: var(--orange-web) !important;
     border-color: var(--orange-web) !important;
@@ -313,27 +318,27 @@ body {
 // NG-ZORRO Card styling
 .ant-card {
   border-color: var(--platinum) !important;
-  
+
   .ant-card-head {
     color: var(--oxford-blue);
     border-bottom-color: var(--platinum);
-    
+
     .ant-card-head-title {
       color: var(--oxford-blue);
       font-weight: 600;
     }
   }
-  
+
   &:hover {
     box-shadow: var(--card-hover-shadow);
   }
 }
 
 // NG-ZORRO Form styling
-.ant-form-item-label > label {
+.ant-form-item-label>label {
   color: var(--oxford-blue) !important;
   font-weight: 600;
-  
+
   &.ant-form-item-required::before {
     color: var(--orange-web) !important;
   }
@@ -357,14 +362,14 @@ body {
   .ant-modal-header {
     background-color: var(--white);
     border-bottom-color: var(--platinum);
-    
+
     .ant-modal-title {
       color: var(--oxford-blue);
       font-weight: 600;
       font-size: var(--text-xl);
     }
   }
-  
+
   .ant-modal-footer {
     border-top-color: var(--platinum);
   }
@@ -378,7 +383,7 @@ body {
         color: var(--color-success);
       }
     }
-    
+
     .ant-message-error {
       .anticon {
         color: var(--color-error);

@@ -62,7 +62,8 @@ import {
   FileExclamationOutline,
   LeftOutline,
   RightOutline,
-  EyeOutline
+  EyeOutline,
+  ArrowRightOutline
 } from '@ant-design/icons-angular/icons';
 
 const icons: IconDefinition[] = [
@@ -97,13 +98,13 @@ const icons: IconDefinition[] = [
   CompassOutline,
   EnvironmentOutline,
   ForwardOutline,
-  ExclamationCircleOutline,
   HomeOutline,
   ReloadOutline,
   FileExclamationOutline,
   LeftOutline,
   RightOutline,
-  EyeOutline
+  EyeOutline,
+  ArrowRightOutline
 ];
 
 const NgZorroModules = [
