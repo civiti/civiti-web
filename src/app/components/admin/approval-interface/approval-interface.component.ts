@@ -232,7 +232,8 @@ import {
         nzClass="approval-modal">
         
         <div *nzModalContent>
-          <div class="modal-content" nz-spin [nzSpinning]="isProcessing || false">
+          <nz-spin [nzSpinning]="isProcessing || false">
+            <div class="modal-content">
             
             <!-- Issue Details -->
             <div class="issue-details" *ngIf="selectedIssue">
@@ -376,7 +377,8 @@ import {
               </form>
             </div>
 
-          </div>
+            </div>
+          </nz-spin>
         </div>
         
       </nz-modal>

@@ -86,7 +86,8 @@ import { MockIssueCreationService, IssueCategory } from '../../../services/mock-
       </nz-alert>
 
       <!-- Category Selection -->
-      <div class="categories-container" nz-spin [nzSpinning]="isLoading">
+      <nz-spin [nzSpinning]="isLoading">
+        <div class="categories-container">
         
         <div class="categories-intro">
           <h2>What type of issue are you reporting?</h2>
@@ -189,7 +190,8 @@ import { MockIssueCreationService, IssueCategory } from '../../../services/mock-
           </div>
         </div>
 
-      </div>
+        </div>
+      </nz-spin>
     </div>
   `,
   styles: [`

@@ -128,7 +128,8 @@ import {
       </div>
 
       <!-- Review Content (shown before submission) -->
-      <div class="review-content" *ngIf="!isSubmitted && issueData" nz-spin [nzSpinning]="isSubmitting">
+      <nz-spin [nzSpinning]="isSubmitting">
+        <div class="review-content" *ngIf="!isSubmitted && issueData">
         
         <!-- Issue Overview -->
         <nz-card nzTitle="Issue Overview" class="review-card">
@@ -283,7 +284,8 @@ import {
           </div>
         </div>
 
-      </div>
+        </div>
+      </nz-spin>
     </div>
   `,
   styles: [`

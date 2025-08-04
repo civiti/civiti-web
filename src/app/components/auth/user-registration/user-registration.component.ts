@@ -93,7 +93,7 @@ interface RegistrationData {
             <nz-step nzTitle="Preferences" nzDescription="Communication"></nz-step>
           </nz-steps>
 
-          <div nz-spin [nzSpinning]="(isLoading$ | async) || false">
+          <nz-spin [nzSpinning]="(isLoading$ | async) || false">
             
             <!-- Error Alert -->
             <nz-alert
@@ -339,7 +339,7 @@ interface RegistrationData {
               </p>
             </div>
 
-          </div>
+          </nz-spin>
         </nz-card>
       </div>
     </div>

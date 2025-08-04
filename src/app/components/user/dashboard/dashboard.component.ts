@@ -71,7 +71,8 @@ import {
     NzMenuModule
   ],
   template: `
-    <div class="dashboard-container" nz-spin [nzSpinning]="(isLoading$ | async) || false">
+    <nz-spin [nzSpinning]="(isLoading$ | async) || false">
+      <div class="dashboard-container">
       
       <!-- Header Section -->
       <div class="dashboard-header">
@@ -337,7 +338,8 @@ import {
         </div>
       </div>
 
-    </div>
+      </div>
+    </nz-spin>
   `,
   styles: [`
     .dashboard-container {

@@ -62,7 +62,7 @@ import {
       <div class="login-form-container">
         <nz-card [nzBordered]="false" class="login-form-card">
           
-          <div nz-spin [nzSpinning]="(isLoading$ | async) || false">
+          <nz-spin [nzSpinning]="(isLoading$ | async) || false">
             
             <!-- Error Alert -->
             <nz-alert
@@ -191,7 +191,7 @@ import {
               </p>
             </div>
 
-          </div>
+          </nz-spin>
         </nz-card>
       </div>
     </div>

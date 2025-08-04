@@ -109,7 +109,8 @@ import {
       </div>
 
       <!-- Details Form -->
-      <div class="details-form-section" nz-spin [nzSpinning]="isGeneratingAI">
+      <nz-spin [nzSpinning]="isGeneratingAI">
+        <div class="details-form-section">
         <nz-card nzTitle="Issue Details" class="details-card">
           
           <form nz-form [formGroup]="detailsForm" (ngSubmit)="generateAIDescription()">
@@ -271,7 +272,8 @@ import {
         <div class="requirement-note" *ngIf="!aiAnalysis">
           <p>Please generate an AI description to continue</p>
         </div>
-      </div>
+        </div>
+      </nz-spin>
 
     </div>
   `,

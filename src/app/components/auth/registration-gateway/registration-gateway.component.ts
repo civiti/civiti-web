@@ -52,7 +52,7 @@ import {
 
       <div class="registration-card-container">
         <nz-card [nzBordered]="false" class="registration-card">
-          <div nz-spin [nzSpinning]="(isLoading$ | async) || false">
+          <nz-spin [nzSpinning]="(isLoading$ | async) || false">
             <!-- Error Alert -->
             <nz-alert
               *ngIf="error$ | async as error"
@@ -123,7 +123,7 @@ import {
               </p>
             </div>
 
-          </div>
+          </nz-spin>
         </nz-card>
       </div>
     </div>

@@ -105,7 +105,8 @@ import { MockIssueCreationService, IssueCategory, PhotoData } from '../../../ser
           </div>
 
           <!-- Upload Area -->
-          <div class="upload-area" nz-spin [nzSpinning]="isUploading">
+          <nz-spin [nzSpinning]="isUploading">
+            <div class="upload-area">
             
             <!-- File Input (Mock Implementation) -->
             <div class="mock-upload-area" (click)="triggerFileInput()">
@@ -212,7 +213,8 @@ import { MockIssueCreationService, IssueCategory, PhotoData } from '../../../ser
         <div class="requirement-note" *ngIf="uploadedPhotos.length === 0">
           <p>At least one photo is required to continue</p>
         </div>
-      </div>
+        </div>
+      </nz-spin>
 
     </div>
   `,
