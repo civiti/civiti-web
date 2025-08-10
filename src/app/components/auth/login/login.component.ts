@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable, Subject, of } from 'rxjs';
@@ -60,7 +60,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private store: Store<AppState>,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.isLoading$ = this.store.select(selectAuthLoading);
     this.error$ = this.store.select(selectAuthError);
@@ -75,7 +76,7 @@ export class LoginComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(isAuthenticated => {
         if (isAuthenticated) {
-          this.router.navigate(['/dashboard']);
+          this.navigateAfterLogin();
         }
       });
   }
@@ -129,5 +130,16 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   clearError(): void {
     this.store.dispatch(AuthActions.clearAuthError());
+  }
+
+  private navigateAfterLogin(): void {
+    // Check for return URL in query params
+    const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+    if (returnUrl) {
+      this.router.navigateByUrl(returnUrl);
+    } else {
+      // Default to dashboard for direct login
+      this.router.navigate(['/dashboard']);
+    }
   }
 }

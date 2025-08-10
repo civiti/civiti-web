@@ -1,4 +1,32 @@
-<div class="min-h-screen bg-background flex items-center justify-center p-4">
+<div class="min-h-screen bg-background flex items-center justify-center p-4 relative">
+  <!-- Discrete Auth Buttons -->
+  <div class="absolute top-4 right-4">
+    <nz-space nzSize="small">
+      <button 
+        *nzSpaceItem
+        nz-button 
+        nzType="text" 
+        nzSize="small"
+        class="auth-button"
+        (click)="navigateToLogin()"
+      >
+        <i nz-icon nzType="login" nzTheme="outline" class="mr-1"></i>
+        Conectează-te
+      </button>
+      <button 
+        *nzSpaceItem
+        nz-button 
+        nzType="default" 
+        nzSize="small"
+        class="auth-button register-button"
+        (click)="navigateToRegister()"
+      >
+        <i nz-icon nzType="user-add" nzTheme="outline" class="mr-1"></i>
+        Înregistrează-te
+      </button>
+    </nz-space>
+  </div>
+  
   <nz-card class="w-full max-w-md mx-auto">
     <div class="text-center mb-6">
       <h1 nz-typography class="text-2xl font-bold mb-2 text-oxford-blue">
@@ -6,6 +34,10 @@
       </h1>
       <p nz-typography nzType="secondary" class="text-oxford-blue opacity-75">
         Selectează-ți locația pentru a vedea problemele din comunitate
+      </p>
+      <p nz-typography nzType="secondary" class="text-oxford-blue opacity-60 text-xs mt-2">
+        <i nz-icon nzType="info-circle" nzTheme="outline" class="mr-1"></i>
+        Nu este nevoie de cont pentru a vizualiza și susține problemele existente
       </p>
     </div>
 

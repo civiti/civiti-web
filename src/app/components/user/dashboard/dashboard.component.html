@@ -18,6 +18,16 @@
       </div>
       
       <div class="header-actions">
+        <button 
+          nz-button 
+          nzType="default" 
+          nzSize="small"
+          (click)="navigateToIssues()"
+          class="issues-nav-button"
+        >
+          <i nz-icon nzType="unordered-list" nzTheme="outline" class="mr-1"></i>
+          Vezi Probleme
+        </button>
         <button nz-button nzType="text" nzSize="large" nz-dropdown [nzDropdownMenu]="userMenu" nzTrigger="click">
           <span nz-icon nzType="user"></span>
           <span nz-icon nzType="down"></span>

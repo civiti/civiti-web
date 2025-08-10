@@ -10,6 +10,7 @@ import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { CommonModule } from '@angular/common';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../store/app.state';
@@ -38,6 +39,7 @@ interface LocationData {
     NzAlertModule,
     NzGridModule,
     NzTypographyModule,
+    NzSpaceModule,
   ],
   templateUrl: './location-selection.component.html',
   styleUrls: ['./location-selection.component.scss']
@@ -95,5 +97,13 @@ export class LocationSelectionComponent implements OnInit {
 
     // Navigate to issues list
     this._router.navigate(['/issues']);
+  }
+
+  navigateToLogin(): void {
+    this._router.navigate(['/auth/login'], { queryParams: { returnUrl: '/location' } });
+  }
+
+  navigateToRegister(): void {
+    this._router.navigate(['/auth/register'], { queryParams: { returnUrl: '/location' } });
   }
 } 

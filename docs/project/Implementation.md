@@ -32,10 +32,12 @@ The user registration and issue creation system was implemented through a sequen
 ### ✅ Completed Features
 
 #### 📝 Authentication System
+- **Anonymous Access**: Public access to location selection and issues viewing
 - **Registration Gateway**: Modern OAuth + email options with trust signals
 - **User Registration Form**: 3-step progressive form with validation
 - **Login Component**: Clean login with Google OAuth simulation
 - **JWT Mock Authentication**: Realistic token management and session handling
+- **Progressive Authentication**: Auth only required for issue creation
 
 #### 🏠 User Dashboard
 - **Gamification Dashboard**: Points, levels, badges, and achievements
@@ -382,7 +384,7 @@ All mock services follow this pattern:
 ```typescript
 // Route structure MUST match ux.md user journey
 const routes: Routes = [
-  // Anonymous User Routes
+  // Anonymous User Routes (No authentication required)
   {
     path: '',
     redirectTo: '/location',
@@ -390,17 +392,17 @@ const routes: Routes = [
   },
   {
     path: 'location',
-    component: LocationSelectionComponent, // Page 1 from ux.md
+    component: LocationSelectionComponent, // Landing page - Anonymous access
     data: { animation: 'LocationPage' }
   },
   {
     path: 'issues',
-    component: IssuesListComponent, // Page 2 from ux.md
+    component: IssuesListComponent, // Public issues list - Anonymous access
     data: { animation: 'IssuesPage' }
   },
   {
     path: 'issue/:id',
-    component: IssueDetailComponent, // Page 3 from ux.md
+    component: IssueDetailComponent, // Public issue details - Anonymous access
     data: { animation: 'DetailPage' }
   },
   
@@ -657,6 +659,30 @@ app.Run();
 ```
 
 ### **Authentication Flow with Supabase**
+
+#### **Anonymous Access Flow**
+The platform follows a progressive authentication model:
+
+1. **Landing Page (Location Selection)**: Fully anonymous access
+   - No authentication required
+   - Discrete sign in/register buttons in top-right corner
+   - Clear messaging about anonymous participation
+
+2. **Issues List**: Public access after location selection
+   - View all approved issues without authentication
+   - Send support emails without authentication
+   - Discrete auth buttons in header
+   - Authentication prompt only when clicking "Create Issue"
+
+3. **Issue Details**: Full anonymous access
+   - View complete issue information
+   - Send support emails to authorities
+   - No authentication barriers
+
+4. **Authentication Required Only For**:
+   - Creating new issues
+   - Accessing user dashboard
+   - Admin functionality
 
 ```typescript
 // Frontend (Angular) - Auth Service Integration

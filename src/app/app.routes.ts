@@ -4,7 +4,7 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    redirectTo: '/auth/register',
+    redirectTo: '/location',
     pathMatch: 'full'
   },
   // Authentication routes
@@ -34,9 +34,10 @@ export const routes: Routes = [
     loadComponent: () => import('./components/user/dashboard/dashboard.component').then(m => m.DashboardComponent),
     data: { animation: 'DashboardPage' }
   },
-  // Issue creation routes
+  // Issue creation routes - requires authentication
   {
     path: 'create-issue',
+    // TODO: Add auth guard here when implementing backend integration
     children: [
       {
         path: '',
@@ -71,7 +72,7 @@ export const routes: Routes = [
       }
     ]
   },
-  // Legacy location route (keep for backward compatibility)
+  // Location selection route (landing page)
   {
     path: 'location',
     loadComponent: () => import('./components/location-selection/location-selection.component').then(m => m.LocationSelectionComponent),
@@ -91,6 +92,6 @@ export const routes: Routes = [
   // Fallback route
   {
     path: '**',
-    redirectTo: '/auth/register'
+    redirectTo: '/location'
   }
 ];

@@ -44,9 +44,35 @@
   }
 }
 
-.header-actions button {
-  color: var(--white) !important;
-  border-color: rgba(255, 255, 255, 0.3) !important;
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  
+  button.ant-btn,
+  :deep(button.ant-btn),
+  nz-button button.ant-btn {
+    color: var(--white);
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+}
+
+.issues-nav-button.ant-btn,
+:deep(.issues-nav-button.ant-btn),
+nz-button.issues-nav-button button.ant-btn {
+  background-color: rgba(252, 163, 17, 0.15);
+  border-color: rgba(252, 163, 17, 0.5);
+  color: var(--orange-web);
+  transition: all 0.3s ease;
+  
+  &:hover,
+  &:focus {
+    background-color: var(--orange-web);
+    color: white;
+    border-color: var(--orange-web);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(252, 163, 17, 0.3);
+  }
 }
 
 .gamification-section {

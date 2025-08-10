@@ -189,4 +189,8 @@ export class DashboardComponent implements OnInit, OnDestroy {
     console.log('[DASHBOARD] User logout requested');
     this.store.dispatch(AuthActions.logout());
   }
+
+  navigateToIssues(): void {
+    this.router.navigate(['/issues']);
+  }
 }

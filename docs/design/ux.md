@@ -9,9 +9,9 @@ Supporting Citizen - Someone who wants to help resolve existing issues in their 
 Issue Creator - A user who documents and publishes new community problems
 
 🗺️ User Journey Map
-1. Entry & Location Selection
-User Goal: Access issues in my local area
-Landing Page → Location Selection
+1. Entry & Location Selection (LANDING PAGE)
+User Goal: Access issues in my local area without requiring authentication
+Landing Page → Location Selection (Anonymous Access)
 ├── Dropdown 1: Județ (County) - [Bucharest] *hardcoded*
 ├── Dropdown 2: Oraș (City) - [Bucharest] *hardcoded*
 └── Dropdown 3: Cartier (District) - [Sector 5] *hardcoded*
@@ -20,13 +20,15 @@ Key Elements:
 
 Clean, simple interface
 Pre-selected values for MVP
+Discrete sign in/register buttons (top right)
+Clear messaging about anonymous access
 Clear call-to-action to proceed
 
 
-2. Issues Discovery
-User Goal: Find and understand local problems I can help with
-Issues List Page
-├── Header: "Active Issues in [Sector 5, Bucharest]"
+2. Issues Discovery (PUBLIC ACCESS)
+User Goal: Find and understand local problems I can help with (no authentication required)
+Issues List Page (Publicly Accessible)
+├── Header: "Active Issues in [Sector 5, Bucharest]" with discrete auth buttons
 ├── Filter/Sort Options
 │   ├── Sort by: Date (Newest/Oldest)
 │   ├── Sort by: Urgency
@@ -39,11 +41,13 @@ Issues List Page
 │   ├── Date Created
 │   ├── Email Counter: "X emails sent"
 │   └── [View Details] button
-└── [+ Create New Issue] button (future feature)
+└── [+ Create New Issue] button → Prompts for authentication
 Interaction Flow:
 
-Scroll through active issues
-Click on any issue card to view details
+Scroll through active issues (anonymous)
+Click on any issue card to view details (anonymous)
+Send support emails (anonymous)
+Create issue requires authentication
 Visual indicators for issue urgency/popularity
 
 
@@ -146,16 +150,24 @@ After Email Modal Closes
     └── Invite friends to participate
 
 🔄 User Flow Scenarios
-Scenario A: First-time User Supporting an Issue
+Scenario A: Anonymous User Supporting an Issue (PRIMARY FLOW)
 
-Lands on homepage → Sees location selector
-Confirms Sector 5 → Views issue list
-Attracted by "Broken sidewalk" issue → Clicks to view
-Reviews photos and description → Decides to help
-Clicks "Primăria Sector 5" → Modal opens
-Fills in personal details → Reviews generated email
-Copies email components → Sends via personal email
-Sees success message → Returns to issue list
+Lands on location selection page → Sees discrete auth options (can ignore)
+Notices "no account needed" message → Feels comfortable proceeding
+Confirms Sector 5 → Views issue list (no barriers)
+Attracted by "Broken sidewalk" issue → Clicks to view (anonymous)
+Reviews photos and description → Decides to help (anonymous)
+Clicks "Primăria Sector 5" → Modal opens (anonymous)
+Fills in personal details → Reviews generated email (anonymous)
+Copies email components → Sends via personal email (anonymous)
+Sees success message → Returns to issue list (anonymous)
+
+Scenario A2: Anonymous User Wanting to Create Issue
+
+Follows same flow → Tries to create new issue
+Sees authentication prompt → Chooses to register or login
+Completes registration → Returns to create issue flow
+Creates issue → Can continue using authenticated features
 
 Scenario B: Returning User Checking Progress
 
@@ -236,8 +248,11 @@ Authority response rate: Track over time
 
 🔐 Privacy & Trust Elements
 
-No account required for basic participation
+No account required for viewing and supporting issues (ANONYMOUS ACCESS)
+Discrete authentication options - users can choose to register/login
+Authentication only required for creating new issues
 Clear data usage explanation
 Optional fields marked clearly
 No spam - one email per authority per user per issue
 Transparent email counter (no fake numbers)
+Location selection as landing page removes barriers to entry

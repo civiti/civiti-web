@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
@@ -86,7 +86,8 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private store: Store<AppState>,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.isLoading$ = this.store.select(selectAuthLoading);
     this.error$ = this.store.select(selectAuthError);
@@ -101,7 +102,7 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(isAuthenticated => {
         if (isAuthenticated) {
-          this.router.navigate(['/dashboard']);
+          this.navigateAfterRegistration();
         }
       });
   }
@@ -208,5 +209,16 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
 
   clearError(): void {
     this.store.dispatch(AuthActions.clearAuthError());
+  }
+
+  private navigateAfterRegistration(): void {
+    // Check for return URL in query params
+    const returnUrl = this.route.snapshot.queryParams['returnUrl'];
+    if (returnUrl) {
+      this.router.navigateByUrl(returnUrl);
+    } else {
+      // Default to dashboard for direct registration
+      this.router.navigate(['/dashboard']);
+    }
   }
 }

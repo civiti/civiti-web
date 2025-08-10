@@ -17,11 +17,13 @@ The frontend is feature-complete with mock services but will continue to evolve 
 - Optimize performance with actual API responses
 
 ### Completed Features (December 2024)
+- **Anonymous Access** to location selection and issues viewing
 - **User Registration System** with Google OAuth and email/password options (mocked)
 - **Issue Creation Workflow** where registered users can report civic issues
 - **AI-Enhanced Descriptions** (mocked) for issue text generation
 - **Gamification System** with points, badges, and achievements
 - **Admin Approval Interface** for issue moderation
+- **Progressive Authentication** - auth only required for creating issues
 
 ### Backend Tech Stack (Next Phase)
 - **.NET 9 Minimal API** with C# 13
@@ -217,6 +219,38 @@ romanian-translator:
 5. Keep mock services updated for unimplemented endpoints"
 ```
 
+## 🚫 CSS Best Practices & Anti-Patterns
+
+### NEVER Use !important
+The use of `!important` in CSS is strictly prohibited in this codebase. Instead:
+
+1. **Use Higher Specificity**: Add more specific selectors
+   ```scss
+   // ❌ BAD
+   .button { color: white !important; }
+   
+   // ✅ GOOD
+   .navbar .auth-section button.auth-button { color: white; }
+   ```
+
+2. **Use CSS Custom Properties**: For theming and dynamic values
+   ```scss
+   // Define in :root or component
+   --button-text-color: white;
+   
+   // Use in styles
+   .button { color: var(--button-text-color); }
+   ```
+
+3. **Leverage NG-ZORRO Classes**: Target both custom and framework classes
+   ```scss
+   button.auth-button.ant-btn { /* styles */ }
+   ```
+
+4. **Component Encapsulation**: Use Angular's ViewEncapsulation strategies appropriately
+
+5. **CSS Methodology**: Follow BEM or similar naming conventions for better organization
+
 ## 🎨 Design System Enforcement
 
 ### Color Usage (from Colour-Scheme.md)
@@ -277,6 +311,8 @@ Civica.Api/
 - 🚧 Backend development is ACTIVE - Building API to replace mock services
 - 🔄 Integration is ITERATIVE - Frontend and backend evolve together
 - 📝 Documentation must be updated with all changes
+- 🌐 Anonymous access enabled - Location selection → Issues list → Issue details (no auth required)
+- 🔐 Authentication only for issue creation - Progressive authentication model
 
 ### Backend Development Rules
 - ✅ Use .NET 9 Minimal API patterns
@@ -292,6 +328,12 @@ Civica.Api/
 - ⚠️ Preserve all frontend functionality
 - ⚠️ Ensure backward compatibility
 - ⚠️ Test thoroughly before replacing mocks
+
+### CSS & Styling Rules
+- ❌ NEVER use `!important` in CSS - use proper specificity instead
+- ✅ Use CSS custom properties for theming
+- ✅ Target NG-ZORRO classes alongside custom classes
+- ✅ Follow CSS methodologies (BEM, etc.) for maintainability
 
 ## 🔧 Agent-Specific Instructions
 

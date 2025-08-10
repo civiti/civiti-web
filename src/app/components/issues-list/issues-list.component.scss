@@ -41,11 +41,15 @@
   line-height: 1.2;
 }
 
-.priority-urgent {
-  background-color: var(--orange-web) !important;
-  color: white !important;
+// Priority urgent styling with proper specificity
+.priority-urgent,
+nz-tag.priority-urgent,
+.ant-tag.priority-urgent {
+  background-color: var(--orange-web);
+  color: white;
   font-weight: 700;
   animation: pulse 2s infinite;
+  border-color: var(--orange-web);
 }
 
 @keyframes pulse {
@@ -76,6 +80,48 @@
 
 .navbar {
   background-color: var(--oxford-blue);
+  color: white;
+  
+  .ant-page-header-heading-title {
+    color: white;
+    font-weight: 600;
+  }
+  
+  // Auth buttons in navbar - high specificity targeting both custom class and NG-ZORRO classes
+  nz-page-header-extra button.auth-button.ant-btn,
+  nz-page-header-extra .auth-button {
+    color: white;
+    background-color: transparent;
+    border-color: rgba(255, 255, 255, 0.3);
+    transition: all 0.3s ease;
+    
+    // Ensure icons are also visible
+    i[nz-icon] {
+      color: currentColor;
+    }
+    
+    &:hover,
+    &:focus {
+      color: var(--oxford-blue);
+      background-color: white;
+      border-color: white;
+      transform: translateY(-1px);
+    }
+    
+    &.register-button {
+      background-color: var(--orange-web);
+      border-color: var(--orange-web);
+      color: white;
+      
+      &:hover,
+      &:focus {
+        background-color: white;
+        color: var(--orange-web);
+        border-color: white;
+        transform: translateY(-1px);
+      }
+    }
+  }
 }
 
 .bg-background {
@@ -118,6 +164,51 @@
   max-width: 1200px;
 }
 
+// General auth buttons (fallback for other contexts)
+button.auth-button.ant-btn,
+.auth-button {
+  color: var(--oxford-blue);
+  border-color: transparent;
+  transition: all 0.3s ease;
+  font-weight: 500;
+  
+  &:hover,
+  &:focus {
+    color: var(--orange-web);
+    background-color: rgba(252, 163, 17, 0.1);
+    border-color: rgba(252, 163, 17, 0.3);
+  }
+  
+  &.register-button {
+    background-color: rgba(252, 163, 17, 0.1);
+    border-color: rgba(252, 163, 17, 0.3);
+    color: var(--orange-web);
+    
+    &:hover,
+    &:focus {
+      background-color: var(--orange-web);
+      color: white;
+      transform: translateY(-1px);
+    }
+  }
+}
+
+// Create issue FAB styling
+.create-issue-fab {
+  background: linear-gradient(135deg, var(--orange-web) 0%, #FDB833 100%);
+  border: none;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 8px 25px rgba(252, 163, 17, 0.4);
+  }
+  
+  &:active {
+    transform: translateY(-1px) scale(1.02);
+  }
+}
+
 @media (max-width: 768px) {
   .grid {
     grid-template-columns: 1fr;
@@ -126,5 +217,11 @@
 
   .container {
     padding: 1rem;
+  }
+  
+  // Stack auth buttons on mobile
+  .auth-button {
+    font-size: 12px;
+    padding: 4px 8px;
   }
 }
