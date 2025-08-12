@@ -64,10 +64,13 @@ export class OauthCallbackComponent implements OnInit {
                                 user.email?.split('@')[0] || 'User';
               
               this.apiService.createUserProfile({
+                supabaseUserId: user.id,
+                email: user.email || '',
                 displayName,
-                phoneNumber: null,
+                county: 'București',
                 city: 'București',
-                district: 'Sector 5'
+                district: 'Sector 5',
+                residenceType: 'urban'
               }).subscribe({
                 next: (profile) => {
                   this.store.dispatch(AuthActions.loginWithGoogleSuccess({

@@ -27,6 +27,14 @@ import {
   selectAuthError,
   selectIsAuthenticated
 } from '../../../store/auth/auth.selectors';
+import { 
+  ROMANIAN_COUNTIES, 
+  BUCHAREST_DISTRICTS, 
+  RESIDENCE_TYPES,
+  getCitiesForCounty,
+  hasDistricts,
+  County
+} from '../../../data/romanian-locations';
 
 interface RegistrationData {
   email: string;
@@ -36,9 +44,10 @@ interface RegistrationData {
   location: {
     county: string;
     city: string;
-    district: string;
+    district?: string;
   };
-  residenceType?: 'apartment' | 'house' | 'business';
+  residenceType: 'urban' | 'rural';
+  birthYear?: number;
   communicationPrefs: {
     issueUpdates: boolean;
     communityNews: boolean;
@@ -79,6 +88,16 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
   currentStep = 0;
   passwordVisible = false;
 
+  // Location data
+  counties = ROMANIAN_COUNTIES;
+  cities: string[] = [];
+  districts = BUCHAREST_DISTRICTS;
+  residenceTypes = RESIDENCE_TYPES;
+  showDistricts = false;
+  
+  // Birth year options (18 to 100 years old)
+  birthYears: number[] = [];
+
   isLoading$!: Observable<boolean>;
   error$!: Observable<string | null>;
   isAuthenticated$!: Observable<boolean>;
@@ -93,6 +112,7 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
     this.error$ = this.store.select(selectAuthError);
     this.isAuthenticated$ = this.store.select(selectIsAuthenticated);
 
+    this.initializeBirthYears();
     this.initializeForm();
   }
 
@@ -104,6 +124,13 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
         if (isAuthenticated) {
           this.navigateAfterRegistration();
         }
+      });
+
+    // Watch for county changes to update cities
+    this.registrationForm.get('county')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(countyCode => {
+        this.onCountyChange(countyCode);
       });
   }
 
@@ -121,10 +148,11 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
       confirmPassword: ['', [Validators.required]],
 
       // Step 2: Location
-      county: ['bucuresti', [Validators.required]],
-      city: ['bucuresti', [Validators.required]],
-      district: ['sector5', [Validators.required]],
-      residenceType: [null],
+      county: ['', [Validators.required]],
+      city: ['', [Validators.required]],
+      district: [''],
+      residenceType: ['urban', [Validators.required]],
+      birthYear: [null],
 
       // Step 3: Preferences
       issueUpdates: [true],
@@ -136,6 +164,41 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
     }, {
       validators: this.passwordMatchValidator
     });
+  }
+
+  private initializeBirthYears(): void {
+    const currentYear = new Date().getFullYear();
+    const minYear = currentYear - 100;
+    const maxYear = currentYear - 18;
+    
+    for (let year = maxYear; year >= minYear; year--) {
+      this.birthYears.push(year);
+    }
+  }
+
+  onCountyChange(countyCode: string): void {
+    if (countyCode) {
+      // Update cities based on selected county
+      this.cities = getCitiesForCounty(countyCode);
+      
+      // Show districts only for București
+      this.showDistricts = hasDistricts(countyCode);
+      
+      // Reset city and district selections
+      this.registrationForm.patchValue({
+        city: '',
+        district: ''
+      });
+      
+      // Update district validators
+      const districtControl = this.registrationForm.get('district');
+      if (this.showDistricts) {
+        districtControl?.setValidators([Validators.required]);
+      } else {
+        districtControl?.clearValidators();
+      }
+      districtControl?.updateValueAndValidity();
+    }
   }
 
   private passwordMatchValidator(form: FormGroup) {
@@ -162,7 +225,8 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
       case 1:
         return !!(this.registrationForm.get('county')?.valid &&
           this.registrationForm.get('city')?.valid &&
-          this.registrationForm.get('district')?.valid);
+          this.registrationForm.get('residenceType')?.valid &&
+          (!this.showDistricts || this.registrationForm.get('district')?.valid));
 
       case 2:
         return !!(this.registrationForm.get('agreeToTerms')?.valid &&
@@ -188,16 +252,28 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (this.registrationForm.valid) {
       const formValue = this.registrationForm.value;
+      const selectedCounty = this.counties.find(c => c.code === formValue.county);
 
       console.log('[USER REGISTRATION] Submitting registration:', {
         email: formValue.email,
-        displayName: formValue.displayName
+        displayName: formValue.displayName,
+        location: {
+          county: selectedCounty?.name || formValue.county,
+          city: formValue.city,
+          district: formValue.district,
+          residenceType: formValue.residenceType
+        }
       });
 
       this.store.dispatch(AuthActions.registerWithEmail({
         email: formValue.email,
         password: formValue.password,
-        displayName: formValue.displayName
+        displayName: formValue.displayName,
+        county: selectedCounty?.name || formValue.county,
+        city: formValue.city,
+        district: formValue.district || undefined,
+        residenceType: formValue.residenceType,
+        birthYear: formValue.birthYear || undefined
       }));
     } else {
       // Mark all fields as touched to show validation errors

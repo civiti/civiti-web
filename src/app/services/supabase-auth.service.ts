@@ -3,6 +3,7 @@ import { createClient, SupabaseClient, AuthResponse, User } from '@supabase/supa
 import { Observable, from, BehaviorSubject, throwError } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
+import { resetTokenRefreshState } from '../interceptors/auth.interceptor';
 
 export interface SupabaseAuthUser {
   id: string;
@@ -193,9 +194,13 @@ export class SupabaseAuthService {
         this.currentUser$.next(null);
         localStorage.removeItem('civica_access_token');
         localStorage.removeItem('civica_refresh_token');
+        // Reset token refresh state to clean up any pending requests
+        resetTokenRefreshState();
       }),
       catchError(error => {
         console.error('Sign out error:', error);
+        // Reset state even on error
+        resetTokenRefreshState();
         return throwError(() => error);
       })
     );

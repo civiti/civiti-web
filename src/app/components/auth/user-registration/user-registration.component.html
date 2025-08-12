@@ -117,44 +117,85 @@
             
             <nz-form-item>
               <nz-form-label [nzSpan]="24" nzFor="county" nzRequired>Județ</nz-form-label>
-              <nz-form-control [nzSpan]="24">
-                <nz-select formControlName="county" id="county" nzPlaceHolder="Selectează județul">
-                  <nz-option nzValue="bucuresti" nzLabel="București"></nz-option>
-                  <nz-option nzValue="ilfov" nzLabel="Ilfov"></nz-option>
+              <nz-form-control [nzSpan]="24" [nzErrorTip]="countyErrorTip">
+                <nz-select formControlName="county" id="county" 
+                  nzPlaceHolder="Selectează județul"
+                  nzShowSearch>
+                  <nz-option *ngFor="let county of counties" 
+                    [nzValue]="county.code" 
+                    [nzLabel]="county.name"></nz-option>
                 </nz-select>
+                <ng-template #countyErrorTip>
+                  <span *ngIf="registrationForm.get('county')?.hasError('required')">
+                    Te rugăm să selectezi județul
+                  </span>
+                </ng-template>
               </nz-form-control>
             </nz-form-item>
 
             <nz-form-item>
               <nz-form-label [nzSpan]="24" nzFor="city" nzRequired>Oraș</nz-form-label>
-              <nz-form-control [nzSpan]="24">
-                <nz-select formControlName="city" id="city" nzPlaceHolder="Selectează orașul">
-                  <nz-option nzValue="bucuresti" nzLabel="București"></nz-option>
+              <nz-form-control [nzSpan]="24" [nzErrorTip]="cityErrorTip">
+                <nz-select formControlName="city" id="city" 
+                  nzPlaceHolder="Selectează orașul"
+                  nzShowSearch
+                  [nzDisabled]="!registrationForm.get('county')?.value">
+                  <nz-option *ngFor="let city of cities" 
+                    [nzValue]="city" 
+                    [nzLabel]="city"></nz-option>
                 </nz-select>
+                <ng-template #cityErrorTip>
+                  <span *ngIf="registrationForm.get('city')?.hasError('required')">
+                    Te rugăm să selectezi orașul
+                  </span>
+                </ng-template>
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item *ngIf="showDistricts">
+              <nz-form-label [nzSpan]="24" nzFor="district" nzRequired>Sector</nz-form-label>
+              <nz-form-control [nzSpan]="24" [nzErrorTip]="districtErrorTip">
+                <nz-select formControlName="district" id="district" 
+                  nzPlaceHolder="Selectează sectorul">
+                  <nz-option *ngFor="let district of districts" 
+                    [nzValue]="district" 
+                    [nzLabel]="district"></nz-option>
+                </nz-select>
+                <ng-template #districtErrorTip>
+                  <span *ngIf="registrationForm.get('district')?.hasError('required')">
+                    Te rugăm să selectezi sectorul
+                  </span>
+                </ng-template>
               </nz-form-control>
             </nz-form-item>
 
             <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzFor="district" nzRequired>Cartier/Sector</nz-form-label>
-              <nz-form-control [nzSpan]="24">
-                <nz-select formControlName="district" id="district" nzPlaceHolder="Selectează cartierul">
-                  <nz-option nzValue="sector1" nzLabel="Sector 1"></nz-option>
-                  <nz-option nzValue="sector2" nzLabel="Sector 2"></nz-option>
-                  <nz-option nzValue="sector3" nzLabel="Sector 3"></nz-option>
-                  <nz-option nzValue="sector4" nzLabel="Sector 4"></nz-option>
-                  <nz-option nzValue="sector5" nzLabel="Sector 5"></nz-option>
-                  <nz-option nzValue="sector6" nzLabel="Sector 6"></nz-option>
+              <nz-form-label [nzSpan]="24" nzFor="residenceType" nzRequired>Tip de rezidență</nz-form-label>
+              <nz-form-control [nzSpan]="24" [nzErrorTip]="residenceTypeErrorTip">
+                <nz-select formControlName="residenceType" id="residenceType" 
+                  nzPlaceHolder="Selectează tipul de rezidență">
+                  <nz-option *ngFor="let type of residenceTypes" 
+                    [nzValue]="type.value" 
+                    [nzLabel]="type.label"></nz-option>
                 </nz-select>
+                <ng-template #residenceTypeErrorTip>
+                  <span *ngIf="registrationForm.get('residenceType')?.hasError('required')">
+                    Te rugăm să selectezi tipul de rezidență
+                  </span>
+                </ng-template>
               </nz-form-control>
             </nz-form-item>
 
             <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzFor="residenceType">Tip de locuință (Opțional)</nz-form-label>
+              <nz-form-label [nzSpan]="24" nzFor="birthYear">Anul nașterii (Opțional)</nz-form-label>
               <nz-form-control [nzSpan]="24">
-                <nz-select formControlName="residenceType" id="residenceType" nzPlaceHolder="Selectează tipul de locuință" nzAllowClear>
-                  <nz-option nzValue="apartment" nzLabel="Apartament"></nz-option>
-                  <nz-option nzValue="house" nzLabel="Casă"></nz-option>
-                  <nz-option nzValue="business" nzLabel="Afacere"></nz-option>
+                <nz-select formControlName="birthYear" id="birthYear" 
+                  nzPlaceHolder="Selectează anul nașterii" 
+                  nzAllowClear
+                  nzShowSearch>
+                  <nz-option *ngFor="let year of birthYears" 
+                    [nzValue]="year" 
+                    [nzLabel]="year.toString()"></nz-option>
                 </nz-select>
               </nz-form-control>
             </nz-form-item>

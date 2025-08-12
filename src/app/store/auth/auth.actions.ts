@@ -33,7 +33,16 @@ export const loginWithEmailFailure = createAction(
 // Registration Actions
 export const registerWithEmail = createAction(
   '[Auth] Register with Email',
-  props<{ email: string; password: string; displayName: string }>()
+  props<{ 
+    email: string; 
+    password: string; 
+    displayName: string;
+    county: string;
+    city: string;
+    district?: string;
+    residenceType: 'urban' | 'rural';
+    birthYear?: number;
+  }>()
 );
 
 export const registerWithEmailSuccess = createAction(
