@@ -41,8 +41,7 @@
         <div class="summary-item" *ngIf="selectedCategory">
           <div class="summary-label">Categorie</div>
           <div class="summary-value">
-            <span class="category-icon">{{ selectedCategory.icon }}</span>
-            {{ selectedCategory.name }}
+            {{ selectedCategory | titlecase }}
           </div>
         </div>
 
@@ -148,47 +147,29 @@
     <nz-card nzTitle="Raport generat de AI" class="ai-content-card">
       
       <div class="ai-confidence">
-        <nz-tag [nzColor]="getConfidenceColor(aiAnalysis.confidence)">
-          {{ (aiAnalysis.confidence * 100) | number:'1.0-0' }}% încredere
+        <nz-tag [nzColor]="getConfidenceColor(aiAnalysis.aiConfidence || 0)">
+          {{ ((aiAnalysis.aiConfidence || 0) * 100) | number:'1.0-0' }}% încredere
         </nz-tag>
       </div>
 
       <div class="ai-content">
         
-        <div class="ai-section">
+        <div class="ai-section" *ngIf="aiAnalysis.aiGeneratedDescription">
           <h4>Descriere profesională</h4>
-          <div class="ai-text" [innerHTML]="aiAnalysis.description"></div>
+          <div class="ai-text" [innerHTML]="aiAnalysis.aiGeneratedDescription"></div>
           <button nz-button nzType="link" nzSize="small" (click)="editDescription()">
             <span nz-icon nzType="edit"></span>
             Editează descrierea
           </button>
         </div>
 
-        <div class="ai-section">
+        <div class="ai-section" *ngIf="aiAnalysis.aiProposedSolution">
           <h4>Soluție propusă</h4>
-          <div class="ai-text" [innerHTML]="aiAnalysis.proposedSolution"></div>
+          <div class="ai-text" [innerHTML]="aiAnalysis.aiProposedSolution"></div>
           <button nz-button nzType="link" nzSize="small" (click)="editSolution()">
             <span nz-icon nzType="edit"></span>
             Editează soluția
           </button>
-        </div>
-
-        <div class="ai-extracted-details" *ngIf="aiAnalysis.extractedDetails">
-          <h4>Analiză AI</h4>
-          <div class="details-grid">
-            <div class="detail-item" *ngIf="aiAnalysis.extractedDetails.estimatedCost">
-              <div class="detail-label">Cost estimat</div>
-              <div class="detail-value">{{ aiAnalysis.extractedDetails.estimatedCost }}</div>
-            </div>
-            <div class="detail-item" *ngIf="aiAnalysis.extractedDetails.timeToResolve">
-              <div class="detail-label">Timp de rezolvare</div>
-              <div class="detail-value">{{ aiAnalysis.extractedDetails.timeToResolve }}</div>
-            </div>
-            <div class="detail-item" *ngIf="aiAnalysis.extractedDetails.affectedArea">
-              <div class="detail-label">Zona afectată</div>
-              <div class="detail-value">{{ aiAnalysis.extractedDetails.affectedArea }}</div>
-            </div>
-          </div>
         </div>
 
       </div>

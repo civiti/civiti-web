@@ -9,86 +9,47 @@ export interface UserState {
 
 export interface UserProfile {
   id: string;
+  supabaseUserId: string;
   email: string;
-  displayName: string;
   photoURL?: string;
-  location: {
-    county: string;
-    city: string;
-    district: string;
-  };
-  profile: {
-    residenceType?: 'apartment' | 'house' | 'business';
-    communicationPrefs: {
-      issueUpdates: boolean;
-      communityNews: boolean;
-      monthlyDigest: boolean;
-      achievements: boolean;
-    };
-  };
-  createdAt: Date;
-  lastActive: Date;
-  emailVerified: boolean;
+  displayName: string;
+  county: string;
+  city: string;
+  district?: string;
+  residenceType: 'urban' | 'rural';
+  birthYear?: number;
+  points: number;
+  level: number;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface GamificationData {
-  points: number;
-  level: number;
-  badges: Badge[];
-  stats: UserStats;
-  achievements: Achievement[];
-  streaks: Streaks;
-  leaderboardPosition?: LeaderboardPosition;
+  totalPoints: number;
+  currentLevel: number;
+  pointsToNextLevel: number;
+  rank: number;
+  recentBadges: Badge[];
+  activeAchievements: Achievement[];
 }
 
 export interface Badge {
   id: string;
   name: string;
   description: string;
-  iconUrl: string;
-  category: 'starter' | 'progress' | 'achievement' | 'special';
-  earnedAt: Date;
-  rarity: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
-}
-
-export interface UserStats {
-  issuesReported: number;
-  issuesResolved: number;
-  communityVotes: number;
-  commentsGiven: number;
-  helpfulComments: number;
-  qualityScore: number; // 0-100
-  approvalRate: number; // 0-100
+  tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+  pointValue: number;
+  requirement?: string;
+  earnedAt: string;
 }
 
 export interface Achievement {
   id: string;
-  title: string;
+  name: string;
   description: string;
-  progress: number; // 0-100
-  maxProgress: number;
-  completed: boolean;
-  completedAt?: Date;
-  reward: {
-    points: number;
-    badge?: string;
-  };
-}
-
-export interface Streaks {
-  currentLoginStreak: number;
-  longestLoginStreak: number;
-  currentVotingStreak: number;
-  longestVotingStreak: number;
-  lastActivityDate: Date;
-}
-
-export interface LeaderboardPosition {
-  overall: number;
-  monthly: number;
-  category: number;
-  neighborhood: number;
-  totalUsers: number;
+  progress: number;
+  target: number;
+  pointReward: number;
 }
 
 export interface UserPreferences {

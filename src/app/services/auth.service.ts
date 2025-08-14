@@ -2,15 +2,36 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import { MockAuthService, AuthResponse, TokenResponse } from './mock-auth.service';
 import { SupabaseAuthService, SupabaseAuthResponse } from './supabase-auth.service';
+
+// Define auth types for compatibility
+export interface AuthUser {
+  id: string;
+  email: string | null;
+  displayName: string | null;
+  photoURL: string | null;
+  authProvider: 'email' | 'google';
+  emailVerified: boolean;
+  createdAt: Date;
+  lastLoginAt: Date;
+}
+
+export interface AuthResponse {
+  user: AuthUser;
+  token: string;
+  refreshToken: string;
+}
+
+export interface TokenResponse {
+  token: string;
+  refreshToken: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   constructor(
-    private mockAuthService: MockAuthService,
     private supabaseAuthService: SupabaseAuthService
   ) {}
 
@@ -19,12 +40,8 @@ export class AuthService {
   // ============================================
 
   loginWithGoogle(): Observable<AuthResponse> {
-    if (environment.mockMode) {
-      return this.mockAuthService.loginWithGoogle();
-    }
-
     return this.supabaseAuthService.signInWithGoogle().pipe(
-      map(this.mapSupabaseToMockResponse),
+      map(this.mapSupabaseToAuthResponse),
       catchError(error => {
         // Handle OAuth redirect case
         if (error.type === 'oauth_redirect') {
@@ -36,12 +53,8 @@ export class AuthService {
   }
 
   loginWithEmail(email: string, password: string): Observable<AuthResponse> {
-    if (environment.mockMode) {
-      return this.mockAuthService.loginWithEmail(email, password);
-    }
-
     return this.supabaseAuthService.signInWithEmail(email, password).pipe(
-      map(this.mapSupabaseToMockResponse),
+      map(this.mapSupabaseToAuthResponse),
       catchError(error => {
         throw new Error(error.message || 'Email login failed');
       })
@@ -49,12 +62,8 @@ export class AuthService {
   }
 
   registerWithEmail(email: string, password: string, displayName: string): Observable<AuthResponse> {
-    if (environment.mockMode) {
-      return this.mockAuthService.registerWithEmail(email, password, displayName);
-    }
-
     return this.supabaseAuthService.signUpWithEmail(email, password, displayName).pipe(
-      map(this.mapSupabaseToMockResponse),
+      map(this.mapSupabaseToAuthResponse),
       catchError(error => {
         throw new Error(error.message || 'Registration failed');
       })
@@ -62,10 +71,6 @@ export class AuthService {
   }
 
   refreshToken(): Observable<TokenResponse> {
-    if (environment.mockMode) {
-      return this.mockAuthService.refreshToken();
-    }
-
     return this.supabaseAuthService.refreshToken().pipe(
       map(token => ({
         token,
@@ -78,10 +83,6 @@ export class AuthService {
   }
 
   getCurrentUser(): Observable<AuthResponse | null> {
-    if (environment.mockMode) {
-      return this.mockAuthService.getCurrentUser();
-    }
-
     return this.supabaseAuthService.getCurrentUser().pipe(
       map(user => {
         if (!user) return null;
@@ -108,18 +109,10 @@ export class AuthService {
   }
 
   isTokenValid(): Observable<boolean> {
-    if (environment.mockMode) {
-      return this.mockAuthService.isTokenValid();
-    }
-
     return this.supabaseAuthService.isAuthenticated();
   }
 
   logout(): Observable<void> {
-    if (environment.mockMode) {
-      return this.mockAuthService.logout();
-    }
-
     return this.supabaseAuthService.signOut().pipe(
       catchError(error => {
         throw new Error(error.message || 'Logout failed');
@@ -132,10 +125,6 @@ export class AuthService {
   // ============================================
 
   sendEmailVerification(): Observable<void> {
-    if (environment.mockMode) {
-      return this.mockAuthService.sendEmailVerification();
-    }
-
     return this.supabaseAuthService.sendEmailVerification().pipe(
       catchError(error => {
         throw new Error(error.message || 'Failed to send verification email');
@@ -144,12 +133,8 @@ export class AuthService {
   }
 
   verifyEmail(token: string): Observable<void> {
-    if (environment.mockMode) {
-      return this.mockAuthService.verifyEmail(token);
-    }
-
     // Email verification is handled automatically by Supabase
-    // This method is mainly for mock compatibility
+    // This method is mainly for compatibility
     return new Observable(observer => {
       observer.next();
       observer.complete();
@@ -161,10 +146,6 @@ export class AuthService {
   // ============================================
 
   resetPassword(email: string): Observable<void> {
-    if (environment.mockMode) {
-      return this.mockAuthService.resetPassword(email);
-    }
-
     return this.supabaseAuthService.resetPassword(email).pipe(
       catchError(error => {
         throw new Error(error.message || 'Password reset failed');
@@ -176,7 +157,7 @@ export class AuthService {
   // Helper Methods
   // ============================================
 
-  private mapSupabaseToMockResponse(supabaseResponse: SupabaseAuthResponse): AuthResponse {
+  private mapSupabaseToAuthResponse(supabaseResponse: SupabaseAuthResponse): AuthResponse {
     return {
       user: {
         id: supabaseResponse.user.id,
@@ -194,10 +175,6 @@ export class AuthService {
   }
 
   getAccessToken(): string | null {
-    if (environment.mockMode) {
-      return localStorage.getItem('civica_token');
-    }
-
     return this.supabaseAuthService.getAccessToken();
   }
 }

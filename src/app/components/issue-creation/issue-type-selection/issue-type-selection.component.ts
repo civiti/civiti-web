@@ -17,7 +17,17 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 
 import { AppState } from '../../../store/app.state';
 import { selectIsAuthenticated } from '../../../store/auth/auth.selectors';
-import { MockIssueCreationService, IssueCategory } from '../../../services/mock-issue-creation.service';
+import { IntegrationService } from '../../../services/integration.service';
+import { IssueCategory, ISSUE_CATEGORIES } from '../../../types/civica-api.types';
+
+// Define IssueCategory interface for component
+interface IssueCategoryInfo {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  examples: string[];
+}
 
 @Component({
   selector: 'app-issue-type-selection',
@@ -40,8 +50,8 @@ import { MockIssueCreationService, IssueCategory } from '../../../services/mock-
 export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  categories: IssueCategory[] = [];
-  selectedCategory: IssueCategory | null = null;
+  categories: IssueCategoryInfo[] = [];
+  selectedCategory: IssueCategoryInfo | null = null;
   isLoading = false;
   currentLocation: any = null;
 
@@ -50,7 +60,7 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<AppState>,
     private router: Router,
-    private issueCreationService: MockIssueCreationService
+    private integrationService: IntegrationService
   ) {
     this.isAuthenticated$ = this.store.select(selectIsAuthenticated);
   }
@@ -68,19 +78,17 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
   private loadCategories(): void {
     this.isLoading = true;
 
-    this.issueCreationService.getIssueCategories()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (categories) => {
-          this.categories = categories;
-          this.isLoading = false;
-          console.log('[ISSUE TYPE] Categories loaded:', categories.length);
-        },
-        error: (error) => {
-          console.error('[ISSUE TYPE] Failed to load categories:', error);
-          this.isLoading = false;
-        }
-      });
+    // Load categories from the constants defined in API types
+    this.categories = Object.entries(ISSUE_CATEGORIES).map(([id, name]) => ({
+      id: id as IssueCategory,
+      name,
+      description: `Probleme legate de ${name.toLowerCase()}`,
+      icon: this.getCategoryIcon(id as IssueCategory),
+      examples: this.getCategoryExamples(id as IssueCategory)
+    }));
+
+    this.isLoading = false;
+    console.log('[ISSUE TYPE] Categories loaded:', this.categories.length);
   }
 
   private loadCurrentLocation(): void {
@@ -92,7 +100,7 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
     };
   }
 
-  selectCategory(category: IssueCategory): void {
+  selectCategory(category: IssueCategoryInfo): void {
     this.selectedCategory = category;
     console.log('[ISSUE TYPE] Category selected:', category.name);
   }
@@ -122,5 +130,29 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
     console.log('[ISSUE TYPE] Category help requested');
     // TODO: Show category help modal or navigate to help page
     alert('Ghidul de ajutor pentru categorii va fi implementat în următoarea fază.');
+  }
+
+  private getCategoryIcon(categoryId: IssueCategory): string {
+    const icons: { [key in IssueCategory]: string } = {
+      Infrastructure: 'build',
+      Environment: 'global',
+      Transportation: 'car',
+      PublicServices: 'tool',
+      Safety: 'safety',
+      Other: 'question-circle'
+    };
+    return icons[categoryId];
+  }
+
+  private getCategoryExamples(categoryId: IssueCategory): string[] {
+    const examples: { [key in IssueCategory]: string[] } = {
+      Infrastructure: ['Drum deteriorat', 'Trotuar stricat', 'Grop în carosabil'],
+      Environment: ['Poluare', 'Zgomot', 'Defrișări'],
+      Transportation: ['Semafor defect', 'Lipsă trecere pietoni', 'Transport public'],
+      PublicServices: ['Lipsă apă', 'Pane curent', 'Problemă gaze'],
+      Safety: ['Iluminat public', 'Zone nesigure', 'Câini fără stăpân'],
+      Other: ['Altă problemă', 'Nedefinită', 'Diverse']
+    };
+    return examples[categoryId];
   }
 }

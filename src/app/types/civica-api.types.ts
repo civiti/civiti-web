@@ -11,26 +11,24 @@
 // ============================================
 
 export type IssueCategory = 
-  | 'infrastructure'
-  | 'utilities'
-  | 'sanitation'
-  | 'transportation'
-  | 'environment'
-  | 'safety'
-  | 'education'
-  | 'health'
-  | 'administrative'
-  | 'other';
+  | 'Infrastructure'
+  | 'Environment'
+  | 'Transportation'
+  | 'PublicServices'
+  | 'Safety'
+  | 'Other';
 
-export type UrgencyLevel = 'low' | 'medium' | 'high' | 'critical';
+export type UrgencyLevel = 'Unspecified' | 'Low' | 'Medium' | 'High' | 'Urgent';
 
 export type IssueStatus = 
-  | 'pending_approval'
-  | 'approved'
-  | 'rejected'
-  | 'changes_requested'
-  | 'resolved'
-  | 'archived';
+  | 'Unspecified'
+  | 'Draft'
+  | 'Submitted'
+  | 'UnderReview'
+  | 'Approved'
+  | 'InProgress'
+  | 'Resolved'
+  | 'Rejected';
 
 export type ResidenceType = 'urban' | 'rural';
 
@@ -124,6 +122,7 @@ export interface UserProfileResponse {
   id: string;
   supabaseUserId: string;
   email: string;
+  photoURL?: string;
   displayName: string;
   county: string;
   city: string;
@@ -341,16 +340,30 @@ export interface ModerationStats {
 }
 
 export interface AdminStatisticsResponse {
-  totalIssues: number;
-  pendingApproval: number;
-  approvedToday: number;
-  rejectedToday: number;
+  totalSubmissions: number;
+  pendingReview: number;
+  approved: number;
+  rejected: number;
+  inProgress: number;
+  resolved: number;
+  submissionsToday: number;
+  submissionsThisWeek: number;
+  submissionsThisMonth: number;
+  reviewedToday: number;
+  reviewedThisWeek: number;
+  reviewedThisMonth: number;
+  averageReviewTimeHours: number;
+  issuesByCategory: { [key: string]: number };
+  issuesByUrgency: { [key: string]: number };
+  issuesByPriority: { [key: string]: number };
   totalUsers: number;
-  activeUsersToday: number;
+  activeUsersThisMonth: number;
   totalEmailsSent: number;
-  emailsSentToday: number;
-  topCategories: CategoryStats[];
-  moderationStats: ModerationStats;
+  approvalRate: number;
+  resolutionRate: number;
+  backlogCount: number;
+  period: string;
+  generatedAt: string;
 }
 
 export interface ErrorResponse {
@@ -450,33 +463,39 @@ export interface FilterOptions {
 // ============================================
 
 export const ISSUE_CATEGORIES: Record<IssueCategory, string> = {
-  infrastructure: 'Infrastructură',
-  utilities: 'Utilități',
-  sanitation: 'Salubritate',
-  transportation: 'Transport',
-  environment: 'Mediu',
-  safety: 'Siguranță',
-  education: 'Educație',
-  health: 'Sănătate',
-  administrative: 'Administrativ',
-  other: 'Altele'
+  Infrastructure: 'Infrastructură',
+  Environment: 'Mediu',
+  Transportation: 'Transport',
+  PublicServices: 'Servicii Publice',
+  Safety: 'Siguranță',
+  Other: 'Altele'
 };
 
 export const URGENCY_LEVELS: Record<UrgencyLevel, string> = {
-  low: 'Scăzută',
-  medium: 'Medie',
-  high: 'Ridicată',
-  critical: 'Critică'
+  Unspecified: 'Nespecificat',
+  Low: 'Scăzută',
+  Medium: 'Medie',
+  High: 'Ridicată',
+  Urgent: 'Urgentă'
 };
 
 export const ISSUE_STATUSES: Record<IssueStatus, string> = {
-  pending_approval: 'În așteptare',
-  approved: 'Aprobat',
-  rejected: 'Respins',
-  changes_requested: 'Modificări solicitate',
-  resolved: 'Rezolvat',
-  archived: 'Arhivat'
+  Unspecified: 'Nespecificat',
+  Draft: 'Ciornă',
+  Submitted: 'Trimis',
+  UnderReview: 'În Evaluare',
+  Approved: 'Aprobat',
+  InProgress: 'În Progres',
+  Resolved: 'Rezolvat',
+  Rejected: 'Respins'
 };
+
+// AI Analysis interface matching backend
+export interface AIAnalysisResult {
+  aiGeneratedDescription?: string;
+  aiProposedSolution?: string;
+  aiConfidence?: number;
+}
 
 export const API_ENDPOINTS = {
   // Base URLs

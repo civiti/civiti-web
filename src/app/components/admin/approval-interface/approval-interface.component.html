@@ -33,7 +33,7 @@
       <div nz-col [nzSpan]="12" [nzMd]="6">
         <nz-card class="stat-card">
           <nz-statistic
-            [nzValue]="adminStats.approvedToday"
+            [nzValue]="adminStats.reviewedToday"
             nzTitle="Approved Today"
             [nzValueStyle]="{ color: '#28A745' }">
           </nz-statistic>
@@ -54,7 +54,7 @@
       <div nz-col [nzSpan]="12" [nzMd]="6">
         <nz-card class="stat-card">
           <nz-statistic
-            [nzValue]="adminStats.averageReviewTime"
+            [nzValue]="adminStats.averageReviewTimeHours"
             nzSuffix="h"
             nzTitle="Avg Review Time"
             [nzValueStyle]="{ color: '#6c757d' }">
@@ -100,8 +100,8 @@
             </td>
             
             <td>
-              <nz-tag [nzColor]="getCategoryColor(issue.category.id)">
-                {{ issue.category.name }}
+              <nz-tag [nzColor]="getCategoryColor(issue.category)">
+                {{ issue.category | titlecase }}
               </nz-tag>
             </td>
             
@@ -119,7 +119,7 @@
             </td>
             
             <td>
-              <nz-badge [nzCount]="issue.photos.length" nzShowZero>
+              <nz-badge [nzCount]="issue.photoCount" nzShowZero>
                 <span nz-icon nzType="picture"></span>
               </nz-badge>
             </td>
@@ -181,8 +181,8 @@
           <div class="issue-header">
             <h3>{{ selectedIssue.title }}</h3>
             <div class="issue-meta">
-              <nz-tag [nzColor]="getCategoryColor(selectedIssue.category.id)">
-                {{ selectedIssue.category.name }}
+              <nz-tag [nzColor]="getCategoryColor(selectedIssue.category)">
+                {{ selectedIssue.category | titlecase }}
               </nz-tag>
               <nz-badge 
                 [nzStatus]="getUrgencyStatus(selectedIssue.urgency)" 
@@ -201,36 +201,12 @@
 
           <div class="issue-location">
             <h4>Location</h4>
-            <p>{{ selectedIssue.location.address }}</p>
+            <p>{{ selectedIssue.location }}</p>
           </div>
 
-          <div class="issue-photos" *ngIf="selectedIssue.photos.length > 0">
-            <h4>Photos ({{ selectedIssue.photos.length }})</h4>
-            <div class="photos-grid">
-              <div 
-                *ngFor="let photo of selectedIssue.photos" 
-                class="photo-item"
-                (click)="viewPhoto(photo.url)">
-                <img [src]="photo.thumbnail || photo.url" [alt]="'Issue photo'" class="photo-thumbnail">
-                <div class="photo-quality" [ngClass]="'quality-' + photo.quality">
-                  {{ photo.quality }}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- AI Generated Text -->
-          <div class="ai-text" *ngIf="selectedIssue.aiGeneratedText">
-            <h4>AI Analysis</h4>
-            <div class="ai-confidence">
-              Confidence: {{ (selectedIssue.aiGeneratedText.confidence * 100) | number:'1.0-0' }}%
-            </div>
-            <div class="ai-content">
-              <p><strong>Generated Description:</strong></p>
-              <p>{{ selectedIssue.aiGeneratedText.description }}</p>
-              <p><strong>Proposed Solution:</strong></p>
-              <p>{{ selectedIssue.aiGeneratedText.proposedSolution }}</p>
-            </div>
+          <div class="issue-photos" *ngIf="selectedIssue.photoCount > 0">
+            <h4>Photos ({{ selectedIssue.photoCount }})</h4>
+            <p>Photo details available in full issue view</p>
           </div>
 
         </div>

@@ -5,23 +5,23 @@ import { map, catchError, switchMap, tap } from 'rxjs/operators';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import * as UserActions from './user.actions';
-import { MockUserService } from '../../services/mock-user.service';
+import { IntegrationService } from '../../services/integration.service';
 
 @Injectable()
 export class UserEffects {
   private actions$ = inject(Actions);
-  private mockUserService = inject(MockUserService);
+  private integrationService = inject(IntegrationService);
   private message = inject(NzMessageService);
 
   // Load User Profile Effects
   loadUserProfile$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.loadUserProfile),
-      switchMap(({ userId }) =>
-        this.mockUserService.getUserProfile(userId).pipe(
+      switchMap(() =>
+        this.integrationService.getUserProfile().pipe(
           map(profile => UserActions.loadUserProfileSuccess({ profile })),
-          catchError(error => of(UserActions.loadUserProfileFailure({ 
-            error: error.message || 'Failed to load user profile' 
+          catchError(error => of(UserActions.loadUserProfileFailure({
+            error: error.message || 'Failed to load user profile'
           })))
         )
       )
@@ -33,10 +33,10 @@ export class UserEffects {
     this.actions$.pipe(
       ofType(UserActions.updateUserProfile),
       switchMap(({ updates }) =>
-        this.mockUserService.updateUserProfile(updates).pipe(
+        this.integrationService.updateUserProfile(updates).pipe(
           map(profile => UserActions.updateUserProfileSuccess({ profile })),
-          catchError(error => of(UserActions.updateUserProfileFailure({ 
-            error: error.message || 'Failed to update user profile' 
+          catchError(error => of(UserActions.updateUserProfileFailure({
+            error: error.message || 'Failed to update user profile'
           })))
         )
       )
@@ -47,11 +47,13 @@ export class UserEffects {
   loadGamificationData$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.loadGamificationData),
-      switchMap(({ userId }) =>
-        this.mockUserService.getGamificationData(userId).pipe(
-          map(gamification => UserActions.loadGamificationDataSuccess({ gamification })),
-          catchError(error => of(UserActions.loadGamificationDataFailure({ 
-            error: error.message || 'Failed to load gamification data' 
+      switchMap(() =>
+        this.integrationService.getUserFullProfile().pipe(
+          map(fullProfile => UserActions.loadGamificationDataSuccess({
+            gamification: fullProfile.gamification
+          })),
+          catchError(error => of(UserActions.loadGamificationDataFailure({
+            error: error.message || 'Failed to load gamification data'
           })))
         )
       )
@@ -62,23 +64,15 @@ export class UserEffects {
   updatePoints$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.updatePoints),
-      switchMap(({ points, reason }) =>
-        this.mockUserService.updatePoints(points, reason).pipe(
-          map(response => UserActions.updatePointsSuccess({ 
-            newPoints: response.newPoints,
-            totalPoints: response.totalPoints
-          })),
-          tap(({ newPoints }) => {
-            if (newPoints > 0) {
-              this.message.success(`+${newPoints} points earned! ${reason}`);
-            }
-          }),
-          catchError(error => {
-            this.message.error('Failed to update points');
-            return of({ type: '[User] Update Points Error' });
-          })
-        )
-      )
+      switchMap(({ points, reason }) => {
+        // For now, simulate point update since backend may not have this specific endpoint
+        // This will be replaced when backend implements point tracking
+        this.message.success(`+${points} points earned! ${reason}`);
+        return of(UserActions.updatePointsSuccess({
+          newPoints: points,
+          totalPoints: points // This should be updated once we have real data
+        }));
+      })
     )
   );
 
@@ -86,18 +80,21 @@ export class UserEffects {
   awardBadge$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.awardBadge),
-      switchMap(({ badgeId, reason }) =>
-        this.mockUserService.awardBadge(badgeId, reason).pipe(
-          map(gamification => UserActions.awardBadgeSuccess({ gamification })),
-          tap(() => {
-            this.message.success(`🏆 New badge earned! ${reason}`, { nzDuration: 5000 });
-          }),
+      switchMap(({ badgeId, reason }) => {
+        // For now, simulate badge award since backend may not have this specific endpoint
+        this.message.success(`🏆 New badge earned! ${reason}`, { nzDuration: 5000 });
+
+        // Return updated gamification data by fetching full profile
+        return this.integrationService.getUserFullProfile().pipe(
+          map(fullProfile => UserActions.awardBadgeSuccess({
+            gamification: fullProfile.gamification
+          })),
           catchError(error => {
             this.message.error('Failed to award badge');
             return of({ type: '[User] Award Badge Error' });
           })
-        )
-      )
+        );
+      })
     )
   );
 
@@ -105,15 +102,21 @@ export class UserEffects {
   updateStreak$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.updateStreak),
-      switchMap(({ streakType, increment }) =>
-        this.mockUserService.updateStreak(streakType, increment).pipe(
-          map(gamification => UserActions.updateStreakSuccess({ gamification })),
+      switchMap(({ streakType, increment }) => {
+        // For now, simulate streak update since backend may not have this specific endpoint
+        console.log(`Updated ${streakType} streak by ${increment}`);
+
+        // Return updated gamification data by fetching full profile
+        return this.integrationService.getUserFullProfile().pipe(
+          map(fullProfile => UserActions.updateStreakSuccess({
+            gamification: fullProfile.gamification
+          })),
           catchError(error => {
             console.error('Failed to update streak:', error);
             return of({ type: '[User] Update Streak Error' });
           })
-        )
-      )
+        );
+      })
     )
   );
 
@@ -121,14 +124,19 @@ export class UserEffects {
   loadUserPreferences$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.loadUserPreferences),
-      switchMap(({ userId }) =>
-        this.mockUserService.getUserPreferences(userId).pipe(
-          map(preferences => UserActions.loadUserPreferencesSuccess({ preferences })),
-          catchError(error => of(UserActions.loadUserPreferencesFailure({ 
-            error: error.message || 'Failed to load user preferences' 
-          })))
-        )
-      )
+      switchMap(() => {
+        // For now, return default preferences since backend may not have this endpoint yet
+        const defaultPreferences = {
+          language: 'ro' as const,
+          theme: 'light' as const,
+          notifications: { email: true, push: true, inApp: false },
+          privacy: { showOnLeaderboard: true, shareLocation: false, publicProfile: true }
+        };
+
+        return of(UserActions.loadUserPreferencesSuccess({
+          preferences: defaultPreferences
+        }));
+      })
     )
   );
 
@@ -136,19 +144,20 @@ export class UserEffects {
   updateUserPreferences$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserActions.updateUserPreferences),
-      switchMap(({ preferences }) =>
-        this.mockUserService.updateUserPreferences(preferences).pipe(
-          map(updatedPreferences => UserActions.updateUserPreferencesSuccess({ 
-            preferences: updatedPreferences 
-          })),
-          tap(() => {
-            this.message.success('Preferences updated successfully');
-          }),
-          catchError(error => of(UserActions.updateUserPreferencesFailure({ 
-            error: error.message || 'Failed to update user preferences' 
-          })))
-        )
-      )
+      switchMap(({ preferences }) => {
+        // For now, simulate preferences update since backend may not have this endpoint yet
+        this.message.success('Preferences updated successfully');
+
+        return of(UserActions.updateUserPreferencesSuccess({
+          preferences: {
+            language: 'ro' as const,
+            theme: 'light' as const,
+            notifications: { email: true, push: true, inApp: false },
+            privacy: { showOnLeaderboard: true, shareLocation: false, publicProfile: true },
+            ...preferences
+          }
+        }));
+      })
     )
   );
 

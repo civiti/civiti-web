@@ -15,7 +15,22 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 
-import { MockIssueCreationService, IssueCategory, PhotoData } from '../../../services/mock-issue-creation.service';
+import { IntegrationService } from '../../../services/integration.service';
+import { IssueCategory } from '../../../types/civica-api.types';
+
+// Keep local PhotoData interface for component
+interface PhotoData {
+  id: string;
+  url: string;
+  thumbnail: string;
+  quality: 'low' | 'medium' | 'high';
+  timestamp: Date;
+  metadata: {
+    size: number;
+    dimensions: { width: number; height: number };
+    format: string;
+  };
+}
 
 @Component({
   selector: 'app-photo-upload',
@@ -45,7 +60,7 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private message: NzMessageService,
-    private issueCreationService: MockIssueCreationService
+    private integrationService: IntegrationService
   ) {}
 
   ngOnInit(): void {

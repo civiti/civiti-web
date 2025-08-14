@@ -83,7 +83,7 @@
               >
               <!-- Status Badge -->
               <div class="absolute top-3 left-3">
-                <nz-tag [nzColor]="issue.status === 'open' ? 'warning' : issue.status === 'resolved' ? 'success' : 'processing'">
+                <nz-tag [nzColor]="issue.status === 'Submitted' ? 'warning' : issue.status === 'Resolved' ? 'success' : 'processing'">
                   {{ getStatusText(issue.status) }}
                 </nz-tag>
               </div>
@@ -105,7 +105,7 @@
             <!-- Location -->
             <div class="flex items-center text-oxford-blue opacity-60 text-xs mb-4">
               <i nz-icon nzType="environment" nzTheme="outline" class="text-base mr-1"></i>
-              <span class="truncate">{{ issue.location.address }}</span>
+              <span class="truncate">{{ issue.address }}</span>
             </div>
 
             <!-- Stats Row -->
@@ -113,7 +113,7 @@
               <!-- Email Counter - PROMINENT as required -->
               <div class="email-counter">
                 <nz-statistic 
-                  [nzValue]="issue.emailsSent" 
+                  [nzValue]="issue.emailCount" 
                   [nzTitle]="'email-uri trimise'"
                   [nzPrefix]="emailIcon"
                   class="email-counter-stat">
@@ -126,7 +126,7 @@
               <!-- Days Since -->
               <div class="text-right">
                 <div class="text-sm font-semibold text-oxford-blue">
-                  {{ getDaysSince(issue.dateCreated) }}
+                  {{ getDaysSince(issue.createdAt) }}
                 </div>
                 <div class="text-xs text-oxford-blue opacity-60">
                   zile în urmă

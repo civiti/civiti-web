@@ -55,8 +55,8 @@ export class AuthEffects {
             return this.apiService.getUserProfile().pipe(
               map(profile => AuthActions.loginWithEmailSuccess({
                 user: {
-                  ...response.user,
-                  ...profile
+                  ...profile, // Spread profile first
+                  ...response.user // Then override with auth user data
                 },
                 token: response.token,
                 refreshToken: response.refreshToken
@@ -99,8 +99,8 @@ export class AuthEffects {
             }).pipe(
               map(profile => AuthActions.registerWithEmailSuccess({
                 user: {
-                  ...response.user,
-                  ...profile
+                  ...profile, // Spread profile first  
+                  ...response.user // Then override with auth user data
                 },
                 token: response.token,
                 refreshToken: response.refreshToken
@@ -206,8 +206,8 @@ export class AuthEffects {
               return this.apiService.getUserProfile().pipe(
                 map(profile => AuthActions.loadUserFromStorageSuccess({
                   user: {
-                    ...userData.user,
-                    ...profile
+                    ...profile, // Spread profile first
+                    ...userData.user // Then override with stored user data
                   },
                   token: userData.token,
                   refreshToken: userData.refreshToken

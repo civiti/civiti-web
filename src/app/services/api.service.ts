@@ -29,7 +29,7 @@ import {
   IssueQueryParams,
   LeaderboardQueryParams,
   PaginationParams
-} from '../../docs/integration/civica-api-types';
+} from '../types/civica-api.types';
 
 @Injectable({
   providedIn: 'root'

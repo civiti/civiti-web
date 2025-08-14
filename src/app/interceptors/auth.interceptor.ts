@@ -1,3 +1,17 @@
+/**
+ * Auth Interceptor for Civica Application
+ * 
+ * Handles:
+ * - JWT token attachment to API requests
+ * - Token refresh with request queuing (prevents race conditions)
+ * - Public vs protected endpoint differentiation
+ * 
+ * Security Notes:
+ * - Uses EXACT path matching to prevent unauthorized access
+ * - Only specific endpoints and methods are public
+ * - All other requests require valid JWT authentication
+ */
+
 import { HttpInterceptorFn, HttpErrorResponse, HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
 import { inject } from '@angular/core';
 import { catchError, switchMap, filter, take } from 'rxjs/operators';
@@ -9,6 +23,62 @@ import { environment } from '../../environments/environment';
 let isRefreshingToken = false;
 const refreshTokenSubject = new BehaviorSubject<string | null>(null);
 
+/**
+ * Define public endpoints that don't require authentication
+ * 
+ * SECURITY CRITICAL: 
+ * - Uses EXACT path matching to prevent unauthorized access
+ * - Each endpoint must specify allowed HTTP methods
+ * - Regex patterns must be carefully crafted to avoid security holes
+ * 
+ * Examples of what this prevents:
+ * - /api/user/issues won't match /api/issues
+ * - /api/issues/123/email-sent won't match /api/issues/{id}
+ * - POST /api/issues won't be treated as public (only GET is)
+ */
+const PUBLIC_ENDPOINTS = [
+  { path: '/api/health', methods: ['GET'] },
+  { path: '/api/issues', methods: ['GET'] }, // List all issues (public viewing)
+  { path: /^\/api\/issues\/[^\/]+$/, methods: ['GET'] }, // View single issue (public viewing)
+  // Note: POST /api/issues requires auth (creating issues)
+  // Note: PUT /api/issues/{id}/email-sent requires auth (tracking emails)
+];
+
+/**
+ * Check if the request is to a public endpoint that doesn't require authentication
+ * Uses exact path matching to prevent security vulnerabilities
+ */
+function isPublicEndpoint(req: HttpRequest<any>): boolean {
+  // Parse the URL to get the pathname
+  let pathname: string;
+  try {
+    const url = new URL(req.url);
+    pathname = url.pathname;
+  } catch {
+    // If URL parsing fails, treat as relative URL
+    pathname = req.url.replace(environment.apiUrl, '');
+  }
+  
+  // Remove any query parameters for comparison
+  const cleanPath = pathname.split('?')[0];
+  
+  // Check against public endpoints
+  return PUBLIC_ENDPOINTS.some(endpoint => {
+    // Check if method matches
+    if (!endpoint.methods.includes(req.method)) {
+      return false;
+    }
+    
+    // Check path - handle both string and regex patterns
+    if (endpoint.path instanceof RegExp) {
+      return endpoint.path.test(cleanPath);
+    } else {
+      // Exact string match
+      return cleanPath === endpoint.path;
+    }
+  });
+}
+
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(SupabaseAuthService);
   
@@ -17,13 +87,8 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
     return next(req);
   }
 
-  // Skip auth header for certain endpoints
-  const skipAuthEndpoints = ['/api/health', '/api/issues']; // public endpoints
-  const shouldSkipAuth = skipAuthEndpoints.some(endpoint => 
-    req.url.includes(endpoint) && req.method === 'GET'
-  );
-  
-  if (shouldSkipAuth) {
+  // Check if this is a public endpoint that doesn't require authentication
+  if (isPublicEndpoint(req)) {
     return next(req);
   }
 

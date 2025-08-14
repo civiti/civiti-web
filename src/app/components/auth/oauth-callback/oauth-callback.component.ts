@@ -43,15 +43,15 @@ export class OauthCallbackComponent implements OnInit {
               // User has a profile, dispatch success
               this.store.dispatch(AuthActions.loginWithGoogleSuccess({
                 user: {
-                  id: user.id,
-                  email: user.email,
-                  displayName: profile.displayName || user.email,
-                  photoURL: profile.photoURL || user.user_metadata?.avatar_url,
+                  ...profile, // Spread profile first
+                  id: user.id, // Then override with Supabase user data
+                  email: user.email || profile.email || '',
+                  displayName: profile.displayName || user.email || '',
+                  photoURL: user.user_metadata?.['avatar_url'] || profile.photoURL,
                   authProvider: 'google',
                   emailVerified: true,
                   createdAt: new Date(user.created_at),
-                  lastLoginAt: new Date(),
-                  ...profile
+                  lastLoginAt: new Date()
                 },
                 token,
                 refreshToken: ''
@@ -59,8 +59,8 @@ export class OauthCallbackComponent implements OnInit {
             },
             error: () => {
               // No profile exists, create one
-              const displayName = user.user_metadata?.full_name || 
-                                user.user_metadata?.name || 
+              const displayName = user.user_metadata?.['full_name'] || 
+                                user.user_metadata?.['name'] || 
                                 user.email?.split('@')[0] || 'User';
               
               this.apiService.createUserProfile({
@@ -75,15 +75,15 @@ export class OauthCallbackComponent implements OnInit {
                 next: (profile) => {
                   this.store.dispatch(AuthActions.loginWithGoogleSuccess({
                     user: {
-                      id: user.id,
-                      email: user.email,
+                      ...profile, // Spread profile first
+                      id: user.id, // Then override with Supabase user data
+                      email: user.email || profile.email,
                       displayName: profile.displayName,
-                      photoURL: profile.photoURL || user.user_metadata?.avatar_url,
+                      photoURL: user.user_metadata?.['avatar_url'] || profile.photoURL,
                       authProvider: 'google',
                       emailVerified: true,
                       createdAt: new Date(user.created_at),
-                      lastLoginAt: new Date(),
-                      ...profile
+                      lastLoginAt: new Date()
                     },
                     token,
                     refreshToken: ''
@@ -95,9 +95,9 @@ export class OauthCallbackComponent implements OnInit {
                   this.store.dispatch(AuthActions.loginWithGoogleSuccess({
                     user: {
                       id: user.id,
-                      email: user.email,
+                      email: user.email || '',
                       displayName: displayName,
-                      photoURL: user.user_metadata?.avatar_url,
+                      photoURL: user.user_metadata?.['avatar_url'],
                       authProvider: 'google',
                       emailVerified: true,
                       createdAt: new Date(user.created_at),

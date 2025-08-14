@@ -20,10 +20,12 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { AppState } from '../../../store/app.state';
 import { selectAuthUser } from '../../../store/auth/auth.selectors';
 import * as UserActions from '../../../store/user/user.actions';
+import { IntegrationService } from '../../../services/integration.service';
 import { 
-  MockIssueCreationService, 
-  IssueCreationData
-} from '../../../services/mock-issue-creation.service';
+  CreateIssueRequest,
+  UrgencyLevel,
+  IssueCategory
+} from '../../../types/civica-api.types';
 
 @Component({
   selector: 'app-issue-review',
@@ -55,7 +57,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
     private router: Router,
     private message: NzMessageService,
     private store: Store<AppState>,
-    private issueCreationService: MockIssueCreationService
+    private integrationService: IntegrationService
   ) {}
 
   ngOnInit(): void {
@@ -119,28 +121,23 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
     console.log('[ISSUE REVIEW] Submitting issue...');
     this.isSubmitting = true;
 
-    // Prepare issue data for submission
-    const issueToSubmit: IssueCreationData = {
-      id: this.issueData.id, // Include the ID from the loaded data
+    // Prepare issue data for submission using the API format
+    const issueToSubmit: CreateIssueRequest = {
       title: this.generateIssueTitle(),
       description: this.issueData.aiAnalysis?.description || this.issueData.briefDescription,
-      category: this.issueData.category,
-      photos: this.issueData.photos,
-      location: this.issueData.location,
-      urgency: this.issueData.urgency,
-      status: 'draft',
-      aiGeneratedText: this.issueData.aiAnalysis,
-      additionalDetails: {
-        whenOccurred: this.getWhenLabel(this.issueData.whenOccurred),
-        affectedPeople: 0, // Mock value
-        previousReports: false // Mock value
-      },
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      userId: 'user-001' // Mock user ID
+      detailedDescription: this.issueData.aiAnalysis?.suggestedSolution,
+      category: this.issueData.category.id as IssueCategory,
+      urgency: this.issueData.urgency as UrgencyLevel,
+      county: this.issueData.location.county,
+      city: this.issueData.location.city,
+      district: this.issueData.location.district,
+      address: this.issueData.location.address,
+      latitude: this.issueData.location.coordinates?.latitude,
+      longitude: this.issueData.location.coordinates?.longitude,
+      photoUrls: this.issueData.photos.map((photo: any) => photo.url)
     };
 
-    this.issueCreationService.submitIssue(issueToSubmit)
+    this.integrationService.createIssue(issueToSubmit)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {

@@ -23,12 +23,68 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
-import { 
-  MockAdminService, 
-  AdminIssue, 
-  ApprovalDecision, 
-  AdminStats 
-} from '../../../services/mock-admin.service';
+import { IntegrationService } from '../../../services/integration.service';
+import {
+  AdminIssueListItem,
+  AdminStatisticsResponse,
+  ApproveIssueRequest,
+  RejectIssueRequest,
+  IssueCategory,
+  UrgencyLevel,
+  IssueStatus
+} from '../../../types/civica-api.types';
+
+// Define local interfaces for component use
+interface AdminIssue {
+  id: string;
+  userId: string;
+  title: string;
+  description: string;
+  category: IssueCategory;
+  address: string;
+  latitude: number;
+  longitude: number;
+  locationAccuracy: number;
+  neighborhood?: string;
+  landmark?: string;
+  urgency: UrgencyLevel;
+  status: IssueStatus;
+  emailsSent: number;
+  currentSituation?: string;
+  desiredOutcome?: string;
+  communityImpact?: string;
+  aiGeneratedDescription?: string;
+  aiProposedSolution?: string;
+  aiConfidence?: number;
+  adminNotes?: string;
+  rejectionReason?: string;
+  priority: Priority;
+  assignedDepartment?: string;
+  estimatedResolutionTime?: string;
+  publicVisibility: boolean;
+  reviewedAt?: string;
+  reviewedBy?: string;
+  createdAt: string;
+  updatedAt: string;
+  photos: IssuePhoto[];
+}
+
+interface IssuePhoto {
+  id: string;
+  url: string;
+  thumbnail?: string;
+  uploadedAt: string;
+}
+
+enum Priority {
+  Unspecified = 0,
+  Low = 1,
+  Medium = 2,
+  High = 3,
+  Critical = 4
+}
+
+
 
 @Component({
   selector: 'app-approval-interface',
@@ -59,19 +115,19 @@ import {
 export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  pendingIssues: AdminIssue[] = [];
-  adminStats: AdminStats | null = null;
+  pendingIssues: AdminIssueListItem[] = [];
+  adminStats: AdminStatisticsResponse | null = null;
   departments: string[] = [];
   isLoading = false;
   isProcessing = false;
 
   // Modal state
   isApprovalModalVisible = false;
-  selectedIssue: AdminIssue | null = null;
+  selectedIssue: AdminIssueListItem | null = null;
   approvalForm!: FormGroup;
 
   constructor(
-    private adminService: MockAdminService,
+    private integrationService: IntegrationService,
     private message: NzMessageService,
     private fb: FormBuilder,
     private router: Router
@@ -88,6 +144,11 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
+  calculateApprovalRate(): number {
+    if (!this.adminStats) return 0;
+    return Math.round(this.adminStats.approvalRate);
+  }
+
   private initializeForm(): void {
     this.approvalForm = this.fb.group({
       decision: ['', [Validators.required]],
@@ -101,12 +162,13 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     // Load pending issues
-    this.adminService.getPendingIssues()
+    this.integrationService.getPendingIssues()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (issues) => {
-          this.pendingIssues = issues;
-          console.log('[ADMIN] Loaded pending issues:', issues.length);
+        next: (response) => {
+          // Convert API response to component format
+          this.pendingIssues = response.items;
+          console.log('[ADMIN] Loaded pending issues:', this.pendingIssues.length);
         },
         error: (error) => {
           console.error('[ADMIN] Failed to load pending issues:', error);
@@ -114,13 +176,13 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
         }
       });
 
-    // Load admin stats
-    this.adminService.getAdminStats()
+    // Load admin statistics
+    this.integrationService.getAdminStatistics()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (stats) => {
+        next: (stats: AdminStatisticsResponse) => {
           this.adminStats = stats;
-          console.log('[ADMIN] Loaded admin stats:', stats);
+          console.log('[ADMIN] Loaded admin stats:', this.adminStats);
           this.isLoading = false;
         },
         error: (error) => {
@@ -130,17 +192,14 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
         }
       });
 
-    // Load departments
-    this.adminService.getDepartments()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (departments) => {
-          this.departments = departments;
-        },
-        error: (error) => {
-          console.error('[ADMIN] Failed to load departments:', error);
-        }
-      });
+    // Load departments - for now use hardcoded list
+    this.departments = [
+      'Primăria',
+      'Poliția Locală',
+      'Serviciul Public de Salubritate',
+      'Direcția de Transport Public',
+      'Serviciul de Utilități Publice'
+    ];
   }
 
   refreshData(): void {
@@ -171,31 +230,31 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
     return statuses[urgency] || 'default';
   }
 
-  getTimeAgo(date: Date): string {
+  getTimeAgo(date: string): string {
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - new Date(date).getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) return 'Just now';
     if (diffInHours < 24) return `${diffInHours}h ago`;
-    
+
     const diffInDays = Math.floor(diffInHours / 24);
     if (diffInDays < 7) return `${diffInDays}d ago`;
-    
+
     const diffInWeeks = Math.floor(diffInDays / 7);
     return `${diffInWeeks}w ago`;
   }
 
-  viewIssueDetails(issue: AdminIssue): void {
+  viewIssueDetails(issue: AdminIssueListItem): void {
     console.log('[ADMIN] View issue details:', issue.id);
     // TODO: Open detailed view modal or navigate to details page
     this.openApprovalModal(issue);
   }
 
-  openApprovalModal(issue: AdminIssue): void {
+  openApprovalModal(issue: AdminIssueListItem): void {
     console.log('[ADMIN] Open approval modal for issue:', issue.id);
     this.selectedIssue = issue;
     this.isApprovalModalVisible = true;
-    
+
     // Reset form
     this.approvalForm.reset({
       decision: '',
@@ -224,51 +283,75 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
     }
 
     const formValue = this.approvalForm.value;
-    const decision: ApprovalDecision = {
-      issueId: this.selectedIssue.id!,
-      decision: formValue.decision,
-      notes: formValue.notes,
-      priority: formValue.priority,
-      assignedDepartment: formValue.assignedDepartment,
-      publicVisibility: formValue.decision === 'approve',
-      adminId: 'admin-001' // Mock admin ID
-    };
+    const issueId = this.selectedIssue.id;
 
-    console.log('[ADMIN] Submitting approval decision:', decision);
+    console.log('[ADMIN] Submitting approval decision for issue:', issueId);
     this.isProcessing = true;
 
-    this.adminService.processApprovalDecision(decision)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (result) => {
-          console.log('[ADMIN] Decision processed successfully:', result);
-          
-          const actionText = decision.decision === 'approve' ? 'approved' : 
-                           decision.decision === 'reject' ? 'rejected' : 'updated';
-          
-          this.message.success(`Issue ${actionText} successfully`);
-          
-          // Remove processed issue from pending list
-          this.pendingIssues = this.pendingIssues.filter(issue => issue.id !== decision.issueId);
-          
-          // Update stats
-          if (this.adminStats) {
-            this.adminStats.pendingReview--;
-            if (decision.decision === 'approve') {
-              this.adminStats.approvedToday++;
-            } else if (decision.decision === 'reject') {
-              this.adminStats.rejectedToday++;
-            }
-          }
-
-          this.closeApprovalModal();
-          this.isProcessing = false;
-        },
-        error: (error) => {
-          console.error('[ADMIN] Failed to process decision:', error);
-          this.message.error('Failed to process decision. Please try again.');
-          this.isProcessing = false;
+    if (formValue.decision === 'approve') {
+      const approvalData: ApproveIssueRequest = {
+        adminNotes: formValue.notes,
+        templateEmail: {
+          subject: `Problemă aprobată: ${this.selectedIssue.title}`,
+          body: 'Problema dumneavoastră a fost aprobată și se află în proces de rezolvare.',
+          targetAuthorities: [formValue.assignedDepartment || 'Primăria']
         }
-      });
+      };
+
+      this.integrationService.approveIssue(issueId, approvalData)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (result) => {
+            console.log('[ADMIN] Issue approved successfully:', result);
+            this.message.success('Issue approved successfully');
+            this.handleDecisionSuccess('approve');
+          },
+          error: (error) => {
+            console.error('[ADMIN] Failed to approve issue:', error);
+            this.message.error('Failed to approve issue. Please try again.');
+            this.isProcessing = false;
+          }
+        });
+    } else if (formValue.decision === 'reject') {
+      const rejectionData: RejectIssueRequest = {
+        reason: formValue.notes || 'Nu îndeplinește criteriile de aprobare',
+        adminNotes: formValue.notes
+      };
+
+      this.integrationService.rejectIssue(issueId, rejectionData)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (result) => {
+            console.log('[ADMIN] Issue rejected successfully:', result);
+            this.message.success('Issue rejected successfully');
+            this.handleDecisionSuccess('reject');
+          },
+          error: (error) => {
+            console.error('[ADMIN] Failed to reject issue:', error);
+            this.message.error('Failed to reject issue. Please try again.');
+            this.isProcessing = false;
+          }
+        });
+    }
+  }
+
+  private handleDecisionSuccess(decision: 'approve' | 'reject'): void {
+    // Remove processed issue from pending list
+    this.pendingIssues = this.pendingIssues.filter(issue => issue.id !== this.selectedIssue?.id);
+
+    // Update stats
+    if (this.adminStats) {
+      this.adminStats.pendingReview--;
+      if (decision === 'approve') {
+        this.adminStats.reviewedToday++;
+        this.adminStats.approved++;
+      } else if (decision === 'reject') {
+        this.adminStats.reviewedToday++;
+        this.adminStats.rejected++;
+      }
+    }
+
+    this.closeApprovalModal();
+    this.isProcessing = false;
   }
 }

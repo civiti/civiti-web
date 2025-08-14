@@ -255,6 +255,19 @@ export class SupabaseAuthService {
     return this.currentUser$.asObservable();
   }
 
+  /**
+   * Get the current user from Supabase session
+   * Used in OAuth callback to get authenticated user details
+   */
+  async getUser(): Promise<User | null> {
+    const { data: { user }, error } = await this.supabase.auth.getUser();
+    if (error) {
+      console.error('Error getting user:', error);
+      return null;
+    }
+    return user;
+  }
+
   // ============================================
   // Email Verification
   // ============================================

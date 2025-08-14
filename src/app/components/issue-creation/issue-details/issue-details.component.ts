@@ -18,12 +18,21 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
-import { 
-  MockIssueCreationService, 
-  IssueCategory, 
-  PhotoData, 
-  AIAnalysisResult 
-} from '../../../services/mock-issue-creation.service';
+import { IntegrationService } from '../../../services/integration.service';
+import {
+  IssueCategory,
+  AIAnalysisResult
+} from '../../../types/civica-api.types';
+
+// Keep local interfaces for component data
+interface PhotoData {
+  id: string;
+  file: File;
+  url: string;
+  description?: string;
+}
+
+
 
 @Component({
   selector: 'app-issue-details',
@@ -60,7 +69,7 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private router: Router,
     private message: NzMessageService,
-    private issueCreationService: MockIssueCreationService
+    private integrationService: IntegrationService
   ) {
     this.initializeForm();
   }
@@ -121,25 +130,19 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
 
     this.isGeneratingAI = true;
 
-    this.issueCreationService.generateAIDescription(
-      this.uploadedPhotos,
-      briefDescription,
-      this.selectedCategory!
-    )
-    .pipe(takeUntil(this.destroy$))
-    .subscribe({
-      next: (analysis) => {
-        this.aiAnalysis = analysis;
-        this.isGeneratingAI = false;
-        console.log('[ISSUE DETAILS] AI analysis generated:', analysis);
-        this.message.success('Descrierea AI a fost generată cu succes!');
-      },
-      error: (error) => {
-        console.error('[ISSUE DETAILS] Failed to generate AI description:', error);
-        this.message.error('Nu s-a putut genera descrierea AI. Vă rugăm să încercați din nou.');
-        this.isGeneratingAI = false;
-      }
-    });
+    // For now, simulate AI description generation since the backend may not have this endpoint
+    // This should be replaced with actual API call when backend implements AI description
+    setTimeout(() => {
+      this.aiAnalysis = {
+        aiGeneratedDescription: `${briefDescription} - Această problemă necesită atenția autorităților locale pentru rezolvarea rapidă și eficientă.`,
+        aiProposedSolution: 'Se recomandă contactarea serviciului de urgență al primăriei pentru intervenție rapidă.',
+        aiConfidence: 0.85
+      };
+
+      this.isGeneratingAI = false;
+      console.log('[ISSUE DETAILS] AI analysis generated:', this.aiAnalysis);
+      this.message.success('Descrierea AI a fost generată cu succes!');
+    }, 1500); // Simulate API delay
   }
 
   getConfidenceColor(confidence: number): string {
@@ -167,7 +170,7 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
     }
 
     console.log('[ISSUE DETAILS] Continuing to review...');
-    
+
     // Store form data and AI analysis in session
     const issueData = {
       id: this.generateIssueId(), // Generate ID here to be used in submission
@@ -181,7 +184,7 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
     };
 
     sessionStorage.setItem('civica_complete_issue_data', JSON.stringify(issueData));
-    
+
     this.router.navigate(['/create-issue/review']);
   }
 

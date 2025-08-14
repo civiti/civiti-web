@@ -20,7 +20,7 @@ import { Observable } from 'rxjs';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
 import * as IssueSelectors from '../../store/issues/issue.selectors';
-import { Issue } from '../../services/mock-data.service';
+import { IssueListItem } from '../../types/civica-api.types';
 
 @Component({
   selector: 'app-issues-list',
@@ -46,13 +46,13 @@ import { Issue } from '../../services/mock-data.service';
   templateUrl: './issues-list.component.html',
   styleUrl: './issues-list.component.scss'
 })
-export class IssuesListComponent implements OnInit {
+export class IssueListItemsListComponent implements OnInit {
   private _router = inject(Router);
   private _store = inject(Store<AppState>);
   private _modal = inject(NzModalService);
   private _imageErrorCount: Map<string, number> = new Map();
 
-  issues$!: Observable<Issue[]>;
+  issues$!: Observable<IssueListItem[]>;
   isLoading$!: Observable<boolean>;
   error$!: Observable<string | null>;
   sortBy$!: Observable<string>;
@@ -78,16 +78,16 @@ export class IssuesListComponent implements OnInit {
     }));
   }
 
-  getUrgencyLevel(issue: Issue): 'urgent' | 'normal' {
-    return issue.emailsSent > 100 ? 'urgent' : 'normal';
+  getUrgencyLevel(issue: IssueListItem): 'urgent' | 'normal' {
+    return issue.emailCount > 100 ? 'urgent' : 'normal';
   }
 
-  getDaysSince(date: Date): string {
+  getDaysSince(date: string | Date): string {
     const days = this.getDaysSinceNumber(date);
     return days.toString();
   }
 
-  private getDaysSinceNumber(date: Date): number {
+  private getDaysSinceNumber(date: string | Date): number {
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - new Date(date).getTime());
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -102,7 +102,7 @@ export class IssuesListComponent implements OnInit {
     }
   }
 
-  getIssueImage(issue: Issue): string {
+  getIssueImage(issue: IssueListItem): string {
     // Use local placeholder for development
     // In production, this would return the actual photo URL from backend
     return '/images/placeholders/issue-placeholder.svg';
