@@ -15,6 +15,10 @@
     "serve:ssr:Civica": "node dist/Civica/server/server.mjs"
   },
   "private": true,
+  "engines": {
+    "node": ">=20.11.1 <21.0.0",
+    "npm": ">=10.0.0"
+  },
   "dependencies": {
     "@angular/common": "^19.2.14",
     "@angular/compiler": "^19.2.14",
@@ -57,5 +61,10 @@
     "karma-jasmine-html-reporter": "~2.1.0",
     "less": "^4.4.0",
     "typescript": "~5.6.3"
+  },
+  "overrides": {
+    "@supabase/supabase-js": {
+      "@supabase/auth-js": "2.61.0"
+    }
   }
 }

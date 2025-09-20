@@ -1,14 +1,24 @@
 const fs = require('fs');
 const path = require('path');
 
+// Load environment variables from .env file
+const dotenv = require('dotenv');
+const result = dotenv.config();
+
+if (result.error) {
+  console.log('Note: .env file not found or could not be read');
+} else {
+  console.log('.env file loaded successfully');
+}
+
 // Environment variables to inject
 const envVars = {
   // API URLs - Default to local backend service
   apiUrl: process.env.API_URL || 'http://localhost:8080/api',
-  
-  // Supabase configuration
+
+  // Supabase configuration - Support both new publishable key and legacy anon key
   supabaseUrl: process.env.SUPABASE_URL || '',
-  supabaseAnonKey: process.env.SUPABASE_ANON_KEY || '',
+  supabaseAnonKey: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || '',
   
   // Google Maps (consider renaming VITE_GOOGLE_MAPS_API_KEY to GOOGLE_MAPS_API_KEY)
   googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY || '',

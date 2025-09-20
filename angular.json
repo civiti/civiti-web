@@ -41,11 +41,7 @@
             "allowedCommonJsDependencies": [
               "glightbox",
               "whatwg-url"
-            ],
-            "server": "src/main.server.ts",
-            "ssr": {
-              "entry": "src/server.ts"
-            }
+            ]
           },
           "configurations": {
             "production": {
