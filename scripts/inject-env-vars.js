@@ -16,9 +16,9 @@ const envVars = {
   // API URLs - Default to local backend service
   apiUrl: process.env.API_URL || 'http://localhost:8080/api',
 
-  // Supabase configuration - Support both new publishable key and legacy anon key
+  // Supabase configuration
   supabaseUrl: process.env.SUPABASE_URL || '',
-  supabaseAnonKey: process.env.SUPABASE_PUBLISHABLE_KEY || process.env.SUPABASE_ANON_KEY || '',
+  supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || '',
   
   // Google Maps (consider renaming VITE_GOOGLE_MAPS_API_KEY to GOOGLE_MAPS_API_KEY)
   googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY || '',
@@ -32,7 +32,7 @@ console.log('Is Vercel environment:', process.env.VERCEL ? 'YES' : 'NO');
 console.log('Environment:', process.env.NODE_ENV || 'development');
 
 // Validate required variables
-const requiredVars = ['supabaseUrl', 'supabaseAnonKey'];
+const requiredVars = ['supabaseUrl', 'supabasePublishableKey'];
 const missingVars = requiredVars.filter(key => !envVars[key]);
 
 if (missingVars.length > 0) {
@@ -63,7 +63,7 @@ export const environment = {
   apiUrl: '${envVars.apiUrl}',
   supabase: {
     url: '${envVars.supabaseUrl}',
-    anonKey: '${envVars.supabaseAnonKey}'
+    publishableKey: '${envVars.supabasePublishableKey}'
   }
 };
 `;
@@ -81,7 +81,7 @@ export const environment = {
   apiUrl: '${envVars.apiUrl}',
   supabase: {
     url: '${envVars.supabaseUrl}',
-    anonKey: '${envVars.supabaseAnonKey}'
+    publishableKey: '${envVars.supabasePublishableKey}'
   }
 };
 `;

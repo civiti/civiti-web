@@ -158,7 +158,7 @@ dotnet run
 ```env
 DATABASE_URL=postgresql://user:password@localhost:5432/civica
 SUPABASE_URL=https://your-project.supabase.co
-SUPABASE_ANON_KEY=your-anon-key
+SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 PORT=8080
 ```
 

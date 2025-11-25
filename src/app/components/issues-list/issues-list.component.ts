@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -66,6 +67,15 @@ export class IssuesListComponent implements OnInit {
     this.error$ = this._store.select(IssueSelectors.selectIssuesError);
     this.sortBy$ = this._store.select(IssueSelectors.selectSortBy);
     this.totalIssues$ = this._store.select(IssueSelectors.selectTotal);
+    
+    // Sync local sortBy with store state using takeUntilDestroyed (Angular 19 best practice)
+    this.sortBy$
+      .pipe(takeUntilDestroyed())
+      .subscribe(sortBy => {
+        if (sortBy && this.sortBy !== sortBy) {
+          this.sortBy = sortBy;
+        }
+      });
   }
 
   ngOnInit(): void {

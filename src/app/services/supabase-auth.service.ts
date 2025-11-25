@@ -32,7 +32,7 @@ export class SupabaseAuthService {
   constructor() {
     this.supabase = createClient(
       environment.supabase.url,
-      environment.supabase.anonKey,
+      environment.supabase.publishableKey,
       {
         auth: {
           persistSession: true,
