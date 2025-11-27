@@ -8,7 +8,7 @@ import { Store } from '@ngrx/store';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
 import { IssueDetailResponse } from '../../types/civica-api.types';
-import { IntegrationService } from '../../services/integration.service';
+import { ApiService } from '../../services/api.service';
 import { CustomValidators } from '../../validators/custom-validators';
 import { SanitizationService } from '../../services/sanitization.service';
 import { Subject } from 'rxjs';
@@ -39,7 +39,7 @@ interface EmailTemplate {
 export class EmailModalComponent implements OnInit, OnDestroy {
     private _fb = inject(FormBuilder);
     private _store = inject(Store<AppState>);
-    private _integrationService = inject(IntegrationService);
+    private _apiService = inject(ApiService);
     private _message = inject(NzMessageService);
     private _modalRef = inject(NzModalRef);
     private _sanitizer = inject(SanitizationService);

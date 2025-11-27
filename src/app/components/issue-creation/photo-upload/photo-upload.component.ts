@@ -15,7 +15,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 
-import { IntegrationService } from '../../../services/integration.service';
+import { ApiService } from '../../../services/api.service';
 import { IssueCategory } from '../../../types/civica-api.types';
 
 // Interface for category data from session storage
@@ -69,7 +69,7 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private message: NzMessageService,
-    private integrationService: IntegrationService
+    private apiService: ApiService
   ) {}
 
   ngOnInit(): void {

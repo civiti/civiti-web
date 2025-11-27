@@ -148,7 +148,7 @@ export interface IssueItem {
   latitude?: number;
   longitude?: number;
   photoUrls: string[];
-  emailCount: number;
+  emailsSent: number;
   status: IssueStatus;
   createdAt: string;
   submitterName?: string;

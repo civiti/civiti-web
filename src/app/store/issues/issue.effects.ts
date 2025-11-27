@@ -5,13 +5,13 @@ import { map, mergeMap, catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
-import { IntegrationService } from '../../services/integration.service';
+import { ApiService } from '../../services/api.service';
 import * as IssueActions from './issue.actions';
 
 @Injectable()
 export class IssueEffects {
   private actions$ = inject(Actions);
-  private integrationService = inject(IntegrationService);
+  private apiService = inject(ApiService);
   private router = inject(Router);
   private message = inject(NzMessageService);
 
@@ -20,7 +20,7 @@ export class IssueEffects {
     this.actions$.pipe(
       ofType(IssueActions.loadIssues),
       mergeMap(({ params }) =>
-        this.integrationService.getIssues(params).pipe(
+        this.apiService.getIssues(params).pipe(
           map(response => IssueActions.loadIssuesSuccess({ 
             issues: response.items,
             totalCount: response.totalCount 
@@ -41,7 +41,7 @@ export class IssueEffects {
     this.actions$.pipe(
       ofType(IssueActions.loadIssue),
       mergeMap(({ id }) =>
-        this.integrationService.getIssueDetails(id).pipe(
+        this.apiService.getIssueById(id).pipe(
           map(issue => {
             if (issue) {
               return IssueActions.loadIssueSuccess({ issue });
@@ -65,7 +65,7 @@ export class IssueEffects {
     this.actions$.pipe(
       ofType(IssueActions.trackEmailSent),
       mergeMap(({ issueId, emailAddress, targetAuthority }) =>
-        this.integrationService.trackEmailSent(issueId, { emailAddress, targetAuthority }).pipe(
+        this.apiService.trackEmailSent(issueId, { emailAddress, targetAuthority }).pipe(
           map(response => {
             this.message.success(`Email trimis! +${response.pointsEarned} puncte câștigate!`);
             return IssueActions.trackEmailSentSuccess({ 
@@ -91,7 +91,7 @@ export class IssueEffects {
     this.actions$.pipe(
       ofType(IssueActions.createIssue),
       mergeMap(({ issue }) =>
-        this.integrationService.createIssue(issue).pipe(
+        this.apiService.createIssue(issue).pipe(
           tap(response => {
             console.log('[Issues Effects] Issue created successfully:', response);
             this.message.success('Problema a fost raportată cu succes!');

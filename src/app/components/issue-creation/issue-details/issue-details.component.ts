@@ -18,7 +18,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
-import { IntegrationService } from '../../../services/integration.service';
+import { ApiService } from '../../../services/api.service';
 import {
   IssueCategory,
   AIAnalysisResult
@@ -69,7 +69,7 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private router: Router,
     private message: NzMessageService,
-    private integrationService: IntegrationService
+    private apiService: ApiService
   ) {
     this.initializeForm();
   }

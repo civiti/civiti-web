@@ -23,7 +23,7 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
-import { IntegrationService } from '../../../services/integration.service';
+import { ApiService } from '../../../services/api.service';
 import {
   AdminIssueListItem,
   AdminStatisticsResponse,
@@ -127,7 +127,7 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
   approvalForm!: FormGroup;
 
   constructor(
-    private integrationService: IntegrationService,
+    private apiService: ApiService,
     private message: NzMessageService,
     private fb: FormBuilder,
     private router: Router
@@ -162,7 +162,7 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
     this.isLoading = true;
 
     // Load pending issues
-    this.integrationService.getPendingIssues()
+    this.apiService.getPendingIssues()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
@@ -177,7 +177,7 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
       });
 
     // Load admin statistics
-    this.integrationService.getAdminStatistics()
+    this.apiService.getAdminStatistics()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (stats: AdminStatisticsResponse) => {
@@ -298,7 +298,7 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
         }
       };
 
-      this.integrationService.approveIssue(issueId, approvalData)
+      this.apiService.approveIssue(issueId, approvalData)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (result) => {
@@ -318,7 +318,7 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
         adminNotes: formValue.notes
       };
 
-      this.integrationService.rejectIssue(issueId, rejectionData)
+      this.apiService.rejectIssue(issueId, rejectionData)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (result) => {

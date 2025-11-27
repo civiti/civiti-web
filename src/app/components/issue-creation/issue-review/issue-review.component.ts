@@ -20,7 +20,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { AppState } from '../../../store/app.state';
 import { selectAuthUser } from '../../../store/auth/auth.selectors';
 import * as UserActions from '../../../store/user/user.actions';
-import { IntegrationService } from '../../../services/integration.service';
+import { ApiService } from '../../../services/api.service';
 import { 
   CreateIssueRequest,
   UrgencyLevel,
@@ -57,7 +57,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
     private router: Router,
     private message: NzMessageService,
     private store: Store<AppState>,
-    private integrationService: IntegrationService
+    private apiService: ApiService
   ) {}
 
   ngOnInit(): void {
@@ -137,7 +137,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
       photoUrls: this.issueData.photos.map((photo: any) => photo.url)
     };
 
-    this.integrationService.createIssue(issueToSubmit)
+    this.apiService.createIssue(issueToSubmit)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (result) => {

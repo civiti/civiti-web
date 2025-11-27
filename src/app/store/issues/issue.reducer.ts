@@ -68,7 +68,7 @@ export const issueReducer = createReducer(
     if (issue) {
       newState = issueAdapter.updateOne({
         id: issueId,
-        changes: { emailCount: newTotalEmails }
+        changes: { emailsSent: newTotalEmails }
       }, state);
     }
     

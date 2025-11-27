@@ -90,7 +90,7 @@ export class IssuesListComponent implements OnInit {
   }
 
   getUrgencyLevel(issue: IssueItem): 'urgent' | 'normal' {
-    return issue.emailCount > 100 ? 'urgent' : 'normal';
+    return (issue.emailsSent || 0) > 100 ? 'urgent' : 'normal';
   }
 
   getDaysSince(date: string | Date): string {

@@ -42,25 +42,20 @@ export const selectSelectedIssue = createSelector(
 export const selectSortedIssues = createSelector(
   selectAll,
   selectSortBy,
-  (issues: IssueItem[], sortBy: string) => {
-    const sortedIssues = [...issues];
-    
-    switch (sortBy) {
-      case 'emails':
-        return sortedIssues.sort((a, b) => b.emailCount - a.emailCount);
-      
-      case 'urgency':
-        return sortedIssues.sort((a, b) => {
-          const urgencyA = getUrgencyScore(a);
-          const urgencyB = getUrgencyScore(b);
-          return urgencyB - urgencyA;
-        });
-      
-      default: // 'date'
-        return sortedIssues.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-    }
+  (issues: IssueItem[], sortBy: string): IssueItem[] => {
+    if (!issues?.length) return [];
+
+    return [...issues].sort((a, b) => {
+      switch (sortBy) {
+        case 'emails':
+          return (b.emailsSent || 0) - (a.emailsSent || 0);
+        case 'urgency':
+          return getUrgencyScore(b) - getUrgencyScore(a);
+        case 'date':
+        default:
+          return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+      }
+    });
   }
 );
 
@@ -69,6 +64,6 @@ function getUrgencyScore(issue: IssueItem): number {
   const daysSince = Math.ceil(
     Math.abs(new Date().getTime() - new Date(issue.createdAt).getTime()) / (1000 * 60 * 60 * 24)
   );
-  const emailRatio = issue.emailCount / 100;
+  const emailRatio = (issue.emailsSent || 0) / 100;
   return emailRatio + (daysSince / 10);
 }

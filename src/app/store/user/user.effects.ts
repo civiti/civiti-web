@@ -5,12 +5,12 @@ import { map, catchError, switchMap, tap } from 'rxjs/operators';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import * as UserActions from './user.actions';
-import { IntegrationService } from '../../services/integration.service';
+import { ApiService } from '../../services/api.service';
 
 @Injectable()
 export class UserEffects {
   private actions$ = inject(Actions);
-  private integrationService = inject(IntegrationService);
+  private apiService = inject(ApiService);
   private message = inject(NzMessageService);
 
   // Load User Profile Effects
@@ -18,7 +18,7 @@ export class UserEffects {
     this.actions$.pipe(
       ofType(UserActions.loadUserProfile),
       switchMap(() =>
-        this.integrationService.getUserProfile().pipe(
+        this.apiService.getUserProfile().pipe(
           map(profile => UserActions.loadUserProfileSuccess({ profile })),
           catchError(error => of(UserActions.loadUserProfileFailure({
             error: error.message || 'Failed to load user profile'
@@ -33,7 +33,7 @@ export class UserEffects {
     this.actions$.pipe(
       ofType(UserActions.updateUserProfile),
       switchMap(({ updates }) =>
-        this.integrationService.updateUserProfile(updates).pipe(
+        this.apiService.updateUserProfile(updates).pipe(
           map(profile => UserActions.updateUserProfileSuccess({ profile })),
           catchError(error => of(UserActions.updateUserProfileFailure({
             error: error.message || 'Failed to update user profile'
@@ -48,7 +48,7 @@ export class UserEffects {
     this.actions$.pipe(
       ofType(UserActions.loadGamificationData),
       switchMap(() =>
-        this.integrationService.getUserFullProfile().pipe(
+        this.apiService.getUserFullProfile().pipe(
           map(fullProfile => UserActions.loadGamificationDataSuccess({
             gamification: fullProfile.gamification
           })),
@@ -85,7 +85,7 @@ export class UserEffects {
         this.message.success(`🏆 New badge earned! ${reason}`, { nzDuration: 5000 });
 
         // Return updated gamification data by fetching full profile
-        return this.integrationService.getUserFullProfile().pipe(
+        return this.apiService.getUserFullProfile().pipe(
           map(fullProfile => UserActions.awardBadgeSuccess({
             gamification: fullProfile.gamification
           })),
@@ -107,7 +107,7 @@ export class UserEffects {
         console.log(`Updated ${streakType} streak by ${increment}`);
 
         // Return updated gamification data by fetching full profile
-        return this.integrationService.getUserFullProfile().pipe(
+        return this.apiService.getUserFullProfile().pipe(
           map(fullProfile => UserActions.updateStreakSuccess({
             gamification: fullProfile.gamification
           })),

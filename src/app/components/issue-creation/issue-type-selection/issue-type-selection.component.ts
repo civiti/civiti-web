@@ -17,7 +17,7 @@ import { NzTagModule } from 'ng-zorro-antd/tag';
 
 import { AppState } from '../../../store/app.state';
 import { selectIsAuthenticated } from '../../../store/auth/auth.selectors';
-import { IntegrationService } from '../../../services/integration.service';
+import { ApiService } from '../../../services/api.service';
 import { IssueCategory, ISSUE_CATEGORIES } from '../../../types/civica-api.types';
 
 // Define IssueCategory interface for component
@@ -60,7 +60,7 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<AppState>,
     private router: Router,
-    private integrationService: IntegrationService
+    private apiService: ApiService
   ) {
     this.isAuthenticated$ = this.store.select(selectIsAuthenticated);
   }
