@@ -20,7 +20,7 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
-import { IssueCategory, AuthorityListResponse } from '../../../types/civica-api.types';
+import { AuthorityListResponse } from '../../../types/civica-api.types';
 import { ApiService } from '../../../services/api.service';
 
 /**
@@ -46,6 +46,14 @@ interface LocationData {
   address: string;
   coordinates?: { lat: number; lng: number };
   accuracy?: number;
+}
+
+interface IssueCategoryInfo {
+  id: string;
+  name: string;
+  description: string;
+  icon: string;
+  examples: string[];
 }
 
 @Component({
@@ -76,7 +84,7 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   // Data from previous steps
-  selectedCategory: IssueCategory | null = null;
+  selectedCategory: IssueCategoryInfo | null = null;
   currentLocation: LocationData | null = null;
 
   // Authority selection state

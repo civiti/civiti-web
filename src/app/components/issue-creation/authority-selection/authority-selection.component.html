@@ -44,7 +44,7 @@
       <div class="summary-content">
         <div class="summary-item" *ngIf="selectedCategory">
           <span nz-icon nzType="folder" class="summary-icon"></span>
-          <span class="summary-value">{{ selectedCategory | titlecase }}</span>
+          <span class="summary-value">{{ selectedCategory.name }}</span>
         </div>
         <div class="summary-item" *ngIf="currentLocation">
           <span nz-icon nzType="environment" class="summary-icon"></span>
