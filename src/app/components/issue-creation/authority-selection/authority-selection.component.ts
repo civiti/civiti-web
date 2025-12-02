@@ -43,10 +43,9 @@ interface SelectedAuthority {
 }
 
 interface LocationData {
-  county: string;
-  city: string;
-  district?: string;
   address: string;
+  coordinates?: { lat: number; lng: number };
+  accuracy?: number;
 }
 
 @Component({
