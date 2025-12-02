@@ -98,6 +98,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
     } else {
       console.warn('[ISSUE REVIEW] No authorities selected, redirecting...');
       this.router.navigate(['/create-issue/authorities']);
+      return;
     }
   }
 

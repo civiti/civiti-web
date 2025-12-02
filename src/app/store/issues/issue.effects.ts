@@ -121,6 +121,7 @@ export class IssueEffects {
         sessionStorage.removeItem('civica_uploaded_photos');
         sessionStorage.removeItem('civica_current_location');
         sessionStorage.removeItem('civica_complete_issue_data');
+        sessionStorage.removeItem('civica_selected_authorities');
       })
     ),
     { dispatch: false }

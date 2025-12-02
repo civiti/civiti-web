@@ -114,7 +114,7 @@
             (click)="toggleAuthority(authority)">
 
             <div class="authority-checkbox">
-              <label nz-checkbox [ngModel]="isAuthoritySelected(authority)" (click)="$event.stopPropagation()"></label>
+              <label nz-checkbox [ngModel]="isAuthoritySelected(authority)" (ngModelChange)="toggleAuthority(authority)" (click)="$event.stopPropagation()"></label>
             </div>
 
             <div class="authority-icon">

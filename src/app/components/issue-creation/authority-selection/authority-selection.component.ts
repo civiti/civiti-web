@@ -105,8 +105,10 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.loadSessionData();
-    this.loadAuthorities();
+    const hasRequiredData = this.loadSessionData();
+    if (hasRequiredData) {
+      this.loadAuthorities();
+    }
   }
 
   ngOnDestroy(): void {
@@ -121,7 +123,7 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
     });
   }
 
-  private loadSessionData(): void {
+  private loadSessionData(): boolean {
     // Load category
     const categoryData = sessionStorage.getItem('civica_selected_category');
     if (categoryData) {
@@ -144,7 +146,10 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
     if (!this.selectedCategory || !this.currentLocation) {
       console.warn('[AUTHORITY SELECTION] Missing required data, redirecting...');
       this.router.navigate(['/create-issue']);
+      return false;
     }
+
+    return true;
   }
 
   private loadAuthorities(): void {
