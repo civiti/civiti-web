@@ -29,11 +29,11 @@ if (!projectRef) {
 }
 
 // Validate project ref format (alphanumeric, 20 characters)
-// Supabase project refs follow this pattern
-const PROJECT_REF_PATTERN = /^[a-z]{20}$/;
+// Supabase project refs are lowercase alphanumeric
+const PROJECT_REF_PATTERN = /^[a-z0-9]{20}$/;
 if (!PROJECT_REF_PATTERN.test(projectRef)) {
   console.error('Error: Invalid SUPABASE_PROJECT_REF format.');
-  console.error('Expected: 20 lowercase letters (e.g., "abcdefghijklmnopqrst")');
+  console.error('Expected: 20 lowercase alphanumeric characters (e.g., "abcdefgh1234ijklmnop")');
   console.error(`Received: "${projectRef}"`);
   process.exit(1);
 }

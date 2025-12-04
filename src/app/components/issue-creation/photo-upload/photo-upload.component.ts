@@ -338,9 +338,10 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
 
       return processedFile;
     } catch (error) {
-      console.warn('[PHOTO UPLOAD] Image processing failed, using original:', error);
-      // SECURITY NOTE: Original file may contain EXIF/GPS data
-      return file;
+      // PRIVACY: Do NOT fall back to original file - it may contain GPS/location data
+      // Fail the upload to protect user privacy
+      console.error('[PHOTO UPLOAD] Image processing failed:', error);
+      throw new Error(`Nu s-a putut procesa imaginea "${file.name}". Vă rugăm să încercați cu altă fotografie.`);
     } finally {
       this.compressingCount--;
     }
