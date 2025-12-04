@@ -2,7 +2,7 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, from, forkJoin, of } from 'rxjs';
-import { takeUntil, first, switchMap, catchError, finalize } from 'rxjs/operators';
+import { takeUntil, switchMap, catchError, finalize } from 'rxjs/operators';
 
 // NG-ZORRO imports
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -102,8 +102,10 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
   }
 
   private loadCurrentUser(): void {
-    this.authService.getCurrentUser()
-      .pipe(takeUntil(this.destroy$), first())
+    // Use getCurrentUserOnceReady to wait for initial auth check to complete
+    // This prevents race condition where BehaviorSubject emits null before session is loaded
+    this.authService.getCurrentUserOnceReady()
+      .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         if (user) {
           this.currentUserId = user.id;
