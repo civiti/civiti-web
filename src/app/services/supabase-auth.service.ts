@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { createClient, SupabaseClient, AuthResponse, User } from '@supabase/supabase-js';
-import { Observable, from, BehaviorSubject, throwError } from 'rxjs';
-import { map, catchError, tap } from 'rxjs/operators';
-import { environment } from '../../environments/environment';
+import { SupabaseClient, User } from '@supabase/supabase-js';
+import { Observable, from, BehaviorSubject, ReplaySubject, throwError } from 'rxjs';
+import { map, catchError, tap, filter, take, switchMap } from 'rxjs/operators';
 import { resetTokenRefreshState } from '../interceptors/auth.interceptor';
+import { SupabaseClientService } from './supabase-client.service';
 
 export interface SupabaseAuthUser {
   id: string;
@@ -28,19 +28,10 @@ export interface SupabaseAuthResponse {
 export class SupabaseAuthService {
   private supabase: SupabaseClient;
   private currentUser$ = new BehaviorSubject<SupabaseAuthUser | null>(null);
+  private authReady$ = new ReplaySubject<boolean>(1);
 
-  constructor() {
-    this.supabase = createClient(
-      environment.supabase.url,
-      environment.supabase.publishableKey,
-      {
-        auth: {
-          persistSession: true,
-          detectSessionInUrl: true,
-          flowType: 'pkce'
-        }
-      }
-    );
+  constructor(private supabaseClientService: SupabaseClientService) {
+    this.supabase = this.supabaseClientService.getClient();
 
     // Listen for auth state changes
     this.supabase.auth.onAuthStateChange((event, session) => {
@@ -75,6 +66,9 @@ export class SupabaseAuthService {
       }
     } catch (error) {
       console.error('Error checking existing session:', error);
+    } finally {
+      // Signal that initial auth check is complete
+      this.authReady$.next(true);
     }
   }
 
@@ -260,6 +254,18 @@ export class SupabaseAuthService {
 
   getCurrentUser(): Observable<SupabaseAuthUser | null> {
     return this.currentUser$.asObservable();
+  }
+
+  /**
+   * Get the current user after initial auth check is complete.
+   * Use this to avoid race conditions on page load/refresh.
+   * Emits once with the user (or null if not authenticated), then completes.
+   */
+  getCurrentUserOnceReady(): Observable<SupabaseAuthUser | null> {
+    return this.authReady$.pipe(
+      take(1),
+      switchMap(() => this.currentUser$.pipe(take(1)))
+    );
   }
 
   /**

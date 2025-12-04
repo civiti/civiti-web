@@ -12,7 +12,11 @@
     "postbuild": "node scripts/inject-api-key-html.js",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:Civica": "node dist/Civica/server/server.mjs"
+    "serve:ssr:Civica": "node dist/Civica/server/server.mjs",
+    "supabase:link": "node scripts/supabase-link.js",
+    "supabase:push": "npx supabase db push",
+    "supabase:status": "npx supabase db remote status",
+    "supabase:diff": "npx supabase db diff --schema storage"
   },
   "private": true,
   "engines": {
@@ -35,6 +39,7 @@
     "@ngrx/store-devtools": "^19.2.1",
     "@supabase/supabase-js": "^2.54.0",
     "@tailwindcss/postcss": "^4.1.11",
+    "browser-image-compression": "^2.0.2",
     "express": "^5.1.0",
     "glightbox": "^3.3.1",
     "ng-zorro-antd": "^19.3.1",
