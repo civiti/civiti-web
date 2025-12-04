@@ -85,8 +85,13 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
   selectedCategory: IssueCategoryInfo | null = null;
   uploadedPhotos: PhotoData[] = [];
   isUploading = false;
-  isCompressing = false;
   uploadProgress = 0;
+
+  // Track number of files being compressed (counter instead of boolean for parallel uploads)
+  private compressingCount = 0;
+  get isCompressing(): boolean {
+    return this.compressingCount > 0;
+  }
 
   constructor(
     private router: Router,
@@ -312,9 +317,8 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
    * and compresses larger files to reduce storage costs and upload time.
    */
   private async compressImage(file: File): Promise<File> {
+    this.compressingCount++;
     try {
-      this.isCompressing = true;
-
       // For small files, only strip EXIF without aggressive compression
       const options = file.size < 500 * 1024
         ? { ...this.compressionOptions, maxSizeMB: Infinity }  // Strip EXIF only
@@ -338,7 +342,7 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
       // SECURITY NOTE: Original file may contain EXIF/GPS data
       return file;
     } finally {
-      this.isCompressing = false;
+      this.compressingCount--;
     }
   }
 

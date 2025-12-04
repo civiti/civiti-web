@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { SupabaseClient } from '@supabase/supabase-js';
-import { from, Observable, throwError, timer } from 'rxjs';
+import { defer, Observable, throwError, timer } from 'rxjs';
 import { map, catchError, retry } from 'rxjs/operators';
 import { SupabaseClientService } from './supabase-client.service';
 
@@ -68,18 +68,20 @@ export class StorageService {
    * @returns Observable with upload result containing path and URL
    */
   uploadPhoto(userId: string, file: File): Observable<UploadResult> {
-    const timestamp = Date.now();
-    const sanitizedFilename = this.sanitizeFilename(file.name);
-    const filePath = `${userId}/${timestamp}-${sanitizedFilename}`;
+    // Use defer to create the Promise lazily on each subscription
+    // This ensures retries actually create new upload attempts
+    return defer(() => {
+      const timestamp = Date.now();
+      const sanitizedFilename = this.sanitizeFilename(file.name);
+      const filePath = `${userId}/${timestamp}-${sanitizedFilename}`;
 
-    return from(
-      this.supabase.storage
+      return this.supabase.storage
         .from(this.BUCKET)
         .upload(filePath, file, {
           cacheControl: '3600',
           upsert: false
-        })
-    ).pipe(
+        });
+    }).pipe(
       map(({ data, error }) => {
         if (error) {
           throw new Error(`Upload failed: ${error.message}`);
@@ -152,7 +154,9 @@ export class StorageService {
    * @param path - The storage path of the file to delete
    */
   deletePhoto(path: string): Observable<void> {
-    return from(
+    // Use defer to create the Promise lazily on each subscription
+    // This ensures retries actually create new delete attempts
+    return defer(() =>
       this.supabase.storage
         .from(this.BUCKET)
         .remove([path])
@@ -204,10 +208,11 @@ export class StorageService {
    */
   deletePhotos(paths: string[]): Observable<void> {
     if (paths.length === 0) {
-      return from(Promise.resolve());
+      return defer(() => Promise.resolve());
     }
 
-    return from(
+    // Use defer for lazy Promise creation (consistent with other methods)
+    return defer(() =>
       this.supabase.storage
         .from(this.BUCKET)
         .remove(paths)
@@ -230,7 +235,7 @@ export class StorageService {
    * @param expiresIn - Expiration time in seconds (default: 1 hour)
    */
   getSignedUrl(path: string, expiresIn = 3600): Observable<string> {
-    return from(
+    return defer(() =>
       this.supabase.storage
         .from(this.BUCKET)
         .createSignedUrl(path, expiresIn)
@@ -264,7 +269,7 @@ export class StorageService {
    * @param userId - The user's ID
    */
   listUserPhotos(userId: string): Observable<string[]> {
-    return from(
+    return defer(() =>
       this.supabase.storage
         .from(this.BUCKET)
         .list(userId)

@@ -6,7 +6,7 @@
  *   Set SUPABASE_PROJECT_REF in your environment or .env file, then:
  *   npm run supabase:link
  */
-const { execSync } = require('child_process');
+const { spawnSync } = require('child_process');
 
 // Try to load from .env file if dotenv is available
 try {
@@ -28,13 +28,27 @@ if (!projectRef) {
   process.exit(1);
 }
 
+// Validate project ref format (alphanumeric, 20 characters)
+// Supabase project refs follow this pattern
+const PROJECT_REF_PATTERN = /^[a-z]{20}$/;
+if (!PROJECT_REF_PATTERN.test(projectRef)) {
+  console.error('Error: Invalid SUPABASE_PROJECT_REF format.');
+  console.error('Expected: 20 lowercase letters (e.g., "abcdefghijklmnopqrst")');
+  console.error(`Received: "${projectRef}"`);
+  process.exit(1);
+}
+
 console.log(`Linking to Supabase project: ${projectRef}`);
 
-try {
-  execSync(`npx supabase link --project-ref ${projectRef}`, {
-    stdio: 'inherit',
-    shell: true
-  });
-} catch (error) {
-  process.exit(error.status || 1);
+// Use spawnSync with argument array to prevent command injection
+const result = spawnSync('npx', ['supabase', 'link', '--project-ref', projectRef], {
+  stdio: 'inherit',
+  shell: process.platform === 'win32'  // Only use shell on Windows for npx resolution
+});
+
+if (result.error) {
+  console.error('Failed to execute command:', result.error.message);
+  process.exit(1);
 }
+
+process.exit(result.status || 0);
