@@ -56,7 +56,7 @@ export const updatePoints = createAction(
 
 export const updatePointsSuccess = createAction(
   '[User] Update Points Success',
-  props<{ newPoints: number; points: number }>()
+  props<{ earnedPoints: number }>()
 );
 
 export const awardBadge = createAction(

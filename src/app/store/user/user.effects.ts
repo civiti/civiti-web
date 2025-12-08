@@ -73,10 +73,7 @@ export class UserEffects {
       ofType(UserActions.updatePoints),
       switchMap(({ points, reason }) => {
         this.message.success(`+${points} puncte câștigate! ${reason}`);
-        return of(UserActions.updatePointsSuccess({
-          newPoints: points,
-          points
-        }));
+        return of(UserActions.updatePointsSuccess({ earnedPoints: points }));
       })
     )
   );

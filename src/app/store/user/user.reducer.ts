@@ -65,11 +65,11 @@ export const userReducer = createReducer(
     error
   })),
 
-  on(UserActions.updatePointsSuccess, (state, { points }) => ({
+  on(UserActions.updatePointsSuccess, (state, { earnedPoints }) => ({
     ...state,
     gamification: state.gamification ? {
       ...state.gamification,
-      points
+      points: state.gamification.points + earnedPoints
     } : null
   })),
 
