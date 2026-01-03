@@ -147,7 +147,7 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
         if (issueData.briefDescription) {
           this.detailsForm.patchValue({
             briefDescription: issueData.briefDescription,
-            urgency: issueData.urgency || 'Medium',
+            urgency: this.normalizeUrgency(issueData.urgency),
             whenOccurred: issueData.whenOccurred || 'now'
           });
         }
@@ -303,5 +303,24 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
       this.issueId = 'issue-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
     }
     return this.issueId;
+  }
+
+  /**
+   * Normalize urgency value to match expected capitalized format.
+   * Handles legacy lowercase values from old session data.
+   */
+  private normalizeUrgency(value: string | undefined): string {
+    if (!value) {
+      return 'Medium';
+    }
+    // Map of valid urgency values (case-insensitive lookup)
+    const urgencyMap: Record<string, string> = {
+      'low': 'Low',
+      'medium': 'Medium',
+      'high': 'High',
+      'urgent': 'Urgent'
+    };
+    const normalized = urgencyMap[value.toLowerCase()];
+    return normalized || 'Medium';
   }
 }
