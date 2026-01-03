@@ -139,12 +139,13 @@ export class AuthoritySelectionComponent implements OnInit {
   private setupAuthorityStream(): void {
     this.loadTrigger$
       .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        // tap AFTER distinctUntilChanged to only set loading when request will actually fire
         tap(search => {
           this.isLoadingAuthorities = true;
           this.isSearching = search.length > 0;
         }),
-        debounceTime(300),
-        distinctUntilChanged(),
         switchMap(search => {
           const params = {
             city: this.issueCity,
