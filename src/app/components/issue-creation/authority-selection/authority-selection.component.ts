@@ -126,6 +126,8 @@ export class AuthoritySelectionComponent implements OnInit {
   ngOnInit(): void {
     const hasRequiredData = this.loadSessionData();
     if (hasRequiredData) {
+      // Set loading state immediately to prevent false "no results" during debounce
+      this.isLoadingAuthorities = true;
       // Trigger initial load through unified stream
       this.loadTrigger$.next('');
     }
