@@ -144,12 +144,16 @@ export class LocationPickerModalComponent implements OnInit, AfterViewInit, OnDe
       // so the confirm button is enabled
       if (this.data.config.initialAddress) {
         this.addressControl.setValue(this.data.config.initialAddress);
+        // Normalize district to ensure consistent format (e.g., "Sectorul 5" → "Sector 5")
+        const normalizedDistrict = this.data.config.initialDistrict
+          ? this.normalizeDistrict(this.data.config.initialDistrict)
+          : null;
         this.selectedLocation = {
           address: this.data.config.initialAddress,
           latitude: lat,
           longitude: lng,
           city: this.data.config.initialCity || 'București',
-          district: this.data.config.initialDistrict || null
+          district: normalizedDistrict
         };
       } else {
         // No address provided - mark for reverse geocoding after Maps loads
