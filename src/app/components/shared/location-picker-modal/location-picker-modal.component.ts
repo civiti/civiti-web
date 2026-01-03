@@ -101,6 +101,9 @@ export class LocationPickerModalComponent implements OnInit, AfterViewInit, OnDe
   // Selected location
   selectedLocation: LocationData | null = null;
 
+  // Track if initial location needs reverse geocoding after Maps loads
+  private _pendingReverseGeocode: google.maps.LatLngLiteral | null = null;
+
   // Google services
   private _autocompleteService: google.maps.places.AutocompleteService | null = null;
   private _placesService: google.maps.places.PlacesService | null = null;
@@ -133,11 +136,26 @@ export class LocationPickerModalComponent implements OnInit, AfterViewInit, OnDe
   ngAfterViewInit(): void {
     // Set initial location if provided
     if (this.data?.config?.initialLocation) {
-      this.mapCenter = this.data.config.initialLocation;
-      this.markerPosition = this.data.config.initialLocation;
-    }
+      const { lat, lng } = this.data.config.initialLocation;
+      this.mapCenter = { lat, lng };
+      this.markerPosition = { lat, lng };
 
-    if (this.data?.config?.initialAddress) {
+      // If we have an initial address, populate selectedLocation immediately
+      // so the confirm button is enabled
+      if (this.data.config.initialAddress) {
+        this.addressControl.setValue(this.data.config.initialAddress);
+        this.selectedLocation = {
+          address: this.data.config.initialAddress,
+          latitude: lat,
+          longitude: lng,
+          city: 'București',
+          district: null
+        };
+      } else {
+        // No address provided - mark for reverse geocoding after Maps loads
+        this._pendingReverseGeocode = { lat, lng };
+      }
+    } else if (this.data?.config?.initialAddress) {
       this.addressControl.setValue(this.data.config.initialAddress);
     }
   }
@@ -155,6 +173,14 @@ export class LocationPickerModalComponent implements OnInit, AfterViewInit, OnDe
       await this.waitForGoogleMaps();
       this.initializeServices();
       this.isMapLoaded = true;
+
+      // Process any pending reverse geocode from initial location
+      if (this._pendingReverseGeocode) {
+        const { lat, lng } = this._pendingReverseGeocode;
+        this._pendingReverseGeocode = null;
+        this.reverseGeocode(lat, lng);
+      }
+
       this._cdr.detectChanges();
     } catch (error) {
       console.error('Failed to load Google Maps:', error);
