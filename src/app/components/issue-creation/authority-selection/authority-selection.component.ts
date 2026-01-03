@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { takeUntil, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 
 // NG-ZORRO imports
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -46,6 +46,8 @@ interface LocationData {
   address: string;
   coordinates?: { lat: number; lng: number };
   accuracy?: number;
+  city?: string;
+  district?: string;
 }
 
 interface IssueCategoryInfo {
@@ -82,10 +84,15 @@ interface IssueCategoryInfo {
 })
 export class AuthoritySelectionComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+  private searchSubject$ = new Subject<string>();
 
   // Data from previous steps
   selectedCategory: IssueCategoryInfo | null = null;
   currentLocation: LocationData | null = null;
+
+  // Issue location for filtering authorities
+  issueCity = '';
+  issueDistrict = '';
 
   // Authority selection state
   availableAuthorities: AuthorityListResponse[] = [];
@@ -93,6 +100,7 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
   selectedAuthorities: SelectedAuthority[] = [];
   searchTerm = '';
   isLoadingAuthorities = false;
+  isSearching = false;
 
   // Custom email form
   customEmailForm!: FormGroup;
@@ -112,10 +120,23 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    this.setupSearchSubscription();
     const hasRequiredData = this.loadSessionData();
     if (hasRequiredData) {
       this.loadAuthorities();
     }
+  }
+
+  private setupSearchSubscription(): void {
+    this.searchSubject$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(searchTerm => {
+        this.performSearch(searchTerm);
+      });
   }
 
   ngOnDestroy(): void {
@@ -141,6 +162,10 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
     const locationData = sessionStorage.getItem('civica_current_location');
     if (locationData) {
       this.currentLocation = JSON.parse(locationData);
+      // Extract city and district for authority filtering
+      this.issueCity = this.currentLocation?.city || 'București';
+      this.issueDistrict = this.currentLocation?.district || '';
+      console.log('[AUTHORITY SELECTION] Loaded location - city:', this.issueCity, 'district:', this.issueDistrict);
     }
 
     // Load previously selected authorities if returning to this step
@@ -149,20 +174,37 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
       this.selectedAuthorities = JSON.parse(authoritiesData);
     }
 
-    // Validate we have required data
+    // Validate we have required data from previous steps
     if (!this.selectedCategory || !this.currentLocation) {
-      console.warn('[AUTHORITY SELECTION] Missing required data, redirecting...');
+      console.warn('[AUTHORITY SELECTION] Missing category/location data, redirecting to start...');
       this.router.navigate(['/create-issue']);
+      return false;
+    }
+
+    // Validate Step 3 data exists (issue details + AI analysis)
+    const completeIssueData = sessionStorage.getItem('civica_complete_issue_data');
+    if (!completeIssueData) {
+      console.warn('[AUTHORITY SELECTION] Missing issue details data, redirecting to details step...');
+      this.router.navigate(['/create-issue/details']);
       return false;
     }
 
     return true;
   }
 
-  private loadAuthorities(): void {
+  private loadAuthorities(search?: string): void {
     this.isLoadingAuthorities = true;
 
-    this.apiService.getAuthorities()
+    // Build query params for location-based filtering
+    const params = {
+      city: this.issueCity,
+      district: this.issueDistrict || undefined,
+      search: search || undefined
+    };
+
+    console.log('[AUTHORITY SELECTION] Loading authorities with params:', params);
+
+    this.apiService.getAuthorities(params)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (authorities) => {
@@ -170,6 +212,7 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
           this.availableAuthorities = authorities;
           this.filteredAuthorities = [...authorities];
           this.isLoadingAuthorities = false;
+          this.isSearching = false;
         },
         error: (error) => {
           console.error('[AUTHORITY SELECTION] Failed to load authorities:', error);
@@ -177,21 +220,26 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
           this.availableAuthorities = [];
           this.filteredAuthorities = [];
           this.isLoadingAuthorities = false;
+          this.isSearching = false;
         }
       });
   }
 
-  filterAuthorities(): void {
-    if (!this.searchTerm.trim()) {
-      this.filteredAuthorities = [...this.availableAuthorities];
-      return;
-    }
+  private performSearch(searchTerm: string): void {
+    this.loadAuthorities(searchTerm.trim() || undefined);
+  }
 
-    const term = this.searchTerm.toLowerCase();
-    this.filteredAuthorities = this.availableAuthorities.filter(auth =>
-      auth.name.toLowerCase().includes(term) ||
-      auth.email.toLowerCase().includes(term)
-    );
+  filterAuthorities(): void {
+    // Use server-side search with debounce
+    this.isSearching = true;
+    this.searchSubject$.next(this.searchTerm);
+  }
+
+  /**
+   * Get display label for authority district
+   */
+  getDistrictLabel(authority: AuthorityListResponse): string {
+    return authority.district || 'Nivel municipal';
   }
 
   isAuthoritySelected(authority: AuthorityListResponse): boolean {

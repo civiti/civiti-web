@@ -46,7 +46,8 @@
         <div class="summary-item" *ngIf="selectedCategory">
           <div class="summary-label">Categorie</div>
           <div class="summary-value">
-            {{ selectedCategory | titlecase }}
+            <span nz-icon [nzType]="selectedCategory.icon" nzTheme="outline" class="category-icon"></span>
+            {{ selectedCategory.name }}
           </div>
         </div>
 
@@ -96,10 +97,10 @@
           <nz-form-label [nzSpan]="24" nzFor="urgency">Nivel de urgență</nz-form-label>
           <nz-form-control [nzSpan]="24">
             <nz-select formControlName="urgency" id="urgency" nzPlaceHolder="Cât de urgentă este această problemă?">
-              <nz-option nzValue="low" nzLabel="Scăzută - Poate aștepta întreținerea de rutină"></nz-option>
-              <nz-option nzValue="medium" nzLabel="Medie - Ar trebui abordată curând"></nz-option>
-              <nz-option nzValue="high" nzLabel="Ridicată - Necesită atenție promptă"></nz-option>
-              <nz-option nzValue="urgent" nzLabel="Urgentă - Pericol de siguranță sau urgență"></nz-option>
+              <nz-option nzValue="Low" nzLabel="Scăzută - Poate aștepta întreținerea de rutină"></nz-option>
+              <nz-option nzValue="Medium" nzLabel="Medie - Ar trebui abordată curând"></nz-option>
+              <nz-option nzValue="High" nzLabel="Ridicată - Necesită atenție promptă"></nz-option>
+              <nz-option nzValue="Urgent" nzLabel="Urgentă - Pericol de siguranță sau urgență"></nz-option>
             </nz-select>
           </nz-form-control>
         </nz-form-item>
@@ -161,20 +162,70 @@
         
         <div class="ai-section" *ngIf="aiAnalysis.aiGeneratedDescription">
           <h4>Descriere profesională</h4>
-          <div class="ai-text" [innerHTML]="aiAnalysis.aiGeneratedDescription"></div>
-          <button nz-button nzType="link" nzSize="small" (click)="editDescription()">
-            <span nz-icon nzType="edit"></span>
-            Editează descrierea
-          </button>
+
+          <!-- View mode -->
+          <ng-container *ngIf="!isEditingDescription">
+            <div class="ai-text">{{ aiAnalysis.aiGeneratedDescription }}</div>
+            <button nz-button nzType="link" nzSize="small" (click)="editDescription()">
+              <span nz-icon nzType="edit"></span>
+              Editează descrierea
+            </button>
+          </ng-container>
+
+          <!-- Edit mode -->
+          <ng-container *ngIf="isEditingDescription">
+            <textarea
+              nz-input
+              #descriptionInput
+              [ngModel]="aiAnalysis.aiGeneratedDescription"
+              rows="4"
+              class="edit-textarea">
+            </textarea>
+            <div class="edit-actions">
+              <button nz-button nzType="primary" nzSize="small" (click)="saveDescription(descriptionInput.value)">
+                <span nz-icon nzType="check"></span>
+                Salvează
+              </button>
+              <button nz-button nzType="default" nzSize="small" (click)="cancelEditDescription()">
+                <span nz-icon nzType="close"></span>
+                Anulează
+              </button>
+            </div>
+          </ng-container>
         </div>
 
         <div class="ai-section" *ngIf="aiAnalysis.aiProposedSolution">
           <h4>Soluție propusă</h4>
-          <div class="ai-text" [innerHTML]="aiAnalysis.aiProposedSolution"></div>
-          <button nz-button nzType="link" nzSize="small" (click)="editSolution()">
-            <span nz-icon nzType="edit"></span>
-            Editează soluția
-          </button>
+
+          <!-- View mode -->
+          <ng-container *ngIf="!isEditingSolution">
+            <div class="ai-text">{{ aiAnalysis.aiProposedSolution }}</div>
+            <button nz-button nzType="link" nzSize="small" (click)="editSolution()">
+              <span nz-icon nzType="edit"></span>
+              Editează soluția
+            </button>
+          </ng-container>
+
+          <!-- Edit mode -->
+          <ng-container *ngIf="isEditingSolution">
+            <textarea
+              nz-input
+              #solutionInput
+              [ngModel]="aiAnalysis.aiProposedSolution"
+              rows="4"
+              class="edit-textarea">
+            </textarea>
+            <div class="edit-actions">
+              <button nz-button nzType="primary" nzSize="small" (click)="saveSolution(solutionInput.value)">
+                <span nz-icon nzType="check"></span>
+                Salvează
+              </button>
+              <button nz-button nzType="default" nzSize="small" (click)="cancelEditSolution()">
+                <span nz-icon nzType="close"></span>
+                Anulează
+              </button>
+            </div>
+          </ng-container>
         </div>
 
       </div>

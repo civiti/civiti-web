@@ -1,5 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, OnDestroy, AfterViewInit, inject, PLATFORM_ID, ChangeDetectorRef } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Subject, from, merge, of } from 'rxjs';
 import { takeUntil, switchMap, catchError, finalize, toArray } from 'rxjs/operators';
@@ -18,7 +18,6 @@ import { NzProgressModule } from 'ng-zorro-antd/progress';
 
 import imageCompression from 'browser-image-compression';
 
-import { ApiService } from '../../../services/api.service';
 import { StorageService, UploadResult } from '../../../services/storage.service';
 import { SupabaseAuthService } from '../../../services/supabase-auth.service';
 import { IssueCategory } from '../../../types/civica-api.types';
@@ -66,12 +65,17 @@ interface PhotoData {
   templateUrl: './photo-upload.component.html',
   styleUrls: ['./photo-upload.component.scss']
 })
-export class PhotoUploadComponent implements OnInit, OnDestroy {
+export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
+  private _platformId = inject(PLATFORM_ID);
+  private _cdr = inject(ChangeDetectorRef);
   private destroy$ = new Subject<void>();
   private currentUserId: string | null = null;
 
   // Track ongoing uploads for cancellation (prevents orphaned files)
   private ongoingUploads = new Map<string, Subject<void>>();
+
+  // GLightbox instance for photo gallery
+  private _lightbox: any;
 
   // Compression settings for optimal storage/quality balance
   private readonly compressionOptions = {
@@ -96,7 +100,6 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private message: NzMessageService,
-    private apiService: ApiService,
     private storageService: StorageService,
     private authService: SupabaseAuthService
   ) {}
@@ -104,6 +107,7 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.loadSelectedCategory();
     this.loadCurrentUser();
+    this.loadExistingPhotos();
   }
 
   private loadCurrentUser(): void {
@@ -122,6 +126,13 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
       });
   }
 
+  ngAfterViewInit(): void {
+    // Initialize GLightbox after view is ready (only in browser)
+    if (isPlatformBrowser(this._platformId)) {
+      this.initializeGallery();
+    }
+  }
+
   ngOnDestroy(): void {
     // Cancel all ongoing uploads to prevent orphaned files
     this.ongoingUploads.forEach((cancel$, photoId) => {
@@ -131,8 +142,52 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
     });
     this.ongoingUploads.clear();
 
+    // Clean up GLightbox instance
+    if (this._lightbox) {
+      this._lightbox.destroy();
+    }
+
     this.destroy$.next();
     this.destroy$.complete();
+  }
+
+  /**
+   * Initialize GLightbox for photo gallery
+   */
+  private async initializeGallery(): Promise<void> {
+    if (!isPlatformBrowser(this._platformId)) {
+      return;
+    }
+
+    try {
+      // Dynamically import GLightbox to avoid SSR issues
+      const GLightbox = (await import('glightbox')).default;
+
+      this._lightbox = GLightbox({
+        selector: '.photo-gallery-item',
+        touchNavigation: true,
+        loop: true,
+        autoplayVideos: false,
+        closeOnOutsideClick: true,
+        openEffect: 'zoom',
+        closeEffect: 'fade',
+        cssEffects: {
+          fade: { in: 'fadeIn', out: 'fadeOut' },
+          zoom: { in: 'zoomIn', out: 'zoomOut' }
+        }
+      });
+    } catch (error) {
+      console.error('[PHOTO UPLOAD] Error loading GLightbox:', error);
+    }
+  }
+
+  /**
+   * Refresh GLightbox after photos are added/removed
+   */
+  refreshGallery(): void {
+    if (this._lightbox) {
+      this._lightbox.reload();
+    }
   }
 
   private loadSelectedCategory(): void {
@@ -143,6 +198,49 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
       // No category selected, redirect back
       console.warn('[PHOTO UPLOAD] No category selected, redirecting...');
       this.router.navigate(['/create-issue']);
+    }
+  }
+
+  /**
+   * Save current photos to sessionStorage.
+   * Called after upload success and photo removal to persist state.
+   */
+  private savePhotosToSession(): void {
+    const photosData = this.uploadedPhotos
+      .filter(photo => photo.storagePath) // Only save uploaded photos
+      .map(photo => ({
+        id: photo.id,
+        url: photo.url,
+        thumbnail: photo.thumbnail,
+        storagePath: photo.storagePath,
+        quality: photo.quality,
+        timestamp: photo.timestamp,
+        metadata: photo.metadata
+      }));
+    sessionStorage.setItem('civica_uploaded_photos', JSON.stringify(photosData));
+  }
+
+  /**
+   * Load previously uploaded photos from sessionStorage.
+   * This enables back navigation without losing uploaded photos.
+   */
+  private loadExistingPhotos(): void {
+    const photosData = sessionStorage.getItem('civica_uploaded_photos');
+    if (photosData) {
+      try {
+        const photos = JSON.parse(photosData) as PhotoData[];
+        if (photos.length > 0) {
+          // Restore photos that have valid storage paths (already uploaded)
+          this.uploadedPhotos = photos.filter(photo => photo.storagePath);
+          console.log('[PHOTO UPLOAD] Restored photos from session:', this.uploadedPhotos.length);
+
+          // Refresh GLightbox after restoring photos
+          setTimeout(() => this.refreshGallery(), 100);
+        }
+      } catch (e) {
+        console.warn('[PHOTO UPLOAD] Failed to parse saved photos:', e);
+        sessionStorage.removeItem('civica_uploaded_photos');
+      }
     }
   }
 
@@ -216,6 +314,9 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
     const previewUrl = URL.createObjectURL(file);
     const photoId = this.generatePhotoId();
 
+    // Track whether blob URL has been handled (to avoid double-revocation)
+    let blobUrlHandled = false;
+
     // Create cancellation Subject for this upload
     const cancel$ = new Subject<void>();
     this.ongoingUploads.set(photoId, cancel$);
@@ -261,12 +362,13 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
                   next: () => console.log('[PHOTO UPLOAD] Orphaned file cleaned up:', result.path),
                   error: (err) => console.error('[PHOTO UPLOAD] Failed to clean up orphaned file:', err)
                 });
+              blobUrlHandled = true;
               URL.revokeObjectURL(previewUrl);
               return of(null);
             }
 
             // Update photo data with real URL from storage
-            URL.revokeObjectURL(previewUrl);
+            // IMPORTANT: Update the URL first, force change detection, THEN revoke blob
             this.uploadedPhotos[idx] = {
               ...this.uploadedPhotos[idx],
               url: result.url,
@@ -274,8 +376,22 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
               storagePath: result.path
             };
 
-            this.message.success(`Fotografia a fost încărcată cu succes (calitate ${this.getQualityLabel(photoData.quality)})`);
+            // Force Angular to update the view with the new URL
+            this._cdr.detectChanges();
+
+            // Mark blob as handled and delay revocation to ensure the new image has started loading
+            blobUrlHandled = true;
+            setTimeout(() => URL.revokeObjectURL(previewUrl), 500);
+
+            this.message.success('Fotografia a fost încărcată cu succes');
             console.log('[PHOTO UPLOAD] Photo uploaded to storage:', result);
+
+            // Save to sessionStorage for back navigation support
+            this.savePhotosToSession();
+
+            // Refresh GLightbox to include the new photo
+            setTimeout(() => this.refreshGallery(), 100);
+
             return of(result);
           }),
           catchError(error => {
@@ -283,6 +399,7 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
             // Remove the failed photo from the list
             const idx = this.uploadedPhotos.findIndex(p => p.id === photoId);
             if (idx !== -1) {
+              blobUrlHandled = true;
               URL.revokeObjectURL(previewUrl);
               this.uploadedPhotos.splice(idx, 1);
             }
@@ -295,6 +412,7 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
         console.error('[PHOTO UPLOAD] Compression failed:', error);
         const idx = this.uploadedPhotos.findIndex(p => p.id === photoId);
         if (idx !== -1) {
+          blobUrlHandled = true;
           URL.revokeObjectURL(previewUrl);
           this.uploadedPhotos.splice(idx, 1);
         }
@@ -306,9 +424,10 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
         this.ongoingUploads.delete(photoId);
         cancel$.complete();
 
-        // Revoke blob URL if still present (handles cancellation case)
-        // On success/error, blob is already revoked, but on cancel via takeUntil it's not
-        if (previewUrl.startsWith('blob:')) {
+        // Only revoke blob URL if it wasn't already handled (cancellation case)
+        // Success/error paths set blobUrlHandled=true and handle revocation with proper timing
+        if (!blobUrlHandled) {
+          console.log('[PHOTO UPLOAD] Revoking blob URL in finalize (cancelled):', photoId);
           URL.revokeObjectURL(previewUrl);
         }
       })
@@ -361,19 +480,38 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
     }
   }
 
-  getQualityLabel(quality: string): string {
-    const labels: { [key: string]: string } = {
-      'high': 'Înaltă',
-      'medium': 'Bună',
-      'low': 'De bază'
-    };
-    return labels[quality] || 'Unknown';
+
+  /**
+   * Handle image load error - helps debug broken images
+   */
+  onImageError(event: Event, photo: PhotoData): void {
+    console.error('[PHOTO UPLOAD] Image failed to load:', {
+      photoId: photo.id,
+      url: photo.url,
+      storagePath: photo.storagePath,
+      isBlobUrl: photo.url.startsWith('blob:')
+    });
   }
 
-  viewPhoto(photo: PhotoData): void {
+  /**
+   * Handle successful image load
+   */
+  onImageLoad(event: Event, photo: PhotoData): void {
+    console.log('[PHOTO UPLOAD] Image loaded successfully:', {
+      photoId: photo.id,
+      url: photo.url.substring(0, 50) + '...',
+      isBlobUrl: photo.url.startsWith('blob:')
+    });
+  }
+
+  viewPhoto(photo: PhotoData, index: number): void {
     console.log('[PHOTO UPLOAD] View photo:', photo.id);
-    // TODO: Open photo in lightbox/modal
-    window.open(photo.url, '_blank');
+    // GLightbox handles opening the photo via the anchor element
+    // This method triggers a click on the gallery item to open the lightbox
+    const galleryItem = document.querySelector(`#photo-gallery-${index}`) as HTMLElement;
+    if (galleryItem) {
+      galleryItem.click();
+    }
   }
 
   removePhoto(index: number): void {
@@ -397,6 +535,12 @@ export class PhotoUploadComponent implements OnInit, OnDestroy {
 
     // Remove from local array for immediate UI feedback
     this.uploadedPhotos.splice(index, 1);
+
+    // Save updated state to sessionStorage
+    this.savePhotosToSession();
+
+    // Refresh GLightbox to update the gallery
+    setTimeout(() => this.refreshGallery(), 100);
 
     // If photo was uploaded to storage, delete it (with automatic retry)
     if (photo.storagePath) {

@@ -80,7 +80,7 @@
             
             <div class="category-content">
               <div class="category-icon">
-                {{ category.icon }}
+                <span nz-icon [nzType]="category.icon" nzTheme="outline"></span>
               </div>
               
               <div class="category-info">
@@ -149,13 +149,6 @@
       <p class="help-text" *ngIf="!selectedCategory">
         Te rugăm să selectezi o categorie pentru a continua
       </p>
-      
-      <div class="category-help">
-        <p>Nu ești sigur ce categorie se potrivește problemei tale?</p>
-        <button nz-button nzType="link" (click)="showCategoryHelp()">
-          Obține ajutor pentru a alege o categorie
-        </button>
-      </div>
     </div>
 
     </div>

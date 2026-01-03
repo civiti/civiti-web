@@ -1,6 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
+// Load environment variables from .env file
+const dotenv = require('dotenv');
+dotenv.config();
+
 // Get the API key from environment (try both new and old names for compatibility)
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY || '';
 

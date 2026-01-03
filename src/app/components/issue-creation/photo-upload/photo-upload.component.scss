@@ -193,7 +193,11 @@
 
 .upload-note {
   font-size: 0.9rem;
-  color: #999 !important;
+}
+
+// Use higher specificity to override default p styles
+p.upload-note {
+  color: #999;
 }
 
 .photo-grid {
@@ -233,6 +237,11 @@
   }
 }
 
+.photo-gallery-item {
+  display: block;
+  text-decoration: none;
+}
+
 .photo-image {
   width: 100%;
   height: 120px;
@@ -257,32 +266,6 @@
 .photo-actions {
   display: flex;
   gap: 0.5rem;
-}
-
-.photo-quality {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.quality-high {
-  background: #28A745;
-  color: var(--white);
-}
-
-.quality-medium {
-  background: var(--orange-web);
-  color: var(--white);
-}
-
-.quality-low {
-  background: #DC3545;
-  color: var(--white);
 }
 
 .navigation-section {
@@ -310,20 +293,21 @@
   gap: 0.5rem;
 }
 
-.continue-btn {
-  background: var(--orange-web) !important;
-  border-color: var(--orange-web) !important;
+// Use ::ng-deep with higher specificity to override NG-ZORRO button styles
+:host ::ng-deep button.continue-btn.ant-btn {
+  background: var(--orange-web);
+  border-color: var(--orange-web);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 
   &:hover:not(:disabled) {
-    background: #e8930f !important;
-    border-color: #e8930f !important;
+    background: #e8930f;
+    border-color: #e8930f;
   }
 
   &:disabled {
-    background: #ccc !important;
-    border-color: #ccc !important;
+    background: #ccc;
+    border-color: #ccc;
   }
 }
 

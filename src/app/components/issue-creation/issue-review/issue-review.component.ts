@@ -18,7 +18,6 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { AppState } from '../../../store/app.state';
-import { selectAuthUser } from '../../../store/auth/auth.selectors';
 import * as UserActions from '../../../store/user/user.actions';
 import { ApiService } from '../../../services/api.service';
 import {
@@ -107,18 +106,12 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
 
   getUrgencyStatus(urgency: string): 'default' | 'processing' | 'success' | 'error' | 'warning' {
     const statuses: { [key: string]: 'default' | 'processing' | 'success' | 'error' | 'warning' } = {
-      'low': 'default',
-      'medium': 'processing',
-      'high': 'warning',
-      'urgent': 'error'
+      'Low': 'default',
+      'Medium': 'processing',
+      'High': 'warning',
+      'Urgent': 'error'
     };
     return statuses[urgency] || 'default';
-  }
-
-  getConfidenceColor(confidence: number): string {
-    if (confidence >= 0.8) return 'green';
-    if (confidence >= 0.6) return 'orange';
-    return 'red';
   }
 
   getWhenLabel(when: string): string {
@@ -130,6 +123,17 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
       'longer': 'Acum mai mult de o săptămână'
     };
     return labels[when] || when;
+  }
+
+
+  getUrgencyLabel(urgency: string): string {
+    const labels: { [key: string]: string } = {
+      'Low': 'Scăzută',
+      'Medium': 'Medie',
+      'High': 'Ridicată',
+      'Urgent': 'Urgentă'
+    };
+    return labels[urgency] || urgency;
   }
 
   viewPhoto(photoUrl: string): void {
@@ -176,7 +180,6 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
       district: this.issueData.location.district || '',
       latitude: this.issueData.location.coordinates?.lat || 0,
       longitude: this.issueData.location.coordinates?.lng || 0,
-      neighborhood: this.issueData.location.neighborhood,
       urgency: this.issueData.urgency as UrgencyLevel,
       desiredOutcome: this.issueData.aiAnalysis?.aiProposedSolution,
       aiGeneratedDescription: this.issueData.aiAnalysis?.aiGeneratedDescription,

@@ -25,6 +25,7 @@ import {
   IssueActionResponse,
   AdminStatisticsResponse,
   AuthorityListResponse,
+  AuthorityQueryParams,
   AuthorityResponse,
   PagedResult,
   IssueQueryParams,
@@ -128,10 +129,23 @@ export class ApiService {
   // ============================================
 
   /**
-   * Get all active predefined authorities
+   * Get authorities with optional location filtering
+   * @param params Optional query parameters for filtering by city, district, or search
    */
-  getAuthorities(): Observable<AuthorityListResponse[]> {
-    return this.http.get<AuthorityListResponse[]>(`${this.baseUrl}/authorities`);
+  getAuthorities(params?: AuthorityQueryParams): Observable<AuthorityListResponse[]> {
+    let httpParams = new HttpParams();
+
+    if (params?.city) {
+      httpParams = httpParams.set('city', params.city);
+    }
+    if (params?.district) {
+      httpParams = httpParams.set('district', params.district);
+    }
+    if (params?.search) {
+      httpParams = httpParams.set('search', params.search);
+    }
+
+    return this.http.get<AuthorityListResponse[]>(`${this.baseUrl}/authorities`, { params: httpParams });
   }
 
   /**
