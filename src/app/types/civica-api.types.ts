@@ -224,6 +224,7 @@ export interface IssueItem {
   address?: string;
   latitude?: number;
   longitude?: number;
+  mainPhotoUrl?: string;
   photoUrls: string[];
   emailsSent: number;
   status: IssueStatus;

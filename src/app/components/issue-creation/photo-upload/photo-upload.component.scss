@@ -235,6 +235,37 @@ p.upload-note {
       opacity: 1;
     }
   }
+
+  // Primary photo styling
+  &.is-primary {
+    border: 2px solid var(--orange-web);
+    box-shadow: 0 2px 12px rgba(252, 163, 17, 0.3);
+
+    &:hover {
+      box-shadow: 0 8px 24px rgba(252, 163, 17, 0.4);
+    }
+  }
+}
+
+.primary-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  background: var(--orange-web);
+  color: var(--white);
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+
+  span[nz-icon] {
+    font-size: 0.875rem;
+  }
 }
 
 .photo-gallery-item {

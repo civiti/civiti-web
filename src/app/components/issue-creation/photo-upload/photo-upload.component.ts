@@ -27,6 +27,7 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
+import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 import imageCompression from 'browser-image-compression';
 
@@ -51,6 +52,7 @@ interface PhotoData {
   storagePath: string;  // Supabase storage path for deletion
   quality: 'low' | 'medium' | 'high';
   timestamp: Date;
+  isPrimary: boolean;   // Primary photo shown as thumbnail in issue list
   metadata: {
     size: number;
     dimensions: { width: number; height: number };
@@ -72,7 +74,8 @@ interface PhotoData {
     NzTypographyModule,
     NzAlertModule,
     NzGridModule,
-    NzProgressModule
+    NzProgressModule,
+    NzToolTipModule
   ],
   templateUrl: './photo-upload.component.html',
   styleUrls: ['./photo-upload.component.scss']
@@ -279,6 +282,7 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
         storagePath: photo.storagePath,
         quality: photo.quality,
         timestamp: photo.timestamp,
+        isPrimary: photo.isPrimary,
         metadata: photo.metadata
       }));
     sessionStorage.setItem('civica_uploaded_photos', JSON.stringify(photosData));
@@ -296,6 +300,13 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
         if (photos.length > 0) {
           // Restore photos that have valid storage paths (already uploaded)
           this.uploadedPhotos = photos.filter(photo => photo.storagePath);
+
+          // Ensure at least one photo is marked as primary
+          const hasPrimary = this.uploadedPhotos.some(p => p.isPrimary);
+          if (!hasPrimary && this.uploadedPhotos.length > 0) {
+            this.uploadedPhotos[0].isPrimary = true;
+          }
+
           console.log('[PHOTO UPLOAD] Restored photos from session:', this.uploadedPhotos.length);
 
           // Schedule gallery refresh after Angular renders the restored photos
@@ -386,6 +397,8 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
     this.ongoingUploads.set(photoId, cancel$);
 
     // Add placeholder while compressing/uploading
+    // Set as primary if this is the first photo
+    const isFirstPhoto = this.uploadedPhotos.length === 0;
     const photoData: PhotoData = {
       id: photoId,
       url: previewUrl,
@@ -393,6 +406,7 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       storagePath: '',  // Will be set after upload
       quality: this.analyzePhotoQuality(file),
       timestamp: new Date(),
+      isPrimary: isFirstPhoto,  // First photo is primary by default
       metadata: {
         size: file.size,
         dimensions: { width: 800, height: 600 },
@@ -605,6 +619,7 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
     }
 
     const photo = this.uploadedPhotos[index];
+    const wasPrimary = photo.isPrimary;
     console.log('[PHOTO UPLOAD] Remove photo:', photo.id);
 
     // Cancel ongoing upload if one exists (prevents orphaned files)
@@ -618,6 +633,11 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
 
     // Remove from local array for immediate UI feedback
     this.uploadedPhotos.splice(index, 1);
+
+    // If removed photo was primary, assign primary to first remaining photo
+    if (wasPrimary && this.uploadedPhotos.length > 0) {
+      this.uploadedPhotos[0].isPrimary = true;
+    }
 
     // Save updated state to sessionStorage
     this.savePhotosToSession();
@@ -649,6 +669,27 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
     }
   }
 
+  /**
+   * Set a photo as the primary/featured image.
+   * Only one photo can be primary at a time.
+   */
+  setPrimaryPhoto(index: number): void {
+    if (index < 0 || index >= this.uploadedPhotos.length) {
+      return;
+    }
+
+    // Clear previous primary
+    this.uploadedPhotos.forEach(photo => photo.isPrimary = false);
+
+    // Set new primary
+    this.uploadedPhotos[index].isPrimary = true;
+
+    console.log('[PHOTO UPLOAD] Set primary photo:', this.uploadedPhotos[index].id);
+
+    // Save updated state
+    this.savePhotosToSession();
+  }
+
   continueToDetails(): void {
     if (this.uploadedPhotos.length === 0) {
       this.message.warning('Vă rugăm să încărcați cel puțin o fotografie pentru a continua');
@@ -672,6 +713,7 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       storagePath: photo.storagePath,
       quality: photo.quality,
       timestamp: photo.timestamp,
+      isPrimary: photo.isPrimary,
       metadata: photo.metadata
     }));
 

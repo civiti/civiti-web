@@ -117,7 +117,13 @@
             *ngFor="let photo of uploadedPhotos; let i = index"
             class="photo-col">
             
-            <div class="photo-preview">
+            <div class="photo-preview" [class.is-primary]="photo.isPrimary">
+              <!-- Primary badge -->
+              <div class="primary-badge" *ngIf="photo.isPrimary">
+                <span nz-icon nzType="star" nzTheme="fill"></span>
+                <span class="badge-text">Principală</span>
+              </div>
+
               <!-- GLightbox anchor for photo preview -->
               <a
                 [id]="'photo-gallery-' + i"
@@ -136,11 +142,22 @@
 
               <div class="photo-overlay">
                 <div class="photo-actions">
+                  <!-- Set as primary button -->
+                  <button
+                    nz-button
+                    [nzType]="photo.isPrimary ? 'primary' : 'default'"
+                    nzSize="small"
+                    nzShape="circle"
+                    [nz-tooltip]="photo.isPrimary ? 'Imagine principală' : 'Setează ca principală'"
+                    (click)="setPrimaryPhoto(i); $event.stopPropagation()">
+                    <span nz-icon nzType="star" [nzTheme]="photo.isPrimary ? 'fill' : 'outline'"></span>
+                  </button>
                   <button
                     nz-button
                     nzType="primary"
                     nzSize="small"
                     nzShape="circle"
+                    nz-tooltip="Vizualizează"
                     (click)="viewPhoto(photo, i); $event.stopPropagation()">
                     <span nz-icon nzType="eye"></span>
                   </button>
@@ -150,6 +167,7 @@
                     nzDanger
                     nzSize="small"
                     nzShape="circle"
+                    nz-tooltip="Șterge"
                     (click)="removePhoto(i); $event.stopPropagation()">
                     <span nz-icon nzType="delete"></span>
                   </button>

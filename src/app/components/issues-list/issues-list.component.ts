@@ -8,25 +8,19 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
-import { NzSpaceModule } from 'ng-zorro-antd/space';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
-import { NzAvatarModule } from 'ng-zorro-antd/avatar';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable, take } from 'rxjs';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
 import * as IssueSelectors from '../../store/issues/issue.selectors';
-import * as AuthActions from '../../store/auth/auth.actions';
-import { selectIsAuthenticated, selectAuthUser, selectUserDisplayName } from '../../store/auth/auth.selectors';
+import { selectIsAuthenticated } from '../../store/auth/auth.selectors';
 import { IssueItem } from '../../types/civica-api.types';
-import { AuthUser } from '../../store/auth/auth.state';
 
 @Component({
   selector: 'app-issues-list',
@@ -41,15 +35,11 @@ import { AuthUser } from '../../store/auth/auth.state';
     NzTagModule,
     NzSelectModule,
     NzFormModule,
-    NzPageHeaderModule,
     NzGridModule,
     NzStatisticModule,
     NzEmptyModule,
     NzToolTipModule,
-    NzSpaceModule,
     NzModalModule,
-    NzAvatarModule,
-    NzDropDownModule,
   ],
   templateUrl: './issues-list.component.html',
   styleUrl: './issues-list.component.scss'
@@ -65,11 +55,7 @@ export class IssuesListComponent implements OnInit {
   error$!: Observable<string | null>;
   sortBy$!: Observable<string>;
   totalIssues$!: Observable<number>;
-
-  // Auth state observables
   isAuthenticated$!: Observable<boolean>;
-  user$!: Observable<AuthUser | null>;
-  displayName$!: Observable<string>;
 
   sortBy = 'date';
 
@@ -79,11 +65,7 @@ export class IssuesListComponent implements OnInit {
     this.error$ = this._store.select(IssueSelectors.selectIssuesError);
     this.sortBy$ = this._store.select(IssueSelectors.selectSortBy);
     this.totalIssues$ = this._store.select(IssueSelectors.selectTotal);
-
-    // Auth state observables
     this.isAuthenticated$ = this._store.select(selectIsAuthenticated);
-    this.user$ = this._store.select(selectAuthUser);
-    this.displayName$ = this._store.select(selectUserDisplayName);
 
     // Sync local sortBy with store state using takeUntilDestroyed (Angular 19 best practice)
     this.sortBy$
@@ -122,24 +104,42 @@ export class IssuesListComponent implements OnInit {
   }
 
   getStatusText(status: string): string {
-    switch (status) {
-      case 'Unspecified': return 'NESPECIFICAT';
-      case 'Draft': return 'CIORNĂ';
-      case 'Submitted': return 'TRIMISĂ';
-      case 'UnderReview': return 'ÎN REVIZUIRE';
-      case 'Approved': return 'APROBATĂ';
-      case 'Rejected': return 'RESPINSĂ';
-      case 'ChangesRequested': return 'MODIFICĂRI NECESARE';
-      case 'InProgress': return 'ÎN PROGRES';
-      case 'Resolved': return 'REZOLVATĂ';
-      case 'Closed': return 'ÎNCHISĂ';
+    // Case-insensitive matching for backend camelCase enum serialization
+    const normalizedStatus = (status || '').toLowerCase();
+    switch (normalizedStatus) {
+      case 'unspecified': return 'NESPECIFICAT';
+      case 'draft': return 'CIORNĂ';
+      case 'submitted': return 'TRIMISĂ';
+      case 'underreview': return 'ÎN REVIZUIRE';
+      case 'approved': return 'APROBATĂ';
+      case 'rejected': return 'RESPINSĂ';
+      case 'changesrequested': return 'MODIFICĂRI NECESARE';
+      case 'inprogress': return 'ÎN PROGRES';
+      case 'resolved': return 'REZOLVATĂ';
+      case 'closed': return 'ÎNCHISĂ';
       default: return 'NECUNOSCUTĂ';
     }
   }
 
+  getStatusColor(status: string): string {
+    const normalizedStatus = (status || '').toLowerCase();
+    switch (normalizedStatus) {
+      case 'submitted':
+      case 'approved':
+        return 'warning';
+      case 'resolved':
+        return 'success';
+      case 'rejected':
+        return 'error';
+      default:
+        return 'processing';
+    }
+  }
+
   getIssueImage(issue: IssueItem): string {
-    // Use local placeholder for development
-    // In production, this would return the actual photo URL from backend
+    if (issue.mainPhotoUrl) {
+      return issue.mainPhotoUrl;
+    }
     return '/images/placeholders/issue-placeholder.svg';
   }
 
@@ -164,22 +164,6 @@ export class IssuesListComponent implements OnInit {
   viewIssueDetails(issueId: string): void {
     this._store.dispatch(IssueActions.selectIssue({ id: issueId }));
     this._router.navigate(['/issue', issueId]);
-  }
-
-  navigateToLogin(): void {
-    this._router.navigate(['/auth/login'], { queryParams: { returnUrl: '/issues' } });
-  }
-
-  navigateToRegister(): void {
-    this._router.navigate(['/auth/register'], { queryParams: { returnUrl: '/issues' } });
-  }
-
-  navigateToDashboard(): void {
-    this._router.navigate(['/dashboard']);
-  }
-
-  logout(): void {
-    this._store.dispatch(AuthActions.logout());
   }
 
   promptToCreateIssue(): void {

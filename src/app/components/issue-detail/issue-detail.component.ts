@@ -5,7 +5,6 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzPageHeaderModule } from 'ng-zorro-antd/page-header';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
@@ -35,7 +34,6 @@ import { GoogleMapsConfigService } from '../../services/google-maps-config.servi
         NzButtonModule,
         NzIconModule,
         NzTagModule,
-        NzPageHeaderModule,
         NzModalModule,
         NzTabsModule,
         NzCollapseModule,
@@ -75,7 +73,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     issue$!: Observable<IssueDetailResponse | null | undefined>;
     isLoading$!: Observable<boolean>;
     error$!: Observable<string | null>;
-    
+
     // Google Maps properties
     mapOptions: any = {
         zoom: 17, // Closer zoom for street-level view
@@ -317,18 +315,35 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     getStatusText(status: string): string {
-        switch (status) {
-            case 'Unspecified': return 'NESPECIFICAT';
-            case 'Draft': return 'CIORNĂ';
-            case 'Submitted': return 'TRIMISĂ';
-            case 'UnderReview': return 'ÎN REVIZUIRE';
-            case 'Approved': return 'APROBATĂ';
-            case 'Rejected': return 'RESPINSĂ';
-            case 'ChangesRequested': return 'MODIFICĂRI NECESARE';
-            case 'InProgress': return 'ÎN PROGRES';
-            case 'Resolved': return 'REZOLVATĂ';
-            case 'Closed': return 'ÎNCHISĂ';
+        // Case-insensitive matching for backend camelCase enum serialization
+        const normalizedStatus = (status || '').toLowerCase();
+        switch (normalizedStatus) {
+            case 'unspecified': return 'NESPECIFICAT';
+            case 'draft': return 'CIORNĂ';
+            case 'submitted': return 'TRIMISĂ';
+            case 'underreview': return 'ÎN REVIZUIRE';
+            case 'approved': return 'APROBATĂ';
+            case 'rejected': return 'RESPINSĂ';
+            case 'changesrequested': return 'MODIFICĂRI NECESARE';
+            case 'inprogress': return 'ÎN PROGRES';
+            case 'resolved': return 'REZOLVATĂ';
+            case 'closed': return 'ÎNCHISĂ';
             default: return 'NECUNOSCUTĂ';
+        }
+    }
+
+    getStatusColor(status: string): string {
+        const normalizedStatus = (status || '').toLowerCase();
+        switch (normalizedStatus) {
+            case 'submitted':
+            case 'approved':
+                return 'warning';
+            case 'resolved':
+                return 'success';
+            case 'rejected':
+                return 'error';
+            default:
+                return 'processing';
         }
     }
 

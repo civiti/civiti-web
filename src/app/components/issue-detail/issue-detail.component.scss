@@ -37,10 +37,6 @@
   to { transform: rotate(360deg); }
 }
 
-.navbar {
-  background-color: var(--oxford-blue);
-}
-
 .bg-background {
   background-color: var(--color-background);
 }
@@ -88,4 +84,14 @@ button[mat-raised-button] {
   .grid {
     grid-template-columns: 1fr;
   }
+}
+
+// Photo gallery overlay - transparent by default, dark on hover
+.photo-overlay {
+  background-color: transparent;
+  transition: background-color 0.3s ease;
+}
+
+.group:hover .photo-overlay {
+  background-color: rgba(0, 0, 0, 0.3);
 }

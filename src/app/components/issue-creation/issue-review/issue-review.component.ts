@@ -171,6 +171,11 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
       }
     });
 
+    // Sort photos so primary photo comes first (used as thumbnail in issue list)
+    const sortedPhotos = [...this.issueData.photos].sort((a: any, b: any) =>
+      (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0)
+    );
+
     // Prepare issue data for submission using the API format
     const issueToSubmit: CreateIssueRequest = {
       title: this.generateIssueTitle(),
@@ -185,7 +190,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
       aiGeneratedDescription: this.issueData.aiAnalysis?.aiGeneratedDescription,
       aiProposedSolution: this.issueData.aiAnalysis?.aiProposedSolution,
       aiConfidence: this.issueData.aiAnalysis?.aiConfidence,
-      photoUrls: this.issueData.photos.map((photo: any) => photo.url),
+      photoUrls: sortedPhotos.map((photo: any) => photo.url),
       authorities
     };
 

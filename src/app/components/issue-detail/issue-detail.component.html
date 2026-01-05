@@ -1,12 +1,4 @@
 <div class="min-h-screen bg-background">
-  <!-- Header -->
-  <nz-page-header class="navbar shadow-md" (nzBack)="goBack()">
-    <nz-page-header-title>Detalii Problemă</nz-page-header-title>
-    <nz-page-header-extra>
-      <i nz-icon nzType="warning" nzTheme="outline" class="text-orange-web text-xl"></i>
-    </nz-page-header-extra>
-  </nz-page-header>
-
   <div class="container mx-auto p-4 max-w-6xl">
     <!-- Loading State -->
     <div *ngIf="isLoading$ | async" class="text-center py-12">
@@ -31,8 +23,7 @@
                     </nz-tag>{{ issue.title }}
                   </h1>
                   <div class="flex items-center gap-3">
-                    <nz-tag
-                      [nzColor]="issue.status === 'Submitted' || issue.status === 'Approved' ? 'warning' : issue.status === 'Resolved' ? 'success' : 'processing'">
+                    <nz-tag [nzColor]="getStatusColor(issue.status)">
                       {{ getStatusText(issue.status) }}
                     </nz-tag>
                   </div>
@@ -65,8 +56,7 @@
                   [attr.data-glightbox]="'title: Fotografie ' + (i + 1) + '; description: ' + (photo.description || issue.title)">
                   <img [src]="photo.url" [alt]="photo.description || 'Fotografie ' + (i + 1)"
                     class="w-full h-40 object-cover rounded-lg" loading="lazy" (error)="onImageError($event, i)">
-                  <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 
-                              transition-opacity rounded-lg flex items-center justify-center">
+                  <div class="photo-overlay absolute inset-0 rounded-lg flex items-center justify-center">
                     <i nz-icon nzType="zoom-in" nzTheme="outline"
                       class="text-white opacity-0 group-hover:opacity-100 transition-opacity text-2xl"></i>
                   </div>
@@ -245,8 +235,7 @@
                 <nz-divider class="my-2"></nz-divider>
                 <div class="flex justify-between items-center">
                   <span class="text-oxford-blue">Status:</span>
-                  <nz-tag
-                    [nzColor]="issue.status === 'Submitted' || issue.status === 'Approved' ? 'warning' : issue.status === 'Resolved' ? 'success' : 'processing'">
+                  <nz-tag [nzColor]="getStatusColor(issue.status)">
                     {{ getStatusText(issue.status) }}
                   </nz-tag>
                 </div>
