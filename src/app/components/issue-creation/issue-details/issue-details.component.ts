@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 
@@ -24,12 +24,28 @@ import {
   AIAnalysisResult
 } from '../../../types/civica-api.types';
 
-// Keep local interfaces for component data
+// Interface for category data from session storage
+interface IssueCategoryInfo {
+  id: IssueCategory;
+  name: string;
+  description: string;
+  icon: string;
+  examples: string[];
+}
+
+// Interface for photo data from session storage
 interface PhotoData {
   id: string;
-  file: File;
   url: string;
-  description?: string;
+  thumbnail: string;
+  storagePath: string;
+  quality: 'low' | 'medium' | 'high';
+  timestamp: Date;
+  metadata: {
+    size: number;
+    dimensions: { width: number; height: number };
+    format: string;
+  };
 }
 
 
@@ -41,6 +57,7 @@ interface PhotoData {
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
+    FormsModule,
     NzCardModule,
     NzButtonModule,
     NzIconModule,
@@ -58,12 +75,19 @@ interface PhotoData {
 export class IssueDetailsComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  selectedCategory: IssueCategory | null = null;
+  // Issue ID - generated once and reused across saves
+  private issueId: string | null = null;
+
+  selectedCategory: IssueCategoryInfo | null = null;
   uploadedPhotos: PhotoData[] = [];
-  currentLocation: any = null;
+  currentLocation: { address: string; coordinates: { lat: number; lng: number }; district?: string } | null = null;
   detailsForm!: FormGroup;
   aiAnalysis: AIAnalysisResult | null = null;
   isGeneratingAI = false;
+
+  // Track if user is editing AI content
+  isEditingDescription = false;
+  isEditingSolution = false;
 
   constructor(
     private fb: FormBuilder,
@@ -86,7 +110,7 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
   private initializeForm(): void {
     this.detailsForm = this.fb.group({
       briefDescription: ['', [Validators.required, Validators.minLength(10)]],
-      urgency: ['medium'],
+      urgency: ['Medium'],
       whenOccurred: ['now']
     });
   }
@@ -110,11 +134,55 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
       this.currentLocation = JSON.parse(locationData);
     }
 
+    // Restore form data if returning from a later step
+    const completeIssueData = sessionStorage.getItem('civica_complete_issue_data');
+    if (completeIssueData) {
+      try {
+        const issueData = JSON.parse(completeIssueData);
+        // Restore issue ID to maintain consistency across saves
+        if (issueData.id) {
+          this.issueId = issueData.id;
+        }
+        // Restore form fields
+        if (issueData.briefDescription) {
+          this.detailsForm.patchValue({
+            briefDescription: issueData.briefDescription,
+            urgency: this.normalizeUrgency(issueData.urgency),
+            whenOccurred: issueData.whenOccurred || 'now'
+          });
+        }
+        // Restore AI analysis
+        if (issueData.aiAnalysis) {
+          this.aiAnalysis = issueData.aiAnalysis;
+        }
+        console.log('[ISSUE DETAILS] Restored form data from session, ID:', this.issueId);
+      } catch (e) {
+        console.warn('[ISSUE DETAILS] Failed to parse saved issue data:', e);
+      }
+    }
+
     // Validate we have required data
     if (!this.selectedCategory || !this.uploadedPhotos.length) {
       console.warn('[ISSUE DETAILS] Missing required data, redirecting...');
       this.router.navigate(['/create-issue']);
     }
+  }
+
+  /**
+   * Save form data to sessionStorage for back navigation support
+   */
+  private saveFormToSession(): void {
+    const issueData = {
+      id: this.getOrCreateIssueId(),
+      category: this.selectedCategory,
+      photos: this.uploadedPhotos,
+      location: this.currentLocation,
+      briefDescription: this.detailsForm.get('briefDescription')?.value,
+      urgency: this.detailsForm.get('urgency')?.value,
+      whenOccurred: this.detailsForm.get('whenOccurred')?.value,
+      aiAnalysis: this.aiAnalysis
+    };
+    sessionStorage.setItem('civica_complete_issue_data', JSON.stringify(issueData));
   }
 
   generateAIDescription(): void {
@@ -131,7 +199,7 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
     this.isGeneratingAI = true;
 
     // For now, simulate AI description generation since the backend may not have this endpoint
-    // This should be replaced with actual API call when backend implements AI description
+    // TODO: Replace with actual API call when backend implements AI description
     setTimeout(() => {
       this.aiAnalysis = {
         aiGeneratedDescription: `${briefDescription} - Această problemă necesită atenția autorităților locale pentru rezolvarea rapidă și eficientă.`,
@@ -142,6 +210,9 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
       this.isGeneratingAI = false;
       console.log('[ISSUE DETAILS] AI analysis generated:', this.aiAnalysis);
       this.message.success('Descrierea AI a fost generată cu succes!');
+
+      // Save to session for back navigation support
+      this.saveFormToSession();
     }, 1500); // Simulate API delay
   }
 
@@ -151,16 +222,51 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
     return 'red';
   }
 
+  // Inline editing methods
   editDescription(): void {
-    console.log('[ISSUE DETAILS] Edit description requested');
-    // TODO: Open modal with editable description
-    this.message.info('Editarea descrierii va fi implementată în următoarea fază.');
+    this.isEditingDescription = true;
+  }
+
+  saveDescription(newDescription: string): void {
+    if (!this.aiAnalysis) {
+      return;
+    }
+    const trimmed = newDescription.trim();
+    if (!trimmed) {
+      this.message.warning('Descrierea nu poate fi goală');
+      return;
+    }
+    this.aiAnalysis.aiGeneratedDescription = trimmed;
+    this.isEditingDescription = false;
+    this.saveFormToSession();
+    this.message.success('Descrierea a fost actualizată');
+  }
+
+  cancelEditDescription(): void {
+    this.isEditingDescription = false;
   }
 
   editSolution(): void {
-    console.log('[ISSUE DETAILS] Edit solution requested');
-    // TODO: Open modal with editable solution
-    this.message.info('Editarea soluției va fi implementată în următoarea fază.');
+    this.isEditingSolution = true;
+  }
+
+  saveSolution(newSolution: string): void {
+    if (!this.aiAnalysis) {
+      return;
+    }
+    const trimmed = newSolution.trim();
+    if (!trimmed) {
+      this.message.warning('Soluția propusă nu poate fi goală');
+      return;
+    }
+    this.aiAnalysis.aiProposedSolution = trimmed;
+    this.isEditingSolution = false;
+    this.saveFormToSession();
+    this.message.success('Soluția a fost actualizată');
+  }
+
+  cancelEditSolution(): void {
+    this.isEditingSolution = false;
   }
 
   continueToReview(): void {
@@ -173,7 +279,7 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
 
     // Store form data and AI analysis in session
     const issueData = {
-      id: this.generateIssueId(), // Generate ID here to be used in submission
+      id: this.getOrCreateIssueId(), // Generate ID here to be used in submission
       category: this.selectedCategory,
       photos: this.uploadedPhotos,
       location: this.currentLocation,
@@ -188,7 +294,33 @@ export class IssueDetailsComponent implements OnInit, OnDestroy {
     this.router.navigate(['/create-issue/authorities']);
   }
 
-  private generateIssueId(): string {
-    return 'issue-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+  /**
+   * Get existing issue ID or create a new one.
+   * Ensures the same ID is used throughout the issue creation flow.
+   */
+  private getOrCreateIssueId(): string {
+    if (!this.issueId) {
+      this.issueId = 'issue-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
+    }
+    return this.issueId;
+  }
+
+  /**
+   * Normalize urgency value to match expected capitalized format.
+   * Handles legacy lowercase values from old session data.
+   */
+  private normalizeUrgency(value: string | undefined): string {
+    if (!value) {
+      return 'Medium';
+    }
+    // Map of valid urgency values (case-insensitive lookup)
+    const urgencyMap: Record<string, string> = {
+      'low': 'Low',
+      'medium': 'Medium',
+      'high': 'High',
+      'urgent': 'Urgent'
+    };
+    const normalized = urgencyMap[value.toLowerCase()];
+    return normalized || 'Medium';
   }
 }

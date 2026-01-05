@@ -1,9 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, inject, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap, tap, catchError } from 'rxjs/operators';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -46,6 +47,8 @@ interface LocationData {
   address: string;
   coordinates?: { lat: number; lng: number };
   accuracy?: number;
+  city?: string;
+  district?: string;
 }
 
 interface IssueCategoryInfo {
@@ -80,12 +83,24 @@ interface IssueCategoryInfo {
   templateUrl: './authority-selection.component.html',
   styleUrls: ['./authority-selection.component.scss']
 })
-export class AuthoritySelectionComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
+export class AuthoritySelectionComponent implements OnInit {
+  // Angular 19+ inject pattern
+  private readonly destroyRef = inject(DestroyRef);
+  private readonly fb = inject(FormBuilder);
+  private readonly router = inject(Router);
+  private readonly message = inject(NzMessageService);
+  private readonly apiService = inject(ApiService);
+
+  // Unified stream for all authority requests (initial load + search)
+  private readonly loadTrigger$ = new Subject<string>();
 
   // Data from previous steps
   selectedCategory: IssueCategoryInfo | null = null;
   currentLocation: LocationData | null = null;
+
+  // Issue location for filtering authorities
+  issueCity = '';
+  issueDistrict = '';
 
   // Authority selection state
   availableAuthorities: AuthorityListResponse[] = [];
@@ -93,6 +108,7 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
   selectedAuthorities: SelectedAuthority[] = [];
   searchTerm = '';
   isLoadingAuthorities = false;
+  isSearching = false;
 
   // Custom email form
   customEmailForm!: FormGroup;
@@ -102,25 +118,60 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
   readonly MAX_AUTHORITIES = 5;
   readonly MIN_AUTHORITIES = 1;
 
-  constructor(
-    private fb: FormBuilder,
-    private router: Router,
-    private message: NzMessageService,
-    private apiService: ApiService
-  ) {
+  constructor() {
     this.initializeForm();
+    this.setupAuthorityStream();
   }
 
   ngOnInit(): void {
     const hasRequiredData = this.loadSessionData();
     if (hasRequiredData) {
-      this.loadAuthorities();
+      // Set loading state immediately to prevent false "no results" during debounce
+      this.isLoadingAuthorities = true;
+      // Trigger initial load through unified stream
+      this.loadTrigger$.next('');
     }
   }
 
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
+  /**
+   * Unified stream for all authority requests.
+   * Uses switchMap to automatically cancel in-flight requests when new ones arrive.
+   * Both initial load and search go through this single stream.
+   */
+  private setupAuthorityStream(): void {
+    this.loadTrigger$
+      .pipe(
+        debounceTime(300),
+        distinctUntilChanged(),
+        // tap AFTER distinctUntilChanged to only set loading when request will actually fire
+        tap(search => {
+          this.isLoadingAuthorities = true;
+          this.isSearching = search.length > 0;
+        }),
+        switchMap(search => {
+          const params = {
+            city: this.issueCity,
+            district: this.issueDistrict || undefined,
+            search: search.trim() || undefined
+          };
+          console.log('[AUTHORITY SELECTION] Loading authorities with params:', params);
+          return this.apiService.getAuthorities(params).pipe(
+            catchError(error => {
+              console.error('[AUTHORITY SELECTION] Failed to load authorities:', error);
+              this.message.warning('Nu s-au putut încărca autoritățile. Poți adăuga manual.');
+              return of([]);
+            })
+          );
+        }),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe(authorities => {
+        console.log('[AUTHORITY SELECTION] Loaded authorities:', authorities);
+        this.availableAuthorities = authorities;
+        this.filteredAuthorities = [...authorities];
+        this.isLoadingAuthorities = false;
+        this.isSearching = false;
+      });
   }
 
   private initializeForm(): void {
@@ -141,6 +192,10 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
     const locationData = sessionStorage.getItem('civica_current_location');
     if (locationData) {
       this.currentLocation = JSON.parse(locationData);
+      // Extract city and district for authority filtering
+      this.issueCity = this.currentLocation?.city || 'București';
+      this.issueDistrict = this.currentLocation?.district || '';
+      console.log('[AUTHORITY SELECTION] Loaded location - city:', this.issueCity, 'district:', this.issueDistrict);
     }
 
     // Load previously selected authorities if returning to this step
@@ -149,49 +204,34 @@ export class AuthoritySelectionComponent implements OnInit, OnDestroy {
       this.selectedAuthorities = JSON.parse(authoritiesData);
     }
 
-    // Validate we have required data
+    // Validate we have required data from previous steps
     if (!this.selectedCategory || !this.currentLocation) {
-      console.warn('[AUTHORITY SELECTION] Missing required data, redirecting...');
+      console.warn('[AUTHORITY SELECTION] Missing category/location data, redirecting to start...');
       this.router.navigate(['/create-issue']);
+      return false;
+    }
+
+    // Validate Step 3 data exists (issue details + AI analysis)
+    const completeIssueData = sessionStorage.getItem('civica_complete_issue_data');
+    if (!completeIssueData) {
+      console.warn('[AUTHORITY SELECTION] Missing issue details data, redirecting to details step...');
+      this.router.navigate(['/create-issue/details']);
       return false;
     }
 
     return true;
   }
 
-  private loadAuthorities(): void {
-    this.isLoadingAuthorities = true;
-
-    this.apiService.getAuthorities()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (authorities) => {
-          console.log('[AUTHORITY SELECTION] Loaded authorities from server:', authorities);
-          this.availableAuthorities = authorities;
-          this.filteredAuthorities = [...authorities];
-          this.isLoadingAuthorities = false;
-        },
-        error: (error) => {
-          console.error('[AUTHORITY SELECTION] Failed to load authorities:', error);
-          this.message.warning('Nu s-au putut încărca autoritățile. Poți adăuga manual.');
-          this.availableAuthorities = [];
-          this.filteredAuthorities = [];
-          this.isLoadingAuthorities = false;
-        }
-      });
+  filterAuthorities(): void {
+    // Trigger search through unified stream
+    this.loadTrigger$.next(this.searchTerm);
   }
 
-  filterAuthorities(): void {
-    if (!this.searchTerm.trim()) {
-      this.filteredAuthorities = [...this.availableAuthorities];
-      return;
-    }
-
-    const term = this.searchTerm.toLowerCase();
-    this.filteredAuthorities = this.availableAuthorities.filter(auth =>
-      auth.name.toLowerCase().includes(term) ||
-      auth.email.toLowerCase().includes(term)
-    );
+  /**
+   * Get display label for authority district
+   */
+  getDistrictLabel(authority: AuthorityListResponse): string {
+    return authority.district || 'Nivel municipal';
   }
 
   isAuthoritySelected(authority: AuthorityListResponse): boolean {

@@ -42,7 +42,7 @@
   <div class="category-info" *ngIf="selectedCategory">
     <nz-card class="category-card">
       <div class="category-summary">
-        <span class="category-icon">{{ selectedCategory.icon }}</span>
+        <span class="category-icon" nz-icon [nzType]="selectedCategory.icon" nzTheme="outline"></span>
         <div class="category-details">
           <h3>{{ selectedCategory.name }}</h3>
           <p>{{ selectedCategory.description }}</p>
@@ -118,33 +118,44 @@
             class="photo-col">
             
             <div class="photo-preview">
-              <img [src]="photo.url" [alt]="'Photo ' + (i + 1)" class="photo-image" loading="lazy">
-              
+              <!-- GLightbox anchor for photo preview -->
+              <a
+                [id]="'photo-gallery-' + i"
+                [href]="photo.url"
+                class="photo-gallery-item"
+                [attr.data-glightbox]="'title: Fotografie ' + (i + 1)"
+                (click)="onGalleryItemClick($event, photo)">
+                <img
+                  [src]="photo.url"
+                  [alt]="'Photo ' + (i + 1)"
+                  class="photo-image"
+                  loading="lazy"
+                  (error)="onImageError($event, photo)"
+                  (load)="onImageLoad($event, photo)">
+              </a>
+
               <div class="photo-overlay">
                 <div class="photo-actions">
-                  <button 
-                    nz-button 
-                    nzType="primary" 
-                    nzSize="small" 
+                  <button
+                    nz-button
+                    nzType="primary"
+                    nzSize="small"
                     nzShape="circle"
-                    (click)="viewPhoto(photo)">
+                    (click)="viewPhoto(photo, i); $event.stopPropagation()">
                     <span nz-icon nzType="eye"></span>
                   </button>
-                  <button 
-                    nz-button 
-                    nzType="primary" 
-                    nzDanger 
-                    nzSize="small" 
+                  <button
+                    nz-button
+                    nzType="primary"
+                    nzDanger
+                    nzSize="small"
                     nzShape="circle"
-                    (click)="removePhoto(i)">
+                    (click)="removePhoto(i); $event.stopPropagation()">
                     <span nz-icon nzType="delete"></span>
                   </button>
                 </div>
               </div>
 
-              <div class="photo-quality" [ngClass]="'quality-' + photo.quality">
-                {{ getQualityLabel(photo.quality) }}
-              </div>
             </div>
             
           </div>

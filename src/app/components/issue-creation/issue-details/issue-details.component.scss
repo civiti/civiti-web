@@ -162,10 +162,11 @@
   border-radius: 8px;
 }
 
-.generate-btn {
-  background: var(--orange-web) !important;
-  border-color: var(--orange-web) !important;
-  color: var(--white) !important;
+// Use ::ng-deep with higher specificity to override NG-ZORRO button styles
+:host ::ng-deep button.generate-btn.ant-btn {
+  background: var(--orange-web);
+  border-color: var(--orange-web);
+  color: var(--white);
   font-weight: 600;
   font-size: 1.1rem;
   height: 48px;
@@ -176,15 +177,15 @@
   transition: all 0.3s ease;
 
   &:hover:not(:disabled) {
-    background: #e8930f !important;
-    border-color: #e8930f !important;
+    background: #e8930f;
+    border-color: #e8930f;
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(252, 163, 17, 0.3);
   }
 
   &:disabled {
-    background: #ccc !important;
-    border-color: #ccc !important;
+    background: #ccc;
+    border-color: #ccc;
     transform: none;
     box-shadow: none;
   }
@@ -298,20 +299,21 @@
   gap: 0.5rem;
 }
 
-.continue-btn {
-  background: var(--orange-web) !important;
-  border-color: var(--orange-web) !important;
+// Use ::ng-deep with higher specificity to override NG-ZORRO button styles
+:host ::ng-deep button.continue-btn.ant-btn {
+  background: var(--orange-web);
+  border-color: var(--orange-web);
   text-transform: uppercase;
   letter-spacing: 0.5px;
 
   &:hover:not(:disabled) {
-    background: #e8930f !important;
-    border-color: #e8930f !important;
+    background: #e8930f;
+    border-color: #e8930f;
   }
 
   &:disabled {
-    background: #ccc !important;
-    border-color: #ccc !important;
+    background: #ccc;
+    border-color: #ccc;
   }
 }
 
@@ -370,4 +372,27 @@
 .ant-form-item-has-error .ant-input,
 .ant-form-item-has-error .ant-select-selector {
   border-color: #DC3545;
+}
+
+// Inline editing styles
+.edit-textarea {
+  width: 100%;
+  margin-bottom: 0.75rem;
+  border-radius: 8px;
+  padding: 1rem;
+  font-size: 1rem;
+  line-height: 1.6;
+  border: 2px solid var(--orange-web);
+
+  &:focus {
+    border-color: var(--orange-web);
+    box-shadow: 0 0 0 2px rgba(252, 163, 17, 0.2);
+    outline: none;
+  }
+}
+
+.edit-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
 }

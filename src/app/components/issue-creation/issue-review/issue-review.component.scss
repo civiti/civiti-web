@@ -181,7 +181,7 @@
 .overview-header {
   display: flex;
   justify-content: space-between;
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: 1.5rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #f0f0f0;
@@ -211,6 +211,18 @@
   }
 }
 
+.urgency-display {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.urgency-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
 .brief-description {
   margin-bottom: 0;
 
@@ -234,11 +246,6 @@
 
 .ai-report {
   margin-bottom: 1rem;
-}
-
-.ai-confidence {
-  margin-bottom: 1.5rem;
-  text-align: center;
 }
 
 .ai-sections {
@@ -305,30 +312,6 @@
   height: 120px;
   object-fit: cover;
   display: block;
-}
-
-.photo-quality {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.8rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--white);
-}
-
-.quality-high {
-  background: #28A745;
-}
-
-.quality-medium {
-  background: var(--orange-web);
-}
-
-.quality-low {
-  background: #DC3545;
 }
 
 .photo-overlay {
@@ -399,10 +382,11 @@
   gap: 0.5rem;
 }
 
-.submit-btn {
-  background: #28A745 !important;
-  border-color: #28A745 !important;
-  color: var(--white) !important;
+// Use ::ng-deep with higher specificity to override NG-ZORRO button styles
+:host ::ng-deep button.submit-btn.ant-btn {
+  background: #28A745;
+  border-color: #28A745;
+  color: var(--white);
   text-transform: uppercase;
   letter-spacing: 0.5px;
   font-size: 1.1rem;
@@ -410,15 +394,15 @@
   padding: 0 2rem;
 
   &:hover:not(:disabled) {
-    background: #218838 !important;
-    border-color: #218838 !important;
+    background: #218838;
+    border-color: #218838;
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(40, 167, 69, 0.3);
   }
 
   &:disabled {
-    background: #ccc !important;
-    border-color: #ccc !important;
+    background: #ccc;
+    border-color: #ccc;
     transform: none;
     box-shadow: none;
   }

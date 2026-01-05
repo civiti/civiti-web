@@ -62,9 +62,10 @@
           <span nz-icon nzType="check-circle" nzTheme="fill" class="selected-icon"></span>
           Autorități selectate ({{ selectedAuthorities.length }}/{{ MAX_AUTHORITIES }})
         </h3>
-        <nz-badge [nzCount]="remainingSlots" nzShowZero [nzStyle]="{ backgroundColor: '#52c41a' }">
+        <span class="slots-remaining">
+          <span class="slots-count">{{ remainingSlots }}</span>
           <span class="slots-label">locuri rămase</span>
-        </nz-badge>
+        </span>
       </div>
       <div class="selected-tags">
         <nz-tag
@@ -87,7 +88,7 @@
         nz-input
         [(ngModel)]="searchTerm"
         (ngModelChange)="filterAuthorities()"
-        placeholder="Caută autorități după nume sau email..."
+        placeholder="Caută autorități după nume..."
       />
     </nz-input-group>
     <ng-template #prefixIcon>
@@ -97,15 +98,22 @@
 
   <!-- Predefined Authorities List -->
   <div class="authorities-section">
-    <nz-card nzTitle="Autorități disponibile" class="authorities-card">
+    <nz-card [nzTitle]="cardTitle" class="authorities-card">
+      <ng-template #cardTitle>
+        <div class="authorities-card-title">
+          <span>Autorități pentru {{ issueCity }}</span>
+          <nz-tag *ngIf="issueDistrict" nzColor="blue">{{ issueDistrict }}</nz-tag>
+        </div>
+      </ng-template>
+
       <nz-alert
         nzType="info"
-        nzMessage="Selectează autoritățile către care dorești să trimiți problema"
+        nzMessage="Selectează autoritățile către care dorești să trimiți problema. Autoritățile de nivel municipal sunt afișate primele."
         nzShowIcon
         class="info-alert">
       </nz-alert>
 
-      <nz-spin [nzSpinning]="isLoadingAuthorities">
+      <nz-spin [nzSpinning]="isLoadingAuthorities || isSearching">
         <div class="authorities-list" *ngIf="filteredAuthorities.length > 0">
           <div
             *ngFor="let authority of filteredAuthorities"
@@ -118,7 +126,7 @@
             </div>
 
             <div class="authority-icon">
-              <span nz-icon nzType="bank"></span>
+              <span nz-icon [nzType]="authority.district ? 'home' : 'bank'"></span>
             </div>
 
             <div class="authority-info">
@@ -127,14 +135,16 @@
             </div>
 
             <div class="authority-type-tag">
-              <nz-tag nzColor="blue">Predefinită</nz-tag>
+              <nz-tag [nzColor]="authority.district ? 'cyan' : 'geekblue'">
+                {{ getDistrictLabel(authority) }}
+              </nz-tag>
             </div>
           </div>
         </div>
 
         <nz-empty
-          *ngIf="!isLoadingAuthorities && filteredAuthorities.length === 0"
-          nzNotFoundContent="Nu s-au găsit autorități. Poți adăuga una personalizată mai jos.">
+          *ngIf="!isLoadingAuthorities && !isSearching && filteredAuthorities.length === 0"
+          nzNotFoundContent="Nu s-au găsit autorități pentru această locație. Poți adăuga una personalizată mai jos.">
         </nz-empty>
       </nz-spin>
     </nz-card>

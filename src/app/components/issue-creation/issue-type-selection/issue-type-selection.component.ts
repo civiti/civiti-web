@@ -3,9 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
 
-// NG-ZORRO imports
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -14,13 +12,14 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTagModule } from 'ng-zorro-antd/tag';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 
 import { AppState } from '../../../store/app.state';
 import { selectIsAuthenticated } from '../../../store/auth/auth.selectors';
-import { ApiService } from '../../../services/api.service';
 import { IssueCategory, ISSUE_CATEGORIES } from '../../../types/civica-api.types';
+import { LocationPickerModalComponent } from '../../shared/location-picker-modal/location-picker-modal.component';
+import { LocationData, SECTOR_5_CENTER } from '../../../types/location.types';
 
-// Define IssueCategory interface for component
 interface IssueCategoryInfo {
   id: string;
   name: string;
@@ -42,7 +41,8 @@ interface IssueCategoryInfo {
     NzSpinModule,
     NzTypographyModule,
     NzAlertModule,
-    NzTagModule
+    NzTagModule,
+    NzModalModule
   ],
   templateUrl: './issue-type-selection.component.html',
   styleUrls: ['./issue-type-selection.component.scss']
@@ -53,14 +53,19 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
   categories: IssueCategoryInfo[] = [];
   selectedCategory: IssueCategoryInfo | null = null;
   isLoading = false;
-  currentLocation: any = null;
+  currentLocation: {
+    address: string;
+    coordinates: { lat: number; lng: number };
+    city?: string;
+    district?: string;
+  } | null = null;
 
   isAuthenticated$!: Observable<boolean>;
 
   constructor(
     private store: Store<AppState>,
     private router: Router,
-    private apiService: ApiService
+    private modalService: NzModalService
   ) {
     this.isAuthenticated$ = this.store.select(selectIsAuthenticated);
   }
@@ -92,11 +97,23 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
   }
 
   private loadCurrentLocation(): void {
-    // Mock current location - in real app would use geolocation
+    // Try to load saved location from session storage
+    const savedLocation = sessionStorage.getItem('civica_current_location');
+    if (savedLocation) {
+      try {
+        this.currentLocation = JSON.parse(savedLocation);
+        return;
+      } catch (e) {
+        console.warn('[ISSUE TYPE] Failed to parse saved location');
+      }
+    }
+
+    // Default location for Sector 5
     this.currentLocation = {
-      address: 'Strada Libertății, Sector 5, București',
-      coordinates: { lat: 44.4268, lng: 26.1025 },
-      accuracy: 10
+      address: 'Sectorul 5, București',
+      coordinates: SECTOR_5_CENTER,
+      city: 'București',
+      district: 'Sector 5'
     };
   }
 
@@ -122,14 +139,36 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
 
   changeLocation(): void {
     console.log('[ISSUE TYPE] Change location requested');
-    // TODO: Implement location selection modal
-    alert('Selectarea locației va fi implementată în următoarea fază.');
-  }
 
-  showCategoryHelp(): void {
-    console.log('[ISSUE TYPE] Category help requested');
-    // TODO: Show category help modal or navigate to help page
-    alert('Ghidul de ajutor pentru categorii va fi implementat în următoarea fază.');
+    const modalRef = this.modalService.create({
+      nzTitle: 'Selectează Locația',
+      nzContent: LocationPickerModalComponent,
+      nzWidth: 700,
+      nzMaskClosable: false,
+      nzData: {
+        config: {
+          initialLocation: this.currentLocation?.coordinates,
+          initialAddress: this.currentLocation?.address,
+          initialCity: this.currentLocation?.city,
+          initialDistrict: this.currentLocation?.district
+        }
+      },
+      nzFooter: null // Footer is in the component
+    });
+
+    modalRef.afterClose.subscribe((result: LocationData | null) => {
+      if (result) {
+        console.log('[ISSUE TYPE] Location selected:', result);
+        this.currentLocation = {
+          address: result.address,
+          coordinates: { lat: result.latitude, lng: result.longitude },
+          city: result.city,
+          district: result.district || undefined
+        };
+        // Save to session storage for persistence
+        sessionStorage.setItem('civica_current_location', JSON.stringify(this.currentLocation));
+      }
+    });
   }
 
   private getCategoryIcon(categoryId: IssueCategory): string {

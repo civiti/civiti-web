@@ -276,31 +276,33 @@
   border-top: 1px solid #e0e0e0;
 }
 
-.continue-btn {
-  background: var(--orange-web) !important;
-  border-color: var(--orange-web) !important;
-  color: var(--white) !important;
+// Button styling with higher specificity to override NG-ZORRO defaults
+:host ::ng-deep button.continue-btn.ant-btn {
+  background: var(--orange-web);
+  border-color: var(--orange-web);
+  color: var(--white);
   font-weight: 600;
   font-size: 1.1rem;
   height: 48px;
   padding: 0 2rem;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
   transition: all 0.3s ease;
 
   &:hover:not(:disabled) {
-    background: #e8930f !important;
-    border-color: #e8930f !important;
+    background: #e8930f;
+    border-color: #e8930f;
     transform: translateY(-2px);
     box-shadow: 0 8px 24px rgba(252, 163, 17, 0.3);
   }
 
   &:disabled {
-    background: #ccc !important;
-    border-color: #ccc !important;
+    background: #ccc;
+    border-color: #ccc;
+    color: var(--white);
     transform: none;
     box-shadow: none;
   }
@@ -310,18 +312,6 @@
   margin-top: 1rem;
   color: #666;
   font-size: 0.95rem;
-}
-
-.category-help {
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #f0f0f0;
-
-  p {
-    margin-bottom: 0.5rem;
-    color: #666;
-    font-size: 0.95rem;
-  }
 }
 
 // Mobile responsiveness

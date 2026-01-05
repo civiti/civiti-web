@@ -75,6 +75,22 @@ export interface AuthorityListResponse {
   id: string;
   name: string;
   email: string;
+  /** City where authority operates */
+  city: string;
+  /** District/Sector within city. Null for city-wide authorities. */
+  district: string | null;
+}
+
+/**
+ * Query parameters for filtering authorities
+ */
+export interface AuthorityQueryParams {
+  /** Filter by city name (case-insensitive) */
+  city?: string;
+  /** Filter by district within city (case-insensitive) */
+  district?: string;
+  /** Search by authority name (case-insensitive, partial match) */
+  search?: string;
 }
 
 /**
