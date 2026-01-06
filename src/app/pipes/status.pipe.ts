@@ -10,6 +10,7 @@ import { Pipe, PipeTransform } from '@angular/core';
   pure: true
 })
 export class StatusTextPipe implements PipeTransform {
+  // Maps to backend IssueStatus enum values
   private static readonly STATUS_MAP: Record<string, string> = {
     'unspecified': 'NESPECIFICAT',
     'draft': 'CIORNĂ',
@@ -17,12 +18,10 @@ export class StatusTextPipe implements PipeTransform {
     'underreview': 'ÎN REVIZUIRE',
     'approved': 'APROBATĂ',
     'active': 'ACTIVĂ',
-    'inprogress': 'ACTIVĂ', // Legacy mapping
-    'rejected': 'RESPINSĂ',
-    'changesrequested': 'MODIFICĂRI NECESARE',
+    'inprogress': 'ACTIVĂ', // Legacy frontend mapping
     'resolved': 'REZOLVATĂ',
-    'cancelled': 'ANULATĂ',
-    'closed': 'ÎNCHISĂ'
+    'rejected': 'RESPINSĂ',
+    'cancelled': 'ANULATĂ'
   };
 
   transform(status: string | null | undefined): string {
@@ -41,25 +40,29 @@ export class StatusTextPipe implements PipeTransform {
   pure: true
 })
 export class StatusColorPipe implements PipeTransform {
+  // Maps to backend IssueStatus enum values
   transform(status: string | null | undefined): string {
     if (!status) return 'default';
 
     const normalizedStatus = status.toLowerCase();
     switch (normalizedStatus) {
       case 'submitted':
+      case 'underreview':
       case 'approved':
         return 'warning';
       case 'active':
-      case 'inprogress':
+      case 'inprogress': // Legacy frontend mapping
         return 'processing';
       case 'resolved':
         return 'success';
       case 'rejected':
         return 'error';
       case 'cancelled':
+      case 'draft':
+      case 'unspecified':
         return 'default';
       default:
-        return 'processing';
+        return 'default';
     }
   }
 }
