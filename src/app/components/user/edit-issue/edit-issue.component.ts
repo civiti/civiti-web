@@ -116,48 +116,50 @@ export class EditIssueComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.loadError = null;
 
-    this.apiService.getIssueById(this.issueId).subscribe({
-      next: (issue) => {
-        this.isLoading = false;
+    this.apiService.getIssueById(this.issueId)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (issue) => {
+          this.isLoading = false;
 
-        // Check ownership - user can only edit their own issues
-        if (issue.user.id !== this.currentUserId) {
-          this.loadError = 'Nu aveți permisiunea de a edita această problemă.';
-          return;
+          // Check ownership - user can only edit their own issues
+          if (issue.user.id !== this.currentUserId) {
+            this.loadError = 'Nu aveți permisiunea de a edita această problemă.';
+            return;
+          }
+
+          // Check if issue can be edited (only Rejected status)
+          if (issue.status.toLowerCase() !== 'rejected') {
+            this.loadError = 'Doar problemele respinse pot fi editate.';
+            return;
+          }
+
+          // All checks passed - populate the form
+          this.issue = issue;
+
+          // Populate form
+          this.editForm.patchValue({
+            title: issue.title,
+            description: issue.description
+          });
+
+          // Populate photos
+          if (issue.photos && issue.photos.length > 0) {
+            this.photoList = issue.photos.map((photo, index) => ({
+              uid: photo.id || `${index}`,
+              name: `photo-${index + 1}`,
+              status: 'done',
+              url: photo.url,
+              thumbUrl: photo.url
+            }));
+          }
+        },
+        error: (error) => {
+          console.error('[EditIssue] Failed to load issue:', error);
+          this.isLoading = false;
+          this.loadError = 'Nu am putut încărca problema. Încercați din nou.';
         }
-
-        // Check if issue can be edited (only Rejected status)
-        if (issue.status.toLowerCase() !== 'rejected') {
-          this.loadError = 'Doar problemele respinse pot fi editate.';
-          return;
-        }
-
-        // All checks passed - populate the form
-        this.issue = issue;
-
-        // Populate form
-        this.editForm.patchValue({
-          title: issue.title,
-          description: issue.description
-        });
-
-        // Populate photos
-        if (issue.photos && issue.photos.length > 0) {
-          this.photoList = issue.photos.map((photo, index) => ({
-            uid: photo.id || `${index}`,
-            name: `photo-${index + 1}`,
-            status: 'done',
-            url: photo.url,
-            thumbUrl: photo.url
-          }));
-        }
-      },
-      error: (error) => {
-        console.error('[EditIssue] Failed to load issue:', error);
-        this.isLoading = false;
-        this.loadError = 'Nu am putut încărca problema. Încercați din nou.';
-      }
-    });
+      });
   }
 
   // Photo upload handling
@@ -287,23 +289,25 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       resubmit: true
     };
 
-    this.apiService.editUserIssue(this.issueId, updateData).subscribe({
-      next: () => {
-        this.isSaving = false;
-        this.message.success('Problema a fost retrimisă pentru aprobare!');
+    this.apiService.editUserIssue(this.issueId, updateData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => {
+          this.isSaving = false;
+          this.message.success('Problema a fost retrimisă pentru aprobare!');
 
-        // Refresh user issues list
-        this.store.dispatch(UserIssuesActions.refreshUserIssues());
+          // Refresh user issues list
+          this.store.dispatch(UserIssuesActions.refreshUserIssues());
 
-        // Navigate back to my issues
-        this.router.navigate(['/my-issues']);
-      },
-      error: (error) => {
-        console.error('[EditIssue] Failed to save:', error);
-        this.isSaving = false;
-        this.message.error('Eroare la salvare. Încercați din nou.');
-      }
-    });
+          // Navigate back to my issues
+          this.router.navigate(['/my-issues']);
+        },
+        error: (error) => {
+          console.error('[EditIssue] Failed to save:', error);
+          this.isSaving = false;
+          this.message.error('Eroare la salvare. Încercați din nou.');
+        }
+      });
   }
 
   goBack(): void {
