@@ -23,8 +23,8 @@
                     </nz-tag>{{ issue.title }}
                   </h1>
                   <div class="flex items-center gap-3">
-                    <nz-tag [nzColor]="getStatusColor(issue.status)">
-                      {{ getStatusText(issue.status) }}
+                    <nz-tag [nzColor]="issue.status | statusColor">
+                      {{ issue.status | statusText }}
                     </nz-tag>
                   </div>
                 </div>
@@ -241,8 +241,8 @@
                 <nz-divider class="my-2"></nz-divider>
                 <div class="flex justify-between items-center">
                   <span class="text-oxford-blue">Status:</span>
-                  <nz-tag [nzColor]="getStatusColor(issue.status)">
-                    {{ getStatusText(issue.status) }}
+                  <nz-tag [nzColor]="issue.status | statusColor">
+                    {{ issue.status | statusText }}
                   </nz-tag>
                 </div>
               </div>

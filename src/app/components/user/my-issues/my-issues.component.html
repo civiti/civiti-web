@@ -22,8 +22,8 @@
                 class="issue-image"
                 (error)="onImageError($event)">
               <div class="status-badge">
-                <nz-tag [nzColor]="getStatusColor(issue.status)">
-                  {{ getDisplayStatusLabel(issue.status) }}
+                <nz-tag [nzColor]="issue.status | statusColor">
+                  {{ issue.status | statusText }}
                 </nz-tag>
               </div>
             </div>

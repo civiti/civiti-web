@@ -27,9 +27,9 @@ import { UserIssuesStatusFilter } from '../../../store/user-issues/user-issues.s
 import {
   IssueItem,
   IssueStatus,
-  ISSUE_STATUSES,
   isActiveStatus
 } from '../../../types/civica-api.types';
+import { StatusTextPipe, StatusColorPipe } from '../../../pipes/status.pipe';
 
 @Component({
   selector: 'app-my-issues',
@@ -49,7 +49,9 @@ import {
     NzSegmentedModule,
     NzModalModule,
     NzToolTipModule,
-    NzAlertModule
+    NzAlertModule,
+    StatusTextPipe,
+    StatusColorPipe
   ],
   templateUrl: './my-issues.component.html',
   styleUrls: ['./my-issues.component.scss']
@@ -108,12 +110,6 @@ export class MyIssuesComponent implements OnInit, OnDestroy {
     ];
   }
 
-  getDisplayStatusLabel(status: IssueStatus | string): string {
-    // Normalize status to match our type (handle case differences from backend)
-    const normalizedStatus = this.normalizeStatus(status);
-    return ISSUE_STATUSES[normalizedStatus] || 'Necunoscut';
-  }
-
   private normalizeStatus(status: string): IssueStatus {
     // Map backend status values to our IssueStatus type (case-insensitive)
     const statusMap: Record<string, IssueStatus> = {
@@ -129,14 +125,6 @@ export class MyIssuesComponent implements OnInit, OnDestroy {
       'cancelled': 'Cancelled'
     };
     return statusMap[status.toLowerCase()] || 'Unspecified';
-  }
-
-  getStatusColor(status: IssueStatus | string): string {
-    const normalized = this.normalizeStatus(status);
-    if (isActiveStatus(normalized)) return 'processing';
-    if (normalized === 'Resolved') return 'success';
-    if (normalized === 'Rejected') return 'error';
-    return 'default';
   }
 
   isActive(status: IssueStatus | string): boolean {

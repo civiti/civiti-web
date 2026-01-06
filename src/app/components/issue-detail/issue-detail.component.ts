@@ -24,6 +24,7 @@ import { IssueDetailResponse } from '../../types/civica-api.types';
 import { EmailModalComponent } from './email-modal.component';
 import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
 import { GoogleMapsConfigService } from '../../services/google-maps-config.service';
+import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
 
 @Component({
     selector: 'app-issue-detail',
@@ -46,6 +47,8 @@ import { GoogleMapsConfigService } from '../../services/google-maps-config.servi
         GoogleMap,
         MapMarker,
         MapInfoWindow,
+        StatusTextPipe,
+        StatusColorPipe,
     ],
     templateUrl: './issue-detail.component.html',
     styleUrl: './issue-detail.component.scss'
@@ -311,39 +314,6 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             return 'apartment';
         } else {
             return 'team';
-        }
-    }
-
-    getStatusText(status: string): string {
-        // Case-insensitive matching for backend camelCase enum serialization
-        const normalizedStatus = (status || '').toLowerCase();
-        switch (normalizedStatus) {
-            case 'unspecified': return 'NESPECIFICAT';
-            case 'draft': return 'CIORNĂ';
-            case 'submitted': return 'TRIMISĂ';
-            case 'underreview': return 'ÎN REVIZUIRE';
-            case 'approved': return 'APROBATĂ';
-            case 'rejected': return 'RESPINSĂ';
-            case 'changesrequested': return 'MODIFICĂRI NECESARE';
-            case 'inprogress': return 'ÎN PROGRES';
-            case 'resolved': return 'REZOLVATĂ';
-            case 'closed': return 'ÎNCHISĂ';
-            default: return 'NECUNOSCUTĂ';
-        }
-    }
-
-    getStatusColor(status: string): string {
-        const normalizedStatus = (status || '').toLowerCase();
-        switch (normalizedStatus) {
-            case 'submitted':
-            case 'approved':
-                return 'warning';
-            case 'resolved':
-                return 'success';
-            case 'rejected':
-                return 'error';
-            default:
-                return 'processing';
         }
     }
 
