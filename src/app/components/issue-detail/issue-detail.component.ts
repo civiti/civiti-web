@@ -318,10 +318,12 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     /**
-     * Check if issue is resolved (email actions should be disabled)
+     * Check if issue is in a terminal state (email actions should be disabled)
+     * Terminal states: resolved, cancelled
      */
-    isResolved(issue: IssueDetailResponse): boolean {
-        return (issue.status || '').toLowerCase() === 'resolved';
+    isTerminalState(issue: IssueDetailResponse): boolean {
+        const status = (issue.status || '').toLowerCase();
+        return status === 'resolved' || status === 'cancelled';
     }
 
     goBack(): void {

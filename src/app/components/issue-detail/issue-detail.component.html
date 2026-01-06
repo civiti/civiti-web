@@ -135,19 +135,19 @@
         <nz-col [nzXs]="24" [nzLg]="8">
           <div class="space-y-6">
             <!-- Email Counter Card - PROMINENT -->
-            <nz-card [nzBordered]="true" [class]="isResolved(issue) ? 'bg-green-50 border-2 border-green-500' : 'bg-orange-web-20 border-2 border-orange-web'">
+            <nz-card [nzBordered]="true" [class]="isTerminalState(issue) ? 'bg-green-50 border-2 border-green-500' : 'bg-orange-web-20 border-2 border-orange-web'">
               <div class="text-center">
-                <i nz-icon [nzType]="isResolved(issue) ? 'check-circle' : 'mail'" nzTheme="outline"
-                   [class]="isResolved(issue) ? 'text-green-500 text-5xl mb-2' : 'text-orange-web text-5xl mb-2'"></i>
-                <div [class]="isResolved(issue) ? 'email-counter-number text-green-600 font-bold mb-2' : 'email-counter-number text-orange-web font-bold mb-2'">
+                <i nz-icon [nzType]="isTerminalState(issue) ? 'check-circle' : 'mail'" nzTheme="outline"
+                   [class]="isTerminalState(issue) ? 'text-green-500 text-5xl mb-2' : 'text-orange-web text-5xl mb-2'"></i>
+                <div [class]="isTerminalState(issue) ? 'email-counter-number text-green-600 font-bold mb-2' : 'email-counter-number text-orange-web font-bold mb-2'">
                   {{ issue.emailsSent }}
                 </div>
                 <p class="text-oxford-blue font-semibold">
-                  {{ isResolved(issue) ? 'Problema a fost rezolvata!' : 'Email-uri trimise până acum' }}
+                  {{ isTerminalState(issue) ? 'Problema a fost închisă!' : 'Email-uri trimise până acum' }}
                 </p>
                 <p class="text-oxford-blue text-sm opacity-75 mt-2">
-                  {{ isResolved(issue)
-                    ? 'Aceasta problema a fost marcata ca rezolvata. Multumim tuturor celor care au contribuit!'
+                  {{ isTerminalState(issue)
+                    ? 'Această problemă nu mai acceptă email-uri. Mulțumim tuturor celor care au contribuit!'
                     : 'Fiecare email contează! Ajută și tu prin trimiterea unui email către autorități.' }}
                 </p>
               </div>
@@ -173,11 +173,11 @@
                   </div>
                   <p class="text-sm text-oxford-blue opacity-75 mb-3">{{ authority.email }}</p>
                   <button nz-button nzType="primary" nzBlock
-                          [disabled]="isResolved(issue)"
-                          [nz-tooltip]="isResolved(issue) ? 'Problema a fost rezolvata' : ''"
-                          (click)="!isResolved(issue) && openEmailModalWithEmail(authority.email, issue)">
+                          [disabled]="isTerminalState(issue)"
+                          [nz-tooltip]="isTerminalState(issue) ? 'Problema a fost închisă' : ''"
+                          (click)="!isTerminalState(issue) && openEmailModalWithEmail(authority.email, issue)">
                     <i nz-icon nzType="mail" nzTheme="outline" class="mr-2"></i>
-                    {{ isResolved(issue) ? 'Rezolvata' : 'Trimite Email' }}
+                    {{ isTerminalState(issue) ? 'Închisă' : 'Trimite Email' }}
                   </button>
                 </div>
               </div>

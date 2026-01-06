@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, mergeMap, catchError, tap } from 'rxjs/operators';
+import { map, switchMap, mergeMap, catchError, tap } from 'rxjs/operators';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { ApiService } from '../../services/api.service';
@@ -14,11 +14,11 @@ export class UserIssuesEffects {
   private apiService = inject(ApiService);
   private message = inject(NzMessageService);
 
-  // Load User Issues
+  // Load User Issues - use switchMap to cancel pending requests when new load is triggered
   loadUserIssues$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserIssuesActions.loadUserIssues, UserIssuesActions.refreshUserIssues),
-      mergeMap((action) => {
+      switchMap((action) => {
         const params = 'params' in action ? action.params : undefined;
         return this.apiService.getUserIssues(params).pipe(
           map(response => UserIssuesActions.loadUserIssuesSuccess({

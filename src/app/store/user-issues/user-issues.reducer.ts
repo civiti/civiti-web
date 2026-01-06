@@ -6,7 +6,7 @@ export const userIssuesReducer = createReducer(
   initialUserIssuesState,
 
   // Load User Issues
-  on(UserIssuesActions.loadUserIssues, (state) => ({
+  on(UserIssuesActions.loadUserIssues, UserIssuesActions.refreshUserIssues, (state) => ({
     ...state,
     loading: true,
     error: null
