@@ -143,7 +143,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
             description: issue.description
           });
 
-          // Populate photos
+          // Populate photos (reset first to handle issues without photos)
           if (issue.photos && issue.photos.length > 0) {
             this.photoList = issue.photos.map((photo, index) => ({
               uid: photo.id || `${index}`,
@@ -152,6 +152,8 @@ export class EditIssueComponent implements OnInit, OnDestroy {
               url: photo.url,
               thumbUrl: photo.url
             }));
+          } else {
+            this.photoList = [];
           }
         },
         error: (error) => {
