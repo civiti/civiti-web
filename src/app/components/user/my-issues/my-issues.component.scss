@@ -7,68 +7,21 @@
 // Filter Bar
 .filter-bar {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: center;
   margin-bottom: 24px;
-  gap: 16px;
-  flex-wrap: wrap;
 
-  .filter-tabs {
-    ::ng-deep .ant-segmented {
-      background: var(--platinum);
-      padding: 4px;
-      border-radius: 8px;
+  ::ng-deep .ant-segmented {
+    background: var(--platinum);
+    padding: 4px;
+    border-radius: 8px;
 
-      .ant-segmented-item {
-        border-radius: 6px;
+    .ant-segmented-item {
+      border-radius: 6px;
+      padding: 6px 16px;
 
-        &-selected {
-          background: var(--white);
-          box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-      }
-    }
-  }
-
-  .stats-pills {
-    display: flex;
-    gap: 16px;
-    align-items: center;
-
-    .stat-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      font-size: 14px;
-      color: var(--oxford-blue);
-
-      .stat-value {
-        font-weight: 700;
-        padding: 4px 10px;
-        border-radius: 16px;
-        font-size: 15px;
-        min-width: 28px;
-        text-align: center;
-      }
-
-      &.active .stat-value {
-        background: rgba(24, 144, 255, 0.15);
-        color: #1890ff;
-      }
-
-      &.resolved .stat-value {
-        background: rgba(82, 196, 26, 0.15);
-        color: #52c41a;
-      }
-
-      &.rejected .stat-value {
-        background: rgba(255, 77, 79, 0.15);
-        color: #ff4d4f;
-      }
-
-      &.cancelled .stat-value {
-        background: rgba(140, 140, 140, 0.15);
-        color: #8c8c8c;
+      &-selected {
+        background: var(--white);
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       }
     }
   }
@@ -233,19 +186,15 @@
   }
 
   .filter-bar {
-    flex-direction: column;
-    align-items: stretch;
+    ::ng-deep .ant-segmented {
+      // Allow horizontal scroll on mobile if needed
+      max-width: 100%;
+      overflow-x: auto;
 
-    .filter-tabs {
-      order: 1;
-      display: flex;
-      justify-content: center;
-    }
-
-    .stats-pills {
-      order: 2;
-      justify-content: center;
-      flex-wrap: wrap;
+      .ant-segmented-item {
+        padding: 6px 12px;
+        font-size: 13px;
+      }
     }
   }
 

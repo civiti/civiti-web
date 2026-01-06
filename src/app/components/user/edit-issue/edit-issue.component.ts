@@ -3,8 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { Subject, forkJoin, of, from } from 'rxjs';
+import { takeUntil, switchMap, finalize } from 'rxjs/operators';
+import imageCompression from 'browser-image-compression';
 
 // NG-ZORRO imports
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -20,6 +21,8 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 import { AppState } from '../../../store/app.state';
 import { ApiService } from '../../../services/api.service';
+import { StorageService, UploadResult } from '../../../services/storage.service';
+import { SupabaseAuthService } from '../../../services/supabase-auth.service';
 import { IssueDetailResponse } from '../../../types/civica-api.types';
 import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
 
@@ -49,13 +52,27 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private store = inject(Store<AppState>);
   private apiService = inject(ApiService);
+  private storageService = inject(StorageService);
+  private authService = inject(SupabaseAuthService);
   private message = inject(NzMessageService);
   private modal = inject(NzModalService);
+
+  private currentUserId: string | null = null;
+
+  // Compression settings (same as photo-upload component)
+  private readonly compressionOptions = {
+    maxSizeMB: 1,
+    maxWidthOrHeight: 1920,
+    useWebWorker: true,
+    preserveExif: false,
+    initialQuality: 0.85,
+  };
 
   issueId: string = '';
   issue: IssueDetailResponse | null = null;
   isLoading = true;
   isSaving = false;
+  isUploading = false;
   loadError: string | null = null;
 
   editForm: FormGroup;
@@ -69,6 +86,15 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Load current user
+    this.authService.getCurrentUserOnceReady()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        if (user) {
+          this.currentUserId = user.id;
+        }
+      });
+
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
       this.issueId = params['id'];
       if (this.issueId) {
@@ -167,12 +193,77 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   }
 
   private saveChanges(): void {
+    if (!this.currentUserId) {
+      this.message.error('Trebuie să fiți autentificat pentru a salva modificările.');
+      return;
+    }
+
     this.isSaving = true;
 
-    const photoUrls = this.photoList
-      .filter(p => p.url)
+    // Separate existing photos (have url) from new photos (have originFileObj)
+    const existingPhotoUrls = this.photoList
+      .filter(p => p.url && !p.originFileObj)
       .map(p => p.url as string);
 
+    const newPhotos = this.photoList.filter(p => p.originFileObj);
+
+    if (newPhotos.length === 0) {
+      // No new photos to upload, proceed directly
+      this.submitUpdate(existingPhotoUrls);
+    } else {
+      // Upload new photos first
+      this.isUploading = true;
+      this.uploadNewPhotos(newPhotos).pipe(
+        takeUntil(this.destroy$),
+        finalize(() => {
+          this.isUploading = false;
+        })
+      ).subscribe({
+        next: (newUrls) => {
+          const allPhotoUrls = [...existingPhotoUrls, ...newUrls];
+          this.submitUpdate(allPhotoUrls);
+        },
+        error: (error) => {
+          console.error('[EditIssue] Failed to upload photos:', error);
+          this.isSaving = false;
+          this.message.error('Eroare la încărcarea fotografiilor. Încercați din nou.');
+        }
+      });
+    }
+  }
+
+  private uploadNewPhotos(photos: NzUploadFile[]) {
+    const uploadTasks = photos.map(photo => {
+      const file = photo.originFileObj as File;
+      return this.compressAndUpload(file);
+    });
+
+    return forkJoin(uploadTasks);
+  }
+
+  private compressAndUpload(file: File) {
+    return from(this.compressImage(file)).pipe(
+      switchMap(compressedFile =>
+        this.storageService.uploadPhotoWithRetry(this.currentUserId!, compressedFile)
+      ),
+      switchMap((result: UploadResult) => of(result.url))
+    );
+  }
+
+  private async compressImage(file: File): Promise<File> {
+    try {
+      const options = file.size < 500 * 1024
+        ? { ...this.compressionOptions, maxSizeMB: Infinity }
+        : this.compressionOptions;
+
+      return await imageCompression(file, options);
+    } catch (error) {
+      console.error('[EditIssue] Compression failed:', error);
+      throw new Error('Nu s-a putut procesa imaginea.');
+    }
+  }
+
+  private submitUpdate(photoUrls: string[]): void {
     const updateData = {
       title: this.editForm.value.title,
       description: this.editForm.value.description,
@@ -183,7 +274,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
     this.apiService.editUserIssue(this.issueId, updateData).subscribe({
       next: () => {
         this.isSaving = false;
-        this.message.success('Problema a fost retrimisa pentru aprobare!');
+        this.message.success('Problema a fost retrimisă pentru aprobare!');
 
         // Refresh user issues list
         this.store.dispatch(UserIssuesActions.refreshUserIssues());
@@ -194,7 +285,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('[EditIssue] Failed to save:', error);
         this.isSaving = false;
-        this.message.error('Eroare la salvare. Incearca din nou.');
+        this.message.error('Eroare la salvare. Încercați din nou.');
       }
     });
   }

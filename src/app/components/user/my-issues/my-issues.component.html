@@ -1,28 +1,12 @@
 <nz-spin [nzSpinning]="(isLoading$ | async) || false">
   <div class="my-issues-container">
-    <!-- Filter Bar with Stats -->
+    <!-- Filter Bar with Inline Counts -->
     <div class="filter-bar" *ngIf="summary$ | async as summary">
-      <div class="filter-tabs">
-        <nz-segmented
-          [nzOptions]="filterOptions"
-          [(ngModel)]="selectedFilter"
-          (ngModelChange)="onFilterChange($event)">
-        </nz-segmented>
-      </div>
-      <div class="stats-pills">
-        <span class="stat-pill active">
-          <span class="stat-value">{{ summary.active }}</span> active
-        </span>
-        <span class="stat-pill resolved">
-          <span class="stat-value">{{ summary.resolved }}</span> rezolvate
-        </span>
-        <span class="stat-pill rejected">
-          <span class="stat-value">{{ summary.rejected }}</span> respinse
-        </span>
-        <span class="stat-pill cancelled" *ngIf="summary.cancelled > 0">
-          <span class="stat-value">{{ summary.cancelled }}</span> anulate
-        </span>
-      </div>
+      <nz-segmented
+        [nzOptions]="getFilterOptions(summary)"
+        [(ngModel)]="selectedFilter"
+        (ngModelChange)="onFilterChange($event)">
+      </nz-segmented>
     </div>
 
     <!-- Issues Grid -->

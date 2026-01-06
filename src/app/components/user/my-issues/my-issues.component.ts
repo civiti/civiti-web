@@ -65,14 +65,7 @@ export class MyIssuesComponent implements OnInit, OnDestroy {
   statusFilter$: Observable<UserIssuesStatusFilter>;
   summary$: Observable<{ active: number; resolved: number; rejected: number; cancelled: number; total: number }>;
 
-  // Filter options for segmented control
-  filterOptions = [
-    { label: 'Toate', value: 'all' },
-    { label: 'Active', value: 'active' },
-    { label: 'Rezolvate', value: 'resolved' },
-    { label: 'Respinse', value: 'rejected' },
-    { label: 'Anulate', value: 'cancelled' }
-  ];
+  // Filter options will be computed dynamically based on summary counts
 
   selectedFilter: UserIssuesStatusFilter = 'all';
 
@@ -101,6 +94,16 @@ export class MyIssuesComponent implements OnInit, OnDestroy {
   onFilterChange(value: string | number): void {
     const filter = value as UserIssuesStatusFilter;
     this.store.dispatch(UserIssuesActions.setStatusFilter({ filter }));
+  }
+
+  getFilterOptions(summary: { active: number; resolved: number; rejected: number; cancelled: number; total: number }) {
+    return [
+      { label: `Toate (${summary.total})`, value: 'all' },
+      { label: `Active (${summary.active})`, value: 'active' },
+      { label: `Rezolvate (${summary.resolved})`, value: 'resolved' },
+      { label: `Respinse (${summary.rejected})`, value: 'rejected' },
+      { label: `Anulate (${summary.cancelled})`, value: 'cancelled' }
+    ];
   }
 
   getDisplayStatusLabel(status: IssueStatus | string): string {

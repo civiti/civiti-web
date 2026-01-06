@@ -116,7 +116,7 @@
               nzType="default"
               type="button"
               (click)="goBack()"
-              [disabled]="isSaving">
+              [disabled]="isSaving || isUploading">
               <i nz-icon nzType="arrow-left" nzTheme="outline"></i>
               Inapoi
             </button>
@@ -124,10 +124,10 @@
               nz-button
               nzType="primary"
               type="submit"
-              [nzLoading]="isSaving"
-              [disabled]="editForm.invalid || isSaving">
+              [nzLoading]="isSaving || isUploading"
+              [disabled]="editForm.invalid || isSaving || isUploading">
               <i nz-icon nzType="check" nzTheme="outline"></i>
-              Retrimite pentru aprobare
+              {{ isUploading ? 'Se încarcă fotografiile...' : 'Retrimite pentru aprobare' }}
             </button>
           </div>
         </form>

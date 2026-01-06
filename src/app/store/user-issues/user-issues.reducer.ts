@@ -35,9 +35,12 @@ export const userIssuesReducer = createReducer(
     }, state)
   ),
 
-  // Cancel Issue - remove from visible list
+  // Cancel Issue - update status to Cancelled
   on(UserIssuesActions.cancelIssueSuccess, (state, { issueId }) =>
-    userIssuesAdapter.removeOne(issueId, state)
+    userIssuesAdapter.updateOne({
+      id: issueId,
+      changes: { status: 'Cancelled' }
+    }, state)
   ),
 
   // Set Status Filter

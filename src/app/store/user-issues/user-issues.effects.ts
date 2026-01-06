@@ -6,6 +6,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { ApiService } from '../../services/api.service';
 import * as UserIssuesActions from './user-issues.actions';
+import * as AuthActions from '../auth/auth.actions';
 
 @Injectable()
 export class UserIssuesEffects {
@@ -74,6 +75,14 @@ export class UserIssuesEffects {
           })
         )
       )
+    )
+  );
+
+  // Clear user issues on logout to prevent data leakage between sessions
+  clearOnLogout$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(AuthActions.logout),
+      map(() => UserIssuesActions.clearUserIssues())
     )
   );
 }
