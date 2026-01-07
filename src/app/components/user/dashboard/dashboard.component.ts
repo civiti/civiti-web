@@ -22,9 +22,12 @@ import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 
+import { StatusTextPipe, StatusColorPipe } from '../../../pipes/status.pipe';
 import { AppState } from '../../../store/app.state';
 import * as AuthActions from '../../../store/auth/auth.actions';
 import * as UserActions from '../../../store/user/user.actions';
+import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
+import * as UserIssuesSelectors from '../../../store/user-issues/user-issues.selectors';
 import { AuthUser } from '../../../store/auth/auth.state';
 import {
   selectAuthUser,
@@ -35,7 +38,10 @@ import {
   Achievement,
   UserProfile
 } from '../../../store/user/user.state';
-import { BadgeResponse } from '../../../types/civica-api.types';
+import {
+  BadgeResponse,
+  IssueItem
+} from '../../../types/civica-api.types';
 
 // Interface for user statistics from gamification data
 interface UserStats {
@@ -75,7 +81,9 @@ import {
     NzTypographyModule,
     NzEmptyModule,
     NzDropDownModule,
-    NzMenuModule
+    NzMenuModule,
+    StatusTextPipe,
+    StatusColorPipe
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -95,6 +103,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
   recentBadges$!: Observable<BadgeResponse[]>;
   incompleteAchievements$!: Observable<Achievement[]>;
   isLoading$!: Observable<boolean>;
+
+  // User Issues Observables
+  userIssuesSummary$!: Observable<{ active: number; resolved: number; rejected: number; total: number }>;
+  recentUserIssues$!: Observable<IssueItem[]>;
+  userIssuesLoading$!: Observable<boolean>;
+  hasUserIssues$!: Observable<boolean>;
 
   // Mock data for demonstration
   mockActivity = [
@@ -138,6 +152,12 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.recentBadges$ = this.store.select(selectRecentBadges);
     this.incompleteAchievements$ = this.store.select(selectIncompleteAchievements);
     this.isLoading$ = this.store.select(selectUserLoading);
+
+    // User Issues observables
+    this.userIssuesSummary$ = this.store.select(UserIssuesSelectors.selectUserIssuesSummary);
+    this.recentUserIssues$ = this.store.select(UserIssuesSelectors.selectRecentUserIssues);
+    this.userIssuesLoading$ = this.store.select(UserIssuesSelectors.selectUserIssuesLoading);
+    this.hasUserIssues$ = this.store.select(UserIssuesSelectors.selectHasUserIssues);
   }
 
   ngOnInit(): void {
@@ -148,6 +168,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
         // loadUserProfile now returns profile WITH gamification
         this.store.dispatch(UserActions.loadUserProfile({ userId: user.id }));
         this.store.dispatch(UserActions.loadUserPreferences({ userId: user.id }));
+
+        // Load user's own issues
+        this.store.dispatch(UserIssuesActions.loadUserIssues({}));
 
         // Update login streak
         this.store.dispatch(UserActions.updateStreak({ streakType: 'login', increment: true }));
@@ -195,9 +218,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   viewMyIssues(): void {
-    // TODO: Navigate to user's issues page
-    console.log('[DASHBOARD] View My Issues clicked');
-    this.router.navigate(['/issues'], { queryParams: { filter: 'my-issues' } });
+    this.router.navigate(['/my-issues']);
   }
 
   logout(): void {
@@ -207,5 +228,14 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   navigateToIssues(): void {
     this.router.navigate(['/issues']);
+  }
+
+  viewIssueDetails(issueId: string): void {
+    this.router.navigate(['/issue', issueId]);
+  }
+
+  onIssueImageError(event: Event): void {
+    const img = event.target as HTMLImageElement;
+    img.src = '/images/placeholders/issue-placeholder.svg';
   }
 }

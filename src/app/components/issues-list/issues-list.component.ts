@@ -21,6 +21,7 @@ import * as IssueActions from '../../store/issues/issue.actions';
 import * as IssueSelectors from '../../store/issues/issue.selectors';
 import { selectIsAuthenticated } from '../../store/auth/auth.selectors';
 import { IssueItem } from '../../types/civica-api.types';
+import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
 
 @Component({
   selector: 'app-issues-list',
@@ -40,6 +41,8 @@ import { IssueItem } from '../../types/civica-api.types';
     NzEmptyModule,
     NzToolTipModule,
     NzModalModule,
+    StatusTextPipe,
+    StatusColorPipe,
   ],
   templateUrl: './issues-list.component.html',
   styleUrl: './issues-list.component.scss'
@@ -103,39 +106,6 @@ export class IssuesListComponent implements OnInit {
     return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
-  getStatusText(status: string): string {
-    // Case-insensitive matching for backend camelCase enum serialization
-    const normalizedStatus = (status || '').toLowerCase();
-    switch (normalizedStatus) {
-      case 'unspecified': return 'NESPECIFICAT';
-      case 'draft': return 'CIORNĂ';
-      case 'submitted': return 'TRIMISĂ';
-      case 'underreview': return 'ÎN REVIZUIRE';
-      case 'approved': return 'APROBATĂ';
-      case 'rejected': return 'RESPINSĂ';
-      case 'changesrequested': return 'MODIFICĂRI NECESARE';
-      case 'inprogress': return 'ÎN PROGRES';
-      case 'resolved': return 'REZOLVATĂ';
-      case 'closed': return 'ÎNCHISĂ';
-      default: return 'NECUNOSCUTĂ';
-    }
-  }
-
-  getStatusColor(status: string): string {
-    const normalizedStatus = (status || '').toLowerCase();
-    switch (normalizedStatus) {
-      case 'submitted':
-      case 'approved':
-        return 'warning';
-      case 'resolved':
-        return 'success';
-      case 'rejected':
-        return 'error';
-      default:
-        return 'processing';
-    }
-  }
-
   getIssueImage(issue: IssueItem): string {
     if (issue.mainPhotoUrl) {
       return issue.mainPhotoUrl;
@@ -164,6 +134,13 @@ export class IssuesListComponent implements OnInit {
   viewIssueDetails(issueId: string): void {
     this._store.dispatch(IssueActions.selectIssue({ id: issueId }));
     this._router.navigate(['/issue', issueId]);
+  }
+
+  /**
+   * Check if issue is resolved (actions should be disabled)
+   */
+  isResolved(issue: IssueItem): boolean {
+    return (issue.status || '').toLowerCase() === 'resolved';
   }
 
   promptToCreateIssue(): void {

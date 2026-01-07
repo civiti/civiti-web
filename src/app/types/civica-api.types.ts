@@ -26,9 +26,34 @@ export type IssueStatus =
   | 'Submitted'
   | 'UnderReview'
   | 'Approved'
-  | 'InProgress'
+  | 'Active'
   | 'Resolved'
-  | 'Rejected';
+  | 'Rejected'
+  | 'Cancelled';
+
+/** User-facing status labels for display */
+export type UserFacingStatus = 'Activ' | 'Rezolvat' | 'Respins';
+
+/** Statuses that represent an "active" issue */
+export const ACTIVE_ISSUE_STATUSES: IssueStatus[] = [
+  'Submitted',
+  'UnderReview',
+  'Approved',
+  'Active'
+];
+
+/** Map internal status to user-facing display status */
+export function getDisplayStatus(status: IssueStatus): UserFacingStatus | null {
+  if (ACTIVE_ISSUE_STATUSES.includes(status)) return 'Activ';
+  if (status === 'Resolved') return 'Rezolvat';
+  if (status === 'Rejected') return 'Respins';
+  return null; // Hidden statuses (Draft, Cancelled, Unspecified)
+}
+
+/** Check if an issue status is considered "active" */
+export function isActiveStatus(status: IssueStatus): boolean {
+  return ACTIVE_ISSUE_STATUSES.includes(status);
+}
 
 export type ResidenceType = 'Apartment' | 'House' | 'Business';
 
@@ -169,6 +194,27 @@ export interface RejectIssueRequest {
 export interface RequestChangesRequest {
   requestedChanges: string;
   adminNotes?: string;
+}
+
+// ============================================
+// User Issue Management Types
+// ============================================
+
+/**
+ * Request to update an issue's status (for owner actions)
+ * PUT /api/user/issues/{id}/status
+ * Returns 204 No Content on success
+ */
+export interface UpdateIssueStatusRequest {
+  status: 'cancelled' | 'resolved'; // camelCase as expected by backend
+}
+
+/** Request to edit user's own issue */
+export interface EditUserIssueRequest {
+  title?: string;
+  description?: string;
+  photoUrls?: string[];
+  resubmit?: boolean; // If true, changes status back to Submitted
 }
 
 export interface BulkApproveRequest {
@@ -641,12 +687,20 @@ export const URGENCY_LEVELS: Record<UrgencyLevel, string> = {
 export const ISSUE_STATUSES: Record<IssueStatus, string> = {
   Unspecified: 'Nespecificat',
   Draft: 'Ciornă',
-  Submitted: 'Trimis',
+  Submitted: 'Trimisă',
   UnderReview: 'În Evaluare',
-  Approved: 'Aprobat',
-  InProgress: 'În Progres',
-  Resolved: 'Rezolvat',
-  Rejected: 'Respins'
+  Approved: 'Aprobată',
+  Active: 'Activă',
+  Resolved: 'Rezolvată',
+  Rejected: 'Respinsă',
+  Cancelled: 'Anulată'
+};
+
+/** User-facing status labels in Romanian */
+export const USER_FACING_STATUS_LABELS: Record<UserFacingStatus, string> = {
+  Activ: 'Activ',
+  Rezolvat: 'Rezolvat',
+  Respins: 'Respins'
 };
 
 // AI Analysis interface matching backend
@@ -678,6 +732,10 @@ export const API_ENDPOINTS = {
   ISSUES: '/api/issues',
   ISSUE_BY_ID: (id: string) => `/api/issues/${id}`,
   TRACK_EMAIL: (id: string) => `/api/issues/${id}/email-sent`,
+
+  // User Issue Management
+  USER_ISSUE_BY_ID: (id: string) => `/api/user/issues/${id}`,
+  USER_ISSUE_STATUS: (id: string) => `/api/user/issues/${id}/status`,
 
   // Admin
   PENDING_ISSUES: '/api/admin/pending-issues',

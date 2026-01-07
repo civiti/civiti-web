@@ -51,8 +51,8 @@
               >
               <!-- Status Badge -->
               <div class="absolute top-3 left-3">
-                <nz-tag [nzColor]="getStatusColor(issue.status)">
-                  {{ getStatusText(issue.status) }}
+                <nz-tag [nzColor]="issue.status | statusColor">
+                  {{ issue.status | statusText }}
                 </nz-tag>
               </div>
               <!-- Urgency Badge -->

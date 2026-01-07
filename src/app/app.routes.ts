@@ -40,6 +40,16 @@ export const routes: Routes = [
     loadComponent: () => import('./components/user/dashboard/dashboard.component').then(m => m.DashboardComponent),
     data: { animation: 'DashboardPage', headerTitle: 'Panou de Control', showBackButton: true, backUrl: '/issues' }
   },
+  {
+    path: 'my-issues',
+    loadComponent: () => import('./components/user/my-issues/my-issues.component').then(m => m.MyIssuesComponent),
+    data: { animation: 'MyIssuesPage', headerTitle: 'Problemele Mele', showBackButton: true, backUrl: '/dashboard' }
+  },
+  {
+    path: 'edit-issue/:id',
+    loadComponent: () => import('./components/user/edit-issue/edit-issue.component').then(m => m.EditIssueComponent),
+    data: { animation: 'EditIssuePage', headerTitle: 'Editează Problema', showBackButton: true, backUrl: '/my-issues' }
+  },
   // Issue creation routes - requires authentication
   {
     path: 'create-issue',

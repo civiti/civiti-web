@@ -167,6 +167,63 @@
           </div>
         </nz-card>
 
+        <!-- My Issues Preview -->
+        <nz-card class="my-issues-preview-card" [nzLoading]="(userIssuesLoading$ | async) || false">
+          <div class="card-header">
+            <h3>Problemele Mele</h3>
+            <a (click)="viewMyIssues()" class="see-all-link">
+              Vezi toate <i nz-icon nzType="arrow-right" nzTheme="outline"></i>
+            </a>
+          </div>
+
+          <!-- Summary Stats -->
+          <div class="issues-summary" *ngIf="userIssuesSummary$ | async as summary">
+            <div class="summary-stat">
+              <span class="stat-value active">{{ summary.active }}</span>
+              <span class="stat-label">Active</span>
+            </div>
+            <div class="summary-stat">
+              <span class="stat-value resolved">{{ summary.resolved }}</span>
+              <span class="stat-label">Rezolvate</span>
+            </div>
+            <div class="summary-stat">
+              <span class="stat-value rejected">{{ summary.rejected }}</span>
+              <span class="stat-label">Respinse</span>
+            </div>
+          </div>
+
+          <!-- Recent Issues Mini-Cards -->
+          <div class="recent-issues" *ngIf="recentUserIssues$ | async as issues">
+            <div *ngFor="let issue of issues" class="mini-issue-card"
+                 (click)="viewIssueDetails(issue.id)">
+              <div class="mini-issue-image">
+                <img [src]="issue.mainPhotoUrl || '/images/placeholders/issue-placeholder.svg'"
+                     [alt]="issue.title"
+                     (error)="onIssueImageError($event)">
+              </div>
+              <div class="mini-issue-info">
+                <h5>{{ issue.title }}</h5>
+                <div class="issue-meta">
+                  <nz-tag [nzColor]="issue.status | statusColor" nzMode="default">
+                    {{ issue.status | statusText }}
+                  </nz-tag>
+                  <span class="email-count">{{ issue.emailsSent }} email-uri</span>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="issues.length === 0" class="no-issues">
+              <nz-empty nzNotFoundImage="simple"
+                        nzNotFoundContent="Nu ai raportat inca probleme">
+              </nz-empty>
+              <button nz-button nzType="primary" nzSize="small" routerLink="/create-issue" class="report-first-btn">
+                <i nz-icon nzType="plus" nzTheme="outline"></i>
+                Raporteaza prima problema
+              </button>
+            </div>
+          </div>
+        </nz-card>
+
         <!-- Recent Activity -->
         <nz-card nzTitle="Activitate recentă" class="activity-card">
           <nz-list 

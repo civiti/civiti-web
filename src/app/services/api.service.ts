@@ -30,7 +30,8 @@ import {
   PagedResult,
   IssueQueryParams,
   LeaderboardQueryParams,
-  PaginationParams
+  PaginationParams,
+  EditUserIssueRequest
 } from '../types/civica-api.types';
 
 @Injectable({
@@ -176,6 +177,23 @@ export class ApiService {
     }
 
     return this.http.get<PagedResult<IssueItem>>(`${this.baseUrl}/user/issues`, { params: httpParams });
+  }
+
+  /**
+   * Update issue status (cancel or resolve)
+   * PUT /api/user/issues/:id/status
+   * @param status - 'cancelled' | 'resolved' (camelCase)
+   */
+  updateIssueStatus(issueId: string, status: 'cancelled' | 'resolved'): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/user/issues/${issueId}/status`, { status });
+  }
+
+  /**
+   * Edit user's own issue (for rejected issues or drafts)
+   * PUT /api/user/issues/:id
+   */
+  editUserIssue(issueId: string, data: EditUserIssueRequest): Observable<IssueDetailResponse> {
+    return this.http.put<IssueDetailResponse>(`${this.baseUrl}/user/issues/${issueId}`, data);
   }
 
   // ============================================

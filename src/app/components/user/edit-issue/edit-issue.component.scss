@@ -1,0 +1,170 @@
+.edit-issue-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px 16px;
+}
+
+.edit-card {
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(20, 33, 61, 0.08);
+}
+
+.edit-header {
+  margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--platinum);
+
+  h2 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--oxford-blue);
+    margin: 0 0 8px 0;
+  }
+
+  .subtitle {
+    font-size: 14px;
+    color: var(--oxford-blue);
+    opacity: 0.75;
+    margin: 0;
+  }
+}
+
+.mb-4 {
+  margin-bottom: 16px;
+}
+
+// Form styling
+nz-form-item {
+  margin-bottom: 24px;
+}
+
+nz-form-label {
+  font-weight: 500;
+  color: var(--oxford-blue);
+}
+
+.char-count {
+  text-align: right;
+  font-size: 12px;
+  color: var(--oxford-blue);
+  opacity: 0.6;
+  margin-top: 4px;
+}
+
+// Read-only location field
+.readonly-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background-color: var(--platinum);
+  border-radius: 8px;
+  color: var(--oxford-blue);
+
+  i {
+    font-size: 16px;
+    color: var(--orange-web);
+  }
+
+  span {
+    font-size: 14px;
+  }
+}
+
+.field-hint {
+  font-size: 12px;
+  color: var(--oxford-blue);
+  opacity: 0.6;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+// Photo upload styling
+.upload-text {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--oxford-blue);
+}
+
+.photo-hint {
+  font-size: 12px;
+  color: var(--oxford-blue);
+  opacity: 0.6;
+  margin-top: 8px;
+  margin-bottom: 0;
+}
+
+// NG-ZORRO upload customization
+::ng-deep {
+  .ant-upload-list-picture-card {
+    .ant-upload-list-item {
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    .ant-upload-list-item-info {
+      border-radius: 8px;
+    }
+  }
+
+  .ant-upload.ant-upload-select-picture-card {
+    border-radius: 8px;
+    border-color: var(--platinum);
+    background-color: rgba(229, 229, 229, 0.3);
+
+    &:hover {
+      border-color: var(--orange-web);
+    }
+  }
+}
+
+// Form actions
+.form-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--platinum);
+
+  button {
+    min-width: 140px;
+  }
+
+  button[nzType="primary"] {
+    background-color: var(--orange-web);
+    border-color: var(--orange-web);
+
+    &:hover:not(:disabled) {
+      background-color: darken(#FCA311, 5%);
+      border-color: darken(#FCA311, 5%);
+    }
+
+    &:disabled {
+      opacity: 0.6;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 576px) {
+  .edit-issue-container {
+    padding: 16px 12px;
+  }
+
+  .edit-header {
+    h2 {
+      font-size: 20px;
+    }
+  }
+
+  .form-actions {
+    flex-direction: column-reverse;
+    gap: 12px;
+
+    button {
+      width: 100%;
+    }
+  }
+}

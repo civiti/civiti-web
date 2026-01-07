@@ -350,6 +350,156 @@ nz-button.issues-nav-button button.ant-btn {
   text-align: right;
 }
 
+// My Issues Preview Card
+.my-issues-preview-card {
+  border-radius: 12px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(20, 33, 61, 0.1);
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+
+    h3 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--oxford-blue);
+      margin: 0;
+    }
+
+    .see-all-link {
+      color: var(--orange-web);
+      font-size: 14px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: color 0.2s ease;
+
+      &:hover {
+        color: #e59400;
+      }
+    }
+  }
+
+  .issues-summary {
+    display: flex;
+    justify-content: space-around;
+    padding: 16px;
+    background: var(--platinum);
+    border-radius: 8px;
+    margin-bottom: 16px;
+
+    .summary-stat {
+      text-align: center;
+
+      .stat-value {
+        display: block;
+        font-size: 24px;
+        font-weight: 700;
+        line-height: 1.2;
+
+        &.active {
+          color: #1890ff;
+        }
+
+        &.resolved {
+          color: #52c41a;
+        }
+
+        &.rejected {
+          color: #ff4d4f;
+        }
+      }
+
+      .stat-label {
+        display: block;
+        font-size: 12px;
+        color: #666;
+        margin-top: 4px;
+      }
+    }
+  }
+
+  .recent-issues {
+    .mini-issue-card {
+      display: flex;
+      gap: 12px;
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      margin-bottom: 8px;
+
+      &:hover {
+        background: var(--platinum);
+      }
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+
+      .mini-issue-image {
+        width: 60px;
+        height: 60px;
+        border-radius: 8px;
+        overflow: hidden;
+        flex-shrink: 0;
+
+        img {
+          width: 100%;
+          height: 100%;
+          object-fit: cover;
+        }
+      }
+
+      .mini-issue-info {
+        flex: 1;
+        min-width: 0;
+
+        h5 {
+          font-size: 14px;
+          font-weight: 500;
+          color: var(--oxford-blue);
+          margin: 0 0 8px 0;
+          white-space: nowrap;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+
+        .issue-meta {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+
+          .email-count {
+            font-size: 12px;
+            color: #888;
+          }
+        }
+      }
+    }
+
+    .no-issues {
+      text-align: center;
+      padding: 16px 0;
+
+      .report-first-btn {
+        margin-top: 12px;
+        background: var(--orange-web);
+        border-color: var(--orange-web);
+
+        &:hover {
+          background: #e59400;
+          border-color: #e59400;
+        }
+      }
+    }
+  }
+}
+
 // Mobile responsiveness
 @media (max-width: 768px) {
   .dashboard-container {
