@@ -65,7 +65,11 @@ import {
   PercentageOutline,
   FieldTimeOutline,
   FlagOutline,
-  InboxOutline
+  InboxOutline,
+  TrophyOutline,
+  CrownOutline,
+  StarOutline,
+  FireOutline
 } from '@ant-design/icons-angular/icons';
 
 export const ngZorroConfig = provideNzConfig({
@@ -149,7 +153,11 @@ const icons: IconDefinition[] = [
   PercentageOutline,
   FieldTimeOutline,
   FlagOutline,
-  InboxOutline
+  InboxOutline,
+  TrophyOutline,
+  CrownOutline,
+  StarOutline,
+  FireOutline
 ];
 
 export const ngZorroIcons = provideNzIcons(icons);

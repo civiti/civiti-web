@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .email-modal-container.copy-workflow {
   width: 100%;
 }
@@ -133,8 +135,8 @@
 
     &:hover,
     &:focus {
-      background-color: darken(#FCA311, 10%);
-      border-color: darken(#FCA311, 10%);
+      background-color: color.adjust(#FCA311, $lightness: -10%);
+      border-color: color.adjust(#FCA311, $lightness: -10%);
     }
   }
 }

@@ -34,9 +34,7 @@ import {
   selectUserDisplayName
 } from '../../../store/auth/auth.selectors';
 import {
-  GamificationData,
-  Achievement,
-  UserProfile
+  Achievement
 } from '../../../store/user/user.state';
 import {
   BadgeResponse,
@@ -50,13 +48,11 @@ interface UserStats {
   communityVotes: number;
 }
 import {
-  selectGamificationData,
   selectUserPoints,
   selectUserLevel,
   selectUserBadges,
   selectUserStats,
   selectNextLevelProgress,
-  selectRecentBadges,
   selectIncompleteAchievements,
   selectUserLoading
 } from '../../../store/user/user.selectors';
@@ -94,13 +90,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
   // Observables - initialized in constructor
   user$!: Observable<AuthUser | null>;
   displayName$!: Observable<string>;
-  gamificationData$!: Observable<GamificationData | null>;
   userPoints$!: Observable<number>;
   userLevel$!: Observable<number>;
-  userBadges$!: Observable<BadgeResponse[]>;
   userStats$!: Observable<UserStats | null>;
   levelProgress$!: Observable<{ current: number; required: number; percentage: number }>;
-  recentBadges$!: Observable<BadgeResponse[]>;
+  earnedBadges$!: Observable<BadgeResponse[]>;
   incompleteAchievements$!: Observable<Achievement[]>;
   isLoading$!: Observable<boolean>;
 
@@ -143,13 +137,11 @@ export class DashboardComponent implements OnInit, OnDestroy {
     // Initialize observables
     this.user$ = this.store.select(selectAuthUser);
     this.displayName$ = this.store.select(selectUserDisplayName);
-    this.gamificationData$ = this.store.select(selectGamificationData);
     this.userPoints$ = this.store.select(selectUserPoints);
     this.userLevel$ = this.store.select(selectUserLevel);
-    this.userBadges$ = this.store.select(selectUserBadges);
     this.userStats$ = this.store.select(selectUserStats);
     this.levelProgress$ = this.store.select(selectNextLevelProgress);
-    this.recentBadges$ = this.store.select(selectRecentBadges);
+    this.earnedBadges$ = this.store.select(selectUserBadges);
     this.incompleteAchievements$ = this.store.select(selectIncompleteAchievements);
     this.isLoading$ = this.store.select(selectUserLoading);
 
@@ -171,9 +163,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         // Load user's own issues
         this.store.dispatch(UserIssuesActions.loadUserIssues({}));
-
-        // Update login streak
-        this.store.dispatch(UserActions.updateStreak({ streakType: 'login', increment: true }));
       }
     });
   }
@@ -215,6 +204,23 @@ export class DashboardComponent implements OnInit, OnDestroy {
     };
 
     return colors[rarity?.toLowerCase()] || 'default';
+  }
+
+  getBadgeIcon(category: string, rarity: string): string {
+    // Override with rarity for special badges
+    const rarityLower = rarity?.toLowerCase();
+    if (rarityLower === 'legendary') return 'trophy';
+    if (rarityLower === 'epic') return 'crown';
+
+    // Map by badge category (Starter, Progress, Achievement, Special)
+    const categoryIcons: Record<string, string> = {
+      'starter': 'star',
+      'progress': 'fire',
+      'achievement': 'check-circle',
+      'special': 'crown'
+    };
+
+    return categoryIcons[category?.toLowerCase()] || 'star';
   }
 
   viewMyIssues(): void {

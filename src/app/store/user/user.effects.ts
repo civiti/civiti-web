@@ -100,20 +100,6 @@ export class UserEffects {
     )
   );
 
-  // Update Streak Effects
-  // TODO: Backend streak endpoint not implemented yet
-  // When implemented, this should POST to /api/user/streak with { streakType, increment }
-  // For now, this is a no-op that logs the intent
-  updateStreak$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(UserActions.updateStreak),
-      tap(({ streakType, increment }) => {
-        console.warn(`[Streak] Backend endpoint not implemented. Intent: ${streakType} streak, increment: ${increment}`);
-      })
-    ),
-    { dispatch: false }
-  );
-
   // Load User Preferences Effects
   loadUserPreferences$ = createEffect(() =>
     this.actions$.pipe(

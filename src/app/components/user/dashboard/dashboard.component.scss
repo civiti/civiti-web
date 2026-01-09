@@ -283,14 +283,31 @@ nz-button.issues-nav-button button.ant-btn {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 
-  img {
-    width: 24px;
-    height: 24px;
+  // Badge icon SVG styling
+  i.badge-icon-svg {
+    font-size: 24px;
   }
-}
 
-.badge-emoji {
-  font-size: 1.5rem;
+  // Rarity-based icon colors
+  &.rarity-common i {
+    color: #8c8c8c;
+  }
+
+  &.rarity-uncommon i {
+    color: #1890ff;
+  }
+
+  &.rarity-rare i {
+    color: #faad14;
+  }
+
+  &.rarity-epic i {
+    color: #722ed1;
+  }
+
+  &.rarity-legendary i {
+    color: #f5222d;
+  }
 }
 
 .badge-info {

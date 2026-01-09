@@ -1,3 +1,5 @@
+@use "sass:color";
+
 .edit-issue-container {
   max-width: 800px;
   margin: 0 auto;
@@ -137,8 +139,8 @@ nz-form-label {
     border-color: var(--orange-web);
 
     &:hover:not(:disabled) {
-      background-color: darken(#FCA311, 5%);
-      border-color: darken(#FCA311, 5%);
+      background-color: color.adjust(#FCA311, $lightness: -5%);
+      border-color: color.adjust(#FCA311, $lightness: -5%);
     }
 
     &:disabled {

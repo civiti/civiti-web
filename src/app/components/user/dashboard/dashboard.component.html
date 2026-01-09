@@ -258,16 +258,19 @@
       <!-- Right Column -->
       <div nz-col [nzSpan]="24" [nzLg]="8">
         
-        <!-- Recent Badges -->
-        <nz-card nzTitle="Insigne recente" class="badges-card" *ngIf="recentBadges$ | async as badges">
+        <!-- Earned Badges -->
+        <nz-card nzTitle="Insignele tale" class="badges-card" *ngIf="earnedBadges$ | async as badges">
           <div class="badges-grid" *ngIf="badges.length > 0; else noBadges">
-            <div 
-              *ngFor="let badge of badges" 
+            <div
+              *ngFor="let badge of badges"
               class="badge-item"
               [title]="badge.description">
-              <div class="badge-icon">
-                <img [src]="badge.iconUrl" [alt]="badge.name" onerror="this.style.display='none'">
-                <span *ngIf="!badge.iconUrl" class="badge-emoji">🏆</span>
+              <div class="badge-icon" [ngClass]="'rarity-' + badge.rarity.toLowerCase()">
+                <i nz-icon
+                   [nzType]="getBadgeIcon(badge.category, badge.rarity)"
+                   nzTheme="outline"
+                   class="badge-icon-svg">
+                </i>
               </div>
               <div class="badge-info">
                 <h5>{{ badge.name }}</h5>

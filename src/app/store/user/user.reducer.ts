@@ -79,11 +79,6 @@ export const userReducer = createReducer(
     gamification
   })),
 
-  on(UserActions.updateStreakSuccess, (state, { gamification }) => ({
-    ...state,
-    gamification
-  })),
-
   // Preferences Reducers
   on(UserActions.loadUserPreferences, (state) => ({
     ...state,

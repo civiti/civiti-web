@@ -69,16 +69,6 @@ export const awardBadgeSuccess = createAction(
   props<{ gamification: GamificationData }>()
 );
 
-export const updateStreak = createAction(
-  '[User] Update Streak',
-  props<{ streakType: 'login' | 'voting'; increment: boolean }>()
-);
-
-export const updateStreakSuccess = createAction(
-  '[User] Update Streak Success',
-  props<{ gamification: GamificationData }>()
-);
-
 // Preferences Actions
 export const loadUserPreferences = createAction(
   '[User] Load User Preferences',
