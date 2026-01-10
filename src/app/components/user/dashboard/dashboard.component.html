@@ -265,7 +265,7 @@
               *ngFor="let badge of badges"
               class="badge-item"
               [title]="badge.description">
-              <div class="badge-icon" [ngClass]="'rarity-' + badge.rarity.toLowerCase()">
+              <div class="badge-icon" [ngClass]="'rarity-' + (badge.rarity?.toLowerCase() || 'common')">
                 <i nz-icon
                    [nzType]="getBadgeIcon(badge.category, badge.rarity)"
                    nzTheme="outline"
@@ -274,7 +274,7 @@
               </div>
               <div class="badge-info">
                 <h5>{{ badge.name }}</h5>
-                <nz-tag [nzColor]="getBadgeColor(badge.rarity)">{{ badge.rarity }}</nz-tag>
+                <nz-tag [nzColor]="getBadgeColor(badge.rarity)">{{ badge.rarity || 'Common' }}</nz-tag>
               </div>
             </div>
           </div>
