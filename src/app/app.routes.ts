@@ -1,4 +1,5 @@
 import { Routes } from '@angular/router';
+import { authGuard, adminGuard } from './guards';
 
 // Route structure based on ux.md user journey with lazy loading
 // Header config: headerTitle, showBackButton, backUrl, hideHeader
@@ -34,25 +35,29 @@ export const routes: Routes = [
       }
     ]
   },
-  // User dashboard routes
+  // User dashboard routes - requires authentication
   {
     path: 'dashboard',
     loadComponent: () => import('./components/user/dashboard/dashboard.component').then(m => m.DashboardComponent),
+    canActivate: [authGuard],
     data: { animation: 'DashboardPage', headerTitle: 'Panou de Control', showBackButton: true, backUrl: '/issues' }
   },
   {
     path: 'my-issues',
     loadComponent: () => import('./components/user/my-issues/my-issues.component').then(m => m.MyIssuesComponent),
+    canActivate: [authGuard],
     data: { animation: 'MyIssuesPage', headerTitle: 'Problemele Mele', showBackButton: true, backUrl: '/dashboard' }
   },
   {
     path: 'edit-issue/:id',
     loadComponent: () => import('./components/user/edit-issue/edit-issue.component').then(m => m.EditIssueComponent),
+    canActivate: [authGuard],
     data: { animation: 'EditIssuePage', headerTitle: 'Editează Problema', showBackButton: true, backUrl: '/my-issues' }
   },
   // Issue creation routes - requires authentication
   {
     path: 'create-issue',
+    canActivate: [authGuard],
     children: [
       {
         path: '',
@@ -81,14 +86,30 @@ export const routes: Routes = [
       }
     ]
   },
-  // Admin routes
+  // Admin routes - requires admin role
   {
     path: 'admin',
+    canActivate: [adminGuard],
     children: [
+      {
+        path: '',
+        redirectTo: 'dashboard',
+        pathMatch: 'full'
+      },
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./components/admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
+        data: { animation: 'AdminDashboardPage', headerTitle: 'Panou Administrare', showBackButton: true, backUrl: '/issues' }
+      },
       {
         path: 'approval',
         loadComponent: () => import('./components/admin/approval-interface/approval-interface.component').then(m => m.ApprovalInterfaceComponent),
-        data: { animation: 'AdminPage', headerTitle: 'Administrare', showBackButton: true, backUrl: '/issues' }
+        data: { animation: 'AdminApprovalPage', headerTitle: 'Aprobare Probleme', showBackButton: true, backUrl: '/admin/dashboard' }
+      },
+      {
+        path: 'activity',
+        loadComponent: () => import('./components/admin/activity-log/activity-log.component').then(m => m.ActivityLogComponent),
+        data: { animation: 'AdminActivityPage', headerTitle: 'Jurnal Activitate', showBackButton: true, backUrl: '/admin/dashboard' }
       }
     ]
   },

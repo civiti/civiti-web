@@ -31,7 +31,9 @@ import {
   IssueQueryParams,
   LeaderboardQueryParams,
   PaginationParams,
-  EditUserIssueRequest
+  EditUserIssueRequest,
+  AdminActivityLogEntry,
+  ActivityLogQueryParams
 } from '../types/civica-api.types';
 
 @Injectable({
@@ -260,5 +262,28 @@ export class ApiService {
 
   getAdminStatistics(): Observable<AdminStatisticsResponse> {
     return this.http.get<AdminStatisticsResponse>(`${this.baseUrl}/admin/statistics`);
+  }
+
+  // ============================================
+  // Admin Activity Log Endpoints
+  // ============================================
+
+  /**
+   * Get admin actions (audit log)
+   * GET /api/admin/actions
+   */
+  getAdminActions(params?: ActivityLogQueryParams): Observable<PagedResult<AdminActivityLogEntry>> {
+    let httpParams = new HttpParams();
+
+    if (params) {
+      Object.keys(params).forEach(key => {
+        const value = params[key as keyof ActivityLogQueryParams];
+        if (value !== undefined && value !== null) {
+          httpParams = httpParams.set(key, value.toString());
+        }
+      });
+    }
+
+    return this.http.get<PagedResult<AdminActivityLogEntry>>(`${this.baseUrl}/admin/actions`, { params: httpParams });
   }
 }

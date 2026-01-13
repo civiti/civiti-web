@@ -90,6 +90,7 @@ export class OauthCallbackComponent implements OnInit {
       error: (error) => {
         console.error('Profile creation error:', error);
         // Even if profile creation fails, dispatch login with basic user data
+        // Read role from Supabase app_metadata (set via Dashboard)
         this.store.dispatch(AuthActions.loginWithGoogleSuccess({
           user: {
             id: user.id,
@@ -99,7 +100,8 @@ export class OauthCallbackComponent implements OnInit {
             authProvider: 'google',
             emailVerified: true,
             createdAt: new Date(user.created_at),
-            lastLoginAt: new Date()
+            lastLoginAt: new Date(),
+            role: user.app_metadata?.['role'] || 'user'
           },
           token,
           refreshToken: ''
@@ -109,9 +111,12 @@ export class OauthCallbackComponent implements OnInit {
   }
 
   private dispatchLoginSuccess(user: any, profile: any, token: string): void {
+    // Role comes from Supabase app_metadata (single source of truth)
+    // The JWT is signed and tamper-proof
+    const role = user.app_metadata?.['role'] || 'user';
+
     this.store.dispatch(AuthActions.loginWithGoogleSuccess({
       user: {
-        ...profile,
         id: user.id,
         email: user.email || profile.email || '',
         displayName: profile.displayName || user.email || '',
@@ -119,7 +124,8 @@ export class OauthCallbackComponent implements OnInit {
         authProvider: 'google',
         emailVerified: true,
         createdAt: new Date(user.created_at),
-        lastLoginAt: new Date()
+        lastLoginAt: new Date(),
+        role
       },
       token,
       refreshToken: ''

@@ -69,7 +69,15 @@ import {
   TrophyOutline,
   CrownOutline,
   StarOutline,
-  FireOutline
+  FireOutline,
+  // Admin panel icons
+  DashboardOutline,
+  HistoryOutline,
+  AuditOutline,
+  FileAddOutline,
+  CheckSquareOutline,
+  CaretDownFill,
+  UnorderedListOutline
 } from '@ant-design/icons-angular/icons';
 
 export const ngZorroConfig = provideNzConfig({
@@ -157,7 +165,15 @@ const icons: IconDefinition[] = [
   TrophyOutline,
   CrownOutline,
   StarOutline,
-  FireOutline
+  FireOutline,
+  // Admin panel icons
+  DashboardOutline,
+  HistoryOutline,
+  AuditOutline,
+  FileAddOutline,
+  CheckSquareOutline,
+  CaretDownFill,
+  UnorderedListOutline
 ];
 
 export const ngZorroIcons = provideNzIcons(icons);

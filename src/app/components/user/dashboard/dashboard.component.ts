@@ -187,7 +187,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
     return titles[Math.min(level - 1, titles.length - 1)];
   }
 
-  getBadgeColor(rarity: string): string {
+  getBadgeColor(rarity: string | null): string {
     // Map rarity values to colors
     // The backend uses string rarity values, we'll map common rarities
     const colors: { [key: string]: string } = {
@@ -203,10 +203,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
       'platinum': 'purple'
     };
 
-    return colors[rarity?.toLowerCase()] || 'default';
+    return colors[rarity?.toLowerCase() ?? ''] || 'default';
   }
 
-  getBadgeIcon(category: string, rarity: string): string {
+  getBadgeIcon(category: string, rarity: string | null): string {
     // Override with rarity for special badges
     const rarityLower = rarity?.toLowerCase();
     if (rarityLower === 'legendary') return 'trophy';

@@ -1,0 +1,211 @@
+<nz-spin [nzSpinning]="isLoading">
+  <div class="admin-dashboard-container">
+
+    <!-- Header Section -->
+    <div class="admin-header">
+      <div class="header-content">
+        <div class="admin-welcome">
+          <nz-avatar
+            [nzSrc]="(user$ | async)?.photoUrl || undefined"
+            [nzText]="(displayName$ | async)?.charAt(0)"
+            nzSize="large"
+            class="admin-avatar">
+          </nz-avatar>
+          <div class="welcome-text">
+            <h1>Panou de Administrare</h1>
+            <p>Bine ai venit, {{ displayName$ | async }}!</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="stats-section" *ngIf="statistics$ | async as stats">
+      <div nz-row [nzGutter]="[16, 16]">
+
+        <div nz-col [nzSpan]="12" [nzSm]="6">
+          <nz-card class="stat-card pending">
+            <nz-statistic
+              [nzValue]="stats.pendingReview"
+              nzTitle="În așteptare"
+              [nzPrefix]="pendingIcon"
+              [nzValueStyle]="{ color: '#FCA311' }">
+            </nz-statistic>
+            <ng-template #pendingIcon>
+              <i nz-icon nzType="clock-circle" nzTheme="outline"></i>
+            </ng-template>
+          </nz-card>
+        </div>
+
+        <div nz-col [nzSpan]="12" [nzSm]="6">
+          <nz-card class="stat-card approved">
+            <nz-statistic
+              [nzValue]="stats.approved"
+              nzTitle="Aprobate"
+              [nzPrefix]="approvedIcon"
+              [nzValueStyle]="{ color: '#28A745' }">
+            </nz-statistic>
+            <ng-template #approvedIcon>
+              <i nz-icon nzType="check-circle" nzTheme="outline"></i>
+            </ng-template>
+          </nz-card>
+        </div>
+
+        <div nz-col [nzSpan]="12" [nzSm]="6">
+          <nz-card class="stat-card rejected">
+            <nz-statistic
+              [nzValue]="stats.rejected"
+              nzTitle="Respinse"
+              [nzPrefix]="rejectedIcon"
+              [nzValueStyle]="{ color: '#DC3545' }">
+            </nz-statistic>
+            <ng-template #rejectedIcon>
+              <i nz-icon nzType="close-circle" nzTheme="outline"></i>
+            </ng-template>
+          </nz-card>
+        </div>
+
+        <div nz-col [nzSpan]="12" [nzSm]="6">
+          <nz-card class="stat-card rate">
+            <nz-statistic
+              [nzValue]="stats.approvalRate"
+              nzTitle="Rată aprobare"
+              nzSuffix="%"
+              [nzValueStyle]="{ color: getApprovalRateColor(stats.approvalRate) }">
+            </nz-statistic>
+          </nz-card>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions-section">
+      <nz-card nzTitle="Acțiuni rapide" class="actions-card">
+        <div class="quick-actions">
+
+          <div class="action-item primary" (click)="navigateToApproval()">
+            <div class="action-icon">
+              <nz-badge [nzCount]="(statistics$ | async)?.pendingReview || 0" [nzOverflowCount]="99">
+                <span nz-icon nzType="check-circle" nzTheme="outline"></span>
+              </nz-badge>
+            </div>
+            <div class="action-content">
+              <h4>Aprobă probleme</h4>
+              <p>{{ (statistics$ | async)?.pendingReview || 0 }} probleme în așteptare</p>
+            </div>
+            <span nz-icon nzType="arrow-right" class="action-arrow"></span>
+          </div>
+
+          <div class="action-item" (click)="navigateToActivity()">
+            <div class="action-icon">
+              <span nz-icon nzType="history" nzTheme="outline"></span>
+            </div>
+            <div class="action-content">
+              <h4>Jurnal activitate</h4>
+              <p>Vizualizează acțiunile administrative</p>
+            </div>
+            <span nz-icon nzType="arrow-right" class="action-arrow"></span>
+          </div>
+
+          <div class="action-item" (click)="navigateToIssues()">
+            <div class="action-icon">
+              <span nz-icon nzType="unordered-list" nzTheme="outline"></span>
+            </div>
+            <div class="action-content">
+              <h4>Vezi probleme publice</h4>
+              <p>Răsfoiește problemele comunității</p>
+            </div>
+            <span nz-icon nzType="arrow-right" class="action-arrow"></span>
+          </div>
+
+        </div>
+      </nz-card>
+    </div>
+
+    <!-- Statistics Details -->
+    <div class="details-section" *ngIf="statistics$ | async as stats">
+      <div nz-row [nzGutter]="[24, 24]">
+
+        <!-- Today's Activity -->
+        <div nz-col [nzSpan]="24" [nzMd]="12">
+          <nz-card nzTitle="Activitate azi" class="activity-today-card">
+            <nz-list [nzDataSource]="[
+              { label: 'Probleme noi', value: stats.submissionsToday, icon: 'file-add', color: '#FCA311' },
+              { label: 'Revizuite azi', value: stats.reviewedToday, icon: 'audit', color: '#14213D' }
+            ]" [nzRenderItem]="activityItem">
+              <ng-template #activityItem let-item>
+                <nz-list-item>
+                  <nz-list-item-meta>
+                    <nz-list-item-meta-avatar>
+                      <nz-avatar [nzIcon]="item.icon" [style.backgroundColor]="item.color"></nz-avatar>
+                    </nz-list-item-meta-avatar>
+                    <nz-list-item-meta-title>{{ item.label }}</nz-list-item-meta-title>
+                  </nz-list-item-meta>
+                  <span class="activity-value">{{ item.value }}</span>
+                </nz-list-item>
+              </ng-template>
+            </nz-list>
+          </nz-card>
+        </div>
+
+        <!-- Weekly Summary -->
+        <div nz-col [nzSpan]="24" [nzMd]="12">
+          <nz-card nzTitle="Sumar săptămânal" class="weekly-card">
+            <nz-list [nzDataSource]="[
+              { label: 'Probleme noi', value: stats.submissionsThisWeek, icon: 'file-add', color: '#FCA311' },
+              { label: 'Revizuite', value: stats.reviewedThisWeek, icon: 'check-square', color: '#28A745' },
+              { label: 'Timp mediu revizuire', value: (stats.averageReviewTimeHours | number:'1.1-1') + 'h', icon: 'clock-circle', color: '#14213D' }
+            ]" [nzRenderItem]="weeklyItem">
+              <ng-template #weeklyItem let-item>
+                <nz-list-item>
+                  <nz-list-item-meta>
+                    <nz-list-item-meta-avatar>
+                      <nz-avatar [nzIcon]="item.icon" [style.backgroundColor]="item.color"></nz-avatar>
+                    </nz-list-item-meta-avatar>
+                    <nz-list-item-meta-title>{{ item.label }}</nz-list-item-meta-title>
+                  </nz-list-item-meta>
+                  <span class="activity-value">{{ item.value }}</span>
+                </nz-list-item>
+              </ng-template>
+            </nz-list>
+          </nz-card>
+        </div>
+
+        <!-- Issues by Category -->
+        <div nz-col [nzSpan]="24" [nzMd]="12">
+          <nz-card nzTitle="Probleme pe categorii" class="category-card">
+            <div class="category-list" *ngIf="stats.issuesByCategory">
+              <div *ngFor="let item of stats.issuesByCategory | keyvalue" class="category-item">
+                <span class="category-name">{{ getCategoryLabel(item.key) }}</span>
+                <nz-tag>{{ item.value }}</nz-tag>
+              </div>
+              <nz-empty *ngIf="(stats.issuesByCategory | keyvalue)?.length === 0"
+                        nzNotFoundImage="simple"
+                        nzNotFoundContent="Nicio problemă">
+              </nz-empty>
+            </div>
+          </nz-card>
+        </div>
+
+        <!-- Issues by Urgency -->
+        <div nz-col [nzSpan]="24" [nzMd]="12">
+          <nz-card nzTitle="Probleme pe urgență" class="urgency-card">
+            <div class="urgency-list" *ngIf="stats.issuesByUrgency">
+              <div *ngFor="let item of stats.issuesByUrgency | keyvalue" class="urgency-item">
+                <span class="urgency-name">{{ getUrgencyLabel(item.key) }}</span>
+                <nz-tag [nzColor]="getUrgencyColor(item.key)">{{ item.value }}</nz-tag>
+              </div>
+              <nz-empty *ngIf="(stats.issuesByUrgency | keyvalue)?.length === 0"
+                        nzNotFoundImage="simple"
+                        nzNotFoundContent="Nicio problemă">
+              </nz-empty>
+            </div>
+          </nz-card>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</nz-spin>

@@ -23,6 +23,11 @@ export const selectAuthLoading = createSelector(
   (state: AuthState) => state.isLoading
 );
 
+export const selectIsAuthInitialized = createSelector(
+  selectAuthState,
+  (state: AuthState) => state.isInitialized
+);
+
 export const selectAuthError = createSelector(
   selectAuthState,
   (state: AuthState) => state.error
@@ -46,4 +51,39 @@ export const selectUserEmail = createSelector(
 export const selectIsEmailVerified = createSelector(
   selectAuthUser,
   (user) => user?.emailVerified || false
+);
+
+// Role-based selectors for admin access control
+export const selectUserRole = createSelector(
+  selectAuthUser,
+  (user) => user?.role || 'user'
+);
+
+export const selectIsAdmin = createSelector(
+  selectUserRole,
+  (role) => role === 'admin'
+);
+
+export const selectCanAccessAdminPanel = createSelector(
+  selectIsAuthenticated,
+  selectIsAdmin,
+  (isAuthenticated, isAdmin) => isAuthenticated && isAdmin
+);
+
+// Compound selectors for guards to ensure atomic state reads
+export const selectAuthGuardState = createSelector(
+  selectIsAuthInitialized,
+  selectIsAuthenticated,
+  (isInitialized, isAuthenticated) => ({ isInitialized, isAuthenticated })
+);
+
+export const selectAdminGuardState = createSelector(
+  selectIsAuthInitialized,
+  selectIsAuthenticated,
+  selectCanAccessAdminPanel,
+  (isInitialized, isAuthenticated, canAccessAdminPanel) => ({
+    isInitialized,
+    isAuthenticated,
+    canAccessAdminPanel
+  })
 );

@@ -1,0 +1,97 @@
+<div class="activity-log-container">
+
+  <!-- Header -->
+  <div class="page-header">
+    <h2>Jurnal de Activitate</h2>
+    <p>Vizualizează istoricul acțiunilor administrative</p>
+  </div>
+
+  <!-- Filters -->
+  <nz-card class="filters-card">
+    <div class="filters-row">
+      <nz-select
+        class="action-filter"
+        [(ngModel)]="selectedAction"
+        (ngModelChange)="onFilterChange()"
+        nzPlaceHolder="Toate acțiunile"
+        nzAllowClear
+      >
+        <nz-option
+          *ngFor="let opt of actionOptions"
+          [nzValue]="opt.value"
+          [nzLabel]="opt.label"
+        ></nz-option>
+      </nz-select>
+
+      <nz-range-picker
+        class="date-filter"
+        [(ngModel)]="dateRange"
+        (ngModelChange)="onFilterChange()"
+        nzFormat="dd/MM/yyyy"
+      ></nz-range-picker>
+
+      <button
+        nz-button
+        nzType="default"
+        (click)="resetFilters()"
+        *ngIf="selectedAction || dateRange?.length"
+      >
+        <i nz-icon nzType="reload"></i>
+        Resetează
+      </button>
+    </div>
+  </nz-card>
+
+  <!-- Activity Timeline -->
+  <nz-card class="timeline-card">
+    <nz-spin [nzSpinning]="isLoading">
+      <nz-timeline *ngIf="activities.length > 0">
+        <nz-timeline-item
+          *ngFor="let activity of activities"
+          [nzColor]="getTimelineColor(activity.action)"
+        >
+          <div class="activity-item">
+            <div class="activity-header">
+              <div class="admin-info">
+                <span class="admin-name">{{ activity.adminName }}</span>
+                <nz-tag [nzColor]="getActionColor(activity.action)" nzMode="default">
+                  {{ getActionLabel(activity.action) }}
+                </nz-tag>
+              </div>
+              <span class="activity-time">{{ formatDateTime(activity.createdAt) }}</span>
+            </div>
+
+            <div class="activity-target">
+              <span class="target-type">
+                <i nz-icon nzType="file-text" nzTheme="outline"></i>
+              </span>
+              <span class="target-name">{{ getTargetLabel(activity) }}</span>
+            </div>
+
+            <div class="activity-details" *ngIf="activity.details">
+              <p>{{ activity.details }}</p>
+            </div>
+          </div>
+        </nz-timeline-item>
+      </nz-timeline>
+
+      <nz-empty
+        *ngIf="activities.length === 0 && !isLoading"
+        nzNotFoundImage="simple"
+        nzNotFoundContent="Nicio activitate găsită"
+      ></nz-empty>
+    </nz-spin>
+
+    <!-- Pagination -->
+    <div class="pagination-container" *ngIf="totalItems > pageSize">
+      <nz-pagination
+        [nzPageIndex]="pageIndex"
+        [nzTotal]="totalItems"
+        [nzPageSize]="pageSize"
+        (nzPageIndexChange)="onPageChange($event)"
+        nzShowSizeChanger="false"
+      ></nz-pagination>
+    </div>
+  </nz-card>
+
+</div>

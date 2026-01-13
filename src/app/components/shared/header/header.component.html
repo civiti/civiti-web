@@ -61,6 +61,10 @@
             <i nz-icon nzType="unordered-list" nzTheme="outline" class="mr-2"></i>
             Probleme
           </li>
+          <li *ngIf="canAccessAdmin$ | async" nz-menu-item (click)="navigateToAdmin()">
+            <i nz-icon nzType="setting" nzTheme="outline" class="mr-2"></i>
+            Administrare
+          </li>
           <li nz-menu-divider></li>
           <li nz-menu-item (click)="logout()">
             <i nz-icon nzType="logout" nzTheme="outline" class="mr-2"></i>

@@ -1,7 +1,10 @@
+import { UserRole } from '../../types/civica-api.types';
+
 // Authentication State Interface
 export interface AuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
+  isInitialized: boolean; // True after initial auth check completes (success or failure)
   token: string | null;
   refreshToken: string | null;
   error: string | null;
@@ -19,11 +22,13 @@ export interface AuthUser {
   emailVerified: boolean;
   createdAt: Date;
   lastLoginAt: Date;
+  role: UserRole;
 }
 
 export const initialAuthState: AuthState = {
   isAuthenticated: false,
   isLoading: false,
+  isInitialized: false,
   token: null,
   refreshToken: null,
   error: null,
