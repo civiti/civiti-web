@@ -1,25 +1,25 @@
 import { inject } from '@angular/core';
 import { Router, CanActivateFn } from '@angular/router';
 import { Store } from '@ngrx/store';
-import { filter, map, take, withLatestFrom } from 'rxjs/operators';
-import { selectIsAuthenticated, selectIsAuthInitialized } from '../store/auth/auth.selectors';
+import { filter, map, take } from 'rxjs/operators';
+import { selectAuthGuardState } from '../store/auth/auth.selectors';
 
 /**
  * Guard that requires user to be authenticated.
  * Waits for auth initialization before evaluating.
+ * Uses compound selector to ensure atomic state reads.
  * Redirects to login page if not authenticated.
  */
 export const authGuard: CanActivateFn = (route, state) => {
   const store = inject(Store);
   const router = inject(Router);
 
-  // Wait for auth initialization before checking authentication
-  return store.select(selectIsAuthInitialized).pipe(
-    filter(isInitialized => isInitialized),
+  // Use compound selector to get all state values atomically
+  return store.select(selectAuthGuardState).pipe(
+    filter(guardState => guardState.isInitialized),
     take(1),
-    withLatestFrom(store.select(selectIsAuthenticated)),
-    map(([_, isAuthenticated]) => {
-      if (isAuthenticated) {
+    map(guardState => {
+      if (guardState.isAuthenticated) {
         return true;
       }
       // Redirect to login with return URL

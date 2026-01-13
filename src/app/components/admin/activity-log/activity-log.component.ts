@@ -1,8 +1,8 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Observable, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { Subject, of } from 'rxjs';
+import { catchError, switchMap, takeUntil } from 'rxjs/operators';
 
 // NG-ZORRO imports
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -42,13 +42,17 @@ import { AdminActivityLogEntry, AdminActionType, PagedResult } from '../../../ty
   templateUrl: './activity-log.component.html',
   styleUrls: ['./activity-log.component.scss']
 })
-export class ActivityLogComponent implements OnInit {
+export class ActivityLogComponent implements OnInit, OnDestroy {
   private readonly apiService = inject(ApiService);
   private readonly message = inject(NzMessageService);
 
+  // Subject to trigger activity loading - switchMap cancels pending requests
+  private readonly loadTrigger$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
+
   // Filters
   selectedAction: AdminActionType | '' = '';
-  dateRange: Date[] = [];
+  dateRange: Date[] | null = [];
 
   // Data
   activities: AdminActivityLogEntry[] = [];
@@ -66,43 +70,57 @@ export class ActivityLogComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    this.loadActivities();
-  }
+    // Set up the load pipeline with switchMap to cancel stale requests
+    this.loadTrigger$.pipe(
+      takeUntil(this.destroy$),
+      switchMap(() => {
+        this.isLoading = true;
 
-  loadActivities(): void {
-    this.isLoading = true;
+        const params: Record<string, unknown> = {
+          page: this.pageIndex,
+          pageSize: this.pageSize
+        };
 
-    const params: Record<string, unknown> = {
-      page: this.pageIndex,
-      pageSize: this.pageSize
-    };
+        if (this.selectedAction) {
+          params['action'] = this.selectedAction;
+        }
 
-    if (this.selectedAction) {
-      params['action'] = this.selectedAction;
-    }
+        if (this.dateRange?.length === 2) {
+          params['startDate'] = this.dateRange[0].toISOString();
+          params['endDate'] = this.dateRange[1].toISOString();
+        }
 
-    if (this.dateRange && this.dateRange.length === 2) {
-      params['startDate'] = this.dateRange[0].toISOString();
-      params['endDate'] = this.dateRange[1].toISOString();
-    }
-
-    this.apiService.getAdminActions(params as Record<string, string>).pipe(
-      catchError(error => {
-        this.message.error('Eroare la încărcarea jurnalului de activitate');
-        console.error('Error loading activity log:', error);
-        return of({
-          items: [],
-          totalItems: 0,
-          page: 1,
-          pageSize: this.pageSize,
-          totalPages: 0
-        } as PagedResult<AdminActivityLogEntry>);
+        return this.apiService.getAdminActions(params as Record<string, string>).pipe(
+          catchError(error => {
+            this.message.error('Eroare la încărcarea jurnalului de activitate');
+            console.error('Error loading activity log:', error);
+            return of({
+              items: [],
+              totalItems: 0,
+              page: 1,
+              pageSize: this.pageSize,
+              totalPages: 0
+            } as PagedResult<AdminActivityLogEntry>);
+          })
+        );
       })
     ).subscribe((result: PagedResult<AdminActivityLogEntry>) => {
       this.activities = result.items;
       this.totalItems = result.totalItems;
       this.isLoading = false;
     });
+
+    // Trigger initial load
+    this.loadTrigger$.next();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  loadActivities(): void {
+    this.loadTrigger$.next();
   }
 
   onFilterChange(): void {

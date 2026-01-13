@@ -16,6 +16,7 @@ export const authReducer = createReducer(
     ...state,
     isAuthenticated: true,
     isLoading: false,
+    isInitialized: true,
     user,
     token,
     refreshToken,
@@ -45,6 +46,7 @@ export const authReducer = createReducer(
     ...state,
     isAuthenticated: true,
     isLoading: false,
+    isInitialized: true,
     user,
     token,
     refreshToken,
@@ -74,6 +76,7 @@ export const authReducer = createReducer(
     ...state,
     isAuthenticated: true,
     isLoading: false,
+    isInitialized: true,
     user,
     token,
     refreshToken,
@@ -118,7 +121,11 @@ export const authReducer = createReducer(
   })),
 
   // Session Management Reducers
-  on(AuthActions.logout, () => initialAuthState),
+  // Keep isInitialized: true after logout since auth check was already done
+  on(AuthActions.logout, () => ({
+    ...initialAuthState,
+    isInitialized: true
+  })),
 
   on(AuthActions.clearAuthError, (state) => ({
     ...state,

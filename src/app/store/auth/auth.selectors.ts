@@ -69,3 +69,21 @@ export const selectCanAccessAdminPanel = createSelector(
   selectIsAdmin,
   (isAuthenticated, isAdmin) => isAuthenticated && isAdmin
 );
+
+// Compound selectors for guards to ensure atomic state reads
+export const selectAuthGuardState = createSelector(
+  selectIsAuthInitialized,
+  selectIsAuthenticated,
+  (isInitialized, isAuthenticated) => ({ isInitialized, isAuthenticated })
+);
+
+export const selectAdminGuardState = createSelector(
+  selectIsAuthInitialized,
+  selectIsAuthenticated,
+  selectCanAccessAdminPanel,
+  (isInitialized, isAuthenticated, canAccessAdminPanel) => ({
+    isInitialized,
+    isAuthenticated,
+    canAccessAdminPanel
+  })
+);

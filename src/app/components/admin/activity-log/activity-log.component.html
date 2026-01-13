@@ -34,7 +34,7 @@
         nz-button
         nzType="default"
         (click)="resetFilters()"
-        *ngIf="selectedAction || dateRange.length"
+        *ngIf="selectedAction || dateRange?.length"
       >
         <i nz-icon nzType="reload"></i>
         Resetează
