@@ -10,6 +10,8 @@
 // Common Types
 // ============================================
 
+export type UserRole = 'user' | 'admin';
+
 export type IssueCategory =
   | 'Infrastructure'
   | 'Environment'
@@ -247,6 +249,7 @@ export interface UserProfileResponse {
   level: number;
   createdAt: string;
   emailVerified: boolean;
+  role: UserRole;
 
   // Notification preferences
   issueUpdatesEnabled: boolean;
@@ -348,7 +351,7 @@ export interface BadgeResponse {
   description: string;
   iconUrl?: string;
   category: string;
-  rarity: string;
+  rarity: string | null;
   requirementDescription?: string;
   earnedAt?: string;
   isEarned: boolean;
@@ -580,6 +583,48 @@ export interface ErrorResponse {
 }
 
 // ============================================
+// Admin Activity Log Types
+// ============================================
+
+/**
+ * Activity log action types (issue moderation actions only)
+ */
+export type AdminActionType =
+  | 'approve_issue'
+  | 'reject_issue'
+  | 'request_changes'
+  | 'bulk_approve';
+
+/**
+ * Admin activity log entry
+ */
+export interface AdminActivityLogEntry {
+  id: string;
+  adminId: string;
+  adminName: string;
+  adminEmail: string;
+  action: AdminActionType;
+  targetType: 'Issue';
+  targetId: string;
+  targetTitle?: string;
+  details?: string;
+  metadata?: Record<string, unknown>;
+  createdAt: string;
+}
+
+/**
+ * Query parameters for activity log
+ */
+export interface ActivityLogQueryParams {
+  adminId?: string;
+  action?: AdminActionType;
+  startDate?: string;
+  endDate?: string;
+  page?: number;
+  pageSize?: number;
+}
+
+// ============================================
 // Query Parameter Interfaces
 // ============================================
 
@@ -744,5 +789,6 @@ export const API_ENDPOINTS = {
   REJECT_ISSUE: (id: string) => `/api/admin/issues/${id}/reject`,
   REQUEST_CHANGES: (id: string) => `/api/admin/issues/${id}/request-changes`,
   BULK_APPROVE: '/api/admin/issues/bulk-approve',
-  ADMIN_STATS: '/api/admin/statistics'
+  ADMIN_STATS: '/api/admin/statistics',
+  ADMIN_ACTIONS: '/api/admin/actions'
 } as const;

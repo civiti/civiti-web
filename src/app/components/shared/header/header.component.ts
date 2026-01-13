@@ -15,7 +15,7 @@ import { NzMenuModule } from 'ng-zorro-antd/menu';
 
 import { AppState } from '../../../store/app.state';
 import * as AuthActions from '../../../store/auth/auth.actions';
-import { selectIsAuthenticated, selectAuthUser, selectUserDisplayName } from '../../../store/auth/auth.selectors';
+import { selectIsAuthenticated, selectAuthUser, selectUserDisplayName, selectCanAccessAdminPanel } from '../../../store/auth/auth.selectors';
 import { AuthUser } from '../../../store/auth/auth.state';
 
 @Component({
@@ -50,11 +50,13 @@ export class HeaderComponent {
   isAuthenticated$: Observable<boolean>;
   user$: Observable<AuthUser | null>;
   displayName$: Observable<string>;
+  canAccessAdmin$: Observable<boolean>;
 
   constructor() {
     this.isAuthenticated$ = this._store.select(selectIsAuthenticated);
     this.user$ = this._store.select(selectAuthUser);
     this.displayName$ = this._store.select(selectUserDisplayName);
+    this.canAccessAdmin$ = this._store.select(selectCanAccessAdminPanel);
   }
 
   onBack(): void {
@@ -84,6 +86,10 @@ export class HeaderComponent {
 
   navigateToIssues(): void {
     this._router.navigate(['/issues']);
+  }
+
+  navigateToAdmin(): void {
+    this._router.navigate(['/admin']);
   }
 
   logout(): void {

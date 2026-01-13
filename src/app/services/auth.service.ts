@@ -4,6 +4,8 @@ import { map, catchError } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { SupabaseAuthService, SupabaseAuthResponse } from './supabase-auth.service';
 
+import { UserRole } from '../types/civica-api.types';
+
 // Define auth types for compatibility
 export interface AuthUser {
   id: string;
@@ -14,6 +16,7 @@ export interface AuthUser {
   emailVerified: boolean;
   createdAt: Date;
   lastLoginAt: Date;
+  role: UserRole;
 }
 
 export interface AuthResponse {
@@ -99,7 +102,8 @@ export class AuthService {
             authProvider: user.authProvider,
             emailVerified: user.emailVerified,
             createdAt: user.createdAt,
-            lastLoginAt: user.lastLoginAt
+            lastLoginAt: user.lastLoginAt,
+            role: user.role // Role from Supabase app_metadata
           },
           token,
           refreshToken: ''
@@ -167,7 +171,8 @@ export class AuthService {
         authProvider: supabaseResponse.user.authProvider,
         emailVerified: supabaseResponse.user.emailVerified,
         createdAt: supabaseResponse.user.createdAt,
-        lastLoginAt: supabaseResponse.user.lastLoginAt
+        lastLoginAt: supabaseResponse.user.lastLoginAt,
+        role: supabaseResponse.user.role // Role from Supabase app_metadata
       },
       token: supabaseResponse.token,
       refreshToken: supabaseResponse.refreshToken

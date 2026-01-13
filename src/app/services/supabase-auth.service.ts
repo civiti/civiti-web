@@ -4,6 +4,7 @@ import { Observable, from, BehaviorSubject, ReplaySubject, throwError } from 'rx
 import { map, catchError, tap, filter, take, switchMap } from 'rxjs/operators';
 import { resetTokenRefreshState } from '../interceptors/auth.interceptor';
 import { SupabaseClientService } from './supabase-client.service';
+import { UserRole } from '../types/civica-api.types';
 
 export interface SupabaseAuthUser {
   id: string;
@@ -14,6 +15,7 @@ export interface SupabaseAuthUser {
   emailVerified: boolean;
   createdAt: Date;
   lastLoginAt: Date;
+  role: UserRole;
 }
 
 export interface SupabaseAuthResponse {
@@ -73,6 +75,16 @@ export class SupabaseAuthService {
   }
 
   private mapSupabaseUserToAuthUser(user: User): SupabaseAuthUser {
+    // Read role from app_metadata (set via Supabase Dashboard or custom claims)
+    const role = (user.app_metadata?.['role'] as UserRole) || 'user';
+
+    console.log('[SupabaseAuth] Mapped user:', {
+      id: user.id,
+      email: user.email,
+      role,
+      app_metadata: user.app_metadata
+    });
+
     return {
       id: user.id,
       email: user.email || '',
@@ -81,7 +93,8 @@ export class SupabaseAuthService {
       authProvider: user.app_metadata?.provider === 'google' ? 'google' : 'email',
       emailVerified: user.email_confirmed_at != null,
       createdAt: new Date(user.created_at),
-      lastLoginAt: new Date()
+      lastLoginAt: new Date(),
+      role
     };
   }
 

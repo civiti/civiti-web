@@ -51,12 +51,16 @@ export class AuthEffects {
       switchMap(({ email, password }) =>
         this.authService.loginWithEmail(email, password).pipe(
           switchMap(response => {
-            // After successful Supabase login, get/create user profile from backend
+            // After successful Supabase login, get user profile for display data
+            // Role comes from Supabase app_metadata (already in response.user.role)
             return this.apiService.getUserProfile().pipe(
               map(profile => AuthActions.loginWithEmailSuccess({
                 user: {
-                  ...profile,
-                  ...response.user
+                  ...response.user,
+                  // Merge profile data for display (displayName, photoUrl)
+                  // Role stays from Supabase app_metadata (response.user.role)
+                  displayName: profile.displayName,
+                  photoUrl: profile.photoUrl ?? response.user.photoUrl
                 },
                 token: response.token,
                 refreshToken: response.refreshToken
@@ -98,8 +102,11 @@ export class AuthEffects {
             }).pipe(
               map(profile => AuthActions.registerWithEmailSuccess({
                 user: {
-                  ...profile,
-                  ...response.user
+                  ...response.user,
+                  // Merge profile data for display (displayName, photoUrl)
+                  // Role stays from Supabase app_metadata (response.user.role)
+                  displayName: profile.displayName,
+                  photoUrl: profile.photoUrl ?? response.user.photoUrl
                 },
                 token: response.token,
                 refreshToken: response.refreshToken
@@ -203,14 +210,24 @@ export class AuthEffects {
             if (userData) {
               // Try to get user profile from backend
               return this.apiService.getUserProfile().pipe(
-                map(profile => AuthActions.loadUserFromStorageSuccess({
-                  user: {
-                    ...profile,
-                    ...userData.user
-                  },
-                  token: userData.token,
-                  refreshToken: userData.refreshToken
-                })),
+                map(profile => {
+                  // Debug logging - remove after verification
+                  console.log('[AuthEffects] User loaded:', {
+                    supabaseRole: userData.user.role,
+                    profileEmail: profile.email
+                  });
+                  // Merge profile data for display (displayName, photoUrl)
+                  // Role stays from Supabase app_metadata (userData.user.role)
+                  return AuthActions.loadUserFromStorageSuccess({
+                    user: {
+                      ...userData.user,
+                      displayName: profile.displayName,
+                      photoUrl: profile.photoUrl ?? userData.user.photoUrl
+                    },
+                    token: userData.token,
+                    refreshToken: userData.refreshToken
+                  });
+                }),
                 catchError(() => {
                   // If profile fetch fails, use auth data only
                   return of(AuthActions.loadUserFromStorageSuccess({
