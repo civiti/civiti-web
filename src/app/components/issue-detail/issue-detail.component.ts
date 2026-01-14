@@ -15,12 +15,13 @@ import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { Store } from '@ngrx/store';
-import { Observable, Subject } from 'rxjs';
+import { Observable, Subject, combineLatest } from 'rxjs';
 import { take, filter, takeUntil } from 'rxjs/operators';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
 import * as IssueSelectors from '../../store/issues/issue.selectors';
-import { IssueDetailResponse } from '../../types/civica-api.types';
+import { selectIsAdmin } from '../../store/auth/auth.selectors';
+import { IssueDetailResponse, IssueStatus } from '../../types/civica-api.types';
 import { EmailModalComponent } from './email-modal.component';
 import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
 import { GoogleMapsConfigService } from '../../services/google-maps-config.service';
@@ -76,6 +77,10 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     issue$!: Observable<IssueDetailResponse | null | undefined>;
     isLoading$!: Observable<boolean>;
     error$!: Observable<string | null>;
+    isAdmin$!: Observable<boolean>;
+
+    // Only Active and Resolved issues are publicly viewable (non-admin users)
+    private readonly PUBLIC_VIEWABLE_STATUSES: IssueStatus[] = ['Active', 'Resolved'];
 
     // Google Maps properties
     mapOptions: any = {
@@ -101,6 +106,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         this.issue$ = this._store.select(IssueSelectors.selectSelectedIssue);
         this.isLoading$ = this._store.select(IssueSelectors.selectIssuesLoading);
         this.error$ = this._store.select(IssueSelectors.selectIssuesError);
+        this.isAdmin$ = this._store.select(selectIsAdmin);
 
         // Reinitialize gallery when issue data changes (only in browser)
         if (isPlatformBrowser(this._platformId) && this.issue$) {
@@ -126,11 +132,28 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         const issueId = this._route.snapshot.paramMap.get('id');
         if (issueId) {
             this._store.dispatch(IssueActions.loadIssue({ id: issueId }));
-            
+
+            // Check access control: non-admin users can only view Active/Resolved issues
+            combineLatest([
+                this.issue$.pipe(filter(issue => !!issue)),
+                this.isAdmin$
+            ]).pipe(
+                take(1),
+                takeUntil(this._destroy$)
+            ).subscribe(([issue, isAdmin]) => {
+                const isPubliclyViewable = this.PUBLIC_VIEWABLE_STATUSES.includes(issue.status);
+
+                if (!isPubliclyViewable && !isAdmin) {
+                    console.warn(`[ACCESS DENIED] Issue ${issue.id} has status "${issue.status}" - redirecting non-admin user`);
+                    this._router.navigate(['/issues']);
+                    return;
+                }
+            });
+
             // Initialize Google Maps with the new loader
             this.initializeGoogleMaps().then(() => {
                 this.isMapLoaded = true;
-                
+
                 // Get issue data and geocode address
                 // Use filter to wait for non-null issue before taking the first value
                 this.issue$.pipe(

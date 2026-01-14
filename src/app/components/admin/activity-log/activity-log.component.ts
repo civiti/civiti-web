@@ -61,12 +61,11 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
   pageSize = 20;
   pageIndex = 1;
 
-  // Action options
+  // Action options - match backend: approve, reject, requestchanges (lowercase)
   actionOptions = [
-    { value: 'approve_issue', label: 'Aprobare problemă' },
-    { value: 'reject_issue', label: 'Respingere problemă' },
-    { value: 'request_changes', label: 'Cerere modificări' },
-    { value: 'bulk_approve', label: 'Aprobare în masă' }
+    { value: 'approve', label: 'Aprobare' },
+    { value: 'reject', label: 'Respingere' },
+    { value: 'requestchanges', label: 'Cerere modificări' }
   ];
 
   ngOnInit(): void {
@@ -82,7 +81,7 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
         };
 
         if (this.selectedAction) {
-          params['action'] = this.selectedAction;
+          params['actionType'] = this.selectedAction;
         }
 
         if (this.dateRange?.length === 2) {
@@ -93,7 +92,7 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
         return this.apiService.getAdminActions(params as Record<string, string>).pipe(
           catchError(error => {
             this.message.error('Eroare la încărcarea jurnalului de activitate');
-            console.error('Error loading activity log:', error);
+            console.error('[ADMIN] Eroare la încărcarea jurnalului de activitate:', error);
             return of({
               items: [],
               totalItems: 0,
@@ -142,30 +141,27 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
 
   getActionLabel(action: AdminActionType): string {
     const labels: Record<AdminActionType, string> = {
-      approve_issue: 'A aprobat',
-      reject_issue: 'A respins',
-      request_changes: 'A cerut modificări pentru',
-      bulk_approve: 'A aprobat în masă'
+      approve: 'A aprobat',
+      reject: 'A respins',
+      requestchanges: 'A cerut modificări pentru'
     };
     return labels[action] || action;
   }
 
   getActionColor(action: AdminActionType): string {
     const colors: Record<AdminActionType, string> = {
-      approve_issue: 'green',
-      reject_issue: 'red',
-      request_changes: 'orange',
-      bulk_approve: 'green'
+      approve: 'green',
+      reject: 'red',
+      requestchanges: 'orange'
     };
     return colors[action] || 'default';
   }
 
   getTimelineColor(action: AdminActionType): string {
     const colors: Record<AdminActionType, string> = {
-      approve_issue: 'green',
-      reject_issue: 'red',
-      request_changes: 'orange',
-      bulk_approve: 'green'
+      approve: 'green',
+      reject: 'red',
+      requestchanges: 'orange'
     };
     return colors[action] || 'gray';
   }
@@ -193,6 +189,6 @@ export class ActivityLogComponent implements OnInit, OnDestroy {
   }
 
   getTargetLabel(entry: AdminActivityLogEntry): string {
-    return entry.targetTitle || `Problemă #${entry.targetId.slice(0, 8)}`;
+    return entry.issueTitle || `Problemă #${entry.issueId.slice(0, 8)}`;
   }
 }

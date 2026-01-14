@@ -157,7 +157,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
-          console.error('[EditIssue] Failed to load issue:', error);
+          console.error('[EditIssue] Nu s-a putut încărca problema:', error);
           this.isLoading = false;
           this.loadError = 'Nu am putut încărca problema. Încercați din nou.';
         }
@@ -205,9 +205,9 @@ export class EditIssueComponent implements OnInit, OnDestroy {
 
     this.modal.confirm({
       nzTitle: 'Retrimite problema',
-      nzContent: 'Esti sigur ca vrei sa retrimiti aceasta problema pentru aprobare? Statusul va fi schimbat in "In verificare".',
+      nzContent: 'Ești sigur că vrei să retrimiți această problemă pentru aprobare? Statusul va fi schimbat în "În verificare".',
       nzOkText: 'Da, retrimite',
-      nzCancelText: 'Anuleaza',
+      nzCancelText: 'Anulează',
       nzOnOk: () => this.saveChanges()
     });
   }
@@ -253,7 +253,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
           this.submitUpdate(allPhotoUrls);
         },
         error: (error) => {
-          console.error('[EditIssue] Failed to upload photos:', error);
+          console.error('[EditIssue] Nu s-au putut încărca fotografiile:', error);
           this.isSaving = false;
           this.message.error('Eroare la încărcarea fotografiilor. Încercați din nou.');
         }
@@ -269,7 +269,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
         // This prevents orphaned files: successful uploads are collected
         // even if some fail, and we can proceed with partial results
         catchError(error => {
-          console.error('[EditIssue] Individual photo upload failed:', error);
+          console.error('[EditIssue] Încărcarea individuală a fotografiei a eșuat:', error);
           return of(null);
         })
       );
@@ -300,7 +300,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
 
       return await imageCompression(file, options);
     } catch (error) {
-      console.error('[EditIssue] Compression failed:', error);
+      console.error('[EditIssue] Compresia a eșuat:', error);
       throw new Error('Nu s-a putut procesa imaginea.');
     }
   }
@@ -327,7 +327,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
           this.router.navigate(['/my-issues']);
         },
         error: (error) => {
-          console.error('[EditIssue] Failed to save:', error);
+          console.error('[EditIssue] Nu s-a putut salva:', error);
           this.isSaving = false;
           this.message.error('Eroare la salvare. Încercați din nou.');
         }

@@ -228,7 +228,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
   }
 
   logout(): void {
-    console.log('[DASHBOARD] User logout requested');
+    console.log('[DASHBOARD] Utilizatorul a solicitat deconectarea');
     this.store.dispatch(AuthActions.logout());
   }
 

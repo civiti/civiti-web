@@ -48,14 +48,14 @@
       <nz-timeline *ngIf="activities.length > 0">
         <nz-timeline-item
           *ngFor="let activity of activities"
-          [nzColor]="getTimelineColor(activity.action)"
+          [nzColor]="getTimelineColor(activity.actionType)"
         >
           <div class="activity-item">
             <div class="activity-header">
               <div class="admin-info">
                 <span class="admin-name">{{ activity.adminName }}</span>
-                <nz-tag [nzColor]="getActionColor(activity.action)" nzMode="default">
-                  {{ getActionLabel(activity.action) }}
+                <nz-tag [nzColor]="getActionColor(activity.actionType)" nzMode="default">
+                  {{ getActionLabel(activity.actionType) }}
                 </nz-tag>
               </div>
               <span class="activity-time">{{ formatDateTime(activity.createdAt) }}</span>
@@ -68,8 +68,8 @@
               <span class="target-name">{{ getTargetLabel(activity) }}</span>
             </div>
 
-            <div class="activity-details" *ngIf="activity.details">
-              <p>{{ activity.details }}</p>
+            <div class="activity-details" *ngIf="activity.notes">
+              <p>{{ activity.notes }}</p>
             </div>
           </div>
         </nz-timeline-item>

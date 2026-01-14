@@ -181,11 +181,6 @@ export interface TrackEmailRequest {
 
 export interface ApproveIssueRequest {
   adminNotes?: string;
-  templateEmail?: {
-    subject: string;
-    body: string;
-    targetAuthorities: string[];
-  };
 }
 
 export interface RejectIssueRequest {
@@ -419,14 +414,14 @@ export interface LeaderboardResponse {
 export interface AdminIssueListItem {
   id: string;
   title: string;
-  description: string;
   category: IssueCategory;
   urgency: UrgencyLevel;
-  location: string;
-  submittedBy: string;
-  submittedAt: string;
-  photoCount: number;
   status: IssueStatus;
+  address: string;
+  createdAt: string;
+  photoCount: number;
+  emailsSent: number;
+  userName: string;
 }
 
 /**
@@ -461,7 +456,6 @@ export interface AdminIssueDetailResponse {
   description: string;
   category: IssueCategory;
   urgency: UrgencyLevel;
-  priority: Priority;
   status: IssueStatus;
 
   // Location details
@@ -488,8 +482,6 @@ export interface AdminIssueDetailResponse {
   // Admin details
   adminNotes?: string;
   rejectionReason?: string;
-  assignedDepartment?: string;
-  estimatedResolutionTime?: string;
   publicVisibility: boolean;
 
   // Review info
@@ -564,7 +556,6 @@ export interface AdminStatisticsResponse {
   averageReviewTimeHours: number;
   issuesByCategory: { [key: string]: number };
   issuesByUrgency: { [key: string]: number };
-  issuesByPriority: { [key: string]: number };
   totalUsers: number;
   activeUsersThisMonth: number;
   totalEmailsSent: number;
@@ -588,40 +579,45 @@ export interface ErrorResponse {
 
 /**
  * Activity log action types (issue moderation actions only)
+ * Values match backend: approve, reject, requestchanges (lowercase)
  */
 export type AdminActionType =
-  | 'approve_issue'
-  | 'reject_issue'
-  | 'request_changes'
-  | 'bulk_approve';
+  | 'approve'
+  | 'reject'
+  | 'requestchanges';
 
 /**
  * Admin activity log entry
+ * Matches GET /api/admin/actions response
  */
 export interface AdminActivityLogEntry {
   id: string;
-  adminId: string;
+  issueId: string;
+  issueTitle: string;
+  adminUserId: string;
   adminName: string;
   adminEmail: string;
-  action: AdminActionType;
-  targetType: 'Issue';
-  targetId: string;
-  targetTitle?: string;
-  details?: string;
-  metadata?: Record<string, unknown>;
+  actionType: AdminActionType;
+  notes: string | null;
+  previousStatus: string;
+  newStatus: string;
   createdAt: string;
 }
 
 /**
  * Query parameters for activity log
+ * Matches backend: GET /api/admin/actions
  */
 export interface ActivityLogQueryParams {
-  adminId?: string;
-  action?: AdminActionType;
-  startDate?: string;
-  endDate?: string;
   page?: number;
   pageSize?: number;
+  issueId?: string;
+  adminUserId?: string;
+  actionType?: AdminActionType;
+  startDate?: string;
+  endDate?: string;
+  sortBy?: string;
+  sortDescending?: boolean;
 }
 
 // ============================================

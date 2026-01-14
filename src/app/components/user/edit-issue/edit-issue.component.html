@@ -1,6 +1,6 @@
 <div class="edit-issue-container">
   <!-- Loading State -->
-  <nz-spin [nzSpinning]="isLoading" nzTip="Se incarca...">
+  <nz-spin [nzSpinning]="isLoading" nzTip="Se încarcă...">
 
     <!-- Error State -->
     <nz-alert
@@ -16,17 +16,17 @@
       <nz-card class="edit-card">
         <!-- Header -->
         <div class="edit-header">
-          <h2>Editeaza Problema</h2>
+          <h2>Editează Problema</h2>
           <p class="subtitle">
-            Modifica detaliile problemei si retrimite pentru aprobare
+            Modifică detaliile problemei și retrimite pentru aprobare
           </p>
         </div>
 
         <!-- Rejection Notice -->
         <nz-alert
           nzType="warning"
-          nzMessage="Aceasta problema a fost respinsa"
-          [nzDescription]="'Editeaza detaliile si retrimite pentru aprobare.'"
+          nzMessage="Această problemă a fost respinsă"
+          [nzDescription]="'Editează detaliile și retrimite pentru aprobare.'"
           nzShowIcon
           class="mb-4">
         </nz-alert>
@@ -39,12 +39,12 @@
             </nz-form-label>
             <nz-form-control
               [nzSpan]="24"
-              nzErrorTip="Titlul trebuie sa aiba intre 10 si 200 caractere">
+              nzErrorTip="Titlul trebuie să aibă între 10 și 200 caractere">
               <input
                 nz-input
                 id="title"
                 formControlName="title"
-                placeholder="Un titlu scurt si descriptiv"
+                placeholder="Un titlu scurt și descriptiv"
                 maxlength="200">
               <div class="char-count">
                 {{ editForm.get('title')?.value?.length || 0 }} / 200
@@ -59,12 +59,12 @@
             </nz-form-label>
             <nz-form-control
               [nzSpan]="24"
-              nzErrorTip="Descrierea trebuie sa aiba intre 30 si 2000 caractere">
+              nzErrorTip="Descrierea trebuie să aibă între 30 și 2000 caractere">
               <textarea
                 nz-input
                 id="description"
                 formControlName="description"
-                placeholder="Descrie problema in detaliu..."
+                placeholder="Descrie problema în detaliu..."
                 [nzAutosize]="{ minRows: 5, maxRows: 12 }"
                 maxlength="2000">
               </textarea>
@@ -90,7 +90,7 @@
                 nzAccept="image/*">
                 <div *ngIf="photoList.length < 5">
                   <span nz-icon nzType="plus"></span>
-                  <div class="upload-text">Adauga foto</div>
+                  <div class="upload-text">Adaugă foto</div>
                 </div>
               </nz-upload>
               <p class="photo-hint">Maxim 5 fotografii, fiecare sub 5MB</p>
@@ -99,13 +99,13 @@
 
           <!-- Location Info (Read-only) -->
           <nz-form-item>
-            <nz-form-label [nzSpan]="24">Locatie</nz-form-label>
+            <nz-form-label [nzSpan]="24">Locație</nz-form-label>
             <nz-form-control [nzSpan]="24">
               <div class="readonly-field">
                 <i nz-icon nzType="environment" nzTheme="outline"></i>
                 <span>{{ issue.address }}</span>
               </div>
-              <p class="field-hint">Locatia nu poate fi modificata</p>
+              <p class="field-hint">Locația nu poate fi modificată</p>
             </nz-form-control>
           </nz-form-item>
 
@@ -118,7 +118,7 @@
               (click)="goBack()"
               [disabled]="isSaving || isUploading">
               <i nz-icon nzType="arrow-left" nzTheme="outline"></i>
-              Inapoi
+              Înapoi
             </button>
             <button
               nz-button

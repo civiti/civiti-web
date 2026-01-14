@@ -35,9 +35,67 @@
 }
 
 .header-actions {
-  button {
-    color: var(--white) !important;
-    border-color: rgba(255, 255, 255, 0.3) !important;
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+
+  button.ant-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    span[nz-icon] {
+      display: flex;
+      align-items: center;
+      line-height: 1;
+    }
+  }
+
+  button.ant-btn-background-ghost {
+    color: var(--white);
+    border-color: rgba(255, 255, 255, 0.5);
+
+    &:hover,
+    &:focus {
+      color: var(--orange-web);
+      border-color: var(--orange-web);
+    }
+  }
+
+  button.ant-btn-primary {
+    background: var(--orange-web);
+    border-color: var(--orange-web);
+
+    &:hover,
+    &:focus {
+      background: #e5940f;
+      border-color: #e5940f;
+    }
+
+    &:disabled {
+      background: rgba(255, 255, 255, 0.3);
+      border-color: rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.6);
+    }
+  }
+}
+
+.bulk-approval-content {
+  .bulk-info {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+    padding: 1rem;
+    background: #f0f7ff;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+    color: var(--oxford-blue);
+
+    span[nz-icon] {
+      font-size: 1.25rem;
+      color: #1890ff;
+      margin-top: 2px;
+    }
   }
 }
 
@@ -86,7 +144,21 @@
 .action-buttons {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 0.25rem;
+
+  button.ant-btn {
+    width: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+
+    span[nz-icon] {
+      display: flex;
+      align-items: center;
+      line-height: 1;
+    }
+  }
 }
 
 .empty-state {

@@ -1,16 +1,25 @@
 <div class="admin-container">
-  
+
   <!-- Header -->
   <div class="admin-header">
     <div class="header-content">
       <div class="header-info">
-        <h1>Admin Approval Dashboard</h1>
-        <p>Review and approve community issue submissions</p>
+        <h1>Panou de Aprobare</h1>
+        <p>Revizuiește și aprobă sesizările comunității</p>
       </div>
       <div class="header-actions">
-        <button nz-button nzType="default" (click)="refreshData()">
+        <button
+          nz-button
+          nzType="primary"
+          [disabled]="selectedCount === 0"
+          (click)="openBulkApprovalModal()"
+          *ngIf="pendingIssues.length > 0">
+          <span nz-icon nzType="check-circle"></span>
+          Aprobă selectate ({{ selectedCount }})
+        </button>
+        <button nz-button nzGhost (click)="refreshData()">
           <span nz-icon nzType="reload"></span>
-          Refresh
+          Reîmprospătare
         </button>
       </div>
     </div>
@@ -24,7 +33,7 @@
         <nz-card class="stat-card">
           <nz-statistic
             [nzValue]="adminStats.pendingReview"
-            nzTitle="Pending Review"
+            nzTitle="În așteptare"
             [nzValueStyle]="{ color: '#FCA311' }">
           </nz-statistic>
         </nz-card>
@@ -34,7 +43,7 @@
         <nz-card class="stat-card">
           <nz-statistic
             [nzValue]="adminStats.reviewedToday"
-            nzTitle="Approved Today"
+            nzTitle="Aprobate azi"
             [nzValueStyle]="{ color: '#28A745' }">
           </nz-statistic>
         </nz-card>
@@ -45,7 +54,7 @@
           <nz-statistic
             [nzValue]="adminStats.approvalRate"
             nzSuffix="%"
-            nzTitle="Approval Rate"
+            nzTitle="Rată aprobare"
             [nzValueStyle]="{ color: '#14213D' }">
           </nz-statistic>
         </nz-card>
@@ -56,7 +65,7 @@
           <nz-statistic
             [nzValue]="adminStats.averageReviewTimeHours"
             nzSuffix="h"
-            nzTitle="Avg Review Time"
+            nzTitle="Timp mediu revizuire"
             [nzValueStyle]="{ color: '#6c757d' }">
           </nz-statistic>
         </nz-card>
@@ -67,87 +76,102 @@
 
   <!-- Issues Table -->
   <div class="issues-section">
-    <nz-card nzTitle="Pending Issues" class="issues-card">
-      
-      <nz-table 
-        #issuesTable 
-        [nzData]="pendingIssues" 
+    <nz-card nzTitle="Probleme în așteptare" class="issues-card">
+
+      <nz-table
+        #issuesTable
+        [nzData]="pendingIssues"
         [nzLoading]="isLoading"
         [nzPageSize]="10"
         [nzShowPagination]="true"
         nzTableLayout="fixed">
-        
+
         <thead>
           <tr>
+            <th nzWidth="50px">
+              <label
+                nz-checkbox
+                [nzChecked]="allSelected"
+                [nzIndeterminate]="selectedCount > 0 && selectedCount < pendingIssues.length"
+                (nzCheckedChange)="toggleSelectAll($event)">
+              </label>
+            </th>
             <th nzWidth="50px">#</th>
-            <th nzWidth="200px">Issue</th>
-            <th nzWidth="120px">Category</th>
-            <th nzWidth="100px">Urgency</th>
-            <th nzWidth="120px">Submitted</th>
-            <th nzWidth="100px">Photos</th>
-            <th nzWidth="150px">Actions</th>
+            <th nzWidth="200px">Problemă</th>
+            <th nzWidth="120px">Categorie</th>
+            <th nzWidth="100px">Urgență</th>
+            <th nzWidth="120px">Trimis</th>
+            <th nzWidth="80px">Poze</th>
+            <th nzWidth="150px">Acțiuni</th>
           </tr>
         </thead>
-        
+
         <tbody>
           <tr *ngFor="let issue of issuesTable.data; let i = index">
-            
+
+            <td>
+              <label
+                nz-checkbox
+                [nzChecked]="isIssueSelected(issue.id)"
+                (nzCheckedChange)="toggleIssueSelection(issue.id, $event)">
+              </label>
+            </td>
             <td>{{ i + 1 }}</td>
-            
+
             <td>
               <div class="issue-title">{{ issue.title }}</div>
-              <div class="issue-description">{{ issue.description | slice:0:80 }}...</div>
+              <div class="issue-description">{{ issue.address | slice:0:80 }}</div>
             </td>
-            
+
             <td>
               <nz-tag [nzColor]="getCategoryColor(issue.category)">
                 {{ issue.category | titlecase }}
               </nz-tag>
             </td>
-            
+
             <td>
-              <nz-badge 
-                [nzStatus]="getUrgencyStatus(issue.urgency)" 
+              <nz-badge
+                [nzStatus]="getUrgencyStatus(issue.urgency)"
                 [nzText]="issue.urgency | titlecase">
               </nz-badge>
             </td>
-            
+
             <td>
               <div class="submission-time">
-                {{ getTimeAgo(issue.submittedAt) }}
+                {{ getTimeAgo(issue.createdAt) }}
               </div>
             </td>
-            
+
             <td>
               <nz-badge [nzCount]="issue.photoCount" nzShowZero>
                 <span nz-icon nzType="picture"></span>
               </nz-badge>
             </td>
-            
+
             <td>
               <div class="action-buttons">
-                <button 
-                  nz-button 
-                  nzType="link" 
+                <button
+                  nz-button
+                  nzType="link"
                   nzSize="small"
                   (click)="viewIssueDetails(issue)">
                   <span nz-icon nzType="eye"></span>
-                  View
+                  Vezi
                 </button>
-                <button 
-                  nz-button 
-                  nzType="primary" 
+                <button
+                  nz-button
+                  nzType="primary"
                   nzSize="small"
                   (click)="openApprovalModal(issue)">
                   <span nz-icon nzType="check"></span>
-                  Review
+                  Revizuiește
                 </button>
               </div>
             </td>
-            
+
           </tr>
         </tbody>
-        
+
       </nz-table>
 
       <!-- Empty State -->
@@ -155,8 +179,8 @@
         <div class="empty-icon">
           <span nz-icon nzType="inbox"></span>
         </div>
-        <h3>No Pending Issues</h3>
-        <p>All community issue submissions have been reviewed.</p>
+        <h3>Nicio problemă în așteptare</h3>
+        <p>Toate sesizările comunității au fost revizuite.</p>
       </div>
 
     </nz-card>
@@ -165,48 +189,43 @@
   <!-- Approval Modal -->
   <nz-modal
     [(nzVisible)]="isApprovalModalVisible"
-    nzTitle="Review Issue Submission"
+    nzTitle="Revizuire sesizare"
     [nzWidth]="800"
     [nzFooter]="null"
     (nzOnCancel)="closeApprovalModal()"
     nzClass="approval-modal">
-    
+
     <div *nzModalContent>
       <nz-spin [nzSpinning]="isProcessing || false">
         <div class="modal-content">
-        
+
         <!-- Issue Details -->
         <div class="issue-details" *ngIf="selectedIssue">
-          
+
           <div class="issue-header">
             <h3>{{ selectedIssue.title }}</h3>
             <div class="issue-meta">
               <nz-tag [nzColor]="getCategoryColor(selectedIssue.category)">
                 {{ selectedIssue.category | titlecase }}
               </nz-tag>
-              <nz-badge 
-                [nzStatus]="getUrgencyStatus(selectedIssue.urgency)" 
+              <nz-badge
+                [nzStatus]="getUrgencyStatus(selectedIssue.urgency)"
                 [nzText]="selectedIssue.urgency | titlecase">
               </nz-badge>
               <span class="submission-time">
-                Submitted {{ getTimeAgo(selectedIssue.submittedAt) }}
+                Trimis {{ getTimeAgo(selectedIssue.createdAt) }}
               </span>
             </div>
           </div>
 
-          <div class="issue-description">
-            <h4>Description</h4>
-            <p>{{ selectedIssue.description }}</p>
-          </div>
-
           <div class="issue-location">
-            <h4>Location</h4>
-            <p>{{ selectedIssue.location }}</p>
+            <h4>Locație</h4>
+            <p>{{ selectedIssue.address }}</p>
           </div>
 
           <div class="issue-photos" *ngIf="selectedIssue.photoCount > 0">
-            <h4>Photos ({{ selectedIssue.photoCount }})</h4>
-            <p>Photo details available in full issue view</p>
+            <h4>Poze ({{ selectedIssue.photoCount }})</h4>
+            <p>Detaliile pozelor sunt disponibile în vizualizarea completă</p>
           </div>
 
         </div>
@@ -214,60 +233,35 @@
         <!-- Approval Form -->
         <div class="approval-form">
           <form nz-form [formGroup]="approvalForm" (ngSubmit)="submitDecision()">
-            
+
             <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzRequired>Decision</nz-form-label>
+              <nz-form-label [nzSpan]="24" nzRequired>Decizie</nz-form-label>
               <nz-form-control [nzSpan]="24">
                 <nz-radio-group formControlName="decision">
                   <label nz-radio nzValue="approve">
                     <span nz-icon nzType="check-circle" style="color: #28A745;"></span>
-                    Approve
+                    Aprobă
                   </label>
                   <label nz-radio nzValue="reject">
                     <span nz-icon nzType="close-circle" style="color: #DC3545;"></span>
-                    Reject
+                    Respinge
                   </label>
                   <label nz-radio nzValue="request_changes">
                     <span nz-icon nzType="exclamation-circle" style="color: #FCA311;"></span>
-                    Request Changes
+                    Solicită modificări
                   </label>
                 </nz-radio-group>
               </nz-form-control>
             </nz-form-item>
 
-            <nz-form-item *ngIf="approvalForm.get('decision')?.value === 'approve'">
-              <nz-form-label [nzSpan]="24">Priority</nz-form-label>
-              <nz-form-control [nzSpan]="24">
-                <nz-select formControlName="priority" nzPlaceHolder="Set priority level">
-                  <nz-option nzValue="low" nzLabel="Low Priority"></nz-option>
-                  <nz-option nzValue="medium" nzLabel="Medium Priority"></nz-option>
-                  <nz-option nzValue="high" nzLabel="High Priority"></nz-option>
-                  <nz-option nzValue="critical" nzLabel="Critical Priority"></nz-option>
-                </nz-select>
-              </nz-form-control>
-            </nz-form-item>
-
-            <nz-form-item *ngIf="approvalForm.get('decision')?.value === 'approve'">
-              <nz-form-label [nzSpan]="24">Assign Department</nz-form-label>
-              <nz-form-control [nzSpan]="24">
-                <nz-select formControlName="assignedDepartment" nzPlaceHolder="Select department">
-                  <nz-option 
-                    *ngFor="let dept of departments" 
-                    [nzValue]="dept" 
-                    [nzLabel]="dept">
-                  </nz-option>
-                </nz-select>
-              </nz-form-control>
-            </nz-form-item>
-
             <nz-form-item>
-              <nz-form-label [nzSpan]="24">Notes</nz-form-label>
+              <nz-form-label [nzSpan]="24">Notițe</nz-form-label>
               <nz-form-control [nzSpan]="24">
                 <textarea
                   nz-input
                   formControlName="notes"
                   rows="4"
-                  placeholder="Add notes or feedback...">
+                  placeholder="Adaugă notițe sau feedback...">
                 </textarea>
               </nz-form-control>
             </nz-form-item>
@@ -275,16 +269,16 @@
             <nz-form-item class="form-actions">
               <nz-form-control [nzSpan]="24">
                 <div class="action-buttons">
-                  <button nz-button nzType="default" (click)="closeApprovalModal()">
-                    Cancel
+                  <button nz-button nzType="default" type="button" (click)="closeApprovalModal()">
+                    Anulează
                   </button>
-                  <button 
-                    nz-button 
-                    nzType="primary" 
+                  <button
+                    nz-button
+                    nzType="primary"
                     type="submit"
                     [disabled]="!approvalForm.valid"
                     [nzLoading]="isProcessing">
-                    Submit Decision
+                    Trimite decizia
                   </button>
                 </div>
               </nz-form-control>
@@ -296,7 +290,42 @@
         </div>
       </nz-spin>
     </div>
-    
+
+  </nz-modal>
+
+  <!-- Bulk Approval Modal -->
+  <nz-modal
+    [(nzVisible)]="isBulkApprovalModalVisible"
+    nzTitle="Aprobare în masă"
+    [nzWidth]="500"
+    [nzOkText]="'Aprobă ' + selectedCount + ' probleme'"
+    nzCancelText="Anulează"
+    [nzOkLoading]="isProcessing"
+    (nzOnOk)="submitBulkApproval()"
+    (nzOnCancel)="closeBulkApprovalModal()">
+
+    <div *nzModalContent>
+      <div class="bulk-approval-content">
+        <p class="bulk-info">
+          <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+          Vei aproba <strong>{{ selectedCount }}</strong> probleme selectate.
+          Toate vor primi statusul "Activ" și vor fi vizibile public.
+        </p>
+
+        <nz-form-item>
+          <nz-form-label>Notițe (opțional)</nz-form-label>
+          <nz-form-control>
+            <textarea
+              nz-input
+              [(ngModel)]="bulkApprovalNotes"
+              rows="3"
+              placeholder="Adaugă notițe pentru toate problemele aprobate...">
+            </textarea>
+          </nz-form-control>
+        </nz-form-item>
+      </div>
+    </div>
+
   </nz-modal>
 
 </div>

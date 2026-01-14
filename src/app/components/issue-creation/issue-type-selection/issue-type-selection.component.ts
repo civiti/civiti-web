@@ -93,7 +93,7 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
     }));
 
     this.isLoading = false;
-    console.log('[ISSUE TYPE] Categories loaded:', this.categories.length);
+    console.log('[TIP PROBLEMĂ] Categorii încărcate:', this.categories.length);
   }
 
   private loadCurrentLocation(): void {
@@ -104,7 +104,7 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
         this.currentLocation = JSON.parse(savedLocation);
         return;
       } catch (e) {
-        console.warn('[ISSUE TYPE] Failed to parse saved location');
+        console.warn('[TIP PROBLEMĂ] Nu s-a putut parsa locația salvată');
       }
     }
 
@@ -119,16 +119,16 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
 
   selectCategory(category: IssueCategoryInfo): void {
     this.selectedCategory = category;
-    console.log('[ISSUE TYPE] Category selected:', category.name);
+    console.log('[TIP PROBLEMĂ] Categorie selectată:', category.name);
   }
 
   continueToPhotos(): void {
     if (!this.selectedCategory) {
-      console.warn('[ISSUE TYPE] No category selected');
+      console.warn('[TIP PROBLEMĂ] Nicio categorie selectată');
       return;
     }
 
-    console.log('[ISSUE TYPE] Continuing to photos with category:', this.selectedCategory.name);
+    console.log('[TIP PROBLEMĂ] Se continuă cu fotografiile pentru categoria:', this.selectedCategory.name);
 
     // Store selected category in session storage for the creation flow
     sessionStorage.setItem('civica_selected_category', JSON.stringify(this.selectedCategory));
@@ -138,7 +138,7 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
   }
 
   changeLocation(): void {
-    console.log('[ISSUE TYPE] Change location requested');
+    console.log('[TIP PROBLEMĂ] Schimbare locație solicitată');
 
     const modalRef = this.modalService.create({
       nzTitle: 'Selectează Locația',
@@ -158,7 +158,7 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
 
     modalRef.afterClose.subscribe((result: LocationData | null) => {
       if (result) {
-        console.log('[ISSUE TYPE] Location selected:', result);
+        console.log('[TIP PROBLEMĂ] Locație selectată:', result);
         this.currentLocation = {
           address: result.address,
           coordinates: { lat: result.latitude, lng: result.longitude },

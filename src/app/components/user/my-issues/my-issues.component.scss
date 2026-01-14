@@ -50,7 +50,7 @@
     .issue-content {
       .issue-title,
       .issue-description {
-        color: #8c8c8c;
+        color: rgba(20, 33, 61, 0.5);
       }
     }
 
@@ -105,7 +105,7 @@
 
     .issue-description {
       font-size: 14px;
-      color: #666;
+      color: rgba(20, 33, 61, 0.7);
       margin: 0 0 12px 0;
       line-height: 1.5;
       display: -webkit-box;
@@ -125,7 +125,7 @@
         align-items: center;
         gap: 4px;
         font-size: 12px;
-        color: #888;
+        color: rgba(20, 33, 61, 0.5);
 
         i {
           font-size: 14px;
@@ -185,7 +185,7 @@
     margin: 0 auto;
 
     .ant-empty-description {
-      color: #666;
+      color: rgba(20, 33, 61, 0.7);
       font-size: 16px;
     }
   }

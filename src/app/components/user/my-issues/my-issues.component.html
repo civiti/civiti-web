@@ -61,7 +61,7 @@
               <button *ngIf="isRejected(issue.status)"
                       nz-button nzType="primary" nzSize="small"
                       (click)="editIssue(issue)">
-                <i nz-icon nzType="edit" nzTheme="outline"></i> Editeaza
+                <i nz-icon nzType="edit" nzTheme="outline"></i> Editează
               </button>
 
               <!-- Mark as solved for active issues -->
@@ -117,7 +117,7 @@
       <ng-template #emptyFooter>
         <button *ngIf="selectedFilter === 'all'" nz-button nzType="primary" (click)="navigateToCreateIssue()">
           <i nz-icon nzType="plus" nzTheme="outline"></i>
-          Raporteaza prima problema
+          Raportează prima problemă
         </button>
       </ng-template>
     </div>

@@ -257,7 +257,7 @@ export class ApiService {
   }
 
   bulkApproveIssues(data: BulkApproveRequest): Observable<BulkApproveResponse> {
-    return this.http.post<BulkApproveResponse>(`${this.baseUrl}/admin/issues/bulk-approve`, data);
+    return this.http.post<BulkApproveResponse>(`${this.baseUrl}/admin/bulk-approve`, data);
   }
 
   getAdminStatistics(): Observable<AdminStatisticsResponse> {
