@@ -39,7 +39,7 @@ export class HeaderComponent {
   private _store = inject(Store<AppState>);
 
   // Page-specific configuration
-  @Input() title = 'Civica';
+  @Input() title = 'Civiti';
   @Input() showBackButton = false;
   @Input() backUrl: string | null = null;
 

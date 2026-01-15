@@ -1,142 +1,124 @@
-<div class="min-h-screen bg-background flex items-center justify-center p-4 relative">
-  <!-- Auth buttons / User profile -->
-  <div class="absolute top-4 right-4">
-    <!-- Auth buttons for unauthenticated users -->
-    <ng-container *ngIf="!(isAuthenticated$ | async)">
-      <nz-space nzSize="small">
-        <button
-          *nzSpaceItem
-          nz-button
-          nzType="text"
-          nzSize="small"
-          class="auth-button"
-          (click)="navigateToLogin()"
-        >
-          <i nz-icon nzType="login" nzTheme="outline" class="mr-1"></i>
-          Conectează-te
-        </button>
-        <button
-          *nzSpaceItem
-          nz-button
-          nzType="default"
-          nzSize="small"
-          class="auth-button register-button"
-          (click)="navigateToRegister()"
-        >
-          <i nz-icon nzType="user-add" nzTheme="outline" class="mr-1"></i>
-          Înregistrează-te
-        </button>
-      </nz-space>
-    </ng-container>
+<div class="location-container">
 
-    <!-- User profile for authenticated users -->
-    <ng-container *ngIf="isAuthenticated$ | async">
-      <div
-        nz-dropdown
-        [nzDropdownMenu]="userMenu"
-        nzTrigger="click"
-        nzPlacement="bottomRight"
-        class="user-avatar-dropdown"
-      >
-        <nz-avatar
-          [nzSrc]="(user$ | async)?.photoUrl || undefined"
-          [nzText]="(displayName$ | async)?.charAt(0)"
-          [nzSize]="36"
-          class="cursor-pointer">
-        </nz-avatar>
-        <i nz-icon nzType="caret-down" nzTheme="fill" class="dropdown-arrow"></i>
-      </div>
-      <nz-dropdown-menu #userMenu="nzDropdownMenu">
-        <ul nz-menu>
-          <li nz-menu-item (click)="navigateToDashboard()">
-            <i nz-icon nzType="dashboard" nzTheme="outline" class="mr-2"></i>
-            Panou
-          </li>
-          <li nz-menu-divider></li>
-          <li nz-menu-item (click)="logout()">
-            <i nz-icon nzType="logout" nzTheme="outline" class="mr-2"></i>
-            Deconectare
-          </li>
-        </ul>
-      </nz-dropdown-menu>
-    </ng-container>
+  <!-- Auth buttons - top right -->
+  <div class="auth-buttons" *ngIf="!(isAuthenticated$ | async)">
+    <a class="auth-link" (click)="navigateToLogin()">
+      <span nz-icon nzType="login" nzTheme="outline"></span>
+      Conectează-te
+    </a>
+    <a class="auth-link auth-link-primary" (click)="navigateToRegister()">
+      <span nz-icon nzType="user-add" nzTheme="outline"></span>
+      Înregistrează-te
+    </a>
   </div>
-  
-  <nz-card class="w-full max-w-md mx-auto">
-    <div class="text-center mb-6">
-      <h1 nz-typography class="text-2xl font-bold mb-2 text-oxford-blue">
-        Civica - Participare Civică
-      </h1>
-      <p nz-typography nzType="secondary" class="text-oxford-blue opacity-75">
-        Selectează-ți locația pentru a vedea problemele din comunitate
-      </p>
-      <p nz-typography nzType="secondary" class="text-oxford-blue opacity-60 text-xs mt-2">
-        <i nz-icon nzType="info-circle" nzTheme="outline" class="mr-1"></i>
-        Nu este nevoie de cont pentru a vizualiza și susține problemele existente
-      </p>
+
+  <!-- User dropdown - top right (authenticated) -->
+  <div class="user-menu" *ngIf="isAuthenticated$ | async">
+    <div
+      nz-dropdown
+      [nzDropdownMenu]="userMenu"
+      nzTrigger="click"
+      nzPlacement="bottomRight"
+      class="user-avatar-dropdown"
+    >
+      <nz-avatar
+        [nzSrc]="(user$ | async)?.photoUrl || undefined"
+        [nzText]="(displayName$ | async)?.charAt(0)"
+        [nzSize]="36"
+        class="user-avatar">
+      </nz-avatar>
+      <span nz-icon nzType="caret-down" nzTheme="fill" class="dropdown-arrow"></span>
     </div>
+    <nz-dropdown-menu #userMenu="nzDropdownMenu">
+      <ul nz-menu>
+        <li nz-menu-item (click)="navigateToDashboard()">
+          <span nz-icon nzType="dashboard" nzTheme="outline"></span>
+          Panou
+        </li>
+        <li nz-menu-divider></li>
+        <li nz-menu-item (click)="logout()">
+          <span nz-icon nzType="logout" nzTheme="outline"></span>
+          Deconectare
+        </li>
+      </ul>
+    </nz-dropdown-menu>
+  </div>
 
-    <form nz-form [formGroup]="locationForm" (ngSubmit)="onContinue()" nzLayout="vertical">
-      <!-- County Selection -->
-      <nz-form-item>
-        <nz-form-label nzRequired>Județ</nz-form-label>
-        <nz-form-control>
-          <nz-select formControlName="county" nzPlaceHolder="Selectează județul" nzShowSearch>
-            <nz-option nzValue="B" nzLabel="București"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
+  <!-- Main Card -->
+  <div class="location-card-wrapper">
+    <nz-card [nzBordered]="false" class="location-card">
 
-      <!-- City Selection -->
-      <nz-form-item>
-        <nz-form-label nzRequired>Oraș</nz-form-label>
-        <nz-form-control>
-          <nz-select formControlName="city" nzPlaceHolder="Selectează orașul" nzShowSearch>
-            <nz-option nzValue="BUCURESTI" nzLabel="București"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
+      <!-- Card Header: Logo + Title -->
+      <div class="card-header">
+        <img src="/images/logo/civiti-logo.svg" alt="Civiti" class="logo" />
+        <h1 class="page-title">Participare Civică</h1>
+        <p class="page-subtitle">Selectează-ți locația pentru a vedea problemele din comunitate</p>
+      </div>
 
-      <!-- District Selection -->
-      <nz-form-item>
-        <nz-form-label nzRequired>Cartier/Sector</nz-form-label>
-        <nz-form-control>
-          <nz-select formControlName="district" nzPlaceHolder="Selectează sectorul" nzShowSearch>
-            <nz-option nzValue="SECTOR5" nzLabel="Sector 5"></nz-option>
-          </nz-select>
-        </nz-form-control>
-      </nz-form-item>
+      <!-- Location Form -->
+      <form nz-form [formGroup]="locationForm" (ngSubmit)="onContinue()" nzLayout="vertical" class="location-form">
 
-      <!-- Info Box -->
-      <nz-alert
-        nzType="info"
-        nzMessage="Pentru MVP"
-        nzDescription="Momentan aplicația funcționează doar pentru București, Sectorul 5."
-        nzShowIcon
-        class="mb-6"
-      ></nz-alert>
+        <nz-form-item>
+          <nz-form-label nzRequired>Județ</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="county" nzPlaceHolder="Selectează județul" nzShowSearch nzSize="large">
+              <nz-option nzValue="B" nzLabel="București"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
 
-      <!-- Continue Button -->
-      <nz-form-item>
-        <button 
-          nz-button 
-          nzType="primary" 
-          nzBlock
-          nzSize="large"
-          type="submit"
-          [nzLoading]="isLoading"
-        >
-          <i nz-icon nzType="arrow-right" nzTheme="outline" class="mr-2"></i>
-          {{ isLoading ? 'Se încarcă...' : 'Continuă la Probleme' }}
-        </button>
-      </nz-form-item>
-    </form>
+        <nz-form-item>
+          <nz-form-label nzRequired>Oraș</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="city" nzPlaceHolder="Selectează orașul" nzShowSearch nzSize="large">
+              <nz-option nzValue="BUCURESTI" nzLabel="București"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
 
-    <!-- Footer -->
-    <div class="text-center mt-6 pt-4 border-t border-platinum">
-      <p class="text-xs text-oxford-blue opacity-50">
-        Platforma Civica - Împreună pentru comunitate
-      </p>
-    </div>
-  </nz-card>
+        <nz-form-item>
+          <nz-form-label nzRequired>Cartier/Sector</nz-form-label>
+          <nz-form-control>
+            <nz-select formControlName="district" nzPlaceHolder="Selectează sectorul" nzShowSearch nzSize="large">
+              <nz-option nzValue="SECTOR5" nzLabel="Sector 5"></nz-option>
+            </nz-select>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Info Alert -->
+        <nz-alert
+          nzType="info"
+          nzMessage="Pentru MVP"
+          nzDescription="Momentan aplicația funcționează doar pentru București, Sectorul 5."
+          nzShowIcon
+          class="info-alert">
+        </nz-alert>
+
+        <!-- Continue Button -->
+        <nz-form-item class="submit-section">
+          <button
+            nz-button
+            nzType="primary"
+            nzBlock
+            nzSize="large"
+            type="submit"
+            [nzLoading]="isLoading"
+            class="continue-btn">
+            <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
+            {{ isLoading ? 'Se încarcă...' : 'Continuă la Probleme' }}
+          </button>
+        </nz-form-item>
+
+      </form>
+
+      <!-- Footer note -->
+      <div class="card-footer">
+        <p>
+          <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+          Nu este nevoie de cont pentru a vizualiza problemele
+        </p>
+      </div>
+
+    </nz-card>
+  </div>
 </div>

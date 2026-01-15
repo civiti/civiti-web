@@ -34,11 +34,11 @@ export class App implements OnInit {
   private _router = inject(Router);
   private _activatedRoute = inject(ActivatedRoute);
 
-  protected title = 'Civica';
+  protected title = 'Civiti';
 
   // Default route config - hideHeader true to prevent flash on cold start
   routeConfig: RouteConfig = {
-    title: 'Civica',
+    title: 'Civiti',
     showBackButton: false,
     backUrl: null,
     hideHeader: true
@@ -68,7 +68,7 @@ export class App implements OnInit {
     }
     const data = route.snapshot.data;
     this.routeConfig = {
-      title: data['headerTitle'] || 'Civica',
+      title: data['headerTitle'] || 'Civiti',
       showBackButton: data['showBackButton'] ?? false,
       backUrl: data['backUrl'] || null,
       hideHeader: data['hideHeader'] ?? false

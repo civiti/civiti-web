@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Civica** is a civic engagement platform for Romanian citizens to collectively pressure local authorities through coordinated email campaigns. The frontend is an Angular 19 application with NgRx state management, connected to a .NET backend deployed on Railway.
+**Civiti** is a civic engagement platform for Romanian citizens to collectively pressure local authorities through coordinated email campaigns. The frontend is an Angular 19 application with NgRx state management, connected to a .NET backend deployed on Railway.
 
 **Backend API**: `https://civiti-server-production.up.railway.app`
 
