@@ -282,6 +282,10 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
     this.router.navigate(['/auth/login']);
   }
 
+  retryRegistration(): void {
+    this.store.dispatch(AuthActions.clearEmailConfirmationPending());
+  }
+
   private navigateAfterRegistration(): void {
     // Check for return URL in query params
     const returnUrl = this.route.snapshot.queryParams['returnUrl'];

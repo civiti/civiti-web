@@ -107,9 +107,9 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
     const password = form.get('password');
     const confirmPassword = form.get('confirmPassword');
 
-    if (password && confirmPassword && password.value !== confirmPassword.value) {
-      confirmPassword.setErrors({ passwordMismatch: true });
-      return { passwordMismatch: true };
+    // Only validate when both fields have values
+    if (password?.value && confirmPassword?.value) {
+      return password.value !== confirmPassword.value ? { passwordMismatch: true } : null;
     }
 
     return null;
