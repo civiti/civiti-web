@@ -30,6 +30,7 @@ import {
   BUCHAREST_CENTER,
   BUCHAREST_LOCATION_BIAS
 } from '../../../types/location.types';
+import { DEFAULT_CITY } from '../../../data/romanian-locations';
 
 export interface LocationPickerModalData {
   config?: LocationPickerConfig;
@@ -153,7 +154,7 @@ export class LocationPickerModalComponent implements OnInit, AfterViewInit, OnDe
           address: this.data.config.initialAddress,
           latitude: lat,
           longitude: lng,
-          city: this.data.config.initialCity || 'București',
+          city: this.data.config.initialCity || DEFAULT_CITY,
           district: normalizedDistrict
         };
       } else {
@@ -405,7 +406,7 @@ export class LocationPickerModalComponent implements OnInit, AfterViewInit, OnDe
    * Extract city from address components
    */
   private extractCity(components?: google.maps.GeocoderAddressComponent[]): string {
-    if (!components) return 'București';
+    if (!components) return DEFAULT_CITY;
 
     // Look for locality (city)
     const locality = components.find(c => c.types.includes('locality'));
@@ -416,10 +417,10 @@ export class LocationPickerModalComponent implements OnInit, AfterViewInit, OnDe
     // Fallback: check administrative_area_level_1 for București
     const adminArea = components.find(c => c.types.includes('administrative_area_level_1'));
     if (adminArea && adminArea.long_name.toLowerCase().includes('bucure')) {
-      return 'București';
+      return DEFAULT_CITY;
     }
 
-    return 'București'; // Default for MVP
+    return DEFAULT_CITY; // Default for MVP
   }
 
   /**
@@ -487,7 +488,7 @@ export class LocationPickerModalComponent implements OnInit, AfterViewInit, OnDe
       return false;
     }
     // For MVP, require București (any sector)
-    return this.selectedLocation.city === 'București';
+    return this.selectedLocation.city === DEFAULT_CITY;
   }
 
   /**
@@ -499,10 +500,10 @@ export class LocationPickerModalComponent implements OnInit, AfterViewInit, OnDe
     }
     if (!this.isInAllowedArea()) {
       const city = this.selectedLocation.city;
-      if (city && city !== 'București') {
-        return `Locația selectată este în ${city}. Pentru MVP, acceptăm doar adrese din București.`;
+      if (city && city !== DEFAULT_CITY) {
+        return `Locația selectată este în ${city}. Pentru MVP, acceptăm doar adrese din ${DEFAULT_CITY}.`;
       }
-      return 'Pentru MVP, acceptăm doar adrese din București.';
+      return `Pentru MVP, acceptăm doar adrese din ${DEFAULT_CITY}.`;
     }
     return null;
   }

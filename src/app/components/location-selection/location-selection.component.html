@@ -62,7 +62,7 @@
           <nz-form-label nzRequired>Județ</nz-form-label>
           <nz-form-control>
             <nz-select formControlName="county" nzPlaceHolder="Selectează județul" nzShowSearch nzSize="large">
-              <nz-option nzValue="B" nzLabel="București"></nz-option>
+              <nz-option nzValue="B" [nzLabel]="defaultCity"></nz-option>
             </nz-select>
           </nz-form-control>
         </nz-form-item>
@@ -71,7 +71,7 @@
           <nz-form-label nzRequired>Oraș</nz-form-label>
           <nz-form-control>
             <nz-select formControlName="city" nzPlaceHolder="Selectează orașul" nzShowSearch nzSize="large">
-              <nz-option nzValue="București" nzLabel="București"></nz-option>
+              <nz-option [nzValue]="defaultCity" [nzLabel]="defaultCity"></nz-option>
             </nz-select>
           </nz-form-control>
         </nz-form-item>

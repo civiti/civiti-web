@@ -19,6 +19,7 @@ import { selectIsAuthenticated } from '../../../store/auth/auth.selectors';
 import { IssueCategory, ISSUE_CATEGORIES } from '../../../types/civica-api.types';
 import { LocationPickerModalComponent } from '../../shared/location-picker-modal/location-picker-modal.component';
 import { LocationData, BUCHAREST_CENTER } from '../../../types/location.types';
+import { DEFAULT_CITY } from '../../../data/romanian-locations';
 
 interface IssueCategoryInfo {
   id: string;
@@ -60,6 +61,7 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
     district?: string;
   } | null = null;
 
+  locationError: string | null = null;
   isAuthenticated$!: Observable<boolean>;
 
   constructor(
@@ -110,9 +112,9 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
 
     // Default location for București (no specific sector)
     this.currentLocation = {
-      address: 'București, România',
+      address: `${DEFAULT_CITY}, România`,
       coordinates: BUCHAREST_CENTER,
-      city: 'București',
+      city: DEFAULT_CITY,
       district: undefined
     };
   }
@@ -122,11 +124,35 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
     console.log('[TIP PROBLEMĂ] Categorie selectată:', category.name);
   }
 
+  /**
+   * Check if the current location is the default generic one (no specific address selected)
+   */
+  isLocationGeneric(): boolean {
+    if (!this.currentLocation) return true;
+
+    // Check if it's the default generic address without a district
+    const isDefaultAddress = this.currentLocation.address === `${DEFAULT_CITY}, România`;
+    const hasNoDistrict = !this.currentLocation.district;
+
+    return isDefaultAddress && hasNoDistrict;
+  }
+
   continueToPhotos(): void {
     if (!this.selectedCategory) {
       console.warn('[TIP PROBLEMĂ] Nicio categorie selectată');
       return;
     }
+
+    // Validate that user has selected a specific location
+    if (this.isLocationGeneric()) {
+      this.locationError = 'Te rugăm să selectezi o adresă specifică pentru a continua';
+      // Auto-open the location picker
+      this.changeLocation();
+      return;
+    }
+
+    // Clear any previous error
+    this.locationError = null;
 
     console.log('[TIP PROBLEMĂ] Se continuă cu fotografiile pentru categoria:', this.selectedCategory.name);
 
@@ -167,6 +193,11 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
         };
         // Save to session storage for persistence
         sessionStorage.setItem('civica_current_location', JSON.stringify(this.currentLocation));
+
+        // Clear location error if a valid location was selected
+        if (!this.isLocationGeneric()) {
+          this.locationError = null;
+        }
       }
     });
   }

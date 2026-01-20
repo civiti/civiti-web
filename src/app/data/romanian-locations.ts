@@ -226,12 +226,18 @@ export const ROMANIAN_COUNTIES: County[] = [
 
 export const BUCHAREST_DISTRICTS = [
   'Sector 1',
-  'Sector 2', 
+  'Sector 2',
   'Sector 3',
   'Sector 4',
   'Sector 5',
   'Sector 6'
 ];
+
+/**
+ * Default city for MVP - single source of truth
+ * Use this constant everywhere instead of hardcoding 'București'
+ */
+export const DEFAULT_CITY = 'București';
 
 export const RESIDENCE_TYPES = [
   { value: 'Apartment', label: 'Apartament' },

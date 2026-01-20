@@ -21,7 +21,7 @@ import * as LocationActions from '../../store/location/location.actions';
 import * as AuthActions from '../../store/auth/auth.actions';
 import { selectIsAuthenticated, selectAuthUser, selectUserDisplayName } from '../../store/auth/auth.selectors';
 import { AuthUser } from '../../store/auth/auth.state';
-import { SanitizationService } from '../../services/sanitization.service';
+import { DEFAULT_CITY } from '../../data/romanian-locations';
 
 interface LocationData {
   counties: { id: string; name: string }[];
@@ -54,10 +54,12 @@ export class LocationSelectionComponent implements OnInit {
   private _fb = inject(FormBuilder);
   private _router = inject(Router);
   private _store = inject(Store<AppState>);
-  private _sanitizer = inject(SanitizationService);
 
   locationData: LocationData | null = null;
   isLoading = false;
+
+  // Expose constant to template
+  readonly defaultCity = DEFAULT_CITY;
 
   // Auth state observables
   isAuthenticated$: Observable<boolean>;
@@ -72,7 +74,7 @@ export class LocationSelectionComponent implements OnInit {
 
   locationForm = this._fb.group({
     county: [{ value: 'B', disabled: true }, Validators.required],
-    city: [{ value: 'București', disabled: true }, Validators.required]
+    city: [{ value: DEFAULT_CITY, disabled: true }, Validators.required]
   });
 
   ngOnInit(): void {
@@ -85,8 +87,8 @@ export class LocationSelectionComponent implements OnInit {
     // Load static location data
     // For MVP, hardcoded to București
     this.locationData = {
-      counties: [{ id: 'B', name: 'București' }],
-      cities: [{ id: 'București', name: 'București' }]
+      counties: [{ id: 'B', name: DEFAULT_CITY }],
+      cities: [{ id: DEFAULT_CITY, name: DEFAULT_CITY }]
     };
 
     this.isLoading = false;
@@ -97,10 +99,10 @@ export class LocationSelectionComponent implements OnInit {
     // Use getRawValue() to include disabled form controls
     const rawData = this.locationForm.getRawValue();
 
-    // Sanitize values before storing
+    // Store clean values in state - encoding happens at API layer when needed
     const selectedLocation = {
-      county: this._sanitizer.sanitizeUrlParam(rawData.county || ''),
-      city: this._sanitizer.sanitizeUrlParam(rawData.city || ''),
+      county: rawData.county || '',
+      city: rawData.city || '',
       district: '' // District selection moved to issues filter page
     };
 

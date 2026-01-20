@@ -23,6 +23,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { AuthorityListResponse } from '../../../types/civica-api.types';
 import { ApiService } from '../../../services/api.service';
+import { DEFAULT_CITY } from '../../../data/romanian-locations';
 
 /**
  * Validate email format
@@ -193,7 +194,7 @@ export class AuthoritySelectionComponent implements OnInit {
     if (locationData) {
       this.currentLocation = JSON.parse(locationData);
       // Extract city and district for authority filtering
-      this.issueCity = this.currentLocation?.city || 'București';
+      this.issueCity = this.currentLocation?.city || DEFAULT_CITY;
       this.issueDistrict = this.currentLocation?.district || '';
       console.log('[AUTHORITY SELECTION] Loaded location - city:', this.issueCity, 'district:', this.issueDistrict);
     }

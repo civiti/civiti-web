@@ -6,6 +6,7 @@ import { ApiService } from '../../../services/api.service';
 import * as AuthActions from '../../../store/auth/auth.actions';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { CommonModule } from '@angular/common';
+import { DEFAULT_CITY } from '../../../data/romanian-locations';
 
 @Component({
   selector: 'app-oauth-callback',
@@ -79,8 +80,8 @@ export class OauthCallbackComponent implements OnInit {
       supabaseUserId: user.id,
       email: user.email || '',
       displayName,
-      county: 'București',
-      city: 'București',
+      county: DEFAULT_CITY,
+      city: DEFAULT_CITY,
       district: '', // User will select sector when creating issues
       residenceType: 'Apartment'
     }).subscribe({

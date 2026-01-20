@@ -26,7 +26,7 @@ import * as IssueSelectors from '../../store/issues/issue.selectors';
 import { selectIsAuthenticated } from '../../store/auth/auth.selectors';
 import { selectCity } from '../../store/location/location.selectors';
 import { IssueItem, IssueCategory, ISSUE_CATEGORIES } from '../../types/civica-api.types';
-import { BUCHAREST_DISTRICTS } from '../../data/romanian-locations';
+import { BUCHAREST_DISTRICTS, DEFAULT_CITY } from '../../data/romanian-locations';
 import { BUCHAREST_LOCATION_BIAS } from '../../types/location.types';
 import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
 
@@ -99,7 +99,7 @@ export class IssuesListComponent implements OnInit, OnDestroy {
   private _placesService: google.maps.places.PlacesService | null = null;
 
   // City from location store
-  private _currentCity: string = 'București';
+  private _currentCity: string = DEFAULT_CITY;
 
   constructor() {
     this.issues$ = this._store.select(IssueSelectors.selectSortedIssues);
@@ -125,7 +125,7 @@ export class IssuesListComponent implements OnInit, OnDestroy {
     this._store.select(selectCity)
       .pipe(takeUntil(this._destroy$))
       .subscribe(city => {
-        this._currentCity = city || 'București';
+        this._currentCity = city || DEFAULT_CITY;
       });
 
     // Setup address search debounce
