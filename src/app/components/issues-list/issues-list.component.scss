@@ -1,3 +1,126 @@
+// Issues Control Panel - unified header + filters
+.issues-control-panel {
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--platinum);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  margin-bottom: 1.5rem;
+  overflow: hidden;
+
+  .control-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.25rem;
+    gap: 1rem;
+
+    .header-info {
+      flex: 1;
+      min-width: 0;
+
+      h2 {
+        margin: 0 0 0.25rem 0;
+      }
+
+      p {
+        margin: 0;
+      }
+    }
+
+    .header-sort {
+      flex-shrink: 0;
+    }
+
+    @media (max-width: 576px) {
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0.75rem;
+
+      .header-sort {
+        nz-select {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .control-panel-filters {
+    padding: 0.75rem 1.25rem 1rem;
+    border-top: 1px solid var(--platinum);
+    background: rgba(0, 0, 0, 0.01);
+  }
+}
+
+.address-search-wrapper {
+  position: relative;
+
+  // Ensure input and icons are vertically aligned
+  .ant-input-group {
+    display: flex;
+    align-items: center;
+  }
+
+  .ant-input-prefix,
+  .ant-input-suffix {
+    display: flex;
+    align-items: center;
+  }
+
+  // Match NG-ZORRO select clear button styling
+  .ant-select-clear {
+    cursor: pointer;
+    opacity: 0;
+    transition: color 0.2s ease, opacity 0.2s ease;
+    color: rgba(0, 0, 0, 0.25);
+
+    &:hover {
+      color: rgba(0, 0, 0, 0.45);
+    }
+  }
+
+  // Show clear button on hover over the input group
+  &:hover .ant-select-clear,
+  .ant-select-clear:focus {
+    opacity: 1;
+  }
+
+  .autocomplete-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background: white;
+    border: 1px solid #d9d9d9;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 1000;
+    max-height: 200px;
+    overflow-y: auto;
+
+    .suggestion-item {
+      padding: 8px 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--oxford-blue);
+
+      &:hover {
+        background: rgba(252, 163, 17, 0.1);
+      }
+    }
+  }
+}
+
+.clear-filters-col {
+  display: flex;
+  justify-content: flex-end;
+
+  @media (max-width: 768px) {
+    justify-content: flex-start;
+  }
+}
+
 .issue-card {
   border: 1px solid var(--platinum);
   transition: box-shadow 0.3s ease; // Only animate shadow, not transform

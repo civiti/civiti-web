@@ -3,7 +3,7 @@
   <nz-alert
     nzType="info"
     nzMessage="Restricție MVP"
-    nzDescription="Pentru versiunea curentă, acceptăm doar adrese din Sectorul 5, București."
+    nzDescription="Pentru versiunea curentă, acceptăm doar adrese din București."
     nzShowIcon
     class="mvp-alert">
   </nz-alert>
@@ -18,7 +18,7 @@
             nz-input
             #addressInput
             [formControl]="addressControl"
-            placeholder="Caută adresa ta din Sectorul 5..."
+            placeholder="Caută adresa ta din București..."
             (blur)="onAddressInputBlur()"
           />
         </nz-input-group>
@@ -93,7 +93,7 @@
           <nz-tag
             class="district-tag"
             *ngIf="selectedLocation.district"
-            [nzColor]="selectedLocation.district === 'Sector 5' ? 'green' : 'orange'">
+            [nzColor]="isInAllowedArea() ? 'green' : 'orange'">
             {{ selectedLocation.district }}
           </nz-tag>
         </div>

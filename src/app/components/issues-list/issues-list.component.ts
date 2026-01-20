@@ -1,9 +1,9 @@
-import { Component, inject, OnInit, OnDestroy, DestroyRef } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, DestroyRef, Inject, PLATFORM_ID } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Subject } from 'rxjs';
-import { takeUntil, map, distinctUntilChanged } from 'rxjs/operators';
+import { takeUntil, map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
@@ -13,17 +13,21 @@ import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzStatisticModule } from 'ng-zorro-antd/statistic';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
+import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
-import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { ReactiveFormsModule, FormsModule, FormControl } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { Observable, take } from 'rxjs';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
 import * as IssueSelectors from '../../store/issues/issue.selectors';
 import { selectIsAuthenticated } from '../../store/auth/auth.selectors';
-import { IssueItem } from '../../types/civica-api.types';
+import { selectCity } from '../../store/location/location.selectors';
+import { IssueItem, IssueCategory, ISSUE_CATEGORIES } from '../../types/civica-api.types';
+import { BUCHAREST_DISTRICTS, DEFAULT_CITY } from '../../data/romanian-locations';
+import { BUCHAREST_LOCATION_BIAS } from '../../types/location.types';
 import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
 
 @Component({
@@ -45,6 +49,7 @@ import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
     NzToolTipModule,
     NzModalModule,
     NzPaginationModule,
+    NzInputModule,
     StatusTextPipe,
     StatusColorPipe,
   ],
@@ -56,6 +61,7 @@ export class IssuesListComponent implements OnInit, OnDestroy {
   private _route = inject(ActivatedRoute);
   private _store = inject(Store<AppState>);
   private _modal = inject(NzModalService);
+  private _platformId = inject(PLATFORM_ID);
   private _destroy$ = new Subject<void>();
   private _imageErrorCount: Map<string, number> = new Map();
 
@@ -77,6 +83,24 @@ export class IssuesListComponent implements OnInit, OnDestroy {
   sortBy = 'date';
   readonly PAGE_SIZE = 12;
 
+  // Filter state
+  selectedDistrict: string | null = null;
+  selectedCategory: IssueCategory | null = null;
+  addressFilter: string | null = null;
+  districts = BUCHAREST_DISTRICTS;
+  categories = Object.entries(ISSUE_CATEGORIES) as [IssueCategory, string][];
+
+  // Google autocomplete for address search
+  addressSearchControl = new FormControl('');
+  suggestions: Array<{ description: string; place_id: string }> = [];
+  showSuggestions = false;
+  isSearching = false;
+  private _autocompleteService: google.maps.places.AutocompleteService | null = null;
+  private _placesService: google.maps.places.PlacesService | null = null;
+
+  // City from location store
+  private _currentCity: string = DEFAULT_CITY;
+
   constructor() {
     this.issues$ = this._store.select(IssueSelectors.selectSortedIssues);
     this.isLoading$ = this._store.select(IssueSelectors.selectIssuesLoading);
@@ -97,6 +121,33 @@ export class IssuesListComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
+    // Subscribe to city from location store
+    this._store.select(selectCity)
+      .pipe(takeUntil(this._destroy$))
+      .subscribe(city => {
+        this._currentCity = city || DEFAULT_CITY;
+      });
+
+    // Setup address search debounce
+    this.addressSearchControl.valueChanges
+      .pipe(
+        debounceTime(300),
+        takeUntil(this._destroy$)
+      )
+      .subscribe(value => {
+        if (value && value.length >= 3) {
+          this.searchAddress(value);
+        } else {
+          this.suggestions = [];
+          this.showSuggestions = false;
+        }
+      });
+
+    // Initialize Google autocomplete
+    if (isPlatformBrowser(this._platformId)) {
+      this.initGoogleAutocomplete();
+    }
+
     // Listen to URL query params and sync with store
     this._route.queryParams
       .pipe(
@@ -109,14 +160,34 @@ export class IssuesListComponent implements OnInit, OnDestroy {
           }
           return {
             page,
-            sortBy: params['sortBy'] || 'date'
+            sortBy: params['sortBy'] || 'date',
+            district: params['district'] || null,
+            category: params['category'] || null,
+            address: params['address'] || null
           };
         }),
         distinctUntilChanged((prev, curr) =>
-          prev.page === curr.page && prev.sortBy === curr.sortBy
+          prev.page === curr.page &&
+          prev.sortBy === curr.sortBy &&
+          prev.district === curr.district &&
+          prev.category === curr.category &&
+          prev.address === curr.address
         )
       )
-      .subscribe(({ page, sortBy }) => {
+      .subscribe(({ page, sortBy, district, category, address }) => {
+        // Sync filter state from URL
+        this.selectedDistrict = district;
+        this.selectedCategory = category as IssueCategory | null;
+        this.addressFilter = address;
+
+        // Sync address input with URL (only if different to avoid loops)
+        const currentInputValue = this.addressSearchControl.value || '';
+        if (address && address !== currentInputValue) {
+          this.addressSearchControl.setValue(address, { emitEvent: false });
+        } else if (!address && currentInputValue) {
+          this.addressSearchControl.setValue('', { emitEvent: false });
+        }
+
         // Update local sortBy if different
         if (sortBy !== this.sortBy) {
           this.sortBy = sortBy;
@@ -125,11 +196,15 @@ export class IssuesListComponent implements OnInit, OnDestroy {
           }));
         }
 
-        // Load issues with pagination params
+        // Load issues with pagination and filter params
         this._store.dispatch(IssueActions.loadIssues({
           params: {
             page,
             pageSize: this.PAGE_SIZE,
+            city: this._currentCity,
+            district: district || undefined,
+            category: category as IssueCategory || undefined,
+            address: address || undefined,
             ...this.getSortParams(sortBy)
           }
         }));
@@ -274,5 +349,210 @@ export class IssuesListComponent implements OnInit, OnDestroy {
           });
         }
       });
+  }
+
+  // Filter methods
+  onDistrictChange(): void {
+    this.updateFiltersInUrl();
+  }
+
+  onCategoryChange(): void {
+    this.updateFiltersInUrl();
+  }
+
+  /**
+   * Handle Enter key press in address input - triggers search with typed text
+   */
+  onAddressSearch(): void {
+    const value = this.addressSearchControl.value?.trim();
+    this.showSuggestions = false;
+
+    if (value && value.length >= 2) {
+      this.addressFilter = value;
+      this.updateFiltersInUrl();
+    } else if (!value) {
+      // Clear address filter if input is empty
+      this.addressFilter = null;
+      this.updateFiltersInUrl();
+    }
+  }
+
+  /**
+   * Clear address filter and trigger search
+   */
+  clearAddressFilter(): void {
+    this.addressSearchControl.setValue('', { emitEvent: false });
+    this.addressFilter = null;
+    this.showSuggestions = false;
+    this.updateFiltersInUrl();
+  }
+
+  clearFilters(): void {
+    this.selectedDistrict = null;
+    this.selectedCategory = null;
+    this.addressFilter = null;
+    this.addressSearchControl.setValue('', { emitEvent: false });
+    this.updateFiltersInUrl();
+  }
+
+  hasActiveFilters(): boolean {
+    return !!(this.selectedDistrict || this.selectedCategory || this.addressFilter);
+  }
+
+  private updateFiltersInUrl(): void {
+    this._router.navigate([], {
+      relativeTo: this._route,
+      queryParams: {
+        page: 1, // Reset to page 1 when filters change
+        district: this.selectedDistrict || null,
+        category: this.selectedCategory || null,
+        address: this.addressFilter || null
+      },
+      queryParamsHandling: 'merge'
+    });
+  }
+
+  // Google autocomplete methods
+  private async initGoogleAutocomplete(): Promise<void> {
+    try {
+      await this.waitForGoogleMaps();
+      this._autocompleteService = new google.maps.places.AutocompleteService();
+      // Create a dummy div for PlacesService (required by API)
+      const dummyDiv = document.createElement('div');
+      this._placesService = new google.maps.places.PlacesService(dummyDiv);
+    } catch (error) {
+      console.warn('Google Maps not available for address autocomplete');
+    }
+  }
+
+  private waitForGoogleMaps(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let attempts = 0;
+      const maxAttempts = 20;
+
+      const check = async () => {
+        if (typeof google !== 'undefined' && google.maps && google.maps.importLibrary) {
+          try {
+            await google.maps.importLibrary('places');
+            resolve();
+          } catch (error) {
+            reject(new Error('Failed to load Google Maps libraries'));
+          }
+        } else if (attempts >= maxAttempts) {
+          reject(new Error('Google Maps API failed to load'));
+        } else {
+          attempts++;
+          setTimeout(check, 500);
+        }
+      };
+
+      check();
+    });
+  }
+
+  private searchAddress(query: string): void {
+    if (!this._autocompleteService) {
+      return;
+    }
+
+    this.isSearching = true;
+
+    const request: google.maps.places.AutocompletionRequest = {
+      input: query,
+      componentRestrictions: { country: 'ro' },
+      locationBias: {
+        center: BUCHAREST_LOCATION_BIAS.center,
+        radius: BUCHAREST_LOCATION_BIAS.radius
+      } as google.maps.CircleLiteral,
+      types: ['address']
+    };
+
+    this._autocompleteService.getPlacePredictions(
+      request,
+      (predictions, status) => {
+        this.isSearching = false;
+
+        if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+          this.suggestions = predictions.map(p => ({
+            description: p.description,
+            place_id: p.place_id
+          }));
+          this.showSuggestions = true;
+        } else {
+          this.suggestions = [];
+          this.showSuggestions = false;
+        }
+      }
+    );
+  }
+
+  onAddressSuggestionSelected(suggestion: { description: string; place_id: string }): void {
+    this.showSuggestions = false;
+    this.addressSearchControl.setValue(suggestion.description, { emitEvent: false });
+
+    // Extract a useful search term from the address (street name, not full address)
+    // e.g., "Bulevardul Unirii 15, București" -> use partial match
+    const addressParts = suggestion.description.split(',');
+    const streetAddress = addressParts[0]?.trim() || suggestion.description;
+    this.addressFilter = streetAddress;
+
+    if (!this._placesService) {
+      // If Places service unavailable, just use the address filter
+      this.updateFiltersInUrl();
+      return;
+    }
+
+    // Get place details to also extract district
+    this._placesService.getDetails(
+      { placeId: suggestion.place_id, fields: ['address_components'] },
+      (place, status) => {
+        if (status === google.maps.places.PlacesServiceStatus.OK && place?.address_components) {
+          const district = this.extractDistrict(place.address_components);
+          if (district) {
+            this.selectedDistrict = district;
+          }
+        }
+        // Always update URL with address filter
+        this.updateFiltersInUrl();
+      }
+    );
+  }
+
+  onAddressInputBlur(): void {
+    // Small delay to allow click events on suggestions to fire first
+    setTimeout(() => {
+      this.showSuggestions = false;
+    }, 200);
+  }
+
+  private extractDistrict(components: google.maps.GeocoderAddressComponent[]): string | null {
+    if (!components) return null;
+
+    // Look for sector in various component types
+    for (const component of components) {
+      const name = component.long_name.toLowerCase();
+      if (name.includes('sector')) {
+        return this.normalizeDistrict(component.long_name);
+      }
+    }
+
+    // Check sublocality
+    const sublocality = components.find(c =>
+      c.types.includes('sublocality') || c.types.includes('sublocality_level_1')
+    );
+    if (sublocality && sublocality.long_name.toLowerCase().includes('sector')) {
+      return this.normalizeDistrict(sublocality.long_name);
+    }
+
+    return null;
+  }
+
+  private normalizeDistrict(district: string): string {
+    // Extract sector number (supports multi-digit for future expansion)
+    const match = district.match(/sector\w*\s*(\d+)/i);
+    if (match) {
+      return `Sector ${match[1]}`;
+    }
+    return district;
   }
 } 

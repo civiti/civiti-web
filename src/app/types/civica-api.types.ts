@@ -637,6 +637,7 @@ export interface IssueQueryParams {
   county?: string;
   city?: string;
   district?: string;
+  address?: string;
   status?: IssueStatus;
   sortBy?: string;
   sortDescending?: boolean;

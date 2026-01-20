@@ -1,31 +1,109 @@
 <div class="min-h-screen bg-background">
   <div class="container mx-auto p-4 max-w-6xl">
-    <!-- Filter/Sort Section -->
-    <div class="bg-white rounded-lg shadow-sm border border-platinum p-4 mb-6">
-      <nz-row [nzGutter]="16" nzAlign="middle">
-        <nz-col [nzXs]="24" [nzMd]="16">
-          <h2 class="text-oxford-blue font-semibold text-lg mb-2">
+    <!-- Issues Control Panel -->
+    <div class="issues-control-panel">
+      <!-- Header Row: Title + Sort -->
+      <div class="control-panel-header">
+        <div class="header-info">
+          <h2 class="text-oxford-blue font-semibold text-lg">
             {{ (totalIssues$ | async) || 0 }} probleme documentate
           </h2>
           <p class="text-oxford-blue opacity-75 text-sm" *ngIf="paginationInfo$ | async as pagination">
             <span *ngIf="pagination.totalCount > 0">
-              Se afișează {{ pagination.startItem }}-{{ pagination.endItem }} din {{ pagination.totalCount }} probleme
+              Se afișează {{ pagination.startItem }}-{{ pagination.endItem }} din {{ pagination.totalCount }}
             </span>
             <span *ngIf="pagination.totalCount === 0">
-              Alege o problemă și ajută la rezolvarea ei prin trimiterea unui email către autorități
+              Alege o problemă și ajută la rezolvarea ei
             </span>
           </p>
-        </nz-col>
-        
-        <nz-col [nzXs]="24" [nzMd]="8" class="text-right">
-          <nz-select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()" 
-                     nzPlaceHolder="Sortare" style="width: 200px;">
+        </div>
+        <div class="header-sort">
+          <nz-select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()"
+                     nzPlaceHolder="Sortare" style="width: 180px;">
             <nz-option nzValue="date" nzLabel="Cele mai noi"></nz-option>
             <nz-option nzValue="emails" nzLabel="Email-uri trimise"></nz-option>
             <nz-option nzValue="urgency" nzLabel="Urgență"></nz-option>
           </nz-select>
-        </nz-col>
-      </nz-row>
+        </div>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="control-panel-filters">
+        <nz-row [nzGutter]="[12, 12]" nzAlign="middle">
+          <!-- Address Search -->
+          <nz-col [nzXs]="24" [nzSm]="12" [nzMd]="8">
+            <div class="address-search-wrapper">
+              <nz-input-group [nzPrefix]="searchIcon" [nzSuffix]="suffixIcon" nzSize="default">
+                <input
+                  nz-input
+                  [formControl]="addressSearchControl"
+                  placeholder="Caută după adresă..."
+                  (blur)="onAddressInputBlur()"
+                  (keydown.enter)="onAddressSearch()"
+                />
+              </nz-input-group>
+              <ng-template #searchIcon>
+                <span nz-icon nzType="environment"></span>
+              </ng-template>
+              <ng-template #suffixIcon>
+                <span
+                  *ngIf="addressSearchControl.value"
+                  nz-icon
+                  nzType="close-circle"
+                  nzTheme="fill"
+                  class="ant-select-clear"
+                  (click)="clearAddressFilter()">
+                </span>
+              </ng-template>
+
+              <!-- Autocomplete dropdown -->
+              <div class="autocomplete-dropdown" *ngIf="showSuggestions && suggestions.length">
+                <div *ngFor="let s of suggestions"
+                     class="suggestion-item"
+                     (mousedown)="onAddressSuggestionSelected(s)">
+                  <span nz-icon nzType="environment"></span>
+                  {{ s.description }}
+                </div>
+              </div>
+            </div>
+          </nz-col>
+
+          <!-- Sector Filter -->
+          <nz-col [nzXs]="12" [nzSm]="6" [nzMd]="5">
+            <nz-select
+              [(ngModel)]="selectedDistrict"
+              (ngModelChange)="onDistrictChange()"
+              nzPlaceHolder="Sector"
+              nzAllowClear
+              nzSize="default"
+              style="width: 100%">
+              <nz-option *ngFor="let d of districts" [nzValue]="d" [nzLabel]="d"></nz-option>
+            </nz-select>
+          </nz-col>
+
+          <!-- Category Filter -->
+          <nz-col [nzXs]="12" [nzSm]="6" [nzMd]="5">
+            <nz-select
+              [(ngModel)]="selectedCategory"
+              (ngModelChange)="onCategoryChange()"
+              nzPlaceHolder="Categorie"
+              nzAllowClear
+              nzSize="default"
+              style="width: 100%">
+              <nz-option *ngFor="let c of categories" [nzValue]="c[0]" [nzLabel]="c[1]"></nz-option>
+            </nz-select>
+          </nz-col>
+
+          <!-- Clear Filters -->
+          <nz-col [nzXs]="24" [nzSm]="24" [nzMd]="6" class="clear-filters-col">
+            <button nz-button nzType="text" (click)="clearFilters()"
+                    *ngIf="hasActiveFilters()">
+              <span nz-icon nzType="close-circle"></span>
+              Șterge filtrele
+            </button>
+          </nz-col>
+        </nz-row>
+      </div>
     </div>
 
     <!-- Loading State -->

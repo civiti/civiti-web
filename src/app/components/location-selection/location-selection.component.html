@@ -62,7 +62,7 @@
           <nz-form-label nzRequired>Județ</nz-form-label>
           <nz-form-control>
             <nz-select formControlName="county" nzPlaceHolder="Selectează județul" nzShowSearch nzSize="large">
-              <nz-option nzValue="B" nzLabel="București"></nz-option>
+              <nz-option nzValue="B" [nzLabel]="defaultCity"></nz-option>
             </nz-select>
           </nz-form-control>
         </nz-form-item>
@@ -71,16 +71,7 @@
           <nz-form-label nzRequired>Oraș</nz-form-label>
           <nz-form-control>
             <nz-select formControlName="city" nzPlaceHolder="Selectează orașul" nzShowSearch nzSize="large">
-              <nz-option nzValue="BUCURESTI" nzLabel="București"></nz-option>
-            </nz-select>
-          </nz-form-control>
-        </nz-form-item>
-
-        <nz-form-item>
-          <nz-form-label nzRequired>Cartier/Sector</nz-form-label>
-          <nz-form-control>
-            <nz-select formControlName="district" nzPlaceHolder="Selectează sectorul" nzShowSearch nzSize="large">
-              <nz-option nzValue="SECTOR5" nzLabel="Sector 5"></nz-option>
+              <nz-option [nzValue]="defaultCity" [nzLabel]="defaultCity"></nz-option>
             </nz-select>
           </nz-form-control>
         </nz-form-item>
@@ -89,7 +80,7 @@
         <nz-alert
           nzType="info"
           nzMessage="Pentru MVP"
-          nzDescription="Momentan aplicația funcționează doar pentru București, Sectorul 5."
+          nzDescription="Momentan aplicația funcționează doar pentru București."
           nzShowIcon
           class="info-alert">
         </nz-alert>

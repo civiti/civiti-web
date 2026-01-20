@@ -115,18 +115,34 @@
 
     <!-- Current Location Display -->
     <div class="location-info" *ngIf="currentLocation">
-      <nz-card class="location-card">
+      <nz-card class="location-card" [class.location-error]="locationError" [class.location-generic]="isLocationGeneric()">
         <div class="location-content">
-          <span nz-icon nzType="environment" class="location-icon"></span>
+          <div class="location-icon-wrapper" [class.error]="locationError">
+            <span nz-icon nzType="environment" nzTheme="fill"></span>
+          </div>
           <div class="location-details">
-            <div class="location-label">Locație actuală</div>
+            <div class="location-label">Locație</div>
             <div class="location-address">{{ currentLocation.address }}</div>
-            <button nz-button nzType="link" nzSize="small" (click)="changeLocation()">
-              Schimbă locația
+            <div class="location-meta">
+              <nz-tag *ngIf="currentLocation.district" nzColor="processing">{{ currentLocation.district }}</nz-tag>
+              <span class="location-warning" *ngIf="isLocationGeneric()">
+                <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+                Adresă generică
+              </span>
+            </div>
+          </div>
+          <div class="location-action">
+            <button nz-button [nzType]="isLocationGeneric() ? 'primary' : 'default'" (click)="changeLocation()">
+              <span nz-icon nzType="edit" nzTheme="outline"></span>
+              {{ isLocationGeneric() ? 'Alege adresa' : 'Modifică' }}
             </button>
           </div>
         </div>
       </nz-card>
+      <div class="location-error-message" *ngIf="locationError">
+        <span nz-icon nzType="exclamation-circle" nzTheme="fill"></span>
+        {{ locationError }}
+      </div>
     </div>
 
     <!-- Navigation -->

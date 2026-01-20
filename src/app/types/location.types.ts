@@ -50,21 +50,25 @@ export interface LocationBiasConfig {
 }
 
 /**
- * Default location bias for Sector 5, Bucharest
- * Can be updated to expand coverage area
+ * Location bias for București (all sectors)
+ * 15km radius from city center covers all 6 sectors
  */
-export const SECTOR_5_LOCATION_BIAS: LocationBiasConfig = {
+export const BUCHAREST_LOCATION_BIAS: LocationBiasConfig = {
   center: {
-    lat: 44.4040,
-    lng: 26.0720
+    lat: 44.4268,
+    lng: 26.1025
   },
-  radius: 5000 // 5km radius
+  radius: 15000 // 15km radius covers all sectors
 };
 
 /**
- * Default map center for Sector 5, Bucharest
+ * Default map center for București
  */
-export const SECTOR_5_CENTER = {
-  lat: 44.4040,
-  lng: 26.0720
+export const BUCHAREST_CENTER = {
+  lat: 44.4268,
+  lng: 26.1025
 };
+
+// Backward compatibility aliases
+export const SECTOR_5_LOCATION_BIAS = BUCHAREST_LOCATION_BIAS;
+export const SECTOR_5_CENTER = BUCHAREST_CENTER;
