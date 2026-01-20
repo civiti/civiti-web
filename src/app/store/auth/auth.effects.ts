@@ -194,6 +194,8 @@ export class AuthEffects {
         AuthActions.registerWithEmailSuccess
       ),
       tap(({ user }) => {
+        // Clear issue creation data if a different user logs in
+        this.clearDataIfUserChanged(user.id);
         this.message.success(`Bine ai venit, ${user.displayName}!`);
         this.router.navigate(['/dashboard']);
       })
@@ -224,12 +226,16 @@ export class AuthEffects {
       switchMap(() =>
         this.authService.logout().pipe(
           tap(() => {
+            // Clear issue creation draft data to prevent data leakage between users
+            this.clearIssueCreationData();
             this.message.info('Ai fost deconectat');
             this.router.navigate(['/auth/register']);
           }),
           map(() => ({ type: '[Auth] Logout Complete' })),
           catchError(error => {
             console.error('Logout error:', error);
+            // Still clear draft data even on error to ensure privacy
+            this.clearIssueCreationData();
             this.router.navigate(['/auth/register']);
             return of({ type: '[Auth] Logout Error' });
           })
@@ -365,4 +371,33 @@ export class AuthEffects {
     ),
     { dispatch: false }
   );
+
+  /**
+   * Clear issue creation draft data from sessionStorage.
+   * Called on logout to prevent data leakage between users.
+   */
+  private clearIssueCreationData(): void {
+    sessionStorage.removeItem('civica_selected_category');
+    sessionStorage.removeItem('civica_uploaded_photos');
+    sessionStorage.removeItem('civica_current_location');
+    sessionStorage.removeItem('civica_complete_issue_data');
+    sessionStorage.removeItem('civica_selected_authorities');
+    sessionStorage.removeItem('civica_last_user_id');
+  }
+
+  /**
+   * Check if a different user is logging in and clear their draft data.
+   * Prevents one user from seeing another user's issue creation progress.
+   */
+  private clearDataIfUserChanged(newUserId: string): void {
+    const lastUserId = sessionStorage.getItem('civica_last_user_id');
+
+    if (lastUserId && lastUserId !== newUserId) {
+      console.log('[Auth] Different user detected, clearing issue creation data');
+      this.clearIssueCreationData();
+    }
+
+    // Store current user ID for future comparisons
+    sessionStorage.setItem('civica_last_user_id', newUserId);
+  }
 }

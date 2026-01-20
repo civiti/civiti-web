@@ -117,7 +117,123 @@
     <p>
       <span nz-icon nzType="lock"></span>
       Datele tale sunt protejate și nu vor fi partajate cu terți.
-      <a href="#" class="privacy-link">Citește politica de confidențialitate</a>
+      <a (click)="showPrivacyPolicy(); $event.preventDefault()" href="#" class="privacy-link">Citește politica de confidențialitate</a>
     </p>
   </div>
 </div>
+
+<!-- Privacy Policy Modal Template -->
+<ng-template #privacyPolicyTemplate>
+  <div class="policy-content">
+    <p>
+      Această politică descrie modul în care sunt colectate, utilizate și protejate datele cu caracter personal
+      ale utilizatorilor platformei <strong>Civiti</strong>, în conformitate cu Regulamentul (UE) 2016/679 (GDPR).
+    </p>
+
+    <h3>1. Cine suntem</h3>
+    <p>
+      Platforma <strong>Civiti</strong> este o inițiativă civică independentă pentru îmbunătățirea comunităților locale.<br>
+      Email de contact: <a href="mailto:contact&#64;civiti.ro">contact&#64;civiti.ro</a>
+    </p>
+
+    <h3>2. Ce date colectăm</h3>
+    <p>Colectăm doar datele strict necesare funcționării platformei:</p>
+    <ul>
+      <li>Nume și adresă de email (la crearea contului sau la trimiterea de sesizări)</li>
+      <li>Locația de rezidență (județ, oraș, sector - pentru a afișa probleme relevante)</li>
+      <li>Conținut furnizat de utilizatori (descrieri de probleme, fotografii încărcate)</li>
+      <li>Adresa IP și date tehnice (pentru securitate și funcționare)</li>
+    </ul>
+
+    <h3>3. Conținut public</h3>
+    <p>
+      Problemele publicate pe platformă (descrieri, fotografii, locații generale) sunt vizibile public.
+    </p>
+    <nz-alert
+      nzType="warning"
+      nzMessage="Utilizatorii sunt responsabili să nu publice date personale sensibile, date ale altor persoane fără consimțământ sau informații care pot încălca dreptul la viață privată."
+      nzShowIcon>
+    </nz-alert>
+    <p>
+      Administratorul își rezervă dreptul de a elimina conținutul care încalcă aceste reguli.
+    </p>
+
+    <h3>4. Scopul prelucrării datelor</h3>
+    <p>Datele sunt colectate și utilizate pentru:</p>
+    <ul>
+      <li>Crearea și administrarea conturilor de utilizator</li>
+      <li>Publicarea și gestionarea problemelor din comunitate</li>
+      <li>Facilitarea transmiterii de mesaje către autorități</li>
+      <li>Comunicarea cu utilizatorii</li>
+      <li>Îmbunătățirea platformei și securitatea acesteia</li>
+    </ul>
+
+    <h3>5. Temeiul legal</h3>
+    <p>Prelucrarea datelor se face în baza:</p>
+    <ul>
+      <li>Consimțământului utilizatorului</li>
+      <li>Interesului legitim al administratorului pentru funcționarea platformei</li>
+      <li>Obligațiilor legale aplicabile</li>
+    </ul>
+
+    <h3>6. Trimiterea de emailuri către autorități</h3>
+    <p>
+      Utilizatorii pot trimite emailuri către autorități folosind platforma sau propriul client de email.
+      Datele personale incluse în aceste mesaje sunt furnizate în mod voluntar de utilizator.
+    </p>
+    <p>
+      <em>Platforma nu este responsabilă pentru modul în care autoritățile prelucrează datele primite.</em>
+    </p>
+
+    <h3>7. Durata stocării</h3>
+    <p>Datele sunt păstrate:</p>
+    <ul>
+      <li>Pe durata existenței contului de utilizator</li>
+      <li>Sau până la solicitarea ștergerii acestora</li>
+      <li>Sau conform obligațiilor legale aplicabile</li>
+    </ul>
+
+    <h3>8. Drepturile utilizatorilor</h3>
+    <p>Conform GDPR, ai următoarele drepturi:</p>
+    <ul>
+      <li>Dreptul de acces la date</li>
+      <li>Dreptul de rectificare</li>
+      <li>Dreptul la ștergerea datelor („dreptul de a fi uitat")</li>
+      <li>Dreptul la restricționarea prelucrării</li>
+      <li>Dreptul de opoziție</li>
+      <li>Dreptul de a-ți retrage consimțământul</li>
+    </ul>
+    <p>
+      Solicitările pot fi trimise la: <a href="mailto:contact&#64;civiti.ro">contact&#64;civiti.ro</a>
+    </p>
+
+    <h3>9. Securitatea datelor</h3>
+    <p>
+      Aplicăm măsuri tehnice și organizatorice pentru protejarea datelor personale împotriva accesului
+      neautorizat, pierderii sau modificării acestora. Folosim criptare SSL/TLS pentru toate comunicațiile
+      și stocăm datele în servicii cloud securizate.
+    </p>
+
+    <h3>10. Cookie-uri</h3>
+    <p>
+      Platforma utilizează cookie-uri esențiale pentru funcționare (autentificare, preferințe de sesiune).
+      Nu folosim cookie-uri de tracking sau publicitate.
+    </p>
+
+    <h3>11. Fotografii încărcate</h3>
+    <p>
+      Pentru protejarea confidențialității, fotografiile încărcate sunt procesate automat pentru a elimina
+      metadatele EXIF (inclusiv locația GPS și informații despre dispozitiv) înainte de stocare.
+    </p>
+
+    <h3>12. Modificări</h3>
+    <p>
+      Ne rezervăm dreptul de a actualiza această politică. Versiunea actualizată va fi publicată pe platformă
+      și utilizatorii vor fi notificați prin email în cazul modificărilor semnificative.
+    </p>
+
+    <p class="policy-footer">
+      <em>Ultima actualizare: Ianuarie 2025</em>
+    </p>
+  </div>
+</ng-template>

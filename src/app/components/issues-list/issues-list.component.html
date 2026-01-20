@@ -115,7 +115,7 @@
     <!-- Issues Grid -->
     <nz-row *ngIf="!(isLoading$ | async)" [nzGutter]="[16, 16]">
       <nz-col *ngFor="let issue of issues$ | async" [nzXs]="24" [nzMd]="12" [nzLg]="8">
-        <nz-card class="issue-card cursor-pointer hover:shadow-lg transition-all duration-300"
+        <nz-card class="issue-card cursor-pointer"
                  (click)="viewIssueDetails(issue.id)"
                  [nzCover]="coverTemplate">
           <nz-card-meta 

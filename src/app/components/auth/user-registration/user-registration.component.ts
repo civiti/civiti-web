@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -19,6 +19,7 @@ import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzDividerModule } from 'ng-zorro-antd/divider';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzStepsModule } from 'ng-zorro-antd/steps';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 
 import { AppState } from '../../../store/app.state';
 import * as AuthActions from '../../../store/auth/auth.actions';
@@ -77,13 +78,17 @@ interface RegistrationData {
     NzSpinModule,
     NzDividerModule,
     NzTypographyModule,
-    NzStepsModule
+    NzStepsModule,
+    NzModalModule
   ],
   templateUrl: './user-registration.component.html',
   styleUrls: ['./user-registration.component.scss']
 })
 export class UserRegistrationComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
+
+  @ViewChild('privacyPolicyTemplate') privacyPolicyTemplate!: TemplateRef<void>;
+  @ViewChild('termsTemplate') termsTemplate!: TemplateRef<void>;
 
   registrationForm!: FormGroup;
   currentStep = 0;
@@ -107,7 +112,8 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private store: Store<AppState>,
     private router: Router,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private modal: NzModalService
   ) {
     this.isLoading$ = this.store.select(selectAuthLoading);
     this.error$ = this.store.select(selectAuthError);
@@ -295,5 +301,45 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
       // Default to dashboard for direct registration
       this.router.navigate(['/dashboard']);
     }
+  }
+
+  showPrivacyPolicy(): void {
+    const modalRef = this.modal.create({
+      nzTitle: 'Politica de Confidențialitate',
+      nzContent: this.privacyPolicyTemplate,
+      nzWidth: 700,
+      nzCentered: true,
+      nzFooter: [
+        {
+          label: 'Am înțeles',
+          type: 'primary',
+          onClick: () => modalRef.close()
+        }
+      ],
+      nzBodyStyle: {
+        'max-height': '60vh',
+        'overflow-y': 'auto'
+      }
+    });
+  }
+
+  showTermsAndConditions(): void {
+    const modalRef = this.modal.create({
+      nzTitle: 'Termeni și Condiții',
+      nzContent: this.termsTemplate,
+      nzWidth: 700,
+      nzCentered: true,
+      nzFooter: [
+        {
+          label: 'Am înțeles',
+          type: 'primary',
+          onClick: () => modalRef.close()
+        }
+      ],
+      nzBodyStyle: {
+        'max-height': '60vh',
+        'overflow-y': 'auto'
+      }
+    });
   }
 }

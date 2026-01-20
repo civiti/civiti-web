@@ -358,3 +358,50 @@
     }
   }
 }
+
+// Policy modal content styling
+.policy-content {
+  font-family: 'Fira Sans', sans-serif;
+  color: var(--oxford-blue);
+  line-height: 1.6;
+
+  h3 {
+    color: var(--oxford-blue);
+    margin-top: 24px;
+    margin-bottom: 12px;
+    font-size: 1rem;
+    font-weight: 600;
+  }
+
+  p {
+    margin-bottom: 12px;
+  }
+
+  ul {
+    margin-left: 20px;
+    margin-top: 8px;
+    margin-bottom: 12px;
+
+    li {
+      margin-bottom: 4px;
+    }
+  }
+
+  a {
+    color: var(--orange-web);
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  nz-alert {
+    margin: 12px 0;
+  }
+
+  .policy-footer {
+    margin-top: 24px;
+    color: #666;
+    font-size: 12px;
+  }
+}

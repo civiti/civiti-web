@@ -122,22 +122,34 @@
 }
 
 .issue-card {
+  position: relative;
   border: 1px solid var(--platinum);
-  transition: box-shadow 0.3s ease; // Only animate shadow, not transform
 
-  &:hover {
-    // Remove transform to prevent button hover flickering
+  // Use pseudo-element for hover shadow to prevent flickering
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
     box-shadow: 0 12px 32px rgba(20, 33, 61, 0.15);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none; // Don't interfere with hover detection
+    z-index: -1;
+  }
+
+  &:hover::after {
+    opacity: 1;
   }
 
   // Prevent hover conflicts with buttons
   button {
+    position: relative;
     transition: all 0.2s ease;
-    // Add padding to increase hover area and prevent flickering
     margin: 4px 0;
 
     &:hover {
-      transform: translateY(-1px); // Subtle lift effect only on button
+      transform: translateY(-1px);
       box-shadow: 0 4px 12px rgba(252, 163, 17, 0.3);
     }
   }
