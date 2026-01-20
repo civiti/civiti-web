@@ -273,7 +273,7 @@
               <nz-form-item>
                 <nz-form-control [nzSpan]="24">
                   <label nz-checkbox formControlName="agreeToTerms" class="terms-checkbox">
-                    Sunt de acord cu <a href="/terms" target="_blank">Termenii și condițiile</a>
+                    Sunt de acord cu <a (click)="showTermsAndConditions(); $event.preventDefault()" href="#">Termenii și condițiile</a>
                   </label>
                 </nz-form-control>
               </nz-form-item>
@@ -281,7 +281,7 @@
               <nz-form-item>
                 <nz-form-control [nzSpan]="24">
                   <label nz-checkbox formControlName="agreeToPrivacy" class="terms-checkbox">
-                    Sunt de acord cu <a href="/privacy" target="_blank">Politica de confidențialitate</a>
+                    Sunt de acord cu <a (click)="showPrivacyPolicy(); $event.preventDefault()" href="#">Politica de confidențialitate</a>
                   </label>
                 </nz-form-control>
               </nz-form-item>

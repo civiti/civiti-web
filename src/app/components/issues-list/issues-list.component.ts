@@ -315,7 +315,7 @@ export class IssuesListComponent implements OnInit, OnDestroy {
           this._router.navigate(['/create-issue']);
         } else {
           // Show auth modal for unauthenticated users
-          this._modal.create({
+          const modalRef = this._modal.create({
             nzTitle: 'Conectare necesară pentru crearea unei probleme',
             nzContent: 'Pentru a raporta o problemă nouă, este necesar să ai un cont. Poți să te conectezi dacă ai deja unul sau să îți creezi un cont nou.',
             nzFooter: [
@@ -323,23 +323,23 @@ export class IssuesListComponent implements OnInit, OnDestroy {
                 label: 'Mai târziu',
                 type: 'text',
                 onClick: () => {
-                  // Modal closes automatically
+                  modalRef.close();
                 }
               },
               {
                 label: 'Am deja cont',
                 type: 'default',
                 onClick: () => {
+                  modalRef.close();
                   this._router.navigate(['/auth/login'], { queryParams: { returnUrl: '/create-issue' } });
-                  return Promise.resolve();
                 }
               },
               {
                 label: 'Creează cont nou',
                 type: 'primary',
                 onClick: () => {
+                  modalRef.close();
                   this._router.navigate(['/auth/register'], { queryParams: { returnUrl: '/create-issue' } });
-                  return Promise.resolve();
                 }
               }
             ],
