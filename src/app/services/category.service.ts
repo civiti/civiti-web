@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, of, BehaviorSubject } from 'rxjs';
-import { tap, shareReplay, map } from 'rxjs/operators';
+import { tap, shareReplay, map, catchError, finalize } from 'rxjs/operators';
 import { ApiService } from './api.service';
 import { CategoryResponse } from '../types/civica-api.types';
 
@@ -27,6 +27,16 @@ export class CategoryService {
   private loaded = false;
   private loading$: Observable<CategoryResponse[]> | null = null;
 
+  /** Fallback labels used when categories haven't been loaded from backend yet */
+  private static readonly FALLBACK_LABELS: Record<string, string> = {
+    'Infrastructure': 'Infrastructură',
+    'Environment': 'Mediu',
+    'Transportation': 'Transport',
+    'PublicServices': 'Servicii Publice',
+    'Safety': 'Siguranță',
+    'Other': 'Altele'
+  };
+
   constructor(private apiService: ApiService) {}
 
   /**
@@ -45,6 +55,14 @@ export class CategoryService {
       tap(categories => {
         this.categories$.next(categories);
         this.loaded = true;
+      }),
+      catchError(error => {
+        console.error('[CategoryService] Failed to load categories:', error);
+        // Return empty array on error, allowing retry on next call
+        return of([]);
+      }),
+      finalize(() => {
+        // Always reset loading$ so subsequent calls can retry
         this.loading$ = null;
       }),
       shareReplay(1)
@@ -68,11 +86,16 @@ export class CategoryService {
   }
 
   /**
-   * Get category label by value (English ID -> Romanian label)
+   * Get category label by value (English ID -> Romanian label).
+   * Uses cached value if available, falls back to static map if not loaded yet.
    */
   getCategoryLabel(value: string): string {
     const category = this.categories$.value.find(c => c.value === value);
-    return category?.label || value;
+    if (category) {
+      return category.label;
+    }
+    // Fallback to static labels if categories not loaded yet
+    return CategoryService.FALLBACK_LABELS[value] || value;
   }
 
   /**
