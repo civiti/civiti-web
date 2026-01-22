@@ -21,7 +21,7 @@
           <nz-select [(ngModel)]="sortBy" (ngModelChange)="onSortChange()"
                      nzPlaceHolder="Sortare" style="width: 180px;">
             <nz-option nzValue="date" nzLabel="Cele mai noi"></nz-option>
-            <nz-option nzValue="emails" nzLabel="Email-uri trimise"></nz-option>
+            <nz-option nzValue="emails" nzLabel="Contribuții"></nz-option>
             <nz-option nzValue="urgency" nzLabel="Urgență"></nz-option>
           </nz-select>
         </div>
@@ -165,7 +165,7 @@
               <div class="email-counter">
                 <nz-statistic 
                   [nzValue]="issue.emailsSent" 
-                  [nzTitle]="'email-uri trimise'"
+                  [nzTitle]="'contribuții'"
                   [nzPrefix]="emailIcon"
                   class="email-counter-stat">
                 </nz-statistic>
