@@ -225,32 +225,33 @@
         </nz-card>
 
         <!-- Recent Activity -->
-        <nz-card nzTitle="Activitate recentă" class="activity-card">
-          <nz-list 
-            [nzDataSource]="mockActivity" 
-            [nzRenderItem]="activityItem"
-            [nzLoading]="false">
-            <ng-template #activityItem let-item>
-              <nz-list-item>
-                <nz-list-item-meta
-                  [nzAvatar]="activityAvatar"
-                  [nzTitle]="item.title"
-                  [nzDescription]="item.description">
-                  <ng-template #activityAvatar>
-                    <nz-avatar [nzIcon]="item.icon" [style.backgroundColor]="item.color"></nz-avatar>
-                  </ng-template>
-                </nz-list-item-meta>
-                <div class="activity-time">{{ item.time }}</div>
-              </nz-list-item>
-            </ng-template>
-          </nz-list>
-          
-          <div *ngIf="mockActivity.length === 0" class="empty-activity">
-            <nz-empty 
-              nzNotFoundImage="simple" 
+        <nz-card nzTitle="Activitate recentă" class="activity-card" [nzLoading]="(activityLoading$ | async) || false">
+          <ng-container *ngIf="recentActivity$ | async as activities">
+            <nz-list
+              *ngIf="activities.length > 0"
+              [nzDataSource]="activities"
+              [nzRenderItem]="activityItem">
+              <ng-template #activityItem let-item>
+                <nz-list-item>
+                  <nz-list-item-meta
+                    [nzAvatar]="activityAvatar"
+                    [nzTitle]="item.message"
+                    [nzDescription]="item.issueTitle">
+                    <ng-template #activityAvatar>
+                      <nz-avatar [nzIcon]="item.type | activityIcon" [style.backgroundColor]="item.type | activityColor"></nz-avatar>
+                    </ng-template>
+                  </nz-list-item-meta>
+                  <div class="activity-time">{{ item.createdAt | date:'short' }}</div>
+                </nz-list-item>
+              </ng-template>
+            </nz-list>
+
+            <nz-empty
+              *ngIf="activities.length === 0"
+              nzNotFoundImage="simple"
               nzNotFoundContent="Nicio activitate recentă. Începe prin a raporta o problemă!">
             </nz-empty>
-          </div>
+          </ng-container>
         </nz-card>
 
       </div>
@@ -292,24 +293,24 @@
             <div
               *ngFor="let achievement of achievements.slice(0, 3)"
               class="achievement-item">
-              <div class="achievement-info">
+              <div class="achievement-header">
                 <h5>{{ achievement.titleRo }}</h5>
-                <p>{{ achievement.descriptionRo }}</p>
+                <div class="achievement-progress">
+                  <nz-progress
+                    [nzPercent]="achievement.percentageComplete"
+                    nzStrokeColor="#FCA311"
+                    nzSize="small"
+                    [nzShowInfo]="false">
+                  </nz-progress>
+                  <span class="progress-text">{{ achievement.progress }}/{{ achievement.maxProgress }}</span>
+                </div>
               </div>
-              <div class="achievement-progress">
-                <nz-progress 
-                  [nzPercent]="achievement.percentageComplete"
-                  nzStrokeColor="#FCA311"
-                  nzSize="small"
-                  [nzShowInfo]="false">
-                </nz-progress>
-                <span class="progress-text">{{ achievement.progress }}/{{ achievement.maxProgress }}</span>
-              </div>
+              <p class="achievement-description">{{ achievement.descriptionRo }}</p>
             </div>
           </div>
           <ng-template #noAchievements>
-            <nz-empty 
-              nzNotFoundImage="simple" 
+            <nz-empty
+              nzNotFoundImage="simple"
               nzNotFoundContent="Toate realizările completate! Bună treabă!">
             </nz-empty>
           </ng-template>

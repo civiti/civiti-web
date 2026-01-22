@@ -23,11 +23,14 @@ import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
 import { NzMenuModule } from 'ng-zorro-antd/menu';
 
 import { StatusTextPipe, StatusColorPipe } from '../../../pipes/status.pipe';
+import { ActivityIconPipe, ActivityColorPipe } from '../../../pipes/activity.pipe';
 import { AppState } from '../../../store/app.state';
 import * as AuthActions from '../../../store/auth/auth.actions';
 import * as UserActions from '../../../store/user/user.actions';
 import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
 import * as UserIssuesSelectors from '../../../store/user-issues/user-issues.selectors';
+import * as ActivityActions from '../../../store/activity/activity.actions';
+import * as ActivitySelectors from '../../../store/activity/activity.selectors';
 import { AuthUser } from '../../../store/auth/auth.state';
 import {
   selectAuthUser,
@@ -38,7 +41,8 @@ import {
 } from '../../../store/user/user.state';
 import {
   BadgeResponse,
-  IssueItem
+  IssueItem,
+  ActivityFeedItem
 } from '../../../types/civica-api.types';
 
 // Interface for user statistics from gamification data
@@ -79,7 +83,9 @@ import {
     NzDropDownModule,
     NzMenuModule,
     StatusTextPipe,
-    StatusColorPipe
+    StatusColorPipe,
+    ActivityIconPipe,
+    ActivityColorPipe
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -104,30 +110,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
   userIssuesLoading$!: Observable<boolean>;
   hasUserIssues$!: Observable<boolean>;
 
-  // Mock data for demonstration
-  mockActivity = [
-    {
-      title: 'Raportul despre groapă a primit 5 noi susținători',
-      description: 'Problemă #ISS-001 - Trotuar deteriorat pe Strada Libertății',
-      icon: 'like',
-      color: '#FCA311',
-      time: 'Acum 2 ore'
-    },
-    {
-      title: 'Iluminat stradal defect marcat "În curs"',
-      description: 'Problemă #ISS-002 - Raportul dumneavoastră este în curs de soluționare',
-      icon: 'tool',
-      color: '#28A745',
-      time: 'Acum 1 zi'
-    },
-    {
-      title: 'Comentariu nou la problema curățeniei parcului',
-      description: 'Un membru al comunității a furnizat informații suplimentare',
-      icon: 'message',
-      color: '#14213D',
-      time: 'Acum 2 zile'
-    }
-  ];
+  // Activity Observables
+  recentActivity$!: Observable<ActivityFeedItem[]>;
+  activityLoading$!: Observable<boolean>;
 
 
   constructor(
@@ -150,6 +135,10 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.recentUserIssues$ = this.store.select(UserIssuesSelectors.selectRecentUserIssues);
     this.userIssuesLoading$ = this.store.select(UserIssuesSelectors.selectUserIssuesLoading);
     this.hasUserIssues$ = this.store.select(UserIssuesSelectors.selectHasUserIssues);
+
+    // Activity observables
+    this.recentActivity$ = this.store.select(ActivitySelectors.selectRecentActivities);
+    this.activityLoading$ = this.store.select(ActivitySelectors.selectActivityLoading);
   }
 
   ngOnInit(): void {
@@ -163,6 +152,9 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
         // Load user's own issues
         this.store.dispatch(UserIssuesActions.loadUserIssues({}));
+
+        // Load user's activity feed
+        this.store.dispatch(ActivityActions.loadMyActivity({ params: { pageSize: 5 } }));
       }
     });
   }

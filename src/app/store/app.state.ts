@@ -4,6 +4,7 @@ import { UIState } from './ui/ui.state';
 import { AuthState } from './auth/auth.state';
 import { UserState } from './user/user.state';
 import { UserIssuesState } from './user-issues/user-issues.state';
+import { ActivityState } from './activity/activity.state';
 
 export interface AppState {
   issues: IssueState;
@@ -12,4 +13,5 @@ export interface AppState {
   auth: AuthState;
   user: UserState;
   userIssues: UserIssuesState;
+  activity: ActivityState;
 }

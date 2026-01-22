@@ -36,7 +36,9 @@ import {
   ActivityLogQueryParams,
   EnhanceTextRequest,
   EnhanceTextResponse,
-  CategoryResponse
+  CategoryResponse,
+  ActivityFeedItem,
+  ActivityQueryParams
 } from '../types/civica-api.types';
 
 @Injectable({
@@ -309,5 +311,43 @@ export class ApiService {
     }
 
     return this.http.get<PagedResult<AdminActivityLogEntry>>(`${this.baseUrl}/admin/actions`, { params: httpParams });
+  }
+
+  // ============================================
+  // Activity Feed Endpoints
+  // ============================================
+
+  /**
+   * Get public activity feed
+   * GET /api/activity
+   */
+  getPublicActivity(params?: ActivityQueryParams): Observable<PagedResult<ActivityFeedItem>> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        const value = params[key as keyof ActivityQueryParams];
+        if (value !== undefined && value !== null) {
+          httpParams = httpParams.set(key, value.toString());
+        }
+      });
+    }
+    return this.http.get<PagedResult<ActivityFeedItem>>(`${this.baseUrl}/activity`, { params: httpParams });
+  }
+
+  /**
+   * Get user's issues activity (requires auth)
+   * GET /api/activity/my
+   */
+  getMyActivity(params?: ActivityQueryParams): Observable<PagedResult<ActivityFeedItem>> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        const value = params[key as keyof ActivityQueryParams];
+        if (value !== undefined && value !== null) {
+          httpParams = httpParams.set(key, value.toString());
+        }
+      });
+    }
+    return this.http.get<PagedResult<ActivityFeedItem>>(`${this.baseUrl}/activity/my`, { params: httpParams });
   }
 }

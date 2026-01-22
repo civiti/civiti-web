@@ -29,13 +29,14 @@ import { LocationEffects } from './store/location/location.effects';
 import { AuthEffects } from './store/auth/auth.effects';
 import { UserEffects } from './store/user/user.effects';
 import { UserIssuesEffects } from './store/user-issues/user-issues.effects';
+import { ActivityEffects } from './store/activity/activity.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideStore(reducers),
-    provideEffects([IssueEffects, LocationEffects, AuthEffects, UserEffects, UserIssuesEffects]),
+    provideEffects([IssueEffects, LocationEffects, AuthEffects, UserEffects, UserIssuesEffects, ActivityEffects]),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: !isDevMode(),

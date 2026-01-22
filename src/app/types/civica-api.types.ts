@@ -834,5 +834,38 @@ export const API_ENDPOINTS = {
   REQUEST_CHANGES: (id: string) => `/api/admin/issues/${id}/request-changes`,
   BULK_APPROVE: '/api/admin/issues/bulk-approve',
   ADMIN_STATS: '/api/admin/statistics',
-  ADMIN_ACTIONS: '/api/admin/actions'
+  ADMIN_ACTIONS: '/api/admin/actions',
+
+  // Activity Feed
+  ACTIVITY: '/activity',
+  ACTIVITY_MY: '/activity/my'
 } as const;
+
+// ============================================
+// Activity Feed Types
+// ============================================
+
+export type ActivityType =
+  | 'newSupporters'
+  | 'statusChange'
+  | 'issueApproved'
+  | 'issueResolved'
+  | 'issueCreated';
+
+export interface ActivityFeedItem {
+  id: string;
+  type: ActivityType;
+  issueId: string;
+  issueTitle: string;
+  message: string;
+  aggregatedCount: number;
+  actorDisplayName: string | null;
+  createdAt: string;
+}
+
+export interface ActivityQueryParams {
+  page?: number;
+  pageSize?: number;
+  type?: ActivityType;
+  since?: string; // ISO 8601
+}
