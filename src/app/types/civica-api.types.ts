@@ -837,8 +837,8 @@ export const API_ENDPOINTS = {
   ADMIN_ACTIONS: '/api/admin/actions',
 
   // Activity Feed
-  ACTIVITY: '/activity',
-  ACTIVITY_MY: '/activity/my'
+  ACTIVITY: '/api/activity',
+  ACTIVITY_MY: '/api/activity/my'
 } as const;
 
 // ============================================
