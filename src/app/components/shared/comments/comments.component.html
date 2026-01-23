@@ -55,10 +55,10 @@
     <span>Autentifică-te pentru a adăuga un comentariu.</span>
   </div>
 
-  <!-- Closed issue message -->
+  <!-- Status-specific message when comments are disabled -->
   <div *ngIf="!canComment && issueStatus" class="closed-message">
     <i nz-icon nzType="info-circle" nzTheme="outline"></i>
-    <span>Această problemă este închisă. Nu se mai acceptă comentarii noi.</span>
+    <span>{{ commentDisabledMessage }}</span>
   </div>
 
   <!-- Comments List -->

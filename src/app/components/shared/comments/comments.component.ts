@@ -65,6 +65,26 @@ export class CommentsComponent implements OnInit, OnDestroy {
     return status === 'active';
   }
 
+  get commentDisabledMessage(): string {
+    const status = (this.issueStatus || '').toLowerCase();
+    switch (status) {
+      case 'draft':
+        return 'Problema este în stadiu de ciornă. Comentariile vor fi disponibile după publicare.';
+      case 'submitted':
+        return 'Problema este în curs de verificare. Comentariile vor fi disponibile după aprobare.';
+      case 'underreview':
+        return 'Problema este în analiză. Comentariile vor fi disponibile după aprobare.';
+      case 'resolved':
+        return 'Această problemă a fost rezolvată. Nu se mai acceptă comentarii noi.';
+      case 'closed':
+        return 'Această problemă este închisă. Nu se mai acceptă comentarii noi.';
+      case 'rejected':
+        return 'Această problemă a fost respinsă. Nu se mai acceptă comentarii.';
+      default:
+        return 'Comentariile nu sunt disponibile pentru această problemă.';
+    }
+  }
+
   ngOnInit(): void {
     // Initialize selectors
     this.commentTree$ = this.store.select(CommentsSelectors.selectCommentTree);

@@ -72,14 +72,6 @@ export class CommentItemComponent {
     });
   }
 
-  get indentStyle(): { [key: string]: string } {
-    // Cap visual indent at depth 5
-    const visualDepth = Math.min(this.comment.depth, 5);
-    return {
-      'margin-left': `${visualDepth * 24}px`
-    };
-  }
-
   onReplyClick(): void {
     if (this.isReplying) {
       this.setReplying.emit(null);
