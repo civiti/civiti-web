@@ -11,7 +11,7 @@
       </h3>
     </div>
 
-    @if ((totalCount$ | async) ?? 0 > 0) {
+    @if (((totalCount$ | async) ?? 0) > 0) {
       <div class="header-right">
         <nz-select
           [(ngModel)]="sortValue"
@@ -45,8 +45,8 @@
     ></nz-alert>
   }
 
-  <!-- New Comment Form (only for authenticated users on active issues) -->
-  @if ((isAuthenticated$ | async) && canComment) {
+  <!-- New Comment Form (only for authenticated users on active issues, hidden while loading) -->
+  @if ((isAuthenticated$ | async) && canComment && !(loading$ | async)) {
     <div class="new-comment-section">
       <app-comment-form
         [submitting]="(submitting$ | async) ?? false"
@@ -58,8 +58,8 @@
     </div>
   }
 
-  <!-- Login prompt for unauthenticated users -->
-  @if (!(isAuthenticated$ | async) && canComment) {
+  <!-- Login prompt for unauthenticated users (hidden while loading) -->
+  @if (!(isAuthenticated$ | async) && canComment && !(loading$ | async)) {
     <div class="login-prompt">
       <i nz-icon nzType="lock" nzTheme="outline"></i>
       <span>Autentifică-te pentru a adăuga un comentariu.</span>
