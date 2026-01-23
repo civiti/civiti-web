@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, catchError, switchMap, mergeMap, exhaustMap, tap } from 'rxjs/operators';
+import { map, catchError, switchMap, exhaustMap, mergeMap, tap, groupBy } from 'rxjs/operators';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ApiService } from '../../services/api.service';
 import * as CommentsActions from './comments.actions';
@@ -81,15 +81,22 @@ export class CommentsEffects {
     )
   );
 
+  // Use groupBy + exhaustMap to allow concurrent votes on different comments
+  // while preventing duplicate votes on the same comment
   voteHelpful$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CommentsActions.voteHelpful),
-      mergeMap((action) =>
-        this.apiService.voteCommentHelpful(action.commentId).pipe(
-          map(() => CommentsActions.voteHelpfulSuccess({ commentId: action.commentId })),
-          catchError(error => of(CommentsActions.voteHelpfulFailure({
-            error: error.message || 'Eroare la votare'
-          })))
+      groupBy(action => action.commentId),
+      mergeMap(group$ =>
+        group$.pipe(
+          exhaustMap((action) =>
+            this.apiService.voteCommentHelpful(action.commentId).pipe(
+              map(() => CommentsActions.voteHelpfulSuccess({ commentId: action.commentId })),
+              catchError(error => of(CommentsActions.voteHelpfulFailure({
+                error: error.message || 'Eroare la votare'
+              })))
+            )
+          )
         )
       )
     )
@@ -98,12 +105,17 @@ export class CommentsEffects {
   removeVote$ = createEffect(() =>
     this.actions$.pipe(
       ofType(CommentsActions.removeVote),
-      mergeMap((action) =>
-        this.apiService.removeCommentVote(action.commentId).pipe(
-          map(() => CommentsActions.removeVoteSuccess({ commentId: action.commentId })),
-          catchError(error => of(CommentsActions.removeVoteFailure({
-            error: error.message || 'Eroare la anularea votului'
-          })))
+      groupBy(action => action.commentId),
+      mergeMap(group$ =>
+        group$.pipe(
+          exhaustMap((action) =>
+            this.apiService.removeCommentVote(action.commentId).pipe(
+              map(() => CommentsActions.removeVoteSuccess({ commentId: action.commentId })),
+              catchError(error => of(CommentsActions.removeVoteFailure({
+                error: error.message || 'Eroare la anularea votului'
+              })))
+            )
+          )
         )
       )
     )
