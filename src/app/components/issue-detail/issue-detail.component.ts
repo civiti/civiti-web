@@ -27,6 +27,7 @@ import { EmailModalComponent } from './email-modal.component';
 import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
 import { GoogleMapsConfigService } from '../../services/google-maps-config.service';
 import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
+import { CommentsComponent } from '../shared/comments/comments.component';
 
 @Component({
     selector: 'app-issue-detail',
@@ -51,6 +52,7 @@ import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
         MapInfoWindow,
         StatusTextPipe,
         StatusColorPipe,
+        CommentsComponent,
     ],
     templateUrl: './issue-detail.component.html',
     styleUrl: './issue-detail.component.scss'

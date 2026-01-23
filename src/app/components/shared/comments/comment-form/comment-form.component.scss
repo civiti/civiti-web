@@ -1,0 +1,50 @@
+.comment-form {
+  margin-top: 1rem;
+
+  &.reply-form {
+    margin-top: 0.5rem;
+    padding-left: 0;
+  }
+
+  &.edit-form {
+    margin-top: 0;
+  }
+
+  textarea {
+    width: 100%;
+    border-radius: 8px;
+    resize: none;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 0.5rem;
+
+    .char-count {
+      font-size: 0.75rem;
+      color: var(--oxford-blue);
+      opacity: 0.6;
+
+      &.warning {
+        color: var(--orange-web);
+        opacity: 1;
+      }
+
+      &.danger {
+        color: #ff4d4f;
+        opacity: 1;
+      }
+    }
+
+    .buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+  }
+}
+
+::ng-deep .ant-input-textarea-show-count::after {
+  display: none;
+}

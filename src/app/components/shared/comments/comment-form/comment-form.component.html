@@ -1,0 +1,40 @@
+<div class="comment-form" [class.reply-form]="isReply" [class.edit-form]="isEdit">
+  <nz-textarea-count [nzMaxCharacterCount]="maxLength">
+    <textarea
+      nz-input
+      [(ngModel)]="content"
+      [placeholder]="placeholder"
+      [nzAutosize]="{ minRows: isReply ? 2 : 3, maxRows: 8 }"
+      [maxlength]="maxLength"
+      [disabled]="submitting"
+    ></textarea>
+  </nz-textarea-count>
+
+  <div class="form-actions">
+    <span class="char-count" [class.warning]="remainingChars < 100" [class.danger]="remainingChars < 20">
+      {{ remainingChars }} caractere rămase
+    </span>
+    <div class="buttons">
+      <button
+        *ngIf="isReply || isEdit"
+        nz-button
+        nzSize="small"
+        (click)="onCancel()"
+        [disabled]="submitting"
+      >
+        Anulează
+      </button>
+      <button
+        nz-button
+        nzType="primary"
+        nzSize="small"
+        [disabled]="!isValid || submitting"
+        [nzLoading]="submitting"
+        (click)="onSubmit()"
+      >
+        <i *ngIf="!submitting" nz-icon nzType="send" nzTheme="outline"></i>
+        {{ submitLabel }}
+      </button>
+    </div>
+  </div>
+</div>

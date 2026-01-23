@@ -869,3 +869,51 @@ export interface ActivityQueryParams {
   type?: ActivityType;
   since?: string; // ISO 8601
 }
+
+// ============================================
+// Comment Types
+// ============================================
+
+export interface CommentUserResponse {
+  id: string;
+  displayName: string;
+  photoUrl: string | null;
+  level: number;
+}
+
+export interface CommentResponse {
+  id: string;
+  issueId: string;
+  content: string;
+  helpfulCount: number;
+  isEdited: boolean;
+  isDeleted: boolean;
+  createdAt: string;
+  updatedAt: string;
+  parentCommentId: string | null;  // null = top-level, GUID = reply
+  replyCount: number;
+  user: CommentUserResponse;
+  hasVoted: boolean;
+}
+
+/** For UI tree rendering (frontend-only) */
+export interface CommentNode extends CommentResponse {
+  children: CommentNode[];
+  depth: number;
+}
+
+export interface CreateCommentRequest {
+  content: string;
+  parentCommentId?: string | null;
+}
+
+export interface UpdateCommentRequest {
+  content: string;
+}
+
+export interface CommentQueryParams {
+  page?: number;
+  pageSize?: number;
+  sortBy?: 'date' | 'helpful';
+  sortDescending?: boolean;
+}

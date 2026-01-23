@@ -1,0 +1,142 @@
+.comment-item {
+  position: relative;
+
+  &::before {
+    content: '';
+    position: absolute;
+    left: 16px;
+    top: 48px;
+    bottom: 0;
+    width: 2px;
+    background-color: var(--platinum);
+  }
+
+  // Hide line for items without children
+  &:last-child::before {
+    display: none;
+  }
+}
+
+// Override nz-comment styles
+::ng-deep .ant-comment {
+  background: transparent;
+
+  .ant-comment-inner {
+    padding: 12px 0;
+  }
+
+  .ant-comment-content-author {
+    margin-bottom: 4px;
+  }
+
+  .ant-comment-content-author-name {
+    color: var(--oxford-blue);
+    font-weight: 500;
+  }
+
+  .ant-comment-content-author-time {
+    color: var(--oxford-blue);
+    opacity: 0.6;
+    font-size: 0.75rem;
+  }
+
+  .ant-comment-actions {
+    margin-top: 8px;
+
+    > li {
+      margin-right: 8px;
+    }
+  }
+}
+
+.author-name {
+  font-weight: 500;
+  color: var(--oxford-blue);
+}
+
+.level-badge {
+  margin-left: 6px;
+  vertical-align: middle;
+
+  ::ng-deep .ant-badge-count {
+    min-width: 18px;
+    height: 18px;
+    line-height: 18px;
+    border-radius: 9px;
+    padding: 0 4px;
+  }
+}
+
+.edited-tag {
+  margin-left: 8px;
+  font-size: 0.75rem;
+  color: var(--oxford-blue);
+  opacity: 0.5;
+  font-style: italic;
+}
+
+.comment-content {
+  color: var(--oxford-blue);
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  margin: 0;
+
+  &.deleted {
+    color: var(--oxford-blue);
+    opacity: 0.5;
+    font-style: italic;
+  }
+}
+
+// Action buttons
+.action-btn {
+  font-size: 11px;
+  color: var(--oxford-blue);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  user-select: none;
+
+  i {
+    margin-right: 3px;
+    font-size: 11px;
+  }
+
+  &:hover:not(.disabled) {
+    opacity: 1;
+  }
+
+  &.voted,
+  &.active {
+    opacity: 1;
+    color: var(--orange-web);
+  }
+
+  &.disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+  }
+
+  &.danger:hover:not(.disabled) {
+    color: #ff4d4f;
+  }
+}
+
+.reply-form-container {
+  margin-left: 40px;
+  margin-bottom: 16px;
+}
+
+.replies {
+  margin-top: 0;
+}
+
+// Avatar styles
+::ng-deep .ant-comment-avatar {
+  .ant-avatar {
+    background-color: var(--oxford-blue);
+    color: white;
+    font-weight: 500;
+  }
+}

@@ -1,0 +1,134 @@
+<div class="comment-item" [ngStyle]="comment.depth > 0 ? indentStyle : {}">
+  <nz-comment [nzAuthor]="authorTemplate" [nzDatetime]="formattedDate">
+    <!-- Avatar -->
+    <nz-avatar
+      nz-comment-avatar
+      [nzSrc]="comment.user.photoUrl || ''"
+      [nzText]="comment.user.displayName.charAt(0).toUpperCase()"
+      [nzSize]="32"
+      nzIcon="user"
+    ></nz-avatar>
+
+    <!-- Author template with level badge -->
+    <ng-template #authorTemplate>
+      <span class="author-name">{{ comment.user.displayName }}</span>
+      <nz-badge
+        *ngIf="comment.user.level"
+        [nzCount]="comment.user.level"
+        nzShowZero
+        [nzStyle]="{ backgroundColor: '#FCA311', fontSize: '10px' }"
+        nz-tooltip
+        nzTooltipTitle="Nivel utilizator"
+        class="level-badge"
+      ></nz-badge>
+      <span *ngIf="comment.isEdited" class="edited-tag">(editat)</span>
+    </ng-template>
+
+    <!-- Content -->
+    <nz-comment-content>
+      <ng-container *ngIf="!isEditing">
+        <p class="comment-content" [class.deleted]="comment.isDeleted">
+          {{ comment.isDeleted ? '[Comentariu șters]' : comment.content }}
+        </p>
+      </ng-container>
+
+      <!-- Inline Edit Form -->
+      <ng-container *ngIf="isEditing">
+        <app-comment-form
+          [initialContent]="comment.content"
+          [isEdit]="true"
+          [submitting]="submitting"
+          placeholder="Editează comentariul..."
+          submitLabel="Salvează"
+          (submitted)="onEditSubmit($event)"
+          (cancelled)="onEditCancel()"
+        ></app-comment-form>
+      </ng-container>
+    </nz-comment-content>
+
+    <!-- Actions (only if not deleted) -->
+    <ng-container *ngIf="!comment.isDeleted && !isEditing">
+      <!-- Helpful Vote -->
+      <nz-comment-action>
+        <span
+          class="action-btn"
+          [class.voted]="comment.hasVoted"
+          [class.disabled]="!canVote"
+          (click)="canVote && onVoteClick()"
+          nz-tooltip
+          [nzTooltipTitle]="!isAuthenticated ? 'Autentifică-te pentru a vota' : (isOwner ? 'Nu poți vota propriul comentariu' : (comment.hasVoted ? 'Anulează votul' : 'Marchează ca util'))"
+        >
+          <i nz-icon nzType="like" [nzTheme]="comment.hasVoted ? 'fill' : 'outline'"></i>
+          Util ({{ comment.helpfulCount }})
+        </span>
+      </nz-comment-action>
+
+      <!-- Reply -->
+      <nz-comment-action *ngIf="isAuthenticated">
+        <span
+          class="action-btn"
+          [class.active]="isReplying"
+          (click)="onReplyClick()"
+        >
+          <i nz-icon nzType="message" nzTheme="outline"></i>
+          Răspunde
+        </span>
+      </nz-comment-action>
+
+      <!-- Edit (owner only) -->
+      <nz-comment-action *ngIf="isOwner">
+        <span class="action-btn" (click)="onEditClick()">
+          <i nz-icon nzType="edit" nzTheme="outline"></i>
+          Editează
+        </span>
+      </nz-comment-action>
+
+      <!-- Delete (owner or admin) -->
+      <nz-comment-action *ngIf="canDelete">
+        <span
+          class="action-btn danger"
+          nz-popconfirm
+          nzPopconfirmTitle="Sigur vrei să ștergi acest comentariu?"
+          nzOkText="Șterge"
+          nzCancelText="Anulează"
+          (nzOnConfirm)="onDeleteConfirm()"
+        >
+          <i nz-icon nzType="delete" nzTheme="outline"></i>
+          Șterge
+        </span>
+      </nz-comment-action>
+    </ng-container>
+  </nz-comment>
+
+  <!-- Inline Reply Form -->
+  <div *ngIf="isReplying" class="reply-form-container">
+    <app-comment-form
+      [isReply]="true"
+      [submitting]="submitting"
+      placeholder="Scrie un răspuns..."
+      submitLabel="Răspunde"
+      (submitted)="onReplySubmit($event)"
+      (cancelled)="onReplyCancel()"
+    ></app-comment-form>
+  </div>
+
+  <!-- Recursive Children -->
+  <div class="replies" *ngIf="comment.children && comment.children.length > 0">
+    <app-comment-item
+      *ngFor="let child of comment.children"
+      [comment]="child"
+      [currentUserId]="currentUserId"
+      [isAdmin]="isAdmin"
+      [isAuthenticated]="isAuthenticated"
+      [editingCommentId]="editingCommentId"
+      [replyingToCommentId]="replyingToCommentId"
+      [submitting]="submitting"
+      (reply)="reply.emit($event)"
+      (edit)="edit.emit($event)"
+      (delete)="delete.emit($event)"
+      (vote)="vote.emit($event)"
+      (setEditing)="setEditing.emit($event)"
+      (setReplying)="setReplying.emit($event)"
+    ></app-comment-item>
+  </div>
+</div>

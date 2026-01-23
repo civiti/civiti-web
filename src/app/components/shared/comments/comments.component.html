@@ -1,0 +1,96 @@
+<nz-card class="comments-section">
+  <!-- Header -->
+  <div class="comments-header">
+    <div class="header-left">
+      <i nz-icon nzType="message" nzTheme="outline" class="header-icon"></i>
+      <h3 class="header-title">
+        Comentarii
+        <span *ngIf="totalCount$ | async as count" class="comment-count">({{ count }})</span>
+      </h3>
+    </div>
+
+    <div class="header-right" *ngIf="(totalCount$ | async) ?? 0 > 0">
+      <nz-select
+        [(ngModel)]="sortValue"
+        (ngModelChange)="onSortChange($event)"
+        nzSize="small"
+        style="width: 160px"
+      >
+        <nz-option nzValue="date-desc" nzLabel="Cele mai noi"></nz-option>
+        <nz-option nzValue="date-asc" nzLabel="Cele mai vechi"></nz-option>
+        <nz-option nzValue="helpful-desc" nzLabel="Cele mai utile"></nz-option>
+      </nz-select>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading$ | async" class="loading-state">
+    <nz-spin nzSimple></nz-spin>
+    <p>Se încarcă comentariile...</p>
+  </div>
+
+  <!-- Error State -->
+  <nz-alert
+    *ngIf="error$ | async as error"
+    nzType="error"
+    [nzMessage]="error"
+    nzShowIcon
+    class="error-alert"
+  ></nz-alert>
+
+  <!-- New Comment Form (only for authenticated users on active issues) -->
+  <div *ngIf="(isAuthenticated$ | async) && canComment" class="new-comment-section">
+    <app-comment-form
+      [submitting]="(submitting$ | async) ?? false"
+      placeholder="Adaugă un comentariu..."
+      submitLabel="Comentează"
+      (submitted)="onNewComment($event)"
+    ></app-comment-form>
+  </div>
+
+  <!-- Login prompt for unauthenticated users -->
+  <div *ngIf="!(isAuthenticated$ | async) && canComment" class="login-prompt">
+    <i nz-icon nzType="lock" nzTheme="outline"></i>
+    <span>Autentifică-te pentru a adăuga un comentariu.</span>
+  </div>
+
+  <!-- Closed issue message -->
+  <div *ngIf="!canComment && issueStatus" class="closed-message">
+    <i nz-icon nzType="info-circle" nzTheme="outline"></i>
+    <span>Această problemă este închisă. Nu se mai acceptă comentarii noi.</span>
+  </div>
+
+  <!-- Comments List -->
+  <div *ngIf="!(loading$ | async)" class="comments-list">
+    <ng-container *ngIf="(commentTree$ | async) as tree">
+      <ng-container *ngIf="tree.length > 0; else emptyComments">
+        <app-comment-item
+          *ngFor="let comment of tree"
+          [comment]="comment"
+          [currentUserId]="(currentUserId$ | async)"
+          [isAdmin]="(isAdmin$ | async) ?? false"
+          [isAuthenticated]="(isAuthenticated$ | async) ?? false"
+          [editingCommentId]="(editingCommentId$ | async)"
+          [replyingToCommentId]="(replyingToCommentId$ | async)"
+          [submitting]="(submitting$ | async) ?? false"
+          (reply)="handleReplyFromItem($event)"
+          (edit)="onEdit($event)"
+          (delete)="onDelete($event)"
+          (vote)="onVote($event)"
+          (setEditing)="setEditing($event)"
+          (setReplying)="setReplying($event)"
+        ></app-comment-item>
+      </ng-container>
+
+      <ng-template #emptyComments>
+        <nz-empty
+          nzNotFoundImage="simple"
+          [nzNotFoundContent]="emptyContent"
+        ></nz-empty>
+        <ng-template #emptyContent>
+          <span>Niciun comentariu încă. Fii primul care comentează!</span>
+        </ng-template>
+      </ng-template>
+    </ng-container>
+  </div>
+</nz-card>

@@ -33,6 +33,8 @@ import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzMessageModule } from 'ng-zorro-antd/message';
 import { NzTableModule } from 'ng-zorro-antd/table';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
+import { NzCommentModule } from 'ng-zorro-antd/comment';
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
 
 
 // Import required icons
@@ -88,6 +90,8 @@ import {
   NotificationOutline,
   HeartOutline,
   LikeOutline,
+  LikeFill,
+  LockOutline,
   ToolOutline,
   MessageOutline,
   RobotOutline,
@@ -153,6 +157,8 @@ const icons: IconDefinition[] = [
   NotificationOutline,
   HeartOutline,
   LikeOutline,
+  LikeFill,
+  LockOutline,
   ToolOutline,
   MessageOutline,
   RobotOutline,
@@ -201,7 +207,9 @@ const NgZorroModules = [
   NzUploadModule,
   NzMessageModule,
   NzTableModule,
-  NzRadioModule
+  NzRadioModule,
+  NzCommentModule,
+  NzPopconfirmModule
 ];
 
 @NgModule({

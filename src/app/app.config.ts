@@ -30,13 +30,14 @@ import { AuthEffects } from './store/auth/auth.effects';
 import { UserEffects } from './store/user/user.effects';
 import { UserIssuesEffects } from './store/user-issues/user-issues.effects';
 import { ActivityEffects } from './store/activity/activity.effects';
+import { CommentsEffects } from './store/comments/comments.effects';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     provideZoneChangeDetection({ eventCoalescing: true }),
     provideRouter(routes, withPreloading(PreloadAllModules)),
     provideStore(reducers),
-    provideEffects([IssueEffects, LocationEffects, AuthEffects, UserEffects, UserIssuesEffects, ActivityEffects]),
+    provideEffects([IssueEffects, LocationEffects, AuthEffects, UserEffects, UserIssuesEffects, ActivityEffects, CommentsEffects]),
     provideStoreDevtools({
       maxAge: 25,
       logOnly: !isDevMode(),

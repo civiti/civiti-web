@@ -38,7 +38,11 @@ import {
   EnhanceTextResponse,
   CategoryResponse,
   ActivityFeedItem,
-  ActivityQueryParams
+  ActivityQueryParams,
+  CommentResponse,
+  CreateCommentRequest,
+  UpdateCommentRequest,
+  CommentQueryParams
 } from '../types/civica-api.types';
 
 @Injectable({
@@ -349,5 +353,72 @@ export class ApiService {
       });
     }
     return this.http.get<PagedResult<ActivityFeedItem>>(`${this.baseUrl}/activity/my`, { params: httpParams });
+  }
+
+  // ============================================
+  // Comments Endpoints
+  // ============================================
+
+  /**
+   * Get comments for an issue
+   * GET /api/issues/{issueId}/comments
+   */
+  getIssueComments(issueId: string, params?: CommentQueryParams): Observable<PagedResult<CommentResponse>> {
+    let httpParams = new HttpParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        const value = params[key as keyof CommentQueryParams];
+        if (value !== undefined && value !== null) {
+          httpParams = httpParams.set(key, value.toString());
+        }
+      });
+    }
+    return this.http.get<PagedResult<CommentResponse>>(
+      `${this.baseUrl}/issues/${issueId}/comments`,
+      { params: httpParams }
+    );
+  }
+
+  /**
+   * Create a comment or reply
+   * POST /api/issues/{issueId}/comments
+   */
+  createComment(issueId: string, data: CreateCommentRequest): Observable<CommentResponse> {
+    return this.http.post<CommentResponse>(
+      `${this.baseUrl}/issues/${issueId}/comments`,
+      data
+    );
+  }
+
+  /**
+   * Update a comment (author only)
+   * PUT /api/comments/{commentId}
+   */
+  updateComment(commentId: string, data: UpdateCommentRequest): Observable<void> {
+    return this.http.put<void>(`${this.baseUrl}/comments/${commentId}`, data);
+  }
+
+  /**
+   * Delete a comment (author or admin)
+   * DELETE /api/comments/{commentId}
+   */
+  deleteComment(commentId: string): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/comments/${commentId}`);
+  }
+
+  /**
+   * Vote a comment as helpful
+   * POST /api/comments/{commentId}/vote
+   */
+  voteCommentHelpful(commentId: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/comments/${commentId}/vote`, {});
+  }
+
+  /**
+   * Remove a helpful vote
+   * DELETE /api/comments/{commentId}/vote
+   */
+  removeCommentVote(commentId: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.baseUrl}/comments/${commentId}/vote`);
   }
 }

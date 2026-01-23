@@ -7,6 +7,7 @@ import { authReducer } from './auth/auth.reducer';
 import { userReducer } from './user/user.reducer';
 import { userIssuesReducer } from './user-issues/user-issues.reducer';
 import { activityReducer } from './activity/activity.reducer';
+import { commentsReducer } from './comments/comments.reducer';
 
 export const reducers: ActionReducerMap<AppState> = {
   issues: issueReducer,
@@ -15,5 +16,6 @@ export const reducers: ActionReducerMap<AppState> = {
   auth: authReducer,
   user: userReducer,
   userIssues: userIssuesReducer,
-  activity: activityReducer
+  activity: activityReducer,
+  comments: commentsReducer
 };
