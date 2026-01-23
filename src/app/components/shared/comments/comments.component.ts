@@ -76,8 +76,8 @@ export class CommentsComponent implements OnInit, OnDestroy {
         return 'Problema este în analiză. Comentariile vor fi disponibile după aprobare.';
       case 'resolved':
         return 'Această problemă a fost rezolvată. Nu se mai acceptă comentarii noi.';
-      case 'closed':
-        return 'Această problemă este închisă. Nu se mai acceptă comentarii noi.';
+      case 'cancelled':
+        return 'Această problemă a fost anulată. Nu se mai acceptă comentarii noi.';
       case 'rejected':
         return 'Această problemă a fost respinsă. Nu se mai acceptă comentarii.';
       default:

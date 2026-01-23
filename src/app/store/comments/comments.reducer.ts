@@ -44,13 +44,15 @@ export const commentsReducer = createReducer(
         error: null
       };
     }
+    // Only increment formResetCounter for top-level comments, not replies
+    const isTopLevelComment = !comment.parentCommentId;
     return commentsAdapter.addOne(comment, {
       ...state,
       submitting: false,
       error: null,
       replyingToCommentId: null,
       totalCount: state.totalCount + 1,
-      formResetCounter: state.formResetCounter + 1
+      formResetCounter: isTopLevelComment ? state.formResetCounter + 1 : state.formResetCounter
     });
   }),
 
