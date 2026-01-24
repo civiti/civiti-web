@@ -12,7 +12,7 @@
     <!-- Author template with level badge -->
     <ng-template #authorTemplate>
       <span class="author-name">{{ comment.user.displayName }}</span>
-      @if (comment.user.level) {
+      @if (comment.user.level != null) {
         <nz-badge
           [nzCount]="comment.user.level"
           nzShowZero
