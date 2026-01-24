@@ -1,10 +1,10 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { Observable, Subject, from, of } from 'rxjs';
-import { catchError, finalize, map, switchMap } from 'rxjs/operators';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 
 export interface PhotoDownloadProgress {
+  downloadId: string;
   phase: 'fetching' | 'zipping' | 'complete' | 'error';
   current: number;
   total: number;
@@ -13,6 +13,7 @@ export interface PhotoDownloadProgress {
 }
 
 export interface PhotoDownloadResult {
+  downloadId: string;
   success: boolean;
   downloadedCount: number;
   failedCount: number;
@@ -29,18 +30,28 @@ interface PhotoInfo {
 })
 export class PhotoDownloadService {
   private _progress$ = new Subject<PhotoDownloadProgress>();
+  private _downloadCounter = 0;
 
   get progress$(): Observable<PhotoDownloadProgress> {
     return this._progress$.asObservable();
   }
 
+  /**
+   * Generates a unique download ID for tracking progress
+   */
+  generateDownloadId(): string {
+    return `download-${++this._downloadCounter}-${Date.now()}`;
+  }
+
   downloadPhotosAsZip(
     photos: PhotoInfo[],
     issueId: string,
+    downloadId: string,
     issueTitle?: string
   ): Observable<PhotoDownloadResult> {
     if (!photos || photos.length === 0) {
       return of({
+        downloadId,
         success: false,
         downloadedCount: 0,
         failedCount: 0,
@@ -48,12 +59,13 @@ export class PhotoDownloadService {
       });
     }
 
-    return from(this._createAndDownloadZip(photos, issueId, issueTitle));
+    return from(this._createAndDownloadZip(photos, issueId, downloadId, issueTitle));
   }
 
   private async _createAndDownloadZip(
     photos: PhotoInfo[],
     issueId: string,
+    downloadId: string,
     issueTitle?: string
   ): Promise<PhotoDownloadResult> {
     const zip = new JSZip();
@@ -66,10 +78,11 @@ export class PhotoDownloadService {
       const photo = photos[i];
 
       this._progress$.next({
+        downloadId,
         phase: 'fetching',
         current: i + 1,
         total,
-        percentage: Math.round(((i + 1) / total) * 80), // 0-80% for fetching
+        percentage: Math.round(((i + 1) / total) * 80),
         message: `Se descarcă fotografia ${i + 1} din ${total}...`
       });
 
@@ -95,6 +108,7 @@ export class PhotoDownloadService {
     // Check if any photos were downloaded
     if (downloadedCount === 0) {
       this._progress$.next({
+        downloadId,
         phase: 'error',
         current: 0,
         total,
@@ -103,6 +117,7 @@ export class PhotoDownloadService {
       });
 
       return {
+        downloadId,
         success: false,
         downloadedCount: 0,
         failedCount,
@@ -112,6 +127,7 @@ export class PhotoDownloadService {
 
     // Create ZIP
     this._progress$.next({
+      downloadId,
       phase: 'zipping',
       current: downloadedCount,
       total,
@@ -134,6 +150,7 @@ export class PhotoDownloadService {
       saveAs(zipBlob, zipFileName);
 
       this._progress$.next({
+        downloadId,
         phase: 'complete',
         current: downloadedCount,
         total,
@@ -141,7 +158,8 @@ export class PhotoDownloadService {
         message: 'Descărcare completă!'
       });
 
-      const result: PhotoDownloadResult = {
+      return {
+        downloadId,
         success: true,
         downloadedCount,
         failedCount,
@@ -149,12 +167,11 @@ export class PhotoDownloadService {
           ? `S-au descărcat ${downloadedCount} fotografii. ${failedCount} nu au putut fi descărcate.`
           : `S-au descărcat toate cele ${downloadedCount} fotografii cu succes!`
       };
-
-      return result;
     } catch (error) {
       console.error('Failed to create ZIP:', error);
 
       this._progress$.next({
+        downloadId,
         phase: 'error',
         current: downloadedCount,
         total,
@@ -163,6 +180,7 @@ export class PhotoDownloadService {
       });
 
       return {
+        downloadId,
         success: false,
         downloadedCount,
         failedCount: total - downloadedCount,

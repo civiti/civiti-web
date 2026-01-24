@@ -90,6 +90,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     // Photo download state
     isDownloading = false;
     downloadProgress: PhotoDownloadProgress | null = null;
+    private _currentDownloadId: string | null = null;
     private _downloadComplete$ = new Subject<void>();
 
     // Google Maps properties
@@ -651,32 +652,44 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         this.isDownloading = true;
         this.downloadProgress = null;
 
-        // Subscribe to progress updates - completes when download finishes
+        // Generate unique ID for this download to filter progress from concurrent downloads
+        const downloadId = this._photoDownloadService.generateDownloadId();
+        this._currentDownloadId = downloadId;
+
+        // Subscribe to progress updates - filter by download ID and complete when done
         this._photoDownloadService.progress$
-            .pipe(takeUntil(this._downloadComplete$), takeUntil(this._destroy$))
+            .pipe(
+                filter(progress => progress.downloadId === this._currentDownloadId),
+                takeUntil(this._downloadComplete$),
+                takeUntil(this._destroy$)
+            )
             .subscribe(progress => {
                 this.downloadProgress = progress;
                 this._cdr.detectChanges();
             });
 
         this._photoDownloadService
-            .downloadPhotosAsZip(issue.photos, issue.id, issue.title)
+            .downloadPhotosAsZip(issue.photos, issue.id, downloadId, issue.title)
             .pipe(takeUntil(this._destroy$))
             .subscribe({
                 next: result => {
-                    this._downloadComplete$.next();
-                    this.isDownloading = false;
-                    this.downloadProgress = null;
-                    this._cdr.detectChanges();
+                    // Only process if this is still the current download
+                    if (result.downloadId === this._currentDownloadId) {
+                        this._downloadComplete$.next();
+                        this.isDownloading = false;
+                        this.downloadProgress = null;
+                        this._currentDownloadId = null;
+                        this._cdr.detectChanges();
 
-                    if (result.success) {
-                        if (result.failedCount > 0) {
-                            this._message.warning(result.message);
+                        if (result.success) {
+                            if (result.failedCount > 0) {
+                                this._message.warning(result.message);
+                            } else {
+                                this._message.success(result.message);
+                            }
                         } else {
-                            this._message.success(result.message);
+                            this._message.error(result.message);
                         }
-                    } else {
-                        this._message.error(result.message);
                     }
                 },
                 error: error => {
@@ -684,6 +697,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                     this._downloadComplete$.next();
                     this.isDownloading = false;
                     this.downloadProgress = null;
+                    this._currentDownloadId = null;
                     this._cdr.detectChanges();
                     this._message.error('Eroare la descărcarea fotografiilor.');
                 }
