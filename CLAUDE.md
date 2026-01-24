@@ -12,7 +12,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Install dependencies
 npm install
 
-(never start a new development server to check the build passes, use instead '"cd "/mnt/g/Repos Personal/Civica" && npx ng build --configuration=development 2>&1 | head -50"')
+# Build (development)
+npx ng build --configuration=development
 
 # Start development server (injects env vars automatically)
 npm run start:dev
