@@ -1,5 +1,6 @@
 import { Component, inject, OnInit, OnDestroy, AfterViewInit, PLATFORM_ID, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -69,6 +70,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _message = inject(NzMessageService);
     private _platformId = inject(PLATFORM_ID);
     private _cdr = inject(ChangeDetectorRef);
+    private _http = inject(HttpClient);
     private _photoDownloadService = inject(PhotoDownloadService);
     private _imageErrorCount: Map<string, number> = new Map();
     private _lightbox: any;
@@ -658,34 +660,36 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     /**
-     * Open QR poster PDF in a new tab for printing
+     * Open QR poster PDF in a new tab for printing.
+     * Uses HttpClient to ensure auth interceptor adds the JWT token.
      */
-    async downloadPoster(issue: IssueDetailResponse): Promise<void> {
+    downloadPoster(issue: IssueDetailResponse): void {
         if (!isPlatformBrowser(this._platformId)) return;
         if (this.isPosterLoading) return;
 
         this.isPosterLoading = true;
         const posterUrl = `${environment.apiUrl}/issues/${issue.id}/poster`;
 
-        try {
-            const response = await fetch(posterUrl);
-            if (!response.ok) {
-                throw new Error('Failed to fetch poster');
-            }
+        this._http.get(posterUrl, { responseType: 'blob' })
+            .pipe(takeUntil(this._destroy$))
+            .subscribe({
+                next: (blob) => {
+                    const blobUrl = URL.createObjectURL(blob);
+                    window.open(blobUrl, '_blank');
 
-            const blob = await response.blob();
-            const blobUrl = URL.createObjectURL(blob);
-            window.open(blobUrl, '_blank');
+                    // Clean up the blob URL after a delay to allow the new tab to load
+                    setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
 
-            // Clean up the blob URL after a delay to allow the new tab to load
-            setTimeout(() => URL.revokeObjectURL(blobUrl), 60000);
-        } catch (error) {
-            console.error('Error opening poster:', error);
-            this._message.error('Eroare la deschiderea posterului.');
-        } finally {
-            this.isPosterLoading = false;
-            this._cdr.detectChanges();
-        }
+                    this.isPosterLoading = false;
+                    this._cdr.detectChanges();
+                },
+                error: (error) => {
+                    console.error('Error opening poster:', error);
+                    this._message.error('Eroare la deschiderea posterului.');
+                    this.isPosterLoading = false;
+                    this._cdr.detectChanges();
+                }
+            });
     }
 
     downloadAllPhotos(issue: IssueDetailResponse): void {
