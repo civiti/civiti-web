@@ -37,7 +37,8 @@ export const commentsReducer = createReducer(
   })),
 
   on(CommentsActions.createCommentSuccess, (state, { comment }) => {
-    const newPendingCount = state.pendingCreateCount - 1;
+    // Use Math.max to prevent negative count if clearComments reset state while requests were in-flight
+    const newPendingCount = Math.max(0, state.pendingCreateCount - 1);
     const isCurrentIssue = comment.issueId === state.currentIssueId;
 
     // Comment is for a different issue (user navigated away) - just decrement counter
@@ -67,7 +68,8 @@ export const commentsReducer = createReducer(
   }),
 
   on(CommentsActions.createCommentFailure, (state, { error, issueId }) => {
-    const newPendingCount = state.pendingCreateCount - 1;
+    // Use Math.max to prevent negative count if clearComments reset state while requests were in-flight
+    const newPendingCount = Math.max(0, state.pendingCreateCount - 1);
     // Only show error if user is still on the same issue
     const showError = issueId === state.currentIssueId;
     return {
