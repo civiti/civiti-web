@@ -94,7 +94,8 @@ export class CommentsEffects {
           map(() => CommentsActions.voteHelpfulSuccess({ commentId: action.commentId })),
           catchError(error => {
             // Treat "already voted" as success - the intended state was achieved
-            const errorMsg = error.message || error.error?.message || '';
+            // Check error.error?.message first (API response), then error.message (HttpClient generic)
+            const errorMsg = error.error?.message || error.message || '';
             if (errorMsg.toLowerCase().includes('already voted')) {
               return of(CommentsActions.voteHelpfulSuccess({ commentId: action.commentId }));
             }
@@ -115,7 +116,8 @@ export class CommentsEffects {
           map(() => CommentsActions.removeVoteSuccess({ commentId: action.commentId })),
           catchError(error => {
             // Treat "not voted" / "vote not found" as success - the intended state was achieved
-            const errorMsg = error.message || error.error?.message || '';
+            // Check error.error?.message first (API response), then error.message (HttpClient generic)
+            const errorMsg = error.error?.message || error.message || '';
             if (errorMsg.toLowerCase().includes('not voted') ||
                 errorMsg.toLowerCase().includes('vote not found') ||
                 errorMsg.toLowerCase().includes('no vote')) {
