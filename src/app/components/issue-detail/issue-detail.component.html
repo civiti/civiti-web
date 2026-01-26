@@ -18,7 +18,7 @@
               <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                   <h1 class="text-2xl font-bold text-oxford-blue">
-                    <nz-tag *ngIf="getUrgencyLevel(issue) === 'urgent'" nzColor="error" class="mr-2">
+                    <nz-tag *ngIf="issue.urgency | isUrgent" nzColor="error" class="mr-2">
                       URGENT
                     </nz-tag>{{ issue.title }}
                   </h1>

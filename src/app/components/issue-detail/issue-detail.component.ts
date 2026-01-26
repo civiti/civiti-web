@@ -29,6 +29,7 @@ import { EmailModalComponent } from './email-modal.component';
 import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
 import { GoogleMapsConfigService } from '../../services/google-maps-config.service';
 import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
+import { IsUrgentPipe } from '../../pipes/urgency.pipe';
 import { CommentsComponent } from '../shared/comments/comments.component';
 import { PhotoDownloadService, PhotoDownloadProgress } from '../../services/photo-download.service';
 import { environment } from '../../../environments/environment';
@@ -57,6 +58,7 @@ import { environment } from '../../../environments/environment';
         MapInfoWindow,
         StatusTextPipe,
         StatusColorPipe,
+        IsUrgentPipe,
         CommentsComponent,
     ],
     templateUrl: './issue-detail.component.html',
@@ -320,10 +322,6 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         
         // Try local fallback image
         imgElement.src = '/images/placeholders/issue-placeholder.svg';
-    }
-
-    getUrgencyLevel(issue: IssueDetailResponse): 'urgent' | 'normal' {
-        return issue.emailsSent > 100 ? 'urgent' : 'normal';
     }
 
     getDaysSince(date: string): string {
