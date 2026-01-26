@@ -780,6 +780,23 @@ export const URGENCY_LEVELS: Record<UrgencyLevel, string> = {
   urgent: 'Urgentă'
 };
 
+/** Urgency dropdown options for issue creation forms */
+export const URGENCY_OPTIONS: Array<{ value: UrgencyLevel; label: string; description: string }> = [
+  { value: 'low', label: 'Scăzută', description: 'Poate aștepta întreținerea de rutină' },
+  { value: 'medium', label: 'Medie', description: 'Ar trebui abordată curând' },
+  { value: 'high', label: 'Ridicată', description: 'Necesită atenție promptă' },
+  { value: 'urgent', label: 'Urgentă', description: 'Pericol de siguranță sau urgență' }
+];
+
+/** Tag colors for urgency levels */
+export const URGENCY_COLORS: Record<UrgencyLevel, string> = {
+  unspecified: 'default',
+  low: 'default',
+  medium: 'processing',
+  high: 'warning',
+  urgent: 'error'
+};
+
 export const ISSUE_STATUSES: Record<IssueStatus, string> = {
   Unspecified: 'Nespecificat',
   Draft: 'Ciornă',

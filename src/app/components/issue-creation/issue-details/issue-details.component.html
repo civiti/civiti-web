@@ -129,10 +129,7 @@
             <nz-form-label [nzSpan]="24" nzFor="urgency">Nivel de urgență</nz-form-label>
             <nz-form-control [nzSpan]="24">
               <nz-select formControlName="urgency" id="urgency" nzPlaceHolder="Cât de urgentă este această problemă?">
-                <nz-option nzValue="Low" nzLabel="Scăzută - Poate aștepta întreținerea de rutină"></nz-option>
-                <nz-option nzValue="Medium" nzLabel="Medie - Ar trebui abordată curând"></nz-option>
-                <nz-option nzValue="High" nzLabel="Ridicată - Necesită atenție promptă"></nz-option>
-                <nz-option nzValue="Urgent" nzLabel="Urgentă - Pericol de siguranță sau urgență"></nz-option>
+                <nz-option *ngFor="let opt of urgencyOptions" [nzValue]="opt.value" [nzLabel]="opt.label + ' - ' + opt.description"></nz-option>
               </nz-select>
             </nz-form-control>
           </nz-form-item>

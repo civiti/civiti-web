@@ -24,7 +24,9 @@ import {
   CreateIssueRequest,
   UrgencyLevel,
   IssueCategory,
-  IssueAuthorityInput
+  IssueAuthorityInput,
+  URGENCY_LEVELS,
+  URGENCY_COLORS
 } from '../../../types/civica-api.types';
 
 interface SelectedAuthority {
@@ -105,13 +107,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
   }
 
   getUrgencyStatus(urgency: string): 'default' | 'processing' | 'success' | 'error' | 'warning' {
-    const statuses: { [key: string]: 'default' | 'processing' | 'success' | 'error' | 'warning' } = {
-      'low': 'default',
-      'medium': 'processing',
-      'high': 'warning',
-      'urgent': 'error'
-    };
-    return statuses[urgency] || 'default';
+    return (URGENCY_COLORS[urgency as UrgencyLevel] || 'default') as 'default' | 'processing' | 'success' | 'error' | 'warning';
   }
 
   getWhenLabel(when: string): string {
@@ -127,13 +123,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
 
 
   getUrgencyLabel(urgency: string): string {
-    const labels: { [key: string]: string } = {
-      'low': 'Scăzută',
-      'medium': 'Medie',
-      'high': 'Ridicată',
-      'urgent': 'Urgentă'
-    };
-    return labels[urgency] || urgency;
+    return URGENCY_LEVELS[urgency as UrgencyLevel] || urgency;
   }
 
   viewPhoto(photoUrl: string): void {
