@@ -151,7 +151,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                 IssueActions.voteForIssueSuccess,
                 IssueActions.voteForIssueFailure,
                 IssueActions.removeVoteFromIssueSuccess,
-                IssueActions.removeVoteFromIssueFailure
+                IssueActions.removeVoteFromIssueFailure,
+                IssueActions.syncVoteState
             ),
             filter(action => action.issueId === this._currentIssueId),
             takeUntil(this._destroy$)

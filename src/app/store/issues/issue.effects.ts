@@ -146,9 +146,9 @@ export class IssueEffects {
           }),
           catchError(error => {
             console.error(`[Issues Effects] Failed to vote for issue ${issueId}:`, error);
-            // Handle "already voted" as success (idempotent)
+            // Handle "already voted" by syncing state without modifying count
             if (error.status === 409 || error.error?.message?.toLowerCase().includes('already voted')) {
-              return of(IssueActions.voteForIssueSuccess({ issueId }));
+              return of(IssueActions.syncVoteState({ issueId, hasVoted: true }));
             }
             // Map API errors to Romanian messages
             let errorMessage = 'Eroare la înregistrarea votului';
@@ -180,9 +180,9 @@ export class IssueEffects {
           }),
           catchError(error => {
             console.error(`[Issues Effects] Failed to remove vote for issue ${issueId}:`, error);
-            // Handle "not voted" as success (idempotent)
+            // Handle "not voted" by syncing state without modifying count
             if (error.status === 404 || error.error?.message?.toLowerCase().includes('not voted')) {
-              return of(IssueActions.removeVoteFromIssueSuccess({ issueId }));
+              return of(IssueActions.syncVoteState({ issueId, hasVoted: false }));
             }
             this.message.error('Eroare la retragerea votului');
             return of(IssueActions.removeVoteFromIssueFailure({

@@ -170,5 +170,32 @@ export const issueReducer = createReducer(
     }
 
     return newState;
+  }),
+
+  // Sync Vote State - only updates hasVoted without modifying count (for conflict resolution)
+  on(IssueActions.syncVoteState, (state, { issueId, hasVoted }) => {
+    let newState = state;
+
+    // Update the list item if it exists
+    const issue = state.entities[issueId];
+    if (issue && issue.hasVoted !== hasVoted) {
+      newState = issueAdapter.updateOne({
+        id: issueId,
+        changes: { hasVoted }
+      }, newState);
+    }
+
+    // Also update the detailed issue if it's the selected one
+    if (state.selectedIssueDetail && state.selectedIssueDetail.id === issueId && state.selectedIssueDetail.hasVoted !== hasVoted) {
+      newState = {
+        ...newState,
+        selectedIssueDetail: {
+          ...state.selectedIssueDetail,
+          hasVoted
+        }
+      };
+    }
+
+    return newState;
   })
 );

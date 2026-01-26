@@ -114,3 +114,9 @@ export const removeVoteFromIssueFailure = createAction(
   '[Issue Detail] Remove Vote From Issue Failure',
   props<{ issueId: string; error: string }>()
 );
+
+// Sync Vote State (for conflict resolution - only updates hasVoted without modifying count)
+export const syncVoteState = createAction(
+  '[Issue Detail] Sync Vote State',
+  props<{ issueId: string; hasVoted: boolean }>()
+);
