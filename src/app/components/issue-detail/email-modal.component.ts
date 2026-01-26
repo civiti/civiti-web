@@ -190,8 +190,7 @@ ${currentDate}`;
             targetAuthority: primaryAuthority
         }));
 
-        // Immediate feedback - effect will show points earned after API responds
-        this._message.success('Mulțumim pentru contribuție!');
+        // Close modal - effect will show appropriate message after API responds
         this._modalRef.close(true);
     }
 

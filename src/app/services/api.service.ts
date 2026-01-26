@@ -421,4 +421,24 @@ export class ApiService {
   removeCommentVote(commentId: string): Observable<{ message: string }> {
     return this.http.delete<{ message: string }>(`${this.baseUrl}/comments/${commentId}/vote`);
   }
+
+  // ============================================
+  // Issue Voting Endpoints
+  // ============================================
+
+  /**
+   * Vote for an issue
+   * POST /api/issues/{issueId}/vote
+   */
+  voteForIssue(issueId: string): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.baseUrl}/issues/${issueId}/vote`, {});
+  }
+
+  /**
+   * Remove vote from an issue
+   * DELETE /api/issues/{issueId}/vote
+   */
+  removeIssueVote(issueId: string): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.baseUrl}/issues/${issueId}/vote`);
+  }
 }

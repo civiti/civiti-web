@@ -22,6 +22,7 @@
                      nzPlaceHolder="Sortare" style="width: 180px;">
             <nz-option nzValue="date" nzLabel="Cele mai noi"></nz-option>
             <nz-option nzValue="emails" nzLabel="Contribuții"></nz-option>
+            <nz-option nzValue="votes" nzLabel="Cele mai votate"></nz-option>
             <nz-option nzValue="urgency" nzLabel="Urgență"></nz-option>
           </nz-select>
         </div>
@@ -174,8 +175,8 @@
             <div class="flex items-center justify-between border-t border-platinum pt-3">
               <!-- Email Counter - PROMINENT as required -->
               <div class="email-counter">
-                <nz-statistic 
-                  [nzValue]="issue.emailsSent" 
+                <nz-statistic
+                  [nzValue]="issue.emailsSent"
                   [nzTitle]="'contribuții'"
                   [nzPrefix]="emailIcon"
                   class="email-counter-stat">
@@ -183,6 +184,12 @@
                 <ng-template #emailIcon>
                   <i nz-icon nzType="mail" nzTheme="outline" class="text-orange-web"></i>
                 </ng-template>
+              </div>
+
+              <!-- Vote Count - SUBTLE indicator -->
+              <div class="vote-indicator" *ngIf="issue.communityVotes > 0">
+                <i nz-icon nzType="like" nzTheme="outline"></i>
+                <span>{{ issue.communityVotes }}</span>
               </div>
 
               <!-- Days Since -->

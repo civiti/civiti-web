@@ -177,6 +177,29 @@
               </div>
             </nz-card>
 
+            <!-- Community Votes Card -->
+            <nz-card [nzBordered]="true" class="bg-platinum border-2 border-oxford-blue-30">
+              <div class="text-center">
+                <i nz-icon nzType="like" [nzTheme]="issue.hasVoted ? 'fill' : 'outline'"
+                   [class]="issue.hasVoted ? 'text-orange-web text-5xl mb-2' : 'text-oxford-blue text-5xl mb-2'"></i>
+                <div class="vote-counter-number text-oxford-blue font-bold mb-2">
+                  {{ issue.communityVotes }}
+                </div>
+                <p class="text-oxford-blue font-semibold">Voturi Comunitate</p>
+                <p class="text-oxford-blue text-sm opacity-75 mt-2">
+                  Votează pentru a arăta că această problemă este importantă pentru comunitate.
+                </p>
+                <button nz-button nzType="primary" nzBlock class="mt-4"
+                        [disabled]="cannotVote(issue)"
+                        [nzLoading]="isVoting()"
+                        [nz-tooltip]="getVoteTooltip(issue)"
+                        (click)="toggleVote(issue)">
+                  <i nz-icon nzType="like" [nzTheme]="issue.hasVoted ? 'fill' : 'outline'" class="mr-2"></i>
+                  {{ issue.hasVoted ? 'Ai votat' : 'Votează' }}
+                </button>
+              </div>
+            </nz-card>
+
             <!-- Authorities List -->
             <nz-card
               *ngIf="issue.authorities && issue.authorities.length > 0"

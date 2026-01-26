@@ -333,6 +333,8 @@ export interface IssueItem {
   mainPhotoUrl?: string;
   photoUrls: string[];
   emailsSent: number;
+  communityVotes: number;
+  hasVoted: boolean | null;
   status: IssueStatus;
   createdAt: string;
   submitterName?: string;
@@ -358,6 +360,8 @@ export interface IssueDetailResponse {
   urgency: UrgencyLevel;
   status: IssueStatus;
   emailsSent: number;
+  communityVotes: number;
+  hasVoted: boolean | null;
   desiredOutcome?: string;
   communityImpact?: string;
   publicVisibility: boolean;

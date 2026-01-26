@@ -6,7 +6,7 @@ export interface IssueState extends EntityState<IssueItem> {
   selectedIssueDetail: IssueDetailResponse | null;
   loading: boolean;
   error: string | null;
-  sortBy: 'date' | 'emails' | 'urgency';
+  sortBy: 'date' | 'emails' | 'urgency' | 'votes';
   // Pagination
   currentPage: number;
   pageSize: number;

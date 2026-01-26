@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, AfterViewInit, PLATFORM_ID, ViewChild, ChangeDetectorRef } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, AfterViewInit, PLATFORM_ID, ViewChild, ChangeDetectorRef, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -18,12 +18,13 @@ import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { Store } from '@ngrx/store';
+import { Actions, ofType } from '@ngrx/effects';
 import { Observable, Subject, combineLatest } from 'rxjs';
 import { take, filter, takeUntil } from 'rxjs/operators';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
 import * as IssueSelectors from '../../store/issues/issue.selectors';
-import { selectIsAdmin, selectIsAuthInitialized, selectAuthUser } from '../../store/auth/auth.selectors';
+import { selectIsAdmin, selectIsAuthInitialized, selectAuthUser, selectIsAuthenticated } from '../../store/auth/auth.selectors';
 import { IssueDetailResponse, isPubliclyViewableStatus } from '../../types/civica-api.types';
 import { EmailModalComponent } from './email-modal.component';
 import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
@@ -91,6 +92,12 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     isLoading$!: Observable<boolean>;
     error$!: Observable<string | null>;
     isAdmin$!: Observable<boolean>;
+    isAuthenticated$!: Observable<boolean>;
+
+    // Voting state
+    isVoting = signal(false);
+    private _actions$ = inject(Actions);
+    private _currentUserId: string | null = null;
 
     // Photo download state
     isDownloading = false;
@@ -126,6 +133,27 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         this.isLoading$ = this._store.select(IssueSelectors.selectIssuesLoading);
         this.error$ = this._store.select(IssueSelectors.selectIssuesError);
         this.isAdmin$ = this._store.select(selectIsAdmin);
+        this.isAuthenticated$ = this._store.select(selectIsAuthenticated);
+
+        // Track current user ID for vote validation
+        this._store.select(selectAuthUser).pipe(
+            takeUntil(this._destroy$)
+        ).subscribe(user => {
+            this._currentUserId = user?.id || null;
+        });
+
+        // Subscribe to voting action results to manage loading state
+        this._actions$.pipe(
+            ofType(
+                IssueActions.voteForIssueSuccess,
+                IssueActions.voteForIssueFailure,
+                IssueActions.removeVoteFromIssueSuccess,
+                IssueActions.removeVoteFromIssueFailure
+            ),
+            takeUntil(this._destroy$)
+        ).subscribe(() => {
+            this.isVoting.set(false);
+        });
 
         // Reinitialize gallery when issue data changes (only in browser)
         if (isPlatformBrowser(this._platformId) && this.issue$) {
@@ -338,6 +366,61 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     isTerminalState(issue: IssueDetailResponse): boolean {
         const status = (issue.status || '').toLowerCase();
         return status === 'resolved' || status === 'cancelled';
+    }
+
+    /**
+     * Check if user cannot vote on this issue.
+     * Returns true if: not authenticated, is own issue, or issue is in terminal state.
+     */
+    cannotVote(issue: IssueDetailResponse): boolean {
+        // Not authenticated
+        if (!this._currentUserId) {
+            return true;
+        }
+        // Own issue
+        if (issue.user.id === this._currentUserId) {
+            return true;
+        }
+        // Terminal state (resolved, rejected, cancelled)
+        const status = (issue.status || '').toLowerCase();
+        if (status === 'resolved' || status === 'rejected' || status === 'cancelled') {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Get tooltip text for disabled vote button
+     */
+    getVoteTooltip(issue: IssueDetailResponse): string {
+        if (!this._currentUserId) {
+            return 'Autentifică-te pentru a vota';
+        }
+        if (issue.user.id === this._currentUserId) {
+            return 'Nu poți vota propria problemă';
+        }
+        const status = (issue.status || '').toLowerCase();
+        if (status === 'resolved' || status === 'rejected' || status === 'cancelled') {
+            return 'Problema este închisă';
+        }
+        return '';
+    }
+
+    /**
+     * Toggle vote for the issue (vote or unvote)
+     */
+    toggleVote(issue: IssueDetailResponse): void {
+        if (this.cannotVote(issue) || this.isVoting()) {
+            return;
+        }
+
+        this.isVoting.set(true);
+
+        if (issue.hasVoted) {
+            this._store.dispatch(IssueActions.removeVoteFromIssue({ issueId: issue.id }));
+        } else {
+            this._store.dispatch(IssueActions.voteForIssue({ issueId: issue.id }));
+        }
     }
 
     /**

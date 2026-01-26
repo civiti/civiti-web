@@ -214,7 +214,7 @@ export class IssuesListComponent implements OnInit, OnDestroy {
         if (sortBy !== this.sortBy) {
           this.sortBy = sortBy;
           this._store.dispatch(IssueActions.changeSortBy({
-            sortBy: sortBy as 'date' | 'emails' | 'urgency'
+            sortBy: sortBy as 'date' | 'emails' | 'urgency' | 'votes'
           }));
         }
 
@@ -252,6 +252,8 @@ export class IssuesListComponent implements OnInit, OnDestroy {
     switch (sortBy) {
       case 'emails':
         return { sortBy: 'emails', sortDescending: true };
+      case 'votes':
+        return { sortBy: 'communityVotes', sortDescending: true };
       case 'urgency':
         return { sortBy: 'urgency', sortDescending: true };
       case 'date':
@@ -263,7 +265,7 @@ export class IssuesListComponent implements OnInit, OnDestroy {
   onSortChange(): void {
     // Dispatch sort change to store first
     this._store.dispatch(IssueActions.changeSortBy({
-      sortBy: this.sortBy as 'date' | 'emails' | 'urgency'
+      sortBy: this.sortBy as 'date' | 'emails' | 'urgency' | 'votes'
     }));
 
     // Update URL with new sort and reset to page 1

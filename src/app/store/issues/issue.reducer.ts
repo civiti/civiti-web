@@ -108,5 +108,67 @@ export const issueReducer = createReducer(
     ...state,
     loading: false,
     error
-  }))
+  })),
+
+  // Vote for Issue Success - idempotent update
+  on(IssueActions.voteForIssueSuccess, (state, { issueId }) => {
+    let newState = state;
+
+    // Update the list item if it exists (idempotent check)
+    const issue = state.entities[issueId];
+    if (issue && !issue.hasVoted) {
+      newState = issueAdapter.updateOne({
+        id: issueId,
+        changes: {
+          communityVotes: issue.communityVotes + 1,
+          hasVoted: true
+        }
+      }, newState);
+    }
+
+    // Also update the detailed issue if it's the selected one (idempotent check)
+    if (state.selectedIssueDetail && state.selectedIssueDetail.id === issueId && !state.selectedIssueDetail.hasVoted) {
+      newState = {
+        ...newState,
+        selectedIssueDetail: {
+          ...state.selectedIssueDetail,
+          communityVotes: state.selectedIssueDetail.communityVotes + 1,
+          hasVoted: true
+        }
+      };
+    }
+
+    return newState;
+  }),
+
+  // Remove Vote from Issue Success - idempotent update
+  on(IssueActions.removeVoteFromIssueSuccess, (state, { issueId }) => {
+    let newState = state;
+
+    // Update the list item if it exists (idempotent check)
+    const issue = state.entities[issueId];
+    if (issue && issue.hasVoted) {
+      newState = issueAdapter.updateOne({
+        id: issueId,
+        changes: {
+          communityVotes: Math.max(0, issue.communityVotes - 1),
+          hasVoted: false
+        }
+      }, newState);
+    }
+
+    // Also update the detailed issue if it's the selected one (idempotent check)
+    if (state.selectedIssueDetail && state.selectedIssueDetail.id === issueId && state.selectedIssueDetail.hasVoted) {
+      newState = {
+        ...newState,
+        selectedIssueDetail: {
+          ...state.selectedIssueDetail,
+          communityVotes: Math.max(0, state.selectedIssueDetail.communityVotes - 1),
+          hasVoted: false
+        }
+      };
+    }
+
+    return newState;
+  })
 );

@@ -48,7 +48,7 @@ export const selectIssue = createAction(
 // Change Sort
 export const changeSortBy = createAction(
   '[Issues] Change Sort By',
-  props<{ sortBy: 'date' | 'emails' | 'urgency' }>()
+  props<{ sortBy: 'date' | 'emails' | 'urgency' | 'votes' }>()
 );
 
 // Track Email Sent
@@ -81,4 +81,36 @@ export const createIssueSuccess = createAction(
 export const createIssueFailure = createAction(
   '[Issue Creation] Create Issue Failure',
   props<{ error: string }>()
+);
+
+// Vote for Issue
+export const voteForIssue = createAction(
+  '[Issue Detail] Vote For Issue',
+  props<{ issueId: string }>()
+);
+
+export const voteForIssueSuccess = createAction(
+  '[Issue Detail] Vote For Issue Success',
+  props<{ issueId: string }>()
+);
+
+export const voteForIssueFailure = createAction(
+  '[Issue Detail] Vote For Issue Failure',
+  props<{ issueId: string; error: string }>()
+);
+
+// Remove Vote from Issue
+export const removeVoteFromIssue = createAction(
+  '[Issue Detail] Remove Vote From Issue',
+  props<{ issueId: string }>()
+);
+
+export const removeVoteFromIssueSuccess = createAction(
+  '[Issue Detail] Remove Vote From Issue Success',
+  props<{ issueId: string }>()
+);
+
+export const removeVoteFromIssueFailure = createAction(
+  '[Issue Detail] Remove Vote From Issue Failure',
+  props<{ issueId: string; error: string }>()
 );

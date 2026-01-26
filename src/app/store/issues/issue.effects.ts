@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { of } from 'rxjs';
-import { map, mergeMap, catchError, tap } from 'rxjs/operators';
+import { map, mergeMap, concatMap, catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
@@ -79,7 +79,11 @@ export class IssueEffects {
           }),
           catchError(error => {
             console.error(`[Issues Effects] Failed to track email for issue ${issueId}:`, error);
-            this.message.error('Eroare la înregistrarea email-ului');
+            if (error.status === 429) {
+              this.message.info('Ai contribuit deja la această problemă. Mulțumim!');
+            } else {
+              this.message.error('Eroare la înregistrarea email-ului');
+            }
             return of(IssueActions.trackEmailSentFailure({
               error: error.message || 'Failed to track email'
             }));
@@ -128,5 +132,66 @@ export class IssueEffects {
       })
     ),
     { dispatch: false }
+  );
+
+  // Vote for Issue Effect
+  voteForIssue$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IssueActions.voteForIssue),
+      concatMap(({ issueId }) =>
+        this.apiService.voteForIssue(issueId).pipe(
+          map(() => {
+            this.message.success('Votul tău a fost înregistrat!');
+            return IssueActions.voteForIssueSuccess({ issueId });
+          }),
+          catchError(error => {
+            console.error(`[Issues Effects] Failed to vote for issue ${issueId}:`, error);
+            // Handle "already voted" as success (idempotent)
+            if (error.status === 409 || error.error?.message?.toLowerCase().includes('already voted')) {
+              return of(IssueActions.voteForIssueSuccess({ issueId }));
+            }
+            // Map API errors to Romanian messages
+            let errorMessage = 'Eroare la înregistrarea votului';
+            if (error.error?.message) {
+              const msg = error.error.message.toLowerCase();
+              if (msg.includes('cannot vote on own issue')) {
+                errorMessage = 'Nu poți vota pentru propria problemă';
+              } else if (msg.includes('only vote on active')) {
+                errorMessage = 'Poți vota doar pentru probleme active';
+              }
+            }
+            this.message.error(errorMessage);
+            return of(IssueActions.voteForIssueFailure({ issueId, error: errorMessage }));
+          })
+        )
+      )
+    )
+  );
+
+  // Remove Vote from Issue Effect
+  removeVoteFromIssue$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(IssueActions.removeVoteFromIssue),
+      concatMap(({ issueId }) =>
+        this.apiService.removeIssueVote(issueId).pipe(
+          map(() => {
+            this.message.success('Votul tău a fost retras');
+            return IssueActions.removeVoteFromIssueSuccess({ issueId });
+          }),
+          catchError(error => {
+            console.error(`[Issues Effects] Failed to remove vote for issue ${issueId}:`, error);
+            // Handle "not voted" as success (idempotent)
+            if (error.status === 404 || error.error?.message?.toLowerCase().includes('not voted')) {
+              return of(IssueActions.removeVoteFromIssueSuccess({ issueId }));
+            }
+            this.message.error('Eroare la retragerea votului');
+            return of(IssueActions.removeVoteFromIssueFailure({
+              issueId,
+              error: error.message || 'Failed to remove vote'
+            }));
+          })
+        )
+      )
+    )
   );
 }
