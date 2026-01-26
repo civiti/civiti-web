@@ -6,8 +6,7 @@ import { NgZorroModule } from '../../shared/ng-zorro.module';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
-import { IssueDetailResponse, IssueAuthorityResponse, URGENCY_LEVELS } from '../../types/civica-api.types';
-import { CategoryService } from '../../services/category.service';
+import { IssueDetailResponse, IssueAuthorityResponse } from '../../types/civica-api.types';
 
 export interface EmailModalData {
     issue: IssueDetailResponse;
@@ -33,7 +32,6 @@ export class EmailModalComponent implements OnInit {
     private _store = inject(Store<AppState>);
     private _message = inject(NzMessageService);
     private _modalRef = inject(NzModalRef);
-    private _categoryService = inject(CategoryService);
 
     issue: IssueDetailResponse;
     authorities: IssueAuthorityResponse[];
@@ -61,38 +59,74 @@ export class EmailModalComponent implements OnInit {
 
     /**
      * Generate read-only email template with placeholders for user to fill in their email client
+     * Compliant with Romanian petition law (OG 27/2002 and Legii 233/2002)
      */
     private generateEmailTemplate(): void {
         if (!this.issue || !this.authorities.length) return;
 
-        const categoryLabel = this._categoryService.getCategoryLabel(this.issue.category);
-        const urgencyLabel = URGENCY_LEVELS[this.issue.urgency] || this.issue.urgency;
-
-        const subject = `Problemă urgentă: ${this.issue.title}`;
+        // Legally-compliant subject format
+        const subject = `Petiție - [NUMELE TĂU COMPLET] - ${this.issue.title}`;
 
         // Build location string from available fields
         const locationParts = [this.issue.address];
         if (this.issue.district) locationParts.push(this.issue.district);
         const locationString = locationParts.filter(Boolean).join(', ') || 'Locație nespecificată';
 
-        const body = `Stimată autoritate,
+        // Format dates as DD.MM.YYYY
+        const createdDate = this.formatDateRomanian(this.issue.createdAt);
+        const currentDate = this.formatDateRomanian(new Date().toISOString());
 
-Subsemnatul/a [NUMELE TĂU COMPLET], cu adresa de email [ADRESA TA DE EMAIL], doresc să vă aduc la cunoștință următoarea problemă:
+        // Build community impact section if available
+        const communityImpactSection = this.issue.communityImpact?.trim()
+            ? `\n${this.issue.communityImpact.trim()}`
+            : '';
 
-${this.issue.description}
+        // Build desired outcome section
+        const desiredOutcomeText = this.issue.desiredOutcome?.trim()
+            ? this.issue.desiredOutcome.trim()
+            : 'Vă solicit să luați măsurile necesare pentru remedierea acestei probleme în cel mai scurt timp posibil.';
+
+        // Build photos section
+        const photoCount = this.issue.photos?.length || 0;
+        const photosSection = photoCount > 0
+            ? `La prezenta petiție anexez ${photoCount} ${photoCount === 1 ? 'fotografie care documentează' : 'fotografii care documentează'} problema semnalată.\n`
+            : '';
+
+        const body = `Către: [NUMELE AUTORITĂȚII]
+
+Subsemnatul/a [NUMELE TĂU COMPLET], CNP: [CNP-UL TĂU], domiciliat(ă) în [ADRESA TA DE DOMICILIU], email: [ADRESA TA DE EMAIL], telefon: [NUMĂRUL TĂU DE TELEFON], vă adresez prezenta petiție prin care solicit să luați măsuri în legătură cu următoarea problemă:
+
+${this.issue.title}
 
 Locație: ${locationString}
-Categorie: ${categoryLabel}
-Urgență: ${urgencyLabel}
+Data sesizării: ${createdDate}
 
-Această problemă afectează comunitatea noastră și necesită o intervenție urgentă din partea dumneavoastră.
+${this.issue.description}${communityImpactSection}
 
-Vă mulțumesc pentru atenție și aștept cu interes răspunsul dumneavoastră.
+${desiredOutcomeText}
+
+${photosSection}Link către documentația completă: https://civiti.ro/issues/${this.issue.id}
+
+Conform O.G. 27/2002 privind reglementarea activității de soluționare a petițiilor, vă rog să îmi comunicați răspunsul la adresa de domiciliu menționată mai sus sau prin email la [ADRESA TA DE EMAIL], în termenul legal de 30 de zile.
+
+De asemenea, vă rog să îmi comunicați numărul de înregistrare al acestei petiții pe adresa de email menționată mai sus, pentru a putea urmări soluționarea acesteia.
 
 Cu stimă,
-[SEMNĂTURA TA]`;
+[NUMELE TĂU COMPLET]
+${currentDate}`;
 
         this.emailTemplate = { subject, body };
+    }
+
+    /**
+     * Format ISO date string to Romanian format DD.MM.YYYY
+     */
+    private formatDateRomanian(isoDate: string): string {
+        const date = new Date(isoDate);
+        const day = date.getDate().toString().padStart(2, '0');
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const year = date.getFullYear();
+        return `${day}.${month}.${year}`;
     }
 
     /**

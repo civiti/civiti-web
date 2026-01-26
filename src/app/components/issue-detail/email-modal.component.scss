@@ -151,6 +151,25 @@
   }
 }
 
+// Legal note (compact warning)
+.legal-note {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 0 12px 0;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--oxford-blue);
+  background-color: rgba(252, 163, 17, 0.15);
+  border-radius: 4px;
+  border-left: 3px solid var(--orange-web);
+
+  .anticon {
+    color: var(--orange-web);
+    font-size: 12px;
+  }
+}
+
 // NG-ZORRO overrides
 :host ::ng-deep {
   // Card styling
@@ -202,6 +221,7 @@
       color: var(--oxford-blue);
     }
   }
+
 
   // Collapsible instructions styling
   .instructions-collapse.ant-collapse {

@@ -28,6 +28,11 @@ const UPDATE_COMMENT_ERROR_MAP: Record<string, string> = {
   'Comment not found': 'Comentariul nu a fost găsit.',
 };
 
+const VOTE_ERROR_MAP: Record<string, string> = {
+  'You cannot vote on your own comment': 'Nu poți vota propriul comentariu.',
+  'Comment not found': 'Comentariul nu a fost găsit.',
+};
+
 function mapCreateCommentError(error: HttpErrorResponse): string {
   // Check for 403 Forbidden (user trying to do something unauthorized)
   if (error.status === 403) {
@@ -142,14 +147,13 @@ export class CommentsEffects {
           map(() => CommentsActions.voteHelpfulSuccess({ commentId: action.commentId })),
           catchError(error => {
             // Treat "already voted" as success - the intended state was achieved
-            // Check error.error?.message first (API response), then error.message (HttpClient generic)
-            const errorMsg = error.error?.message || error.message || '';
+            // Check error.error?.message first (API response), then error.error?.error, then error.message (HttpClient generic)
+            const errorMsg = error.error?.message || error.error?.error || error.message || '';
             if (errorMsg.toLowerCase().includes('already voted')) {
               return of(CommentsActions.voteHelpfulSuccess({ commentId: action.commentId }));
             }
-            return of(CommentsActions.voteHelpfulFailure({
-              error: errorMsg || 'Eroare la votare'
-            }));
+            const userMessage = VOTE_ERROR_MAP[errorMsg] || errorMsg || 'Eroare la votare';
+            return of(CommentsActions.voteHelpfulFailure({ error: userMessage }));
           })
         )
       )
@@ -164,16 +168,15 @@ export class CommentsEffects {
           map(() => CommentsActions.removeVoteSuccess({ commentId: action.commentId })),
           catchError(error => {
             // Treat "not voted" / "vote not found" as success - the intended state was achieved
-            // Check error.error?.message first (API response), then error.message (HttpClient generic)
-            const errorMsg = error.error?.message || error.message || '';
+            // Check error.error?.message first (API response), then error.error?.error, then error.message (HttpClient generic)
+            const errorMsg = error.error?.message || error.error?.error || error.message || '';
             if (errorMsg.toLowerCase().includes('not voted') ||
                 errorMsg.toLowerCase().includes('vote not found') ||
                 errorMsg.toLowerCase().includes('no vote')) {
               return of(CommentsActions.removeVoteSuccess({ commentId: action.commentId }));
             }
-            return of(CommentsActions.removeVoteFailure({
-              error: errorMsg || 'Eroare la anularea votului'
-            }));
+            const userMessage = VOTE_ERROR_MAP[errorMsg] || errorMsg || 'Eroare la anularea votului';
+            return of(CommentsActions.removeVoteFailure({ error: userMessage }));
           })
         )
       )

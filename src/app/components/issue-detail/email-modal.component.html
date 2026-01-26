@@ -71,16 +71,23 @@
   <nz-collapse class="instructions-collapse">
     <nz-collapse-panel
       [nzHeader]="instructionsHeader"
-      [nzActive]="false">
+      [nzActive]="true">
+      <p class="legal-note">
+        <span nz-icon nzType="warning" nzTheme="fill"></span>
+        Conform OG 27/2002, petiția trebuie să conțină datele tale de identificare.
+      </p>
+
       <ul class="hints-list">
-        <li>Trimite email-uri <strong>SEPARATE</strong> către fiecare autoritate - nu folosi CC/BCC</li>
-        <li>Personalizează mesajul pentru fiecare autoritate în parte</li>
-        <li>Descarcă și atașează fotografiile problemei sau adaugă un link către această pagină</li>
-        <li>Înlocuiește textele marcate:
+        <li>Trimite email-uri <strong>SEPARATE</strong> către fiecare autoritate</li>
+        <li>Descarcă și atașează fotografiile problemei</li>
+        <li>Înlocuiește textele marcate cu datele tale:
           <ul class="placeholder-list">
-            <li><span class="placeholder-example">[NUMELE TĂU COMPLET]</span> → numele tău</li>
+            <li><span class="placeholder-example">[NUMELE AUTORITĂȚII]</span> → numele autorității destinatare</li>
+            <li><span class="placeholder-example">[NUMELE TĂU COMPLET]</span> → numele tău complet</li>
+            <li><span class="placeholder-example">[CNP-UL TĂU]</span> → codul numeric personal</li>
+            <li><span class="placeholder-example">[ADRESA TA DE DOMICILIU]</span> → adresa completă (str., nr., bl., ap., oraș, județ)</li>
             <li><span class="placeholder-example">[ADRESA TA DE EMAIL]</span> → email-ul tău</li>
-            <li><span class="placeholder-example">[SEMNĂTURA TA]</span> → numele pentru semnătură</li>
+            <li><span class="placeholder-example">[NUMĂRUL TĂU DE TELEFON]</span> → telefonul tău (recomandat)</li>
           </ul>
         </li>
       </ul>
@@ -89,7 +96,7 @@
   <ng-template #instructionsHeader>
     <span class="instructions-header">
       <span nz-icon nzType="info-circle" nzTheme="outline"></span>
-      Instrucțiuni
+      Instrucțiuni importante
     </span>
   </ng-template>
 </div>
