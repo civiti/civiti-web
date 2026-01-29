@@ -88,8 +88,6 @@ body {
 // Ensure routed components fill remaining viewport space after the header
 router-outlet + * {
   flex: 1 0 auto;
-  display: flex;
-  flex-direction: column;
 }
 
 // Issue-specific styling (from Implementation.md)

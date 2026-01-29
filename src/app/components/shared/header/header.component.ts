@@ -44,8 +44,6 @@ export class HeaderComponent {
   backUrl = input<string | null>(null);
   subtitle = input<string | null>(null);
 
-  // Event emitter for custom back navigation
-  back = output<void>();
 
   // Auth state observables
   isAuthenticated$: Observable<boolean>;
@@ -61,7 +59,6 @@ export class HeaderComponent {
   }
 
   onBack(): void {
-    this.back.emit();
     if (this.backUrl()) {
       this._router.navigate([this.backUrl()!]);
     } else {
