@@ -318,6 +318,8 @@
 
     .action-buttons {
       display: flex;
+      flex-direction: row;
+      align-items: center;
       justify-content: flex-end;
       gap: 1rem;
     }
@@ -353,7 +355,7 @@
     justify-content: center;
   }
 
-  .form-actions .action-buttons {
+  .approval-form .form-actions .action-buttons {
     flex-direction: column;
   }
 }
