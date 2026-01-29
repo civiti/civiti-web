@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { distinctUntilChanged, map, takeUntil } from 'rxjs/operators';
 
 // NG-ZORRO imports
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -144,11 +144,15 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     // Load user data when component initializes
     // Profile now includes gamification data - single API call
-    this.user$.pipe(takeUntil(this.destroy$)).subscribe(user => {
-      if (user) {
+    this.user$.pipe(
+      map(user => user?.id ?? null),
+      distinctUntilChanged(),
+      takeUntil(this.destroy$)
+    ).subscribe(userId => {
+      if (userId) {
         // loadUserProfile now returns profile WITH gamification
-        this.store.dispatch(UserActions.loadUserProfile({ userId: user.id }));
-        this.store.dispatch(UserActions.loadUserPreferences({ userId: user.id }));
+        this.store.dispatch(UserActions.loadUserProfile({ userId }));
+        this.store.dispatch(UserActions.loadUserPreferences({ userId }));
 
         // Load user's own issues
         this.store.dispatch(UserIssuesActions.loadUserIssues({}));

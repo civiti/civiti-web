@@ -192,14 +192,17 @@ export class ApprovalInterfaceComponent implements OnInit, OnDestroy {
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - new Date(date).getTime()) / (1000 * 60 * 60));
 
-    if (diffInHours < 1) return 'Just now';
-    if (diffInHours < 24) return `${diffInHours}h ago`;
+    if (diffInHours < 1) return 'acum';
+    if (diffInHours === 1) return 'acum 1 oră';
+    if (diffInHours < 24) return `acum ${diffInHours} ore`;
 
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays < 7) return `${diffInDays}d ago`;
+    if (diffInDays === 1) return 'acum 1 zi';
+    if (diffInDays < 7) return `acum ${diffInDays} zile`;
 
     const diffInWeeks = Math.floor(diffInDays / 7);
-    return `${diffInWeeks}w ago`;
+    if (diffInWeeks === 1) return 'acum 1 săpt.';
+    return `acum ${diffInWeeks} săpt.`;
   }
 
   viewIssueDetails(issue: AdminIssueListItem): void {
