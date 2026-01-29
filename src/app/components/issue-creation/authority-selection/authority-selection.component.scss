@@ -308,6 +308,17 @@
     background: rgba(252, 163, 17, 0.05);
     box-shadow: 0 2px 8px rgba(252, 163, 17, 0.15);
   }
+
+  &.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+
+    &:hover {
+      border-color: #e8e8e8;
+      background: transparent;
+    }
+  }
 }
 
 .authority-checkbox {

@@ -108,10 +108,13 @@ export class AuthoritySelectionComponent implements OnInit {
   // Authority selection state
   availableAuthorities: AuthorityListResponse[] = [];
   filteredAuthorities = signal<AuthorityListResponse[]>([]);
-  selectedAuthorities: SelectedAuthority[] = [];
+  selectedAuthorities = signal<SelectedAuthority[]>([]);
   searchTerm = '';
   isLoadingAuthorities = false;
   isSearching = false;
+
+  /** Whether the maximum number of authorities has been reached */
+  isAtLimit = computed(() => this.selectedAuthorities().length >= this.MAX_AUTHORITIES);
 
   /** Grouped authorities for display - computed from filteredAuthorities signal */
   groupedAuthorities = computed<AuthorityGroup[]>(() => {
@@ -231,7 +234,7 @@ export class AuthoritySelectionComponent implements OnInit {
     // Load previously selected authorities if returning to this step
     const authoritiesData = sessionStorage.getItem('civica_selected_authorities');
     if (authoritiesData) {
-      this.selectedAuthorities = JSON.parse(authoritiesData);
+      this.selectedAuthorities.set(JSON.parse(authoritiesData));
     }
 
     // Validate we have required data from previous steps
@@ -258,28 +261,26 @@ export class AuthoritySelectionComponent implements OnInit {
   }
 
   isAuthoritySelected(authority: AuthorityListResponse): boolean {
-    return this.selectedAuthorities.some(a => a.authorityId === authority.id || a.email === authority.email);
+    return this.selectedAuthorities().some(a => a.authorityId === authority.id || a.email === authority.email);
   }
 
   toggleAuthority(authority: AuthorityListResponse): void {
-    const index = this.selectedAuthorities.findIndex(a => a.authorityId === authority.id || a.email === authority.email);
+    const current = this.selectedAuthorities();
+    const index = current.findIndex(a => a.authorityId === authority.id || a.email === authority.email);
 
     if (index >= 0) {
-      // Remove authority
-      this.selectedAuthorities.splice(index, 1);
+      this.selectedAuthorities.update(list => list.filter((_, i) => i !== index));
     } else {
-      // Add authority (check limit)
-      if (this.selectedAuthorities.length >= this.MAX_AUTHORITIES) {
-        this.message.warning(`Poți selecta maximum ${this.MAX_AUTHORITIES} autorități`);
+      if (this.isAtLimit()) {
         return;
       }
 
-      this.selectedAuthorities.push({
+      this.selectedAuthorities.update(list => [...list, {
         authorityId: authority.id,
         email: authority.email,
         name: authority.name,
         isCustom: false
-      });
+      }]);
     }
 
     this.saveToSession();
@@ -304,13 +305,13 @@ export class AuthoritySelectionComponent implements OnInit {
     const name = this.customEmailForm.get('name')?.value?.trim() || email;
 
     // Check if already exists
-    if (this.selectedAuthorities.some(a => a.email.toLowerCase() === email.toLowerCase())) {
+    if (this.selectedAuthorities().some(a => a.email.toLowerCase() === email.toLowerCase())) {
       this.message.warning('Această adresă de email este deja adăugată');
       return;
     }
 
     // Check limit
-    if (this.selectedAuthorities.length >= this.MAX_AUTHORITIES) {
+    if (this.isAtLimit()) {
       this.message.warning(`Poți selecta maximum ${this.MAX_AUTHORITIES} autorități`);
       return;
     }
@@ -321,11 +322,11 @@ export class AuthoritySelectionComponent implements OnInit {
       return;
     }
 
-    this.selectedAuthorities.push({
+    this.selectedAuthorities.update(list => [...list, {
       email,
       name,
       isCustom: true
-    });
+    }]);
 
     this.customEmailForm.reset();
     this.showCustomEmailInput = false;
@@ -334,27 +335,19 @@ export class AuthoritySelectionComponent implements OnInit {
   }
 
   removeAuthority(authority: SelectedAuthority): void {
-    const index = this.selectedAuthorities.findIndex(a => a.email === authority.email);
-    if (index >= 0) {
-      this.selectedAuthorities.splice(index, 1);
-      this.saveToSession();
-    }
+    this.selectedAuthorities.update(list => list.filter(a => a.email !== authority.email));
+    this.saveToSession();
   }
 
   private saveToSession(): void {
-    sessionStorage.setItem('civica_selected_authorities', JSON.stringify(this.selectedAuthorities));
+    sessionStorage.setItem('civica_selected_authorities', JSON.stringify(this.selectedAuthorities()));
   }
 
-  get canContinue(): boolean {
-    return this.selectedAuthorities.length >= this.MIN_AUTHORITIES;
-  }
-
-  get remainingSlots(): number {
-    return this.MAX_AUTHORITIES - this.selectedAuthorities.length;
-  }
+  canContinue = computed(() => this.selectedAuthorities().length >= this.MIN_AUTHORITIES);
+  remainingSlots = computed(() => this.MAX_AUTHORITIES - this.selectedAuthorities().length);
 
   continueToReview(): void {
-    if (!this.canContinue) {
+    if (!this.canContinue()) {
       this.message.warning(`Selectează cel puțin ${this.MIN_AUTHORITIES} autoritate`);
       return;
     }

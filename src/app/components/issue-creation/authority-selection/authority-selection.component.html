@@ -51,31 +51,36 @@
   </div>
 
   <!-- Selected Authorities Summary -->
-  <div class="selected-authorities-section" *ngIf="selectedAuthorities.length > 0">
-    <nz-card class="selected-card">
-      <div class="selected-header">
-        <h3>
-          <span nz-icon nzType="check-circle" nzTheme="fill" class="selected-icon"></span>
-          Autorități selectate ({{ selectedAuthorities.length }}/{{ MAX_AUTHORITIES }})
-        </h3>
-        <span class="slots-remaining">
-          <span class="slots-count">{{ remainingSlots }}</span>
-          <span class="slots-label">locuri rămase</span>
-        </span>
-      </div>
-      <div class="selected-tags">
-        <nz-tag
-          *ngFor="let auth of selectedAuthorities"
-          [nzMode]="'closeable'"
-          [nzColor]="auth.isCustom ? 'orange' : 'blue'"
-          (nzOnClose)="removeAuthority(auth)">
-          <span nz-icon [nzType]="auth.isCustom ? 'user' : 'bank'" class="tag-icon"></span>
-          {{ auth.name }}
-          <span class="custom-badge" *ngIf="auth.isCustom">PERSONALIZAT</span>
-        </nz-tag>
-      </div>
-    </nz-card>
-  </div>
+  @if (selectedAuthorities().length > 0) {
+    <div class="selected-authorities-section">
+      <nz-card class="selected-card">
+        <div class="selected-header">
+          <h3>
+            <span nz-icon nzType="check-circle" nzTheme="fill" class="selected-icon"></span>
+            Autorități selectate ({{ selectedAuthorities().length }}/{{ MAX_AUTHORITIES }})
+          </h3>
+          <span class="slots-remaining">
+            <span class="slots-count">{{ remainingSlots() }}</span>
+            <span class="slots-label">locuri rămase</span>
+          </span>
+        </div>
+        <div class="selected-tags">
+          @for (auth of selectedAuthorities(); track auth.email) {
+            <nz-tag
+              [nzMode]="'closeable'"
+              [nzColor]="auth.isCustom ? 'orange' : 'blue'"
+              (nzOnClose)="removeAuthority(auth)">
+              <span nz-icon [nzType]="auth.isCustom ? 'user' : 'bank'" class="tag-icon"></span>
+              {{ auth.name }}
+              @if (auth.isCustom) {
+                <span class="custom-badge">PERSONALIZAT</span>
+              }
+            </nz-tag>
+          }
+        </div>
+      </nz-card>
+    </div>
+  }
 
   <!-- Search and Filter -->
   <div class="search-section">
@@ -122,13 +127,16 @@
 
                 <div class="group-items">
                   @for (authority of group.authorities; track authority.id) {
+                    @let selected = isAuthoritySelected(authority);
+                    @let disabled = isAtLimit() && !selected;
                     <div
                       class="authority-item"
-                      [class.selected]="isAuthoritySelected(authority)"
+                      [class.selected]="selected"
+                      [class.disabled]="disabled"
                       (click)="toggleAuthority(authority)">
 
                       <div class="authority-checkbox">
-                        <label nz-checkbox [ngModel]="isAuthoritySelected(authority)" (ngModelChange)="toggleAuthority(authority)" (click)="$event.stopPropagation()"></label>
+                        <label nz-checkbox [ngModel]="selected" [nzDisabled]="disabled" (ngModelChange)="toggleAuthority(authority)" (click)="$event.stopPropagation()"></label>
                       </div>
 
                       <div class="authority-icon">
@@ -218,7 +226,7 @@
             nz-button
             nzType="dashed"
             type="submit"
-            [disabled]="!customEmailForm.valid || selectedAuthorities.length >= MAX_AUTHORITIES"
+            [disabled]="!customEmailForm.valid || isAtLimit()"
             class="add-custom-btn">
             <span nz-icon nzType="plus"></span>
             Adaugă autoritate
@@ -247,7 +255,7 @@
         nz-button
         nzType="primary"
         nzSize="large"
-        [disabled]="!canContinue"
+        [disabled]="!canContinue()"
         (click)="continueToReview()"
         class="nav-btn continue-btn">
         Continuă cu verificarea
@@ -255,7 +263,7 @@
       </button>
     </div>
 
-    <div class="requirement-note" *ngIf="!canContinue">
+    <div class="requirement-note" *ngIf="!canContinue()">
       <p>Selectează cel puțin {{ MIN_AUTHORITIES }} autoritate pentru a continua</p>
     </div>
   </div>
