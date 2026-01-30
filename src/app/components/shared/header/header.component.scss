@@ -2,18 +2,43 @@
   background-color: var(--oxford-blue);
   color: white;
 
-  .ant-page-header-heading-title {
+  // NG-ZORRO internal elements — need ::ng-deep to pierce encapsulation
+  ::ng-deep {
+    .ant-page-header-heading {
+      align-items: center;
+    }
+
+    .ant-page-header-heading-title {
+      white-space: normal;
+      text-overflow: clip;
+      overflow: visible;
+    }
+
+    .ant-page-header-back-button {
+      color: white;
+
+      &:hover {
+        color: var(--orange-web);
+      }
+    }
+  }
+
+  // Elements in our own template — no ::ng-deep needed
+  nz-page-header-title {
     color: white;
     font-weight: 600;
   }
 
-  // Back button styling
-  .ant-page-header-back-button {
-    color: white;
+  .header-title-text {
+    display: block;
+  }
 
-    &:hover {
-      color: var(--orange-web);
-    }
+  .header-subtitle {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 400;
+    opacity: 0.85;
+    margin-top: 2px;
   }
 
   // Auth buttons in navbar
@@ -58,7 +83,7 @@
   align-items: center;
   cursor: pointer;
   padding: 4px 8px;
-  border-radius: 20px;
+  border-radius: 24px;
   transition: background-color 0.2s ease;
 
   &:hover {
@@ -88,8 +113,12 @@
   }
 
   .navbar {
-    .ant-page-header-heading-title {
+    ::ng-deep .ant-page-header-heading-title {
       font-size: 16px;
+    }
+
+    .header-subtitle {
+      font-size: 0.75rem;
     }
   }
 }

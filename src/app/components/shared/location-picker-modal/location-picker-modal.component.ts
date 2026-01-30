@@ -6,8 +6,6 @@ import {
   inject,
   Inject,
   PLATFORM_ID,
-  ViewChild,
-  ElementRef,
   ChangeDetectorRef
 } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -67,8 +65,6 @@ export class LocationPickerModalComponent implements OnInit, AfterViewInit, OnDe
   private _cdr = inject(ChangeDetectorRef);
   private _destroy$ = new Subject<void>();
   private _isDestroyed = false;
-
-  @ViewChild('addressInput') addressInputRef!: ElementRef<HTMLInputElement>;
 
   // Form control for address input
   addressControl = new FormControl('');

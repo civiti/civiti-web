@@ -8,7 +8,8 @@
       </div>
     </div>
     <div class="authorities-list">
-      <div *ngFor="let authority of authorities; let i = index" class="authority-item">
+      @for (authority of authorities; track authority.email; let i = $index) {
+      <div class="authority-item">
         <div class="authority-info">
           <div class="authority-name">{{ authority.name }}</div>
           <div class="authority-email">{{ authority.email }}</div>
@@ -22,6 +23,7 @@
           {{ emailCopyStates[i] ? 'Copiat!' : 'Copiază' }}
         </button>
       </div>
+      }
     </div>
   </nz-card>
 

@@ -1,32 +1,8 @@
 <div class="admin-container">
 
-  <!-- Header -->
-  <div class="admin-header">
-    <div class="header-content">
-      <div class="header-info">
-        <h1>Panou de Aprobare</h1>
-        <p>Revizuiește și aprobă sesizările comunității</p>
-      </div>
-      <div class="header-actions">
-        <button
-          nz-button
-          nzType="primary"
-          [disabled]="selectedCount === 0"
-          (click)="openBulkApprovalModal()"
-          *ngIf="pendingIssues.length > 0">
-          <span nz-icon nzType="check-circle"></span>
-          Aprobă selectate ({{ selectedCount }})
-        </button>
-        <button nz-button nzGhost (click)="refreshData()">
-          <span nz-icon nzType="reload"></span>
-          Reîmprospătare
-        </button>
-      </div>
-    </div>
-  </div>
-
   <!-- Stats Overview -->
-  <div class="stats-section" *ngIf="adminStats">
+  @if (adminStats) {
+  <div class="stats-section">
     <div nz-row [nzGutter]="[16, 16]">
       
       <div nz-col [nzSpan]="12" [nzMd]="6">
@@ -73,10 +49,30 @@
 
     </div>
   </div>
+  }
 
   <!-- Issues Table -->
   <div class="issues-section">
-    <nz-card nzTitle="Probleme în așteptare" class="issues-card">
+    <nz-card nzTitle="Probleme în așteptare" [nzExtra]="issueActions" class="issues-card">
+      <ng-template #issueActions>
+        <div class="card-header-actions">
+          @if (pendingIssues.length > 0) {
+            <button
+              nz-button
+              nzType="primary"
+              nzSize="small"
+              [disabled]="selectedCount === 0"
+              (click)="openBulkApprovalModal()">
+              <span nz-icon nzType="check-circle"></span>
+              Aprobă selectate ({{ selectedCount }})
+            </button>
+          }
+          <button nz-button nzSize="small" (click)="refreshData()">
+            <span nz-icon nzType="reload"></span>
+            Reîmprospătare
+          </button>
+        </div>
+      </ng-template>
 
       <nz-table
         #issuesTable
@@ -84,6 +80,7 @@
         [nzLoading]="isLoading"
         [nzPageSize]="10"
         [nzShowPagination]="true"
+        [nzNoResult]="emptyState"
         nzTableLayout="fixed">
 
         <thead>
@@ -107,81 +104,84 @@
         </thead>
 
         <tbody>
-          <tr *ngFor="let issue of issuesTable.data; let i = index">
+          @for (issue of issuesTable.data; track issue.id; let i = $index) {
+            <tr>
 
-            <td>
-              <label
-                nz-checkbox
-                [nzChecked]="isIssueSelected(issue.id)"
-                (nzCheckedChange)="toggleIssueSelection(issue.id, $event)">
-              </label>
-            </td>
-            <td>{{ i + 1 }}</td>
+              <td>
+                <label
+                  nz-checkbox
+                  [nzChecked]="isIssueSelected(issue.id)"
+                  (nzCheckedChange)="toggleIssueSelection(issue.id, $event)">
+                </label>
+              </td>
+              <td>{{ i + 1 }}</td>
 
-            <td>
-              <div class="issue-title">{{ issue.title }}</div>
-              <div class="issue-description">{{ issue.address | slice:0:80 }}</div>
-            </td>
+              <td>
+                <div class="issue-title">{{ issue.title }}</div>
+                <div class="issue-description">{{ issue.address | slice:0:80 }}</div>
+              </td>
 
-            <td>
-              <nz-tag [nzColor]="getCategoryColor(issue.category)">
-                {{ issue.category | titlecase }}
-              </nz-tag>
-            </td>
+              <td>
+                <nz-tag [nzColor]="getCategoryColor(issue.category)">
+                  {{ issue.category | titlecase }}
+                </nz-tag>
+              </td>
 
-            <td>
-              <nz-badge
-                [nzStatus]="getUrgencyStatus(issue.urgency)"
-                [nzText]="issue.urgency | titlecase">
-              </nz-badge>
-            </td>
+              <td>
+                <nz-badge
+                  [nzStatus]="getUrgencyStatus(issue.urgency)"
+                  [nzText]="issue.urgency | titlecase">
+                </nz-badge>
+              </td>
 
-            <td>
-              <div class="submission-time">
-                {{ getTimeAgo(issue.createdAt) }}
-              </div>
-            </td>
+              <td>
+                <div class="submission-time">
+                  {{ getTimeAgo(issue.createdAt) }}
+                </div>
+              </td>
 
-            <td>
-              <nz-badge [nzCount]="issue.photoCount" nzShowZero>
-                <span nz-icon nzType="picture"></span>
-              </nz-badge>
-            </td>
+              <td>
+                <nz-badge [nzCount]="issue.photoCount" nzShowZero>
+                  <span nz-icon nzType="picture"></span>
+                </nz-badge>
+              </td>
 
-            <td>
-              <div class="action-buttons">
-                <button
-                  nz-button
-                  nzType="link"
-                  nzSize="small"
-                  (click)="viewIssueDetails(issue)">
-                  <span nz-icon nzType="eye"></span>
-                  Vezi
-                </button>
-                <button
-                  nz-button
-                  nzType="primary"
-                  nzSize="small"
-                  (click)="openApprovalModal(issue)">
-                  <span nz-icon nzType="check"></span>
-                  Revizuiește
-                </button>
-              </div>
-            </td>
+              <td>
+                <div class="action-buttons">
+                  <button
+                    nz-button
+                    nzType="link"
+                    nzSize="small"
+                    (click)="viewIssueDetails(issue)">
+                    <span nz-icon nzType="eye"></span>
+                    Vezi
+                  </button>
+                  <button
+                    nz-button
+                    nzType="primary"
+                    nzSize="small"
+                    (click)="openApprovalModal(issue)">
+                    <span nz-icon nzType="check"></span>
+                    Revizuiește
+                  </button>
+                </div>
+              </td>
 
-          </tr>
+            </tr>
+          }
         </tbody>
 
       </nz-table>
 
-      <!-- Empty State -->
-      <div class="empty-state" *ngIf="!isLoading && pendingIssues.length === 0">
-        <div class="empty-icon">
-          <span nz-icon nzType="inbox"></span>
+      <ng-template #emptyState>
+        <div class="empty-state">
+          <div class="empty-icon">
+            <span nz-icon nzType="inbox"></span>
+          </div>
+          <h3>Nicio problemă în așteptare</h3>
+          <p>Toate sesizările comunității au fost revizuite.</p>
         </div>
-        <h3>Nicio problemă în așteptare</h3>
-        <p>Toate sesizările comunității au fost revizuite.</p>
-      </div>
+      </ng-template>
 
     </nz-card>
   </div>
@@ -200,35 +200,39 @@
         <div class="modal-content">
 
         <!-- Issue Details -->
-        <div class="issue-details" *ngIf="selectedIssue">
+        @if (selectedIssue) {
+          <div class="issue-details">
 
-          <div class="issue-header">
-            <h3>{{ selectedIssue.title }}</h3>
-            <div class="issue-meta">
-              <nz-tag [nzColor]="getCategoryColor(selectedIssue.category)">
-                {{ selectedIssue.category | titlecase }}
-              </nz-tag>
-              <nz-badge
-                [nzStatus]="getUrgencyStatus(selectedIssue.urgency)"
-                [nzText]="selectedIssue.urgency | titlecase">
-              </nz-badge>
-              <span class="submission-time">
-                Trimis {{ getTimeAgo(selectedIssue.createdAt) }}
-              </span>
+            <div class="issue-header">
+              <h3>{{ selectedIssue.title }}</h3>
+              <div class="issue-meta">
+                <nz-tag [nzColor]="getCategoryColor(selectedIssue.category)">
+                  {{ selectedIssue.category | titlecase }}
+                </nz-tag>
+                <nz-badge
+                  [nzStatus]="getUrgencyStatus(selectedIssue.urgency)"
+                  [nzText]="selectedIssue.urgency | titlecase">
+                </nz-badge>
+                <span class="submission-time">
+                  Trimis {{ getTimeAgo(selectedIssue.createdAt) }}
+                </span>
+              </div>
             </div>
-          </div>
 
-          <div class="issue-location">
-            <h4>Locație</h4>
-            <p>{{ selectedIssue.address }}</p>
-          </div>
+            <div class="issue-location">
+              <h4>Locație</h4>
+              <p>{{ selectedIssue.address }}</p>
+            </div>
 
-          <div class="issue-photos" *ngIf="selectedIssue.photoCount > 0">
-            <h4>Poze ({{ selectedIssue.photoCount }})</h4>
-            <p>Detaliile pozelor sunt disponibile în vizualizarea completă</p>
-          </div>
+            @if (selectedIssue.photoCount > 0) {
+              <div class="issue-photos">
+                <h4>Poze ({{ selectedIssue.photoCount }})</h4>
+                <p>Detaliile pozelor sunt disponibile în vizualizarea completă</p>
+              </div>
+            }
 
-        </div>
+          </div>
+        }
 
         <!-- Approval Form -->
         <div class="approval-form">

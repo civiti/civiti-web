@@ -85,6 +85,10 @@ body {
   color: var(--color-text);
 }
 
+// Ensure routed components fill remaining viewport space after the header
+router-outlet + * {
+  flex: 1 0 auto;
+}
 
 // Issue-specific styling (from Implementation.md)
 .issue-card {

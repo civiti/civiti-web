@@ -1,7 +1,8 @@
 <div class="location-container">
 
   <!-- Auth buttons - top right -->
-  <div class="auth-buttons" *ngIf="!(isAuthenticated$ | async)">
+  @if (!(isAuthenticated$ | async)) {
+  <div class="auth-buttons">
     <a class="auth-link" (click)="navigateToLogin()">
       <span nz-icon nzType="login" nzTheme="outline"></span>
       Conectează-te
@@ -11,9 +12,11 @@
       Înregistrează-te
     </a>
   </div>
+  }
 
   <!-- User dropdown - top right (authenticated) -->
-  <div class="user-menu" *ngIf="isAuthenticated$ | async">
+  @if (isAuthenticated$ | async) {
+  <div class="user-menu">
     <div
       nz-dropdown
       [nzDropdownMenu]="userMenu"
@@ -43,6 +46,7 @@
       </ul>
     </nz-dropdown-menu>
   </div>
+  }
 
   <!-- Main Card -->
   <div class="location-card-wrapper">

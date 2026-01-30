@@ -35,19 +35,20 @@
   </div>
 
   <!-- Authentication Check -->
-  <nz-alert
-    *ngIf="!(isAuthenticated$ | async)"
-    nzMessage="Autentificare necesară"
-    nzDescription="Te rugăm să te conectezi pentru a raporta probleme din comunitate"
-    nzType="warning"
-    nzShowIcon
-    nzCloseable
-    class="auth-alert">
-    <div class="auth-actions">
-      <button nz-button nzType="primary" routerLink="/auth/login">Conectare</button>
-      <button nz-button nzType="default" routerLink="/auth/register">Creează cont</button>
-    </div>
-  </nz-alert>
+  @if (!(isAuthenticated$ | async)) {
+    <nz-alert
+      nzMessage="Autentificare necesară"
+      nzDescription="Te rugăm să te conectezi pentru a raporta probleme din comunitate"
+      nzType="warning"
+      nzShowIcon
+      nzCloseable
+      class="auth-alert">
+      <div class="auth-actions">
+        <button nz-button nzType="primary" routerLink="/auth/login">Conectare</button>
+        <button nz-button nzType="default" routerLink="/auth/register">Creează cont</button>
+      </div>
+    </nz-alert>
+  }
 
   <!-- Category Selection -->
   <nz-spin [nzSpinning]="isLoading">
@@ -61,49 +62,52 @@
     <div class="categories-grid">
       <div nz-row [nzGutter]="[16, 16]">
         
-        <div 
-          nz-col 
-          [nzSpan]="24" 
-          [nzMd]="12" 
-          [nzLg]="8"
-          *ngFor="let category of categories"
-          class="category-col">
-          
-          <nz-card 
-            class="category-card" 
-            [class.selected]="selectedCategory?.id === category.id"
-            (click)="selectCategory(category)">
-            
-            <div class="category-content">
-              <div class="category-icon">
-                <span nz-icon [nzType]="category.icon" nzTheme="outline"></span>
-              </div>
-              
-              <div class="category-info">
-                <h3 class="category-title">{{ category.name }}</h3>
-                <p class="category-description">{{ category.description }}</p>
-              </div>
-              
-              <div class="category-examples">
-                <div class="examples-label">Exemple:</div>
-                <div class="examples-tags">
-                  <nz-tag
-                    *ngFor="let example of category.examples"
-                    class="example-tag">
-                    {{ example }}
-                  </nz-tag>
+        @for (category of categories; track category.id) {
+          <div
+            nz-col
+            [nzSpan]="24"
+            [nzMd]="12"
+            [nzLg]="8"
+            class="category-col">
+
+            <nz-card
+              class="category-card"
+              [class.selected]="selectedCategory?.id === category.id"
+              (click)="selectCategory(category)">
+
+              <div class="category-content">
+                <div class="category-icon">
+                  <span nz-icon [nzType]="category.icon" nzTheme="outline"></span>
                 </div>
+
+                <div class="category-info">
+                  <h3 class="category-title">{{ category.name }}</h3>
+                  <p class="category-description">{{ category.description }}</p>
+                </div>
+
+                <div class="category-examples">
+                  <div class="examples-label">Exemple:</div>
+                  <div class="examples-tags">
+                    @for (example of category.examples; track $index) {
+                      <nz-tag class="example-tag">
+                        {{ example }}
+                      </nz-tag>
+                    }
+                  </div>
+                </div>
+
+                @if (selectedCategory?.id === category.id) {
+                  <div class="selection-indicator">
+                    <span nz-icon nzType="check-circle" nzTheme="fill"></span>
+                    Selectat
+                  </div>
+                }
+
               </div>
-              
-              <div class="selection-indicator" *ngIf="selectedCategory?.id === category.id">
-                <span nz-icon nzType="check-circle" nzTheme="fill"></span>
-                Selectat
-              </div>
-              
-            </div>
-          </nz-card>
-          
-        </div>
+            </nz-card>
+
+          </div>
+        }
         
       </div>
     </div>
@@ -117,11 +121,16 @@
           </div>
           <div class="location-details">
             <div class="location-label">Locație</div>
-            <div class="location-address" *ngIf="currentLocation">{{ currentLocation.address }}</div>
-            <div class="location-address location-placeholder" *ngIf="!currentLocation">Nicio locație selectată</div>
-            <div class="location-meta" *ngIf="currentLocation?.district">
-              <nz-tag nzColor="processing">{{ currentLocation?.district }}</nz-tag>
-            </div>
+            @if (currentLocation) {
+              <div class="location-address">{{ currentLocation.address }}</div>
+            } @else {
+              <div class="location-address location-placeholder">Nicio locație selectată</div>
+            }
+            @if (currentLocation?.district) {
+              <div class="location-meta">
+                <nz-tag nzColor="processing">{{ currentLocation?.district }}</nz-tag>
+              </div>
+            }
           </div>
           <div class="location-action">
             <button nz-button nzType="primary" (click)="changeLocation()">
@@ -131,10 +140,12 @@
           </div>
         </div>
       </nz-card>
-      <div class="location-error-message" *ngIf="locationError">
-        <span nz-icon nzType="exclamation-circle" nzTheme="fill"></span>
-        {{ locationError }}
-      </div>
+      @if (locationError) {
+        <div class="location-error-message">
+          <span nz-icon nzType="exclamation-circle" nzTheme="fill"></span>
+          {{ locationError }}
+        </div>
+      }
     </div>
 
     <!-- Navigation -->
@@ -164,9 +175,11 @@
         </button>
       </div>
 
-      <div class="help-text" *ngIf="!selectedCategory">
-        <p>Te rugăm să selectezi o categorie pentru a continua</p>
-      </div>
+      @if (!selectedCategory) {
+        <div class="help-text">
+          <p>Te rugăm să selectezi o categorie pentru a continua</p>
+        </div>
+      }
     </div>
 
     </div>

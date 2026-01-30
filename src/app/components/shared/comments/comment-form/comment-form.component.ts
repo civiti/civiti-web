@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output, OnInit, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, OnInit, input, output, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { NzButtonModule } from 'ng-zorro-antd/button';
@@ -18,34 +18,35 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
   templateUrl: './comment-form.component.html',
   styleUrl: './comment-form.component.scss'
 })
-export class CommentFormComponent implements OnInit, OnChanges {
-  @Input() initialContent = '';
-  @Input() placeholder = 'Scrie un comentariu...';
-  @Input() submitLabel = 'Trimite';
-  @Input() isReply = false;
-  @Input() isEdit = false;
-  @Input() submitting = false;
-  @Input() resetKey = 0;
+export class CommentFormComponent implements OnInit {
+  initialContent = input('');
+  placeholder = input('Scrie un comentariu...');
+  submitLabel = input('Trimite');
+  isReply = input(false);
+  isEdit = input(false);
+  submitting = input(false);
+  resetKey = input(0);
 
-  @Output() submitted = new EventEmitter<string>();
-  @Output() cancelled = new EventEmitter<void>();
+  submitted = output<string>();
+  cancelled = output<void>();
 
   content = '';
   readonly maxLength = 2000;
   private previousResetKey = 0;
 
-  ngOnInit(): void {
-    this.content = this.initialContent;
-    this.previousResetKey = this.resetKey;
+  constructor() {
+    effect(() => {
+      const currentResetKey = this.resetKey();
+      if (currentResetKey !== this.previousResetKey) {
+        this.content = this.initialContent();
+        this.previousResetKey = currentResetKey;
+      }
+    });
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['resetKey'] && !changes['resetKey'].firstChange) {
-      if (this.resetKey !== this.previousResetKey) {
-        this.content = this.initialContent;
-        this.previousResetKey = this.resetKey;
-      }
-    }
+  ngOnInit(): void {
+    this.content = this.initialContent();
+    this.previousResetKey = this.resetKey();
   }
 
   get remainingChars(): number {
@@ -57,13 +58,13 @@ export class CommentFormComponent implements OnInit, OnChanges {
   }
 
   onSubmit(): void {
-    if (this.isValid && !this.submitting) {
+    if (this.isValid && !this.submitting()) {
       this.submitted.emit(this.content.trim());
     }
   }
 
   onCancel(): void {
-    this.content = this.initialContent;
+    this.content = this.initialContent();
     this.cancelled.emit();
   }
 }

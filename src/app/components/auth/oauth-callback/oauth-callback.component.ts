@@ -13,7 +13,7 @@ import { DEFAULT_CITY } from '../../../data/romanian-locations';
   standalone: true,
   imports: [CommonModule, NzSpinModule],
   template: `
-    <div class="flex items-center justify-center min-h-screen bg-gray-50">
+    <div class="flex items-center justify-center flex-1 bg-gray-50">
       <div class="text-center">
         <nz-spin nzSize="large" nzTip="Se procesează autentificarea..."></nz-spin>
       </div>

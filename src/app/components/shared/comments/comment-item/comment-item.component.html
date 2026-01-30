@@ -3,18 +3,18 @@
     <!-- Avatar -->
     <nz-avatar
       nz-comment-avatar
-      [nzSrc]="comment.user.photoUrl || ''"
-      [nzText]="comment.user.displayName.charAt(0).toUpperCase()"
+      [nzSrc]="comment().user.photoUrl || ''"
+      [nzText]="comment().user.displayName.charAt(0).toUpperCase()"
       [nzSize]="32"
       nzIcon="user"
     ></nz-avatar>
 
     <!-- Author template with level badge -->
     <ng-template #authorTemplate>
-      <span class="author-name">{{ comment.user.displayName }}</span>
-      @if (comment.user.level != null) {
+      <span class="author-name">{{ comment().user.displayName }}</span>
+      @if (comment().user.level != null) {
         <nz-badge
-          [nzCount]="comment.user.level"
+          [nzCount]="comment().user.level"
           nzShowZero
           [nzStyle]="{ backgroundColor: '#FCA311', fontSize: '10px' }"
           nz-tooltip
@@ -22,7 +22,7 @@
           class="level-badge"
         ></nz-badge>
       }
-      @if (comment.isEdited) {
+      @if (comment().isEdited) {
         <span class="edited-tag">(editat)</span>
       }
     </ng-template>
@@ -30,15 +30,15 @@
     <!-- Content -->
     <nz-comment-content>
       @if (!isEditing) {
-        <p class="comment-content" [class.deleted]="comment.isDeleted">
-          {{ comment.isDeleted ? '[Comentariu șters]' : comment.content }}
+        <p class="comment-content" [class.deleted]="comment().isDeleted">
+          {{ comment().isDeleted ? '[Comentariu șters]' : comment().content }}
         </p>
       } @else {
         <!-- Inline Edit Form -->
         <app-comment-form
-          [initialContent]="comment.content"
+          [initialContent]="comment().content"
           [isEdit]="true"
-          [submitting]="submitting"
+          [submitting]="submitting()"
           placeholder="Editează comentariul..."
           submitLabel="Salvează"
           (submitted)="onEditSubmit($event)"
@@ -48,24 +48,24 @@
     </nz-comment-content>
 
     <!-- Actions (only if not deleted) -->
-    @if (!comment.isDeleted && !isEditing) {
+    @if (!comment().isDeleted && !isEditing) {
       <!-- Helpful Vote -->
       <nz-comment-action>
         <span
           class="action-btn"
-          [class.voted]="comment.hasVoted"
+          [class.voted]="comment().hasVoted"
           [class.disabled]="!canVote"
           (click)="canVote && onVoteClick()"
           nz-tooltip
-          [nzTooltipTitle]="!isAuthenticated ? 'Autentifică-te pentru a vota' : (isOwner ? 'Nu poți vota propriul comentariu' : (comment.hasVoted ? 'Anulează votul' : 'Marchează ca util'))"
+          [nzTooltipTitle]="!isAuthenticated() ? 'Autentifică-te pentru a vota' : (isOwner ? 'Nu poți vota propriul comentariu' : (comment().hasVoted ? 'Anulează votul' : 'Marchează ca util'))"
         >
-          <i nz-icon nzType="like" [nzTheme]="comment.hasVoted ? 'fill' : 'outline'"></i>
-          Util ({{ comment.helpfulCount }})
+          <i nz-icon nzType="like" [nzTheme]="comment().hasVoted ? 'fill' : 'outline'"></i>
+          Util ({{ comment().helpfulCount }})
         </span>
       </nz-comment-action>
 
       <!-- Reply (only for authenticated users on commentable issues) -->
-      @if (isAuthenticated && canComment) {
+      @if (isAuthenticated() && canComment()) {
         <nz-comment-action>
           <span
             class="action-btn"
@@ -112,7 +112,7 @@
     <div class="reply-form-container">
       <app-comment-form
         [isReply]="true"
-        [submitting]="submitting"
+        [submitting]="submitting()"
         placeholder="Scrie un răspuns..."
         submitLabel="Răspunde"
         (submitted)="onReplySubmit($event)"
@@ -122,18 +122,18 @@
   }
 
   <!-- Recursive Children -->
-  @if (comment.children && comment.children.length > 0) {
-    <div class="replies" [style.margin-left.px]="comment.depth < 5 ? 24 : 0">
-      @for (child of comment.children; track child.id) {
+  @if (comment().children && comment().children.length > 0) {
+    <div class="replies" [style.margin-left.px]="comment().depth < 5 ? 24 : 0">
+      @for (child of comment().children; track child.id) {
         <app-comment-item
           [comment]="child"
-          [currentUserId]="currentUserId"
-          [isAdmin]="isAdmin"
-          [isAuthenticated]="isAuthenticated"
-          [canComment]="canComment"
-          [editingCommentId]="editingCommentId"
-          [replyingToCommentId]="replyingToCommentId"
-          [submitting]="submitting"
+          [currentUserId]="currentUserId()"
+          [isAdmin]="isAdmin()"
+          [isAuthenticated]="isAuthenticated()"
+          [canComment]="canComment()"
+          [editingCommentId]="editingCommentId()"
+          [replyingToCommentId]="replyingToCommentId()"
+          [submitting]="submitting()"
           (reply)="reply.emit($event)"
           (edit)="edit.emit($event)"
           (delete)="delete.emit($event)"

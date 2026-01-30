@@ -35,17 +35,19 @@
   </div>
 
   <!-- Selected Category Info -->
-  <div class="category-info" *ngIf="selectedCategory">
-    <nz-card class="category-card">
-      <div class="category-summary">
-        <span class="category-icon" nz-icon [nzType]="selectedCategory.icon" nzTheme="outline"></span>
-        <div class="category-details">
-          <h3>{{ selectedCategory.name }}</h3>
-          <p>{{ selectedCategory.description }}</p>
+  @if (selectedCategory) {
+    <div class="category-info">
+      <nz-card class="category-card">
+        <div class="category-summary">
+          <span class="category-icon" nz-icon [nzType]="selectedCategory.icon" nzTheme="outline"></span>
+          <div class="category-details">
+            <h3>{{ selectedCategory.name }}</h3>
+            <p>{{ selectedCategory.description }}</p>
+          </div>
         </div>
-      </div>
-    </nz-card>
-  </div>
+      </nz-card>
+    </div>
+  }
 
   <!-- Photo Upload Section -->
   <div class="upload-section">
@@ -80,82 +82,87 @@
       </nz-spin>
 
       <!-- Photo Preview Grid -->
-      <div class="photo-grid" *ngIf="uploadedPhotos.length > 0">
-        <div class="photo-count">
-          <span>{{ uploadedPhotos.length }}/5 fotografii încărcate</span>
-        </div>
-        
-        <div nz-row [nzGutter]="[16, 16]">
-          <div 
-            nz-col 
-            [nzSpan]="12" 
-            [nzSm]="8" 
-            [nzMd]="6"
-            *ngFor="let photo of uploadedPhotos; let i = index"
-            class="photo-col">
-            
-            <div class="photo-preview" [class.is-primary]="photo.isPrimary">
-              <!-- Primary badge -->
-              <div class="primary-badge" *ngIf="photo.isPrimary">
-                <span nz-icon nzType="star" nzTheme="fill"></span>
-                <span class="badge-text">Principală</span>
-              </div>
+      @if (uploadedPhotos.length > 0) {
+        <div class="photo-grid">
+          <div class="photo-count">
+            <span>{{ uploadedPhotos.length }}/5 fotografii încărcate</span>
+          </div>
 
-              <!-- GLightbox anchor for photo preview -->
-              <a
-                [id]="'photo-gallery-' + i"
-                [href]="photo.url"
-                class="photo-gallery-item"
-                [attr.data-glightbox]="'title: Fotografie ' + (i + 1)"
-                (click)="onGalleryItemClick($event, photo)">
-                <img
-                  [src]="photo.url"
-                  [alt]="'Photo ' + (i + 1)"
-                  class="photo-image"
-                  loading="lazy"
-                  (error)="onImageError($event, photo)"
-                  (load)="onImageLoad($event, photo)">
-              </a>
+          <div nz-row [nzGutter]="[16, 16]">
+            @for (photo of uploadedPhotos; track $index; let i = $index) {
+              <div
+                nz-col
+                [nzSpan]="12"
+                [nzSm]="8"
+                [nzMd]="6"
+                class="photo-col">
 
-              <div class="photo-overlay">
-                <div class="photo-actions">
-                  <!-- Set as primary button -->
-                  <button
-                    nz-button
-                    [nzType]="photo.isPrimary ? 'primary' : 'default'"
-                    nzSize="small"
-                    nzShape="circle"
-                    [nz-tooltip]="photo.isPrimary ? 'Imagine principală' : 'Setează ca principală'"
-                    (click)="setPrimaryPhoto(i); $event.stopPropagation()">
-                    <span nz-icon nzType="star" [nzTheme]="photo.isPrimary ? 'fill' : 'outline'"></span>
-                  </button>
-                  <button
-                    nz-button
-                    nzType="primary"
-                    nzSize="small"
-                    nzShape="circle"
-                    nz-tooltip="Vizualizează"
-                    (click)="viewPhoto(photo, i); $event.stopPropagation()">
-                    <span nz-icon nzType="eye"></span>
-                  </button>
-                  <button
-                    nz-button
-                    nzType="primary"
-                    nzDanger
-                    nzSize="small"
-                    nzShape="circle"
-                    nz-tooltip="Șterge"
-                    (click)="removePhoto(i); $event.stopPropagation()">
-                    <span nz-icon nzType="delete"></span>
-                  </button>
+                <div class="photo-preview" [class.is-primary]="photo.isPrimary">
+                  <!-- Primary badge -->
+                  @if (photo.isPrimary) {
+                    <div class="primary-badge">
+                      <span nz-icon nzType="star" nzTheme="fill"></span>
+                      <span class="badge-text">Principală</span>
+                    </div>
+                  }
+
+                  <!-- GLightbox anchor for photo preview -->
+                  <a
+                    [id]="'photo-gallery-' + i"
+                    [href]="photo.url"
+                    class="photo-gallery-item"
+                    [attr.data-glightbox]="'title: Fotografie ' + (i + 1)"
+                    (click)="onGalleryItemClick($event, photo)">
+                    <img
+                      [src]="photo.url"
+                      [alt]="'Photo ' + (i + 1)"
+                      class="photo-image"
+                      loading="lazy"
+                      (error)="onImageError($event, photo)"
+                      (load)="onImageLoad($event, photo)">
+                  </a>
+
+                  <div class="photo-overlay">
+                    <div class="photo-actions">
+                      <!-- Set as primary button -->
+                      <button
+                        nz-button
+                        [nzType]="photo.isPrimary ? 'primary' : 'default'"
+                        nzSize="small"
+                        nzShape="circle"
+                        [nz-tooltip]="photo.isPrimary ? 'Imagine principală' : 'Setează ca principală'"
+                        (click)="setPrimaryPhoto(i); $event.stopPropagation()">
+                        <span nz-icon nzType="star" [nzTheme]="photo.isPrimary ? 'fill' : 'outline'"></span>
+                      </button>
+                      <button
+                        nz-button
+                        nzType="primary"
+                        nzSize="small"
+                        nzShape="circle"
+                        nz-tooltip="Vizualizează"
+                        (click)="viewPhoto(photo, i); $event.stopPropagation()">
+                        <span nz-icon nzType="eye"></span>
+                      </button>
+                      <button
+                        nz-button
+                        nzType="primary"
+                        nzDanger
+                        nzSize="small"
+                        nzShape="circle"
+                        nz-tooltip="Șterge"
+                        (click)="removePhoto(i); $event.stopPropagation()">
+                        <span nz-icon nzType="delete"></span>
+                      </button>
+                    </div>
+                  </div>
+
                 </div>
-              </div>
 
-            </div>
-            
+              </div>
+            }
           </div>
         </div>
-      </div>
+      }
 
     </nz-card>
   </div>
@@ -187,9 +194,11 @@
       </button>
     </div>
     
-    <div class="requirement-note" *ngIf="uploadedPhotos.length === 0">
-      <p>Este necesară cel puțin o fotografie pentru a continua</p>
-    </div>
+    @if (uploadedPhotos.length === 0) {
+      <div class="requirement-note">
+        <p>Este necesară cel puțin o fotografie pentru a continua</p>
+      </div>
+    }
   </div>
 
 </div>

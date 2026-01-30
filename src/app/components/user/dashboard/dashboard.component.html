@@ -1,123 +1,75 @@
 <nz-spin [nzSpinning]="(isLoading$ | async) || false">
   <div class="dashboard-container">
   
-  <!-- Header Section -->
-  <div class="dashboard-header">
-    <div class="header-content">
-      <div class="user-welcome">
-        <nz-avatar
-          [nzSrc]="(user$ | async)?.photoUrl || undefined"
-          [nzText]="(displayName$ | async)?.charAt(0)"
-          nzSize="large"
-          class="user-avatar">
-        </nz-avatar>
-        <div class="welcome-text">
-          <h1>Bună, {{ displayName$ | async }}!</h1>
-          <p>Bine ai revenit la panoul civic</p>
-        </div>
-      </div>
-      
-      <div class="header-actions">
-        <button 
-          nz-button 
-          nzType="default" 
-          nzSize="small"
-          (click)="navigateToIssues()"
-          class="issues-nav-button"
-        >
-          <i nz-icon nzType="unordered-list" nzTheme="outline" class="mr-1"></i>
-          Vezi Probleme
-        </button>
-        <button nz-button nzType="text" nzSize="large" nz-dropdown [nzDropdownMenu]="userMenu" nzTrigger="click">
-          <span nz-icon nzType="user"></span>
-          <span nz-icon nzType="down"></span>
-        </button>
-        <nz-dropdown-menu #userMenu="nzDropdownMenu">
-          <ul nz-menu>
-            <li nz-menu-item>
-              <span nz-icon nzType="setting"></span>
-              Setări profil
-            </li>
-            <li nz-menu-item>
-              <span nz-icon nzType="notification"></span>
-              Notificări
-            </li>
-            <li nz-menu-divider></li>
-            <li nz-menu-item (click)="logout()">
-              <span nz-icon nzType="logout"></span>
-              Deconectare
-            </li>
-          </ul>
-        </nz-dropdown-menu>
-      </div>
-    </div>
-  </div>
-
   <!-- Gamification Progress Section -->
-  <div class="gamification-section" *ngIf="levelProgress$ | async as progress">
-    <nz-card nzTitle="Impactul tău civic" class="impact-card">
-      <div class="impact-overview">
-        <div class="level-info">
-          <div class="level-badge">
-            <span class="level-number">{{ userLevel$ | async }}</span>
-            <span class="level-label">Nivel</span>
+  @if (levelProgress$ | async; as progress) {
+    <div class="gamification-section">
+      <nz-card nzTitle="Impactul tău civic" class="impact-card">
+        <div class="impact-overview">
+          <div class="level-info">
+            <div class="level-badge">
+              <span class="level-number">{{ userLevel$ | async }}</span>
+              <span class="level-label">Nivel</span>
+            </div>
+            <div class="level-title">
+              <h3>{{ getLevelTitle(userLevel$ | async) }}</h3>
+              <p>{{ userPoints$ | async }} puncte de comunitate</p>
+            </div>
           </div>
-          <div class="level-title">
-            <h3>{{ getLevelTitle(userLevel$ | async) }}</h3>
-            <p>{{ userPoints$ | async }} puncte de comunitate</p>
+
+          <div class="progress-info">
+            <nz-progress
+              [nzPercent]="progress.percentage"
+              nzStrokeColor="#FCA311"
+              nzSize="small"
+              class="level-progress">
+            </nz-progress>
+            <p class="progress-text">
+              {{ progress.current }} / {{ progress.required }} puncte până la nivelul {{ (userLevel$ | async)! + 1 }}
+            </p>
           </div>
         </div>
-        
-        <div class="progress-info">
-          <nz-progress 
-            [nzPercent]="progress.percentage" 
-            nzStrokeColor="#FCA311"
-            nzSize="small"
-            class="level-progress">
-          </nz-progress>
-          <p class="progress-text">
-            {{ progress.current }} / {{ progress.required }} puncte până la nivelul {{ (userLevel$ | async)! + 1 }}
-          </p>
-        </div>
-      </div>
-    </nz-card>
-  </div>
+      </nz-card>
+    </div>
+  }
 
   <!-- Stats Grid -->
   <div class="stats-grid">
-    <div nz-row [nzGutter]="[16, 16]" *ngIf="userStats$ | async as stats">
-      
-      <div nz-col [nzSpan]="12" [nzSm]="6">
-        <nz-card class="stat-card">
-          <nz-statistic
-            [nzValue]="stats.issuesReported"
-            nzTitle="Probleme raportate"
-            [nzValueStyle]="{ color: '#FCA311' }">
-          </nz-statistic>
-        </nz-card>
-      </div>
+    @if (userStats$ | async; as stats) {
+      <div nz-row [nzGutter]="[16, 16]">
 
-      <div nz-col [nzSpan]="12" [nzSm]="6">
-        <nz-card class="stat-card">
-          <nz-statistic
-            [nzValue]="stats.issuesResolved"
-            nzTitle="Probleme rezolvate"
-            [nzValueStyle]="{ color: '#28A745' }">
-          </nz-statistic>
-        </nz-card>
-      </div>
+        <div nz-col [nzSpan]="12" [nzSm]="6">
+          <nz-card class="stat-card">
+            <nz-statistic
+              [nzValue]="stats.issuesReported"
+              nzTitle="Probleme raportate"
+              [nzValueStyle]="{ color: '#FCA311' }">
+            </nz-statistic>
+          </nz-card>
+        </div>
 
-      <div nz-col [nzSpan]="12" [nzSm]="6">
-        <nz-card class="stat-card">
-          <nz-statistic
-            [nzValue]="stats.communityVotes"
-            nzTitle="Voturi comunitate"
-            [nzValueStyle]="{ color: '#14213D' }">
-          </nz-statistic>
-        </nz-card>
-      </div>
+        <div nz-col [nzSpan]="12" [nzSm]="6">
+          <nz-card class="stat-card">
+            <nz-statistic
+              [nzValue]="stats.issuesResolved"
+              nzTitle="Probleme rezolvate"
+              [nzValueStyle]="{ color: '#28A745' }">
+            </nz-statistic>
+          </nz-card>
+        </div>
 
-    </div>
+        <div nz-col [nzSpan]="12" [nzSm]="6">
+          <nz-card class="stat-card">
+            <nz-statistic
+              [nzValue]="stats.communityVotes"
+              nzTitle="Voturi comunitate"
+              [nzValueStyle]="{ color: '#14213D' }">
+            </nz-statistic>
+          </nz-card>
+        </div>
+
+      </div>
+    }
   </div>
 
   <!-- Main Content Grid -->
@@ -177,81 +129,91 @@
           </div>
 
           <!-- Summary Stats -->
-          <div class="issues-summary" *ngIf="userIssuesSummary$ | async as summary">
-            <div class="summary-stat">
-              <span class="stat-value active">{{ summary.active }}</span>
-              <span class="stat-label">Active</span>
+          @if (userIssuesSummary$ | async; as summary) {
+            <div class="issues-summary">
+              <div class="summary-stat">
+                <span class="stat-value active">{{ summary.active }}</span>
+                <span class="stat-label">Active</span>
+              </div>
+              <div class="summary-stat">
+                <span class="stat-value resolved">{{ summary.resolved }}</span>
+                <span class="stat-label">Rezolvate</span>
+              </div>
+              <div class="summary-stat">
+                <span class="stat-value rejected">{{ summary.rejected }}</span>
+                <span class="stat-label">Respinse</span>
+              </div>
             </div>
-            <div class="summary-stat">
-              <span class="stat-value resolved">{{ summary.resolved }}</span>
-              <span class="stat-label">Rezolvate</span>
-            </div>
-            <div class="summary-stat">
-              <span class="stat-value rejected">{{ summary.rejected }}</span>
-              <span class="stat-label">Respinse</span>
-            </div>
-          </div>
+          }
 
           <!-- Recent Issues Mini-Cards -->
-          <div class="recent-issues" *ngIf="recentUserIssues$ | async as issues">
-            <div *ngFor="let issue of issues" class="mini-issue-card"
-                 (click)="viewIssueDetails(issue.id)">
-              <div class="mini-issue-image">
-                <img [src]="issue.mainPhotoUrl || '/images/placeholders/issue-placeholder.svg'"
-                     [alt]="issue.title"
-                     (error)="onIssueImageError($event)">
-              </div>
-              <div class="mini-issue-info">
-                <h5>{{ issue.title }}</h5>
-                <div class="issue-meta">
-                  <nz-tag [nzColor]="issue.status | statusColor" nzMode="default">
-                    {{ issue.status | statusText }}
-                  </nz-tag>
-                  <span class="email-count">{{ issue.emailsSent }} contribuții</span>
+          @if (recentUserIssues$ | async; as issues) {
+            <div class="recent-issues">
+              @for (issue of issues; track issue.id) {
+                <div class="mini-issue-card"
+                     (click)="viewIssueDetails(issue.id)">
+                  <div class="mini-issue-image">
+                    <img [src]="issue.mainPhotoUrl || '/images/placeholders/issue-placeholder.svg'"
+                         [alt]="issue.title"
+                         (error)="onIssueImageError($event)">
+                  </div>
+                  <div class="mini-issue-info">
+                    <h5>{{ issue.title }}</h5>
+                    <div class="issue-meta">
+                      <nz-tag [nzColor]="issue.status | statusColor" nzMode="default">
+                        {{ issue.status | statusText }}
+                      </nz-tag>
+                      <span class="email-count">{{ issue.emailsSent }} contribuții</span>
+                    </div>
+                  </div>
                 </div>
-              </div>
-            </div>
+              }
 
-            <div *ngIf="issues.length === 0" class="no-issues">
-              <nz-empty nzNotFoundImage="simple"
-                        nzNotFoundContent="Nu ai raportat încă probleme">
-              </nz-empty>
-              <button nz-button nzType="primary" nzSize="small" routerLink="/create-issue" class="report-first-btn">
-                <i nz-icon nzType="plus" nzTheme="outline"></i>
-                Raportează prima problemă
-              </button>
+              @if (issues.length === 0) {
+                <div class="no-issues">
+                  <nz-empty nzNotFoundImage="simple"
+                            nzNotFoundContent="Nu ai raportat încă probleme">
+                  </nz-empty>
+                  <button nz-button nzType="primary" nzSize="small" routerLink="/create-issue" class="report-first-btn">
+                    <i nz-icon nzType="plus" nzTheme="outline"></i>
+                    Raportează prima problemă
+                  </button>
+                </div>
+              }
             </div>
-          </div>
+          }
         </nz-card>
 
         <!-- Recent Activity -->
         <nz-card nzTitle="Activitate recentă" class="activity-card" [nzLoading]="(activityLoading$ | async) || false">
-          <ng-container *ngIf="recentActivity$ | async as activities">
-            <nz-list
-              *ngIf="activities.length > 0"
-              [nzDataSource]="activities"
-              [nzRenderItem]="activityItem">
-              <ng-template #activityItem let-item>
-                <nz-list-item>
-                  <nz-list-item-meta
-                    [nzAvatar]="activityAvatar"
-                    [nzTitle]="item.message"
-                    [nzDescription]="item.issueTitle">
-                    <ng-template #activityAvatar>
-                      <nz-avatar [nzIcon]="item.type | activityIcon" [style.backgroundColor]="item.type | activityColor"></nz-avatar>
-                    </ng-template>
-                  </nz-list-item-meta>
-                  <div class="activity-time">{{ item.createdAt | date:'short' }}</div>
-                </nz-list-item>
-              </ng-template>
-            </nz-list>
+          @if (recentActivity$ | async; as activities) {
+            @if (activities.length > 0) {
+              <nz-list
+                [nzDataSource]="activities"
+                [nzRenderItem]="activityItem">
+                <ng-template #activityItem let-item>
+                  <nz-list-item>
+                    <nz-list-item-meta
+                      [nzAvatar]="activityAvatar"
+                      [nzTitle]="item.message"
+                      [nzDescription]="item.issueTitle">
+                      <ng-template #activityAvatar>
+                        <nz-avatar [nzIcon]="item.type | activityIcon" [style.backgroundColor]="item.type | activityColor"></nz-avatar>
+                      </ng-template>
+                    </nz-list-item-meta>
+                    <div class="activity-time">{{ item.createdAt | date:'short' }}</div>
+                  </nz-list-item>
+                </ng-template>
+              </nz-list>
+            }
 
-            <nz-empty
-              *ngIf="activities.length === 0"
-              nzNotFoundImage="simple"
-              nzNotFoundContent="Nicio activitate recentă. Începe prin a raporta o problemă!">
-            </nz-empty>
-          </ng-container>
+            @if (activities.length === 0) {
+              <nz-empty
+                nzNotFoundImage="simple"
+                nzNotFoundContent="Nicio activitate recentă. Începe prin a raporta o problemă!">
+              </nz-empty>
+            }
+          }
         </nz-card>
 
       </div>
@@ -260,61 +222,68 @@
       <div nz-col [nzSpan]="24" [nzLg]="8">
         
         <!-- Earned Badges -->
-        <nz-card nzTitle="Insignele tale" class="badges-card" *ngIf="earnedBadges$ | async as badges">
-          <div class="badges-grid" *ngIf="badges.length > 0; else noBadges">
-            <div
-              *ngFor="let badge of badges"
-              class="badge-item"
-              [title]="badge.descriptionRo">
-              <div class="badge-icon" [ngClass]="'rarity-' + (badge.rarity?.toLowerCase() || 'common')">
-                <i nz-icon
-                   [nzType]="getBadgeIcon(badge.category, badge.rarity)"
-                   nzTheme="outline"
-                   class="badge-icon-svg">
-                </i>
+        @if (earnedBadges$ | async; as badges) {
+          <nz-card nzTitle="Insignele tale" class="badges-card">
+            @if (badges.length > 0) {
+              <div class="badges-grid">
+                @for (badge of badges; track $index) {
+                  <div
+                    class="badge-item"
+                    [title]="badge.descriptionRo">
+                    <div class="badge-icon" [ngClass]="'rarity-' + (badge.rarity?.toLowerCase() || 'common')">
+                      <i nz-icon
+                         [nzType]="getBadgeIcon(badge.category, badge.rarity)"
+                         nzTheme="outline"
+                         class="badge-icon-svg">
+                      </i>
+                    </div>
+                    <div class="badge-info">
+                      <h5>{{ badge.nameRo }}</h5>
+                      <nz-tag [nzColor]="getBadgeColor(badge.rarity)">{{ badge.rarityRo || 'Comun' }}</nz-tag>
+                    </div>
+                  </div>
+                }
               </div>
-              <div class="badge-info">
-                <h5>{{ badge.nameRo }}</h5>
-                <nz-tag [nzColor]="getBadgeColor(badge.rarity)">{{ badge.rarityRo || 'Comun' }}</nz-tag>
-              </div>
-            </div>
-          </div>
-          <ng-template #noBadges>
-            <nz-empty 
-              nzNotFoundImage="simple" 
-              nzNotFoundContent="Nicio insignă încă. Continuă să participi pentru a câștiga prima insignă!">
-            </nz-empty>
-          </ng-template>
-        </nz-card>
+            } @else {
+              <nz-empty
+                nzNotFoundImage="simple"
+                nzNotFoundContent="Nicio insignă încă. Continuă să participi pentru a câștiga prima insignă!">
+              </nz-empty>
+            }
+          </nz-card>
+        }
 
         <!-- Achievements Progress -->
-        <nz-card nzTitle="Realizări" class="achievements-card" *ngIf="incompleteAchievements$ | async as achievements">
-          <div class="achievements-list" *ngIf="achievements.length > 0; else noAchievements">
-            <div
-              *ngFor="let achievement of achievements.slice(0, 3)"
-              class="achievement-item">
-              <div class="achievement-header">
-                <h5>{{ achievement.titleRo }}</h5>
-                <div class="achievement-progress">
-                  <nz-progress
-                    [nzPercent]="achievement.percentageComplete"
-                    nzStrokeColor="#FCA311"
-                    nzSize="small"
-                    [nzShowInfo]="false">
-                  </nz-progress>
-                  <span class="progress-text">{{ achievement.progress }}/{{ achievement.maxProgress }}</span>
-                </div>
+        @if (incompleteAchievements$ | async; as achievements) {
+          <nz-card nzTitle="Realizări" class="achievements-card">
+            @if (achievements.length > 0) {
+              <div class="achievements-list">
+                @for (achievement of achievements.slice(0, 3); track $index) {
+                  <div class="achievement-item">
+                    <div class="achievement-header">
+                      <h5>{{ achievement.titleRo }}</h5>
+                      <div class="achievement-progress">
+                        <nz-progress
+                          [nzPercent]="achievement.percentageComplete"
+                          nzStrokeColor="#FCA311"
+                          nzSize="small"
+                          [nzShowInfo]="false">
+                        </nz-progress>
+                        <span class="progress-text">{{ achievement.progress }}/{{ achievement.maxProgress }}</span>
+                      </div>
+                    </div>
+                    <p class="achievement-description">{{ achievement.descriptionRo }}</p>
+                  </div>
+                }
               </div>
-              <p class="achievement-description">{{ achievement.descriptionRo }}</p>
-            </div>
-          </div>
-          <ng-template #noAchievements>
-            <nz-empty
-              nzNotFoundImage="simple"
-              nzNotFoundContent="Toate realizările completate! Bună treabă!">
-            </nz-empty>
-          </ng-template>
-        </nz-card>
+            } @else {
+              <nz-empty
+                nzNotFoundImage="simple"
+                nzNotFoundContent="Toate realizările completate! Bună treabă!">
+              </nz-empty>
+            }
+          </nz-card>
+        }
 
       </div>
 

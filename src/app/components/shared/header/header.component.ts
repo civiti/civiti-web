@@ -1,4 +1,4 @@
-import { Component, inject, Input, Output, EventEmitter } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -39,12 +39,11 @@ export class HeaderComponent {
   private _store = inject(Store<AppState>);
 
   // Page-specific configuration
-  @Input() title = 'Civiti';
-  @Input() showBackButton = false;
-  @Input() backUrl: string | null = null;
+  title = input('Civiti');
+  showBackButton = input(false);
+  backUrl = input<string | null>(null);
+  subtitle = input<string | null>(null);
 
-  // Event emitter for custom back navigation
-  @Output() back = new EventEmitter<void>();
 
   // Auth state observables
   isAuthenticated$: Observable<boolean>;
@@ -60,14 +59,9 @@ export class HeaderComponent {
   }
 
   onBack(): void {
-    if (this.back.observed) {
-      // If parent component is listening, emit the event
-      this.back.emit();
-    } else if (this.backUrl) {
-      // Navigate to specified URL
-      this._router.navigate([this.backUrl]);
+    if (this.backUrl()) {
+      this._router.navigate([this.backUrl()!]);
     } else {
-      // Default: go back in history
       window.history.back();
     }
   }

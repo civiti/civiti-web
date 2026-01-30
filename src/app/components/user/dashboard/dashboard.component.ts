@@ -19,23 +19,16 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { NzDropDownModule } from 'ng-zorro-antd/dropdown';
-import { NzMenuModule } from 'ng-zorro-antd/menu';
-
 import { StatusTextPipe, StatusColorPipe } from '../../../pipes/status.pipe';
 import { ActivityIconPipe, ActivityColorPipe } from '../../../pipes/activity.pipe';
 import { AppState } from '../../../store/app.state';
-import * as AuthActions from '../../../store/auth/auth.actions';
 import * as UserActions from '../../../store/user/user.actions';
 import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
 import * as UserIssuesSelectors from '../../../store/user-issues/user-issues.selectors';
 import * as ActivityActions from '../../../store/activity/activity.actions';
 import * as ActivitySelectors from '../../../store/activity/activity.selectors';
 import { AuthUser } from '../../../store/auth/auth.state';
-import {
-  selectAuthUser,
-  selectUserDisplayName
-} from '../../../store/auth/auth.selectors';
+import { selectAuthUser } from '../../../store/auth/auth.selectors';
 import {
   Achievement
 } from '../../../store/user/user.state';
@@ -80,8 +73,6 @@ import {
     NzSpinModule,
     NzTypographyModule,
     NzEmptyModule,
-    NzDropDownModule,
-    NzMenuModule,
     StatusTextPipe,
     StatusColorPipe,
     ActivityIconPipe,
@@ -95,7 +86,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   // Observables - initialized in constructor
   user$!: Observable<AuthUser | null>;
-  displayName$!: Observable<string>;
   userPoints$!: Observable<number>;
   userLevel$!: Observable<number>;
   userStats$!: Observable<UserStats | null>;
@@ -108,7 +98,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   userIssuesSummary$!: Observable<{ active: number; resolved: number; rejected: number; total: number }>;
   recentUserIssues$!: Observable<IssueItem[]>;
   userIssuesLoading$!: Observable<boolean>;
-  hasUserIssues$!: Observable<boolean>;
 
   // Activity Observables
   recentActivity$!: Observable<ActivityFeedItem[]>;
@@ -121,7 +110,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
   ) {
     // Initialize observables
     this.user$ = this.store.select(selectAuthUser);
-    this.displayName$ = this.store.select(selectUserDisplayName);
     this.userPoints$ = this.store.select(selectUserPoints);
     this.userLevel$ = this.store.select(selectUserLevel);
     this.userStats$ = this.store.select(selectUserStats);
@@ -134,7 +122,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
     this.userIssuesSummary$ = this.store.select(UserIssuesSelectors.selectUserIssuesSummary);
     this.recentUserIssues$ = this.store.select(UserIssuesSelectors.selectRecentUserIssues);
     this.userIssuesLoading$ = this.store.select(UserIssuesSelectors.selectUserIssuesLoading);
-    this.hasUserIssues$ = this.store.select(UserIssuesSelectors.selectHasUserIssues);
 
     // Activity observables
     this.recentActivity$ = this.store.select(ActivitySelectors.selectRecentActivities);
@@ -221,15 +208,6 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   viewMyIssues(): void {
     this.router.navigate(['/my-issues']);
-  }
-
-  logout(): void {
-    console.log('[DASHBOARD] Utilizatorul a solicitat deconectarea');
-    this.store.dispatch(AuthActions.logout());
-  }
-
-  navigateToIssues(): void {
-    this.router.navigate(['/issues']);
   }
 
   viewIssueDetails(issueId: string): void {

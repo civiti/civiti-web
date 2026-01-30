@@ -35,58 +35,61 @@
   </div>
 
   <!-- Submission Success State -->
-  <div class="success-section" *ngIf="isSubmitted">
-    <nz-result
-      nzStatus="success"
-      nzTitle="Problemă trimisă cu succes!"
-      nzSubTitle="Sesizarea ta a fost trimisă pentru verificare. Vei primi actualizări pe măsură ce trece prin procesul de aprobare.">
-      
-      <div nz-result-extra>
-        <div class="success-stats">
-          <div class="stat-item">
-            <div class="stat-icon">🏆</div>
-            <div class="stat-info">
-              <div class="stat-title">Realizare deblocată!</div>
-              <div class="stat-description">Insignă începător civic</div>
+  @if (isSubmitted) {
+    <div class="success-section">
+      <nz-result
+        nzStatus="success"
+        nzTitle="Problemă trimisă cu succes!"
+        nzSubTitle="Sesizarea ta a fost trimisă pentru verificare. Vei primi actualizări pe măsură ce trece prin procesul de aprobare.">
+
+        <div nz-result-extra>
+          <div class="success-stats">
+            <div class="stat-item">
+              <div class="stat-icon">🏆</div>
+              <div class="stat-info">
+                <div class="stat-title">Realizare deblocată!</div>
+                <div class="stat-description">Insignă începător civic</div>
+              </div>
+            </div>
+            <div class="stat-item">
+              <div class="stat-icon">⭐</div>
+              <div class="stat-info">
+                <div class="stat-title">Puncte câștigate</div>
+                <div class="stat-description">+50 puncte de comunitate</div>
+              </div>
             </div>
           </div>
-          <div class="stat-item">
-            <div class="stat-icon">⭐</div>
-            <div class="stat-info">
-              <div class="stat-title">Puncte câștigate</div>
-              <div class="stat-description">+50 puncte de comunitate</div>
-            </div>
+
+          <div class="success-actions">
+            <button nz-button nzType="primary" nzSize="large" routerLink="/dashboard">
+              <span nz-icon nzType="home"></span>
+              Mergi la panou
+            </button>
+            <button nz-button nzType="default" nzSize="large" (click)="createAnotherIssue()">
+              <span nz-icon nzType="plus"></span>
+              Raportează altă problemă
+            </button>
+          </div>
+
+          <div class="next-steps">
+            <h4>Ce urmează?</h4>
+            <ul>
+              <li>✓ Problema ta va fi revizuită de administratorii locali</li>
+              <li>✓ Vei primi notificări despre actualizări de stare</li>
+              <li>✓ Membrii comunității pot vota pentru a susține problema ta</li>
+              <li>✓ Distribuie sesizarea prietenilor pentru mai multă vizibilitate</li>
+            </ul>
           </div>
         </div>
 
-        <div class="success-actions">
-          <button nz-button nzType="primary" nzSize="large" routerLink="/dashboard">
-            <span nz-icon nzType="home"></span>
-            Mergi la panou
-          </button>
-          <button nz-button nzType="default" nzSize="large" (click)="createAnotherIssue()">
-            <span nz-icon nzType="plus"></span>
-            Raportează altă problemă
-          </button>
-        </div>
-        
-        <div class="next-steps">
-          <h4>Ce urmează?</h4>
-          <ul>
-            <li>✓ Problema ta va fi revizuită de administratorii locali</li>
-            <li>✓ Vei primi notificări despre actualizări de stare</li>
-            <li>✓ Membrii comunității pot vota pentru a susține problema ta</li>
-            <li>✓ Distribuie sesizarea prietenilor pentru mai multă vizibilitate</li>
-          </ul>
-        </div>
-      </div>
-      
-    </nz-result>
-  </div>
+      </nz-result>
+    </div>
+  }
 
   <!-- Review Content (shown before submission) -->
   <nz-spin [nzSpinning]="isSubmitting">
-    <div class="review-content" *ngIf="!isSubmitted && issueData">
+    @if (!isSubmitted && issueData) {
+    <div class="review-content">
     
     <!-- Issue Overview -->
     <nz-card nzTitle="Prezentare generală a problemei" class="review-card">
@@ -128,10 +131,12 @@
           <div class="content-text">{{ issueData.communityImpact }}</div>
         </div>
 
-        <div class="ai-enhanced-badge" *ngIf="issueData.isAIEnhanced">
-          <span nz-icon nzType="robot" nzTheme="outline"></span>
-          Text îmbunătățit cu AI
-        </div>
+        @if (issueData.isAIEnhanced) {
+          <div class="ai-enhanced-badge">
+            <span nz-icon nzType="robot" nzTheme="outline"></span>
+            Text îmbunătățit cu AI
+          </div>
+        }
       </div>
     </nz-card>
 
@@ -147,22 +152,23 @@
         
         <div class="photos-grid">
           <div nz-row [nzGutter]="[16, 16]">
-            <div 
-              nz-col 
-              [nzSpan]="12" 
-              [nzSm]="8" 
-              [nzMd]="6"
-              *ngFor="let photo of issueData.photos; let i = index"
-              class="photo-col">
-              
-              <div class="photo-preview" (click)="viewPhoto(photo.url)">
-                <img [src]="photo.thumbnail || photo.url" [alt]="'Photo ' + (i + 1)" class="photo-image">
-                <div class="photo-overlay">
-                  <span nz-icon nzType="eye"></span>
+            @for (photo of issueData.photos; track $index; let i = $index) {
+              <div
+                nz-col
+                [nzSpan]="12"
+                [nzSm]="8"
+                [nzMd]="6"
+                class="photo-col">
+
+                <div class="photo-preview" (click)="viewPhoto(photo.url)">
+                  <img [src]="photo.thumbnail || photo.url" [alt]="'Photo ' + (i + 1)" class="photo-image">
+                  <div class="photo-overlay">
+                    <span nz-icon nzType="eye"></span>
+                  </div>
                 </div>
+
               </div>
-              
-            </div>
+            }
           </div>
         </div>
       </div>
@@ -179,16 +185,20 @@
         </div>
 
         <div class="authorities-list">
-          <div *ngFor="let auth of selectedAuthorities" class="authority-item">
-            <div class="authority-icon">
-              <span nz-icon [nzType]="auth.isCustom ? 'user' : 'bank'"></span>
+          @for (auth of selectedAuthorities; track auth.email) {
+            <div class="authority-item">
+              <div class="authority-icon">
+                <span nz-icon [nzType]="auth.isCustom ? 'user' : 'bank'"></span>
+              </div>
+              <div class="authority-info">
+                <div class="authority-name">{{ auth.name }}</div>
+                <div class="authority-email">{{ auth.email }}</div>
+              </div>
+              @if (auth.isCustom) {
+                <nz-tag nzColor="orange">PERSONALIZAT</nz-tag>
+              }
             </div>
-            <div class="authority-info">
-              <div class="authority-name">{{ auth.name }}</div>
-              <div class="authority-email">{{ auth.email }}</div>
-            </div>
-            <nz-tag *ngIf="auth.isCustom" nzColor="orange">PERSONALIZAT</nz-tag>
-          </div>
+          }
         </div>
       </div>
     </nz-card>
@@ -238,8 +248,12 @@
           [disabled]="isSubmitting"
           (click)="submitIssue()"
           class="nav-btn submit-btn">
-          <span nz-icon nzType="upload" *ngIf="!isSubmitting"></span>
-          <span nz-icon nzType="loading" *ngIf="isSubmitting"></span>
+          @if (!isSubmitting) {
+            <span nz-icon nzType="upload"></span>
+          }
+          @if (isSubmitting) {
+            <span nz-icon nzType="loading"></span>
+          }
           {{ isSubmitting ? 'Se trimite...' : 'Trimite problema' }}
         </button>
       </div>
@@ -250,5 +264,6 @@
     </div>
 
     </div>
+    }
   </nz-spin>
 </div>

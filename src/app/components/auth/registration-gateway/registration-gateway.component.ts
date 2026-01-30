@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, viewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
@@ -48,7 +48,7 @@ import {
 export class RegistrationGatewayComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  @ViewChild('privacyPolicyTemplate') privacyPolicyTemplate!: TemplateRef<void>;
+  privacyPolicyTemplate = viewChild.required<TemplateRef<void>>('privacyPolicyTemplate');
 
   isLoading$!: Observable<boolean>;
   error$!: Observable<string | null>;
@@ -98,7 +98,7 @@ export class RegistrationGatewayComponent implements OnInit, OnDestroy {
   showPrivacyPolicy(): void {
     const modalRef = this.modal.create({
       nzTitle: 'Politica de Confidențialitate',
-      nzContent: this.privacyPolicyTemplate,
+      nzContent: this.privacyPolicyTemplate(),
       nzWidth: 700,
       nzCentered: true,
       nzFooter: [

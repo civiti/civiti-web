@@ -38,14 +38,18 @@
   <div class="summary-section">
     <nz-card nzTitle="Context problemă" class="summary-card" nzSize="small">
       <div class="summary-content">
-        <div class="summary-item" *ngIf="selectedCategory">
-          <span nz-icon nzType="folder" class="summary-icon"></span>
-          <span class="summary-value">{{ selectedCategory.name }}</span>
-        </div>
-        <div class="summary-item" *ngIf="currentLocation">
-          <span nz-icon nzType="environment" class="summary-icon"></span>
-          <span class="summary-value">{{ currentLocation.address }}</span>
-        </div>
+        @if (selectedCategory) {
+          <div class="summary-item">
+            <span nz-icon nzType="folder" class="summary-icon"></span>
+            <span class="summary-value">{{ selectedCategory.name }}</span>
+          </div>
+        }
+        @if (currentLocation) {
+          <div class="summary-item">
+            <span nz-icon nzType="environment" class="summary-icon"></span>
+            <span class="summary-value">{{ currentLocation.address }}</span>
+          </div>
+        }
       </div>
     </nz-card>
   </div>
@@ -103,7 +107,9 @@
       <ng-template #cardTitle>
         <div class="authorities-card-title">
           <span>Autorități pentru {{ issueCity }}</span>
-          <nz-tag *ngIf="issueDistrict()" nzColor="blue">{{ issueDistrict() }}</nz-tag>
+          @if (issueDistrict()) {
+            <nz-tag nzColor="blue">{{ issueDistrict() }}</nz-tag>
+          }
         </div>
       </ng-template>
 
@@ -175,7 +181,8 @@
         <span nz-icon [nzType]="showCustomEmailInput ? 'up' : 'down'"></span>
       </div>
 
-      <div class="custom-form" *ngIf="showCustomEmailInput">
+      @if (showCustomEmailInput) {
+      <div class="custom-form">
         <nz-alert
           nzType="info"
           nzMessage="Autoritatea personalizată va fi folosită doar pentru această problemă"
@@ -233,6 +240,7 @@
           </button>
         </form>
       </div>
+      }
     </nz-card>
   </div>
 
@@ -263,9 +271,11 @@
       </button>
     </div>
 
-    <div class="requirement-note" *ngIf="!canContinue()">
-      <p>Selectează cel puțin {{ MIN_AUTHORITIES }} autoritate pentru a continua</p>
-    </div>
+    @if (!canContinue()) {
+      <div class="requirement-note">
+        <p>Selectează cel puțin {{ MIN_AUTHORITIES }} autoritate pentru a continua</p>
+      </div>
+    }
   </div>
 
 </div>

@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-background">
+<div class="flex-1 bg-background">
   <div class="container mx-auto p-4 max-w-6xl">
     <!-- Issues Control Panel -->
     <div class="issues-control-panel">
@@ -8,14 +8,20 @@
           <h2 class="text-oxford-blue font-semibold text-lg">
             {{ (totalIssues$ | async) || 0 }} probleme documentate
           </h2>
-          <p class="text-oxford-blue opacity-75 text-sm" *ngIf="paginationInfo$ | async as pagination">
-            <span *ngIf="pagination.totalCount > 0">
-              Se afișează {{ pagination.startItem }}-{{ pagination.endItem }} din {{ pagination.totalCount }}
-            </span>
-            <span *ngIf="pagination.totalCount === 0">
-              Alege o problemă și ajută la rezolvarea ei
-            </span>
-          </p>
+          @if (paginationInfo$ | async; as pagination) {
+            <p class="text-oxford-blue opacity-75 text-sm">
+              @if (pagination.totalCount > 0) {
+                <span>
+                  Se afișează {{ pagination.startItem }}-{{ pagination.endItem }} din {{ pagination.totalCount }}
+                </span>
+              }
+              @if (pagination.totalCount === 0) {
+                <span>
+                  Alege o problemă și ajută la rezolvarea ei
+                </span>
+              }
+            </p>
+          }
         </div>
       </div>
 
@@ -38,25 +44,30 @@
                 <span nz-icon nzType="environment"></span>
               </ng-template>
               <ng-template #suffixIcon>
-                <span
-                  *ngIf="addressSearchControl.value"
-                  nz-icon
-                  nzType="close-circle"
-                  nzTheme="fill"
-                  class="ant-select-clear"
-                  (click)="clearAddressFilter()">
-                </span>
+                  @if (addressSearchControl.value) {
+                  <span
+                    nz-icon
+                    nzType="close-circle"
+                    nzTheme="fill"
+                    class="ant-select-clear"
+                    (click)="clearAddressFilter()">
+                  </span>
+                }
               </ng-template>
 
               <!-- Autocomplete dropdown -->
-              <div class="autocomplete-dropdown" *ngIf="showSuggestions && suggestions.length">
-                <div *ngFor="let s of suggestions"
-                     class="suggestion-item"
-                     (mousedown)="onAddressSuggestionSelected(s)">
-                  <span nz-icon nzType="environment"></span>
-                  {{ s.description }}
+              @if (showSuggestions && suggestions.length) {
+                <div class="autocomplete-dropdown">
+                  @for (s of suggestions; track s.place_id) {
+                    <div
+                         class="suggestion-item"
+                         (mousedown)="onAddressSuggestionSelected(s)">
+                      <span nz-icon nzType="environment"></span>
+                      {{ s.description }}
+                    </div>
+                  }
                 </div>
-              </div>
+              }
             </div>
           </div>
 
@@ -69,7 +80,9 @@
               nzAllowClear
               nzSize="default"
               style="width: 100%">
-              <nz-option *ngFor="let d of districts" [nzValue]="d" [nzLabel]="d"></nz-option>
+              @for (d of districts; track $index) {
+                <nz-option [nzValue]="d" [nzLabel]="d"></nz-option>
+              }
             </nz-select>
           </div>
 
@@ -82,7 +95,9 @@
               nzAllowClear
               nzSize="default"
               style="width: 100%">
-              <nz-option *ngFor="let c of categories" [nzValue]="c.value" [nzLabel]="c.label"></nz-option>
+              @for (c of categories; track c.value) {
+                <nz-option [nzValue]="c.value" [nzLabel]="c.label"></nz-option>
+              }
             </nz-select>
           </div>
 
@@ -94,7 +109,9 @@
               nzPlaceHolder="Status"
               nzSize="default"
               style="width: 100%">
-              <nz-option *ngFor="let s of statusOptions" [nzValue]="s.value" [nzLabel]="s.label"></nz-option>
+              @for (s of statusOptions; track s.value) {
+                <nz-option [nzValue]="s.value" [nzLabel]="s.label"></nz-option>
+              }
             </nz-select>
           </div>
 
@@ -113,25 +130,31 @@
           </div>
 
           <!-- Clear Filters -->
-          <div class="filter-item filter-clear" *ngIf="hasActiveFilters()">
+          @if (hasActiveFilters()) {
+          <div class="filter-item filter-clear">
             <button nz-button nzType="text" (click)="clearFilters()">
               <span nz-icon nzType="close-circle"></span>
               Șterge filtrele
             </button>
           </div>
+          }
         </div>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="isLoading$ | async" class="text-center py-12">
-      <i nz-icon nzType="loading" nzTheme="outline" nzSpin class="text-oxford-blue text-4xl mb-4"></i>
-      <p class="text-oxford-blue">Se încarcă problemele...</p>
-    </div>
+    @if (isLoading$ | async) {
+      <div class="text-center py-12">
+        <i nz-icon nzType="loading" nzTheme="outline" nzSpin class="text-oxford-blue text-4xl mb-4"></i>
+        <p class="text-oxford-blue">Se încarcă problemele...</p>
+      </div>
+    }
 
     <!-- Issues Grid -->
-    <nz-row *ngIf="!(isLoading$ | async)" [nzGutter]="[16, 16]">
-      <nz-col *ngFor="let issue of issues$ | async" [nzXs]="24" [nzMd]="12" [nzLg]="8">
+    @if (!(isLoading$ | async)) {
+      <nz-row [nzGutter]="[16, 16]">
+        @for (issue of issues$ | async; track issue.id) {
+          <nz-col [nzXs]="24" [nzMd]="12" [nzLg]="8">
         <nz-card class="issue-card cursor-pointer"
                  (click)="viewIssueDetails(issue.id)"
                  [nzCover]="coverTemplate">
@@ -156,11 +179,13 @@
                 </nz-tag>
               </div>
               <!-- Urgency Badge -->
-              <div class="absolute top-3 right-3" *ngIf="issue.urgency | isUrgent">
+              @if (issue.urgency | isUrgent) {
+              <div class="absolute top-3 right-3">
                 <nz-tag nzColor="error" class="font-bold">
                   URGENT
                 </nz-tag>
               </div>
+              }
             </div>
           </ng-template>
           
@@ -210,27 +235,31 @@
             </button>
           </ng-template>
         </nz-card>
-      </nz-col>
-    </nz-row>
+          </nz-col>
+        }
+      </nz-row>
+    }
 
     <!-- Empty State -->
-    <div *ngIf="!(isLoading$ | async) && ((issues$ | async)?.length || 0) === 0">
-      <nz-empty
-        nzNotFoundContent="Nu au fost găsite probleme"
-        [nzNotFoundFooter]="emptyFooter">
-      </nz-empty>
-      <ng-template #emptyFooter>
-        <p class="text-oxford-blue opacity-75">
-          Încearcă să schimbi criteriile de sortare sau revino mai târziu.
-        </p>
-      </ng-template>
-    </div>
+    @if (!(isLoading$ | async) && ((issues$ | async)?.length || 0) === 0) {
+      <div>
+        <nz-empty
+          nzNotFoundContent="Nu au fost găsite probleme"
+          [nzNotFoundFooter]="emptyFooter">
+        </nz-empty>
+        <ng-template #emptyFooter>
+          <p class="text-oxford-blue opacity-75">
+            Încearcă să schimbi criteriile de sortare sau revino mai târziu.
+          </p>
+        </ng-template>
+      </div>
+    }
 
     <!-- Pagination Section -->
-    <div *ngIf="!(isLoading$ | async) && (paginationInfo$ | async) as pagination"
-         class="pagination-container mt-8 mb-20">
-      <div *ngIf="pagination.totalPages > 1"
-           class="bg-white rounded-lg shadow-sm border border-platinum p-4">
+    @if (!(isLoading$ | async) && (paginationInfo$ | async); as pagination) {
+      <div class="pagination-container mt-8 mb-20">
+        @if (pagination.totalPages > 1) {
+          <div class="bg-white rounded-lg shadow-sm border border-platinum p-4">
         <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
           <!-- Pagination Component -->
           <nz-pagination
@@ -246,8 +275,10 @@
             Pagina {{ pagination.currentPage }} din {{ pagination.totalPages }}
           </p>
         </div>
+          </div>
+        }
       </div>
-    </div>
+    }
 
     <!-- Create Issue Button - requires authentication -->
     <div class="fixed bottom-6 right-6">

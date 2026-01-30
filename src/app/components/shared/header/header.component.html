@@ -1,13 +1,16 @@
 <nz-page-header
   class="navbar shadow-md"
-  [nzBackIcon]="showBackButton ? 'arrow-left' : null"
-  (nzBack)="showBackButton ? onBack() : null">
+  [nzBackIcon]="showBackButton() ? 'arrow-left' : null"
+  (nzBack)="showBackButton() ? onBack() : null">
 
-  <nz-page-header-title>{{ title }}</nz-page-header-title>
+  <nz-page-header-title>
+    <span class="header-title-text">{{ title() }}</span>
+    @if (subtitle()) { <span class="header-subtitle">{{ subtitle() }}</span> }
+  </nz-page-header-title>
 
   <nz-page-header-extra>
     <!-- Auth buttons for unauthenticated users -->
-    <ng-container *ngIf="!(isAuthenticated$ | async)">
+    @if (!(isAuthenticated$ | async)) {
       <nz-space nzSize="small">
         <button
           *nzSpaceItem
@@ -32,10 +35,10 @@
           Înregistrează-te
         </button>
       </nz-space>
-    </ng-container>
+    }
 
     <!-- User profile for authenticated users -->
-    <ng-container *ngIf="isAuthenticated$ | async">
+    @if (isAuthenticated$ | async) {
       <div
         nz-dropdown
         [nzDropdownMenu]="userMenu"
@@ -46,7 +49,7 @@
         <nz-avatar
           [nzSrc]="(user$ | async)?.photoUrl || undefined"
           [nzText]="(displayName$ | async)?.charAt(0)"
-          [nzSize]="36"
+          [nzSize]="42"
           class="cursor-pointer">
         </nz-avatar>
         <i nz-icon nzType="caret-down" nzTheme="fill" class="dropdown-arrow"></i>
@@ -61,10 +64,12 @@
             <i nz-icon nzType="unordered-list" nzTheme="outline" class="mr-2"></i>
             Probleme
           </li>
-          <li *ngIf="canAccessAdmin$ | async" nz-menu-item (click)="navigateToAdmin()">
-            <i nz-icon nzType="setting" nzTheme="outline" class="mr-2"></i>
-            Administrare
-          </li>
+          @if (canAccessAdmin$ | async) {
+            <li nz-menu-item (click)="navigateToAdmin()">
+              <i nz-icon nzType="setting" nzTheme="outline" class="mr-2"></i>
+              Administrare
+            </li>
+          }
           <li nz-menu-divider></li>
           <li nz-menu-item (click)="logout()">
             <i nz-icon nzType="logout" nzTheme="outline" class="mr-2"></i>
@@ -72,6 +77,6 @@
           </li>
         </ul>
       </nz-dropdown-menu>
-    </ng-container>
+    }
   </nz-page-header-extra>
 </nz-page-header>

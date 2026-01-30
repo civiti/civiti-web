@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NzCommentModule } from 'ng-zorro-antd/comment';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
@@ -26,44 +26,44 @@ import { CommentFormComponent } from '../comment-form/comment-form.component';
   styleUrl: './comment-item.component.scss'
 })
 export class CommentItemComponent {
-  @Input() comment!: CommentNode;
-  @Input() currentUserId: string | null = null;
-  @Input() isAdmin = false;
-  @Input() isAuthenticated = false;
-  @Input() canComment = false;
-  @Input() editingCommentId: string | null = null;
-  @Input() replyingToCommentId: string | null = null;
-  @Input() submitting = false;
+  comment = input.required<CommentNode>();
+  currentUserId = input<string | null>(null);
+  isAdmin = input(false);
+  isAuthenticated = input(false);
+  canComment = input(false);
+  editingCommentId = input<string | null>(null);
+  replyingToCommentId = input<string | null>(null);
+  submitting = input(false);
 
-  @Output() reply = new EventEmitter<string>();
-  @Output() edit = new EventEmitter<{ commentId: string; content: string }>();
-  @Output() delete = new EventEmitter<string>();
-  @Output() vote = new EventEmitter<{ commentId: string; hasVoted: boolean }>();
-  @Output() setEditing = new EventEmitter<string | null>();
-  @Output() setReplying = new EventEmitter<string | null>();
+  reply = output<string>();
+  edit = output<{ commentId: string; content: string }>();
+  delete = output<string>();
+  vote = output<{ commentId: string; hasVoted: boolean }>();
+  setEditing = output<string | null>();
+  setReplying = output<string | null>();
 
   get isOwner(): boolean {
-    return this.currentUserId === this.comment.user.id;
+    return this.currentUserId() === this.comment().user.id;
   }
 
   get canDelete(): boolean {
-    return this.isOwner || this.isAdmin;
+    return this.isOwner || this.isAdmin();
   }
 
   get canVote(): boolean {
-    return this.isAuthenticated && !this.isOwner;
+    return this.isAuthenticated() && !this.isOwner;
   }
 
   get isEditing(): boolean {
-    return this.editingCommentId === this.comment.id;
+    return this.editingCommentId() === this.comment().id;
   }
 
   get isReplying(): boolean {
-    return this.replyingToCommentId === this.comment.id;
+    return this.replyingToCommentId() === this.comment().id;
   }
 
   get formattedDate(): string {
-    const date = new Date(this.comment.createdAt);
+    const date = new Date(this.comment().createdAt);
     return date.toLocaleDateString('ro-RO', {
       day: '2-digit',
       month: 'short',
@@ -77,7 +77,7 @@ export class CommentItemComponent {
     if (this.isReplying) {
       this.setReplying.emit(null);
     } else {
-      this.setReplying.emit(this.comment.id);
+      this.setReplying.emit(this.comment().id);
     }
   }
 
@@ -85,19 +85,19 @@ export class CommentItemComponent {
     if (this.isEditing) {
       this.setEditing.emit(null);
     } else {
-      this.setEditing.emit(this.comment.id);
+      this.setEditing.emit(this.comment().id);
     }
   }
 
   onVoteClick(): void {
     this.vote.emit({
-      commentId: this.comment.id,
-      hasVoted: this.comment.hasVoted
+      commentId: this.comment().id,
+      hasVoted: this.comment().hasVoted
     });
   }
 
   onDeleteConfirm(): void {
-    this.delete.emit(this.comment.id);
+    this.delete.emit(this.comment().id);
   }
 
   onReplySubmit(content: string): void {
@@ -109,7 +109,7 @@ export class CommentItemComponent {
   }
 
   onEditSubmit(content: string): void {
-    this.edit.emit({ commentId: this.comment.id, content });
+    this.edit.emit({ commentId: this.comment().id, content });
   }
 
   onEditCancel(): void {

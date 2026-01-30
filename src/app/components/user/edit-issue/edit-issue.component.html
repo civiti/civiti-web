@@ -3,16 +3,18 @@
   <nz-spin [nzSpinning]="isLoading" nzTip="Se încarcă...">
 
     <!-- Error State -->
-    <nz-alert
-      *ngIf="loadError"
-      nzType="error"
-      [nzMessage]="loadError"
-      nzShowIcon
-      class="mb-4">
-    </nz-alert>
+    @if (loadError) {
+      <nz-alert
+        nzType="error"
+        [nzMessage]="loadError"
+        nzShowIcon
+        class="mb-4">
+      </nz-alert>
+    }
 
     <!-- Edit Form -->
-    <div *ngIf="issue && !loadError">
+    @if (issue && !loadError) {
+    <div>
       <nz-card class="edit-card">
         <!-- Header -->
         <div class="edit-header">
@@ -88,10 +90,12 @@
                 [nzShowUploadList]="{ showPreviewIcon: true, showRemoveIcon: true }"
                 [nzMultiple]="true"
                 nzAccept="image/*">
-                <div *ngIf="photoList.length < 5">
-                  <span nz-icon nzType="plus"></span>
-                  <div class="upload-text">Adaugă foto</div>
-                </div>
+                @if (photoList.length < 5) {
+                  <div>
+                    <span nz-icon nzType="plus"></span>
+                    <div class="upload-text">Adaugă foto</div>
+                  </div>
+                }
               </nz-upload>
               <p class="photo-hint">Maxim 5 fotografii, fiecare sub 5MB</p>
             </nz-form-control>
@@ -133,5 +137,6 @@
         </form>
       </nz-card>
     </div>
+    }
   </nz-spin>
 </div>

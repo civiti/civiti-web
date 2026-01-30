@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, OnDestroy, AfterViewInit, PLATFORM_ID, ViewChild, ChangeDetectorRef, signal } from '@angular/core';
+import { Component, inject, OnInit, OnDestroy, AfterViewInit, PLATFORM_ID, viewChild, ChangeDetectorRef, signal } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
@@ -86,8 +86,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _galleryTimeoutId?: number;
     private readonly _googleMapsConfig = inject(GoogleMapsConfigService);
     
-    @ViewChild('infoWindow') infoWindow!: MapInfoWindow;
-    @ViewChild('markerElement') markerElement!: MapMarker;
+    infoWindow = viewChild<MapInfoWindow>('infoWindow');
+    markerElement = viewChild<MapMarker>('markerElement');
 
     issue$!: Observable<IssueDetailResponse | null | undefined>;
     isLoading$!: Observable<boolean>;
@@ -632,8 +632,10 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     openInfoWindow(): void {
-        if (this.infoWindow && this.markerElement) {
-            this.infoWindow.open(this.markerElement);
+        const infoWindow = this.infoWindow();
+        const markerElement = this.markerElement();
+        if (infoWindow && markerElement) {
+            infoWindow.open(markerElement);
         }
     }
     

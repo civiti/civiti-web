@@ -109,12 +109,12 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () => import('./components/admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
-        data: { animation: 'AdminDashboardPage', headerTitle: 'Panou Administrare', showBackButton: true, backUrl: '/issues' }
+        data: { animation: 'AdminDashboardPage', headerTitle: 'Panou de Administrare', showBackButton: true, backUrl: '/issues' }
       },
       {
         path: 'approval',
         loadComponent: () => import('./components/admin/approval-interface/approval-interface.component').then(m => m.ApprovalInterfaceComponent),
-        data: { animation: 'AdminApprovalPage', headerTitle: 'Aprobare Probleme', showBackButton: true, backUrl: '/admin/dashboard' }
+        data: { animation: 'AdminApprovalPage', headerTitle: 'Aprobare Probleme', showBackButton: true, backUrl: '/admin/dashboard', headerSubtitle: 'Revizuiește și aprobă sesizările comunității' }
       },
       {
         path: 'activity',

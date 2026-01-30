@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, ViewChild, TemplateRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, viewChild, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -87,8 +87,8 @@ interface RegistrationData {
 export class UserRegistrationComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
-  @ViewChild('privacyPolicyTemplate') privacyPolicyTemplate!: TemplateRef<void>;
-  @ViewChild('termsTemplate') termsTemplate!: TemplateRef<void>;
+  privacyPolicyTemplate = viewChild.required<TemplateRef<void>>('privacyPolicyTemplate');
+  termsTemplate = viewChild.required<TemplateRef<void>>('termsTemplate');
 
   registrationForm!: FormGroup;
   currentStep = 0;
@@ -306,7 +306,7 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
   showPrivacyPolicy(): void {
     const modalRef = this.modal.create({
       nzTitle: 'Politica de Confidențialitate',
-      nzContent: this.privacyPolicyTemplate,
+      nzContent: this.privacyPolicyTemplate(),
       nzWidth: 700,
       nzCentered: true,
       nzFooter: [
@@ -326,7 +326,7 @@ export class UserRegistrationComponent implements OnInit, OnDestroy {
   showTermsAndConditions(): void {
     const modalRef = this.modal.create({
       nzTitle: 'Termeni și Condiții',
-      nzContent: this.termsTemplate,
+      nzContent: this.termsTemplate(),
       nzWidth: 700,
       nzCentered: true,
       nzFooter: [

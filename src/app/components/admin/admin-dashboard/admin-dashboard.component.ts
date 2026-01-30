@@ -1,7 +1,6 @@
 import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
-import { Store } from '@ngrx/store';
 import { Observable, of } from 'rxjs';
 import { catchError, map, shareReplay } from 'rxjs/operators';
 
@@ -18,9 +17,7 @@ import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 
 import { ApiService } from '../../../services/api.service';
-import { selectAuthUser, selectUserDisplayName } from '../../../store/auth/auth.selectors';
 import { AdminStatisticsResponse } from '../../../types/civica-api.types';
-import { AuthUser } from '../../../store/auth/auth.state';
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -45,20 +42,10 @@ import { AuthUser } from '../../../store/auth/auth.state';
 export class AdminDashboardComponent implements OnInit {
   private readonly apiService = inject(ApiService);
   private readonly router = inject(Router);
-  private readonly store = inject(Store);
-
-  // Auth observables
-  user$: Observable<AuthUser | null>;
-  displayName$: Observable<string>;
 
   // Stats
   statistics$: Observable<AdminStatisticsResponse | null> = of(null);
   isLoading = true;
-
-  constructor() {
-    this.user$ = this.store.select(selectAuthUser);
-    this.displayName$ = this.store.select(selectUserDisplayName);
-  }
 
   ngOnInit(): void {
     this.loadStatistics();

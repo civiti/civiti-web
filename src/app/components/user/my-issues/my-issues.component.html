@@ -1,125 +1,155 @@
 <nz-spin [nzSpinning]="(isLoading$ | async) || false">
   <div class="my-issues-container">
     <!-- Filter Bar with Inline Counts -->
-    <div class="filter-bar" *ngIf="summary$ | async as summary">
-      <nz-segmented
-        [nzOptions]="getFilterOptions(summary)"
-        [(ngModel)]="selectedFilter"
-        (ngModelChange)="onFilterChange($event)">
-      </nz-segmented>
-    </div>
+    @if (summary$ | async; as summary) {
+      <div class="filter-bar">
+        <nz-segmented
+          [nzOptions]="getFilterOptions(summary)"
+          [(ngModel)]="selectedFilter"
+          (ngModelChange)="onFilterChange($event)">
+        </nz-segmented>
+      </div>
+    }
 
     <!-- Issues Grid -->
-    <ng-container *ngIf="(issues$ | async) as issues">
-      <nz-row [nzGutter]="[16, 16]" *ngIf="issues.length > 0">
-        <nz-col *ngFor="let issue of issues" [nzXs]="24" [nzMd]="12" [nzLg]="8">
-        <nz-card class="issue-card" [class.cancelled]="isCancelled(issue.status)" [nzCover]="coverTemplate">
-          <!-- Card Cover -->
-          <ng-template #coverTemplate>
-            <div class="issue-cover">
-              <img
-                [src]="issue.mainPhotoUrl || '/images/placeholders/issue-placeholder.svg'"
-                [alt]="issue.title"
-                class="issue-image"
-                (error)="onImageError($event)">
-              <div class="status-badge">
-                <nz-tag [nzColor]="issue.status | statusColor">
-                  {{ issue.status | statusText }}
-                </nz-tag>
+    @if ((issues$ | async); as issues) {
+      @if (issues.length > 0) {
+        <nz-row [nzGutter]="[16, 16]">
+          @for (issue of issues; track issue.id) {
+            <nz-col [nzXs]="24" [nzMd]="12" [nzLg]="8">
+            <nz-card class="issue-card" [class.cancelled]="isCancelled(issue.status)" [nzCover]="coverTemplate">
+              <!-- Card Cover -->
+              <ng-template #coverTemplate>
+                <div class="issue-cover">
+                  <img
+                    [src]="issue.mainPhotoUrl || '/images/placeholders/issue-placeholder.svg'"
+                    [alt]="issue.title"
+                    class="issue-image"
+                    (error)="onImageError($event)">
+                  <div class="status-badge">
+                    <nz-tag [nzColor]="issue.status | statusColor">
+                      {{ issue.status | statusText }}
+                    </nz-tag>
+                  </div>
+                </div>
+              </ng-template>
+
+              <!-- Card Content -->
+              <div class="issue-content">
+                <h4 class="issue-title">{{ issue.title }}</h4>
+                <p class="issue-description">{{ issue.description }}</p>
+
+                <div class="issue-meta">
+                  @if (issue.address || issue.city) {
+                    <span class="meta-item">
+                      <i nz-icon nzType="environment" nzTheme="outline"></i>
+                      {{ issue.address || issue.city }}
+                    </span>
+                  }
+                  <span class="meta-item">
+                    <i nz-icon nzType="mail" nzTheme="outline"></i>
+                    {{ issue.emailsSent }} contribuții
+                  </span>
+                  <span class="meta-item">
+                    <i nz-icon nzType="clock-circle" nzTheme="outline"></i>
+                    {{ getDaysSinceCreation(issue.createdAt) }} zile
+                  </span>
+                </div>
+
+                <!-- Actions -->
+                <div class="issue-actions">
+                  <button nz-button nzType="default" nzSize="small"
+                          (click)="viewIssueDetails(issue.id)">
+                    <i nz-icon nzType="eye" nzTheme="outline"></i> Vezi
+                  </button>
+
+                  <!-- Edit button for rejected issues -->
+                  @if (isRejected(issue.status)) {
+                    <button
+                            nz-button nzType="primary" nzSize="small"
+                            (click)="editIssue(issue)">
+                      <i nz-icon nzType="edit" nzTheme="outline"></i> Editează
+                    </button>
+                  }
+
+                  <!-- Mark as solved for active issues -->
+                  @if (isActive(issue.status)) {
+                    <button
+                            nz-button nzType="primary" nzSize="small"
+                            nz-tooltip nzTooltipTitle="Marchează problema ca rezolvată"
+                            (click)="markAsSolved(issue)">
+                      <i nz-icon nzType="check-circle" nzTheme="outline"></i> Rezolvă
+                    </button>
+                  }
+
+                  <!-- Cancel for active issues -->
+                  @if (isActive(issue.status)) {
+                    <button
+                            nz-button nzType="text" nzDanger nzSize="small"
+                            nz-tooltip nzTooltipTitle="Anulează problema"
+                            (click)="cancelIssue(issue)">
+                      <i nz-icon nzType="close-circle" nzTheme="outline"></i> Anulează
+                    </button>
+                  }
+                </div>
               </div>
-            </div>
-          </ng-template>
-
-          <!-- Card Content -->
-          <div class="issue-content">
-            <h4 class="issue-title">{{ issue.title }}</h4>
-            <p class="issue-description">{{ issue.description }}</p>
-
-            <div class="issue-meta">
-              <span class="meta-item" *ngIf="issue.address || issue.city">
-                <i nz-icon nzType="environment" nzTheme="outline"></i>
-                {{ issue.address || issue.city }}
-              </span>
-              <span class="meta-item">
-                <i nz-icon nzType="mail" nzTheme="outline"></i>
-                {{ issue.emailsSent }} contribuții
-              </span>
-              <span class="meta-item">
-                <i nz-icon nzType="clock-circle" nzTheme="outline"></i>
-                {{ getDaysSinceCreation(issue.createdAt) }} zile
-              </span>
-            </div>
-
-            <!-- Actions -->
-            <div class="issue-actions">
-              <button nz-button nzType="default" nzSize="small"
-                      (click)="viewIssueDetails(issue.id)">
-                <i nz-icon nzType="eye" nzTheme="outline"></i> Vezi
-              </button>
-
-              <!-- Edit button for rejected issues -->
-              <button *ngIf="isRejected(issue.status)"
-                      nz-button nzType="primary" nzSize="small"
-                      (click)="editIssue(issue)">
-                <i nz-icon nzType="edit" nzTheme="outline"></i> Editează
-              </button>
-
-              <!-- Mark as solved for active issues -->
-              <button *ngIf="isActive(issue.status)"
-                      nz-button nzType="primary" nzSize="small"
-                      nz-tooltip nzTooltipTitle="Marchează problema ca rezolvată"
-                      (click)="markAsSolved(issue)">
-                <i nz-icon nzType="check-circle" nzTheme="outline"></i> Rezolvă
-              </button>
-
-              <!-- Cancel for active issues -->
-              <button *ngIf="isActive(issue.status)"
-                      nz-button nzType="text" nzDanger nzSize="small"
-                      nz-tooltip nzTooltipTitle="Anulează problema"
-                      (click)="cancelIssue(issue)">
-                <i nz-icon nzType="close-circle" nzTheme="outline"></i> Anulează
-              </button>
-            </div>
-          </div>
-        </nz-card>
-      </nz-col>
-      </nz-row>
-    </ng-container>
+            </nz-card>
+          </nz-col>
+          }
+        </nz-row>
+      }
+    }
 
     <!-- Error State -->
-    <div *ngIf="!(isLoading$ | async) && (error$ | async) as error" class="error-state">
-      <nz-alert
-        nzType="error"
-        nzMessage="Eroare la încărcarea problemelor"
-        [nzDescription]="error"
-        nzShowIcon>
-      </nz-alert>
-      <button nz-button nzType="primary" (click)="retryLoad()" class="retry-button">
-        <i nz-icon nzType="reload" nzTheme="outline"></i>
-        Încearcă din nou
-      </button>
-    </div>
+    @if (!(isLoading$ | async) && (error$ | async); as error) {
+      <div class="error-state">
+        <nz-alert
+          nzType="error"
+          nzMessage="Eroare la încărcarea problemelor"
+          [nzDescription]="error"
+          nzShowIcon>
+        </nz-alert>
+        <button nz-button nzType="primary" (click)="retryLoad()" class="retry-button">
+          <i nz-icon nzType="reload" nzTheme="outline"></i>
+          Încearcă din nou
+        </button>
+      </div>
+    }
 
     <!-- Empty State -->
-    <div *ngIf="!(isLoading$ | async) && !(error$ | async) && ((issues$ | async)?.length || 0) === 0" class="empty-state">
-      <nz-empty
-        nzNotFoundImage="simple"
-        [nzNotFoundContent]="emptyContent"
-        [nzNotFoundFooter]="emptyFooter">
-      </nz-empty>
-      <ng-template #emptyContent>
-        <span *ngIf="selectedFilter === 'all'">Nu ai raportat încă nicio problemă</span>
-        <span *ngIf="selectedFilter === 'active'">Nu ai probleme active</span>
-        <span *ngIf="selectedFilter === 'resolved'">Nu ai probleme rezolvate</span>
-        <span *ngIf="selectedFilter === 'rejected'">Nu ai probleme respinse</span>
-        <span *ngIf="selectedFilter === 'cancelled'">Nu ai probleme anulate</span>
-      </ng-template>
-      <ng-template #emptyFooter>
-        <button *ngIf="selectedFilter === 'all'" nz-button nzType="primary" (click)="navigateToCreateIssue()">
-          <i nz-icon nzType="plus" nzTheme="outline"></i>
-          Raportează prima problemă
-        </button>
-      </ng-template>
-    </div>
+    @if (!(isLoading$ | async) && !(error$ | async) && ((issues$ | async)?.length || 0) === 0) {
+      <div class="empty-state">
+        <nz-empty
+          nzNotFoundImage="simple"
+          [nzNotFoundContent]="emptyContent"
+          [nzNotFoundFooter]="emptyFooter">
+        </nz-empty>
+        <ng-template #emptyContent>
+          @if (selectedFilter === 'all') {
+            <span>Nu ai raportat încă nicio problemă</span>
+          }
+          @if (selectedFilter === 'active') {
+            <span>Nu ai probleme active</span>
+          }
+          @if (selectedFilter === 'resolved') {
+            <span>Nu ai probleme rezolvate</span>
+          }
+          @if (selectedFilter === 'rejected') {
+            <span>Nu ai probleme respinse</span>
+          }
+          @if (selectedFilter === 'cancelled') {
+            <span>Nu ai probleme anulate</span>
+          }
+        </ng-template>
+        <ng-template #emptyFooter>
+          @if (selectedFilter === 'all') {
+            <button nz-button nzType="primary" (click)="navigateToCreateIssue()">
+              <i nz-icon nzType="plus" nzTheme="outline"></i>
+              Raportează prima problemă
+            </button>
+          }
+        </ng-template>
+      </div>
+    }
   </div>
 </nz-spin>

@@ -1,7 +1,7 @@
 <div class="registration-container">
 
-  <!-- Email Confirmation Pending View -->
-  <ng-container *ngIf="emailConfirmationPending$ | async; else registrationView">
+  @if (emailConfirmationPending$ | async) {
+    <!-- Email Confirmation Pending View -->
     <div class="confirmation-pending-container">
       <nz-card [nzBordered]="false" class="confirmation-card">
         <div class="confirmation-content">
@@ -41,10 +41,8 @@
         </div>
       </nz-card>
     </div>
-  </ng-container>
-
-  <!-- Registration Form View -->
-  <ng-template #registrationView>
+  } @else {
+    <!-- Registration Form View -->
     <!-- Header -->
     <div class="registration-header">
       <button nz-button nzType="text" nzSize="large" routerLink="/auth/register" class="back-btn">
@@ -69,20 +67,22 @@
       <nz-spin [nzSpinning]="(isLoading$ | async) || false">
         
         <!-- Error Alert -->
-        <nz-alert
-          *ngIf="error$ | async as error"
-          [nzMessage]="error"
-          nzType="error"
-          nzShowIcon
-          nzCloseable
-          (nzOnClose)="clearError()"
-          class="error-alert">
-        </nz-alert>
+        @if (error$ | async; as error) {
+          <nz-alert
+            [nzMessage]="error"
+            nzType="error"
+            nzShowIcon
+            nzCloseable
+            (nzOnClose)="clearError()"
+            class="error-alert">
+          </nz-alert>
+        }
 
         <form nz-form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
           
           <!-- Step 1: Account Information -->
-          <div *ngIf="currentStep === 0" class="form-step">
+          @if (currentStep === 0) {
+          <div class="form-step">
             <h3 class="step-title">Informații cont</h3>
             
             <nz-form-item>
@@ -144,36 +144,40 @@
                   placeholder="Confirmă parola"
                   autocomplete="new-password">
                 <ng-template #confirmPasswordErrorTip>
-                  <span *ngIf="registrationForm.get('confirmPassword')?.hasError('required')">
-                    Te rugăm să confirmi parola
-                  </span>
-                  <span *ngIf="registrationForm.get('confirmPassword')?.hasError('passwordMismatch')">
-                    Parolele nu se potrivesc
-                  </span>
+                  @if (registrationForm.get('confirmPassword')?.hasError('required')) {
+                    <span>Te rugăm să confirmi parola</span>
+                  }
+                  @if (registrationForm.get('confirmPassword')?.hasError('passwordMismatch')) {
+                    <span>Parolele nu se potrivesc</span>
+                  }
                 </ng-template>
               </nz-form-control>
             </nz-form-item>
           </div>
+          }
 
           <!-- Step 2: Location Information -->
-          <div *ngIf="currentStep === 1" class="form-step">
+          @if (currentStep === 1) {
+          <div class="form-step">
             <h3 class="step-title">Informații despre locație</h3>
             <p class="step-description">Ajută-ne să te conectăm cu problemele din zona ta</p>
-            
+
             <nz-form-item>
               <nz-form-label [nzSpan]="24" nzFor="county" nzRequired>Județ</nz-form-label>
               <nz-form-control [nzSpan]="24" [nzErrorTip]="countyErrorTip">
-                <nz-select formControlName="county" id="county" 
+                <nz-select formControlName="county" id="county"
                   nzPlaceHolder="Selectează județul"
                   nzShowSearch>
-                  <nz-option *ngFor="let county of counties" 
-                    [nzValue]="county.code" 
-                    [nzLabel]="county.name"></nz-option>
+                  @for (county of counties; track county.code) {
+                    <nz-option
+                      [nzValue]="county.code"
+                      [nzLabel]="county.name"></nz-option>
+                  }
                 </nz-select>
                 <ng-template #countyErrorTip>
-                  <span *ngIf="registrationForm.get('county')?.hasError('required')">
-                    Te rugăm să selectezi județul
-                  </span>
+                  @if (registrationForm.get('county')?.hasError('required')) {
+                    <span>Te rugăm să selectezi județul</span>
+                  }
                 </ng-template>
               </nz-form-control>
             </nz-form-item>
@@ -181,60 +185,70 @@
             <nz-form-item>
               <nz-form-label [nzSpan]="24" nzFor="city" nzRequired>Oraș</nz-form-label>
               <nz-form-control [nzSpan]="24" [nzErrorTip]="cityErrorTip">
-                <nz-select formControlName="city" id="city" 
+                <nz-select formControlName="city" id="city"
                   nzPlaceHolder="Selectează orașul"
                   nzShowSearch
                   [nzDisabled]="!registrationForm.get('county')?.value">
-                  <nz-option *ngFor="let city of cities" 
-                    [nzValue]="city" 
-                    [nzLabel]="city"></nz-option>
+                  @for (city of cities; track $index) {
+                    <nz-option
+                      [nzValue]="city"
+                      [nzLabel]="city"></nz-option>
+                  }
                 </nz-select>
                 <ng-template #cityErrorTip>
-                  <span *ngIf="registrationForm.get('city')?.hasError('required')">
-                    Te rugăm să selectezi orașul
-                  </span>
+                  @if (registrationForm.get('city')?.hasError('required')) {
+                    <span>Te rugăm să selectezi orașul</span>
+                  }
                 </ng-template>
               </nz-form-control>
             </nz-form-item>
 
-            <nz-form-item *ngIf="showDistricts">
-              <nz-form-label [nzSpan]="24" nzFor="district" nzRequired>Sector</nz-form-label>
-              <nz-form-control [nzSpan]="24" [nzErrorTip]="districtErrorTip">
-                <nz-select formControlName="district" id="district" 
-                  nzPlaceHolder="Selectează sectorul">
-                  <nz-option *ngFor="let district of districts" 
-                    [nzValue]="district" 
-                    [nzLabel]="district"></nz-option>
-                </nz-select>
-                <ng-template #districtErrorTip>
-                  <span *ngIf="registrationForm.get('district')?.hasError('required')">
-                    Te rugăm să selectezi sectorul
-                  </span>
-                </ng-template>
-              </nz-form-control>
-            </nz-form-item>
+            @if (showDistricts) {
+              <nz-form-item>
+                <nz-form-label [nzSpan]="24" nzFor="district" nzRequired>Sector</nz-form-label>
+                <nz-form-control [nzSpan]="24" [nzErrorTip]="districtErrorTip">
+                  <nz-select formControlName="district" id="district"
+                    nzPlaceHolder="Selectează sectorul">
+                    @for (district of districts; track $index) {
+                      <nz-option
+                        [nzValue]="district"
+                        [nzLabel]="district"></nz-option>
+                    }
+                  </nz-select>
+                  <ng-template #districtErrorTip>
+                    @if (registrationForm.get('district')?.hasError('required')) {
+                      <span>Te rugăm să selectezi sectorul</span>
+                    }
+                  </ng-template>
+                </nz-form-control>
+              </nz-form-item>
+            }
 
             <nz-form-item>
               <nz-form-label [nzSpan]="24" nzFor="residenceType" nzRequired>Tip de rezidență</nz-form-label>
               <nz-form-control [nzSpan]="24" [nzErrorTip]="residenceTypeErrorTip">
-                <nz-select formControlName="residenceType" id="residenceType" 
+                <nz-select formControlName="residenceType" id="residenceType"
                   nzPlaceHolder="Selectează tipul de rezidență">
-                  <nz-option *ngFor="let type of residenceTypes" 
-                    [nzValue]="type.value" 
-                    [nzLabel]="type.label"></nz-option>
+                  @for (type of residenceTypes; track type.value) {
+                    <nz-option
+                      [nzValue]="type.value"
+                      [nzLabel]="type.label"></nz-option>
+                  }
                 </nz-select>
                 <ng-template #residenceTypeErrorTip>
-                  <span *ngIf="registrationForm.get('residenceType')?.hasError('required')">
-                    Te rugăm să selectezi tipul de rezidență
-                  </span>
+                  @if (registrationForm.get('residenceType')?.hasError('required')) {
+                    <span>Te rugăm să selectezi tipul de rezidență</span>
+                  }
                 </ng-template>
               </nz-form-control>
             </nz-form-item>
 
           </div>
+          }
 
           <!-- Step 3: Communication Preferences -->
-          <div *ngIf="currentStep === 2" class="form-step">
+          @if (currentStep === 2) {
+          <div class="form-step">
             <h3 class="step-title">Preferințe de comunicare</h3>
             <p class="step-description">Alege cum dorești să fii informat</p>
             
@@ -287,47 +301,51 @@
               </nz-form-item>
             </div>
           </div>
+          }
 
           <!-- Navigation Buttons -->
           <div class="form-navigation">
-            <button
-              *ngIf="currentStep > 0"
-              nz-button
-              nzType="default"
-              nzSize="large"
-              type="button"
-              (click)="previousStep()"
-              class="nav-btn">
-              <span nz-icon nzType="arrow-left"></span>
-              Înapoi
-            </button>
-            
-            <div class="nav-spacer"></div>
-            
-            <button
-              *ngIf="currentStep < 2"
-              nz-button
-              nzType="primary"
-              nzSize="large"
-              type="button"
-              (click)="nextStep()"
-              [disabled]="!isCurrentStepValid()"
-              class="nav-btn">
-              Următorul
-              <span nz-icon nzType="arrow-right"></span>
-            </button>
+            @if (currentStep > 0) {
+              <button
+                nz-button
+                nzType="default"
+                nzSize="large"
+                type="button"
+                (click)="previousStep()"
+                class="nav-btn">
+                <span nz-icon nzType="arrow-left"></span>
+                Înapoi
+              </button>
+            }
 
-            <button
-              *ngIf="currentStep === 2"
-              nz-button
-              nzType="primary"
-              nzSize="large"
-              type="submit"
-              [disabled]="!registrationForm.valid"
-              class="nav-btn submit-btn">
-              <span nz-icon nzType="user-add"></span>
-              Creează cont
-            </button>
+            <div class="nav-spacer"></div>
+
+            @if (currentStep < 2) {
+              <button
+                nz-button
+                nzType="primary"
+                nzSize="large"
+                type="button"
+                (click)="nextStep()"
+                [disabled]="!isCurrentStepValid()"
+                class="nav-btn">
+                Următorul
+                <span nz-icon nzType="arrow-right"></span>
+              </button>
+            }
+
+            @if (currentStep === 2) {
+              <button
+                nz-button
+                nzType="primary"
+                nzSize="large"
+                type="submit"
+                [disabled]="!registrationForm.valid"
+                class="nav-btn submit-btn">
+                <span nz-icon nzType="user-add"></span>
+                Creează cont
+              </button>
+            }
           </div>
 
         </form>
@@ -343,7 +361,7 @@
       </nz-spin>
     </nz-card>
     </div>
-  </ng-template>
+  }
 </div>
 
 <!-- Privacy Policy Modal Template -->

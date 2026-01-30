@@ -1,50 +1,12 @@
-.admin-dashboard-container {
-  min-height: 100vh;
-  background: #f5f5f5;
-  padding: 1.5rem;
+:host {
+  display: flex;
+  flex-direction: column;
 }
 
-// Header Section
-.admin-header {
-  background: linear-gradient(135deg, var(--oxford-blue, #14213D) 0%, #1a2b4f 100%);
-  color: var(--white, #FFFFFF);
-  padding: 2rem;
-  border-radius: 16px;
-  margin-bottom: 2rem;
-  box-shadow: 0 8px 24px rgba(20, 33, 61, 0.15);
-
-  .header-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-  }
-
-  .admin-welcome {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-
-    .admin-avatar {
-      border: 3px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .welcome-text {
-      h1 {
-        margin: 0;
-        font-size: 1.5rem;
-        font-weight: 600;
-        color: white;
-      }
-
-      p {
-        margin: 0.25rem 0 0;
-        opacity: 0.8;
-        font-size: 0.875rem;
-      }
-    }
-  }
+.admin-dashboard-container {
+  flex: 1;
+  background: var(--platinum);
+  padding: 1.5rem;
 }
 
 // Stats Section
@@ -249,14 +211,6 @@
 @media (max-width: 768px) {
   .admin-dashboard-container {
     padding: 1rem;
-  }
-
-  .admin-header {
-    padding: 1.5rem;
-
-    .welcome-text h1 {
-      font-size: 1.25rem;
-    }
   }
 
   .action-item {

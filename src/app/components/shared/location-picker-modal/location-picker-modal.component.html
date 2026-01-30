@@ -31,93 +31,107 @@
         <ng-template #emptyTemplate></ng-template>
 
         <!-- Autocomplete Suggestions Dropdown -->
-        <div class="autocomplete-dropdown" *ngIf="showSuggestions && suggestions.length">
-          <div
-            *ngFor="let suggestion of suggestions"
-            class="suggestion-item"
-            (mousedown)="onSuggestionSelected(suggestion)">
-            <span nz-icon nzType="environment" class="suggestion-icon"></span>
-            <span class="suggestion-text">{{ suggestion.description }}</span>
+        @if (showSuggestions && suggestions.length) {
+          <div class="autocomplete-dropdown">
+            @for (suggestion of suggestions; track suggestion.place_id) {
+              <div
+                class="suggestion-item"
+                (mousedown)="onSuggestionSelected(suggestion)">
+                <span nz-icon nzType="environment" class="suggestion-icon"></span>
+                <span class="suggestion-text">{{ suggestion.description }}</span>
+              </div>
+            }
           </div>
-        </div>
+        }
       </nz-form-control>
     </nz-form-item>
   </div>
 
   <!-- Map Section -->
   <div class="map-section">
-    <div *ngIf="!isMapLoaded && !mapLoadError" class="map-loading">
-      <nz-spin nzTip="Se încarcă harta..."></nz-spin>
-    </div>
+    @if (!isMapLoaded && !mapLoadError) {
+      <div class="map-loading">
+        <nz-spin nzTip="Se încarcă harta..."></nz-spin>
+      </div>
+    }
 
-    <nz-alert
-      *ngIf="mapLoadError"
-      nzType="error"
-      nzMessage="Eroare la încărcarea hărții"
-      nzDescription="Nu s-a putut încărca Google Maps. Vă rugăm să reîncercați."
-      nzShowIcon>
-    </nz-alert>
+    @if (mapLoadError) {
+      <nz-alert
+        nzType="error"
+        nzMessage="Eroare la încărcarea hărții"
+        nzDescription="Nu s-a putut încărca Google Maps. Vă rugăm să reîncercați."
+        nzShowIcon>
+      </nz-alert>
+    }
 
-    <google-map
-      *ngIf="isMapLoaded"
-      height="350px"
-      width="100%"
-      [center]="mapCenter"
-      [zoom]="mapZoom"
-      [options]="mapOptions"
-      (mapClick)="onMapClick($event)">
+    @if (isMapLoaded) {
+      <google-map
+        height="350px"
+        width="100%"
+        [center]="mapCenter"
+        [zoom]="mapZoom"
+        [options]="mapOptions"
+        (mapClick)="onMapClick($event)">
 
-      <!-- Draggable Marker -->
-      <map-marker
-        *ngIf="markerPosition"
-        [position]="markerPosition"
-        [options]="markerOptions"
-        (mapDragend)="onMarkerDragEnd($event)">
-      </map-marker>
+        <!-- Draggable Marker -->
+        @if (markerPosition) {
+          <map-marker
+            [position]="markerPosition"
+            [options]="markerOptions"
+            (mapDragend)="onMarkerDragEnd($event)">
+          </map-marker>
+        }
 
-    </google-map>
+      </google-map>
+    }
   </div>
 
   <!-- Selected Location Display -->
-  <div class="selected-location" *ngIf="selectedLocation">
-    <nz-card size="small" class="location-card" [class.invalid-location]="!isInAllowedArea()">
-      <div class="location-info">
-        <span nz-icon
-          [nzType]="isInAllowedArea() ? 'check-circle' : 'warning'"
-          nzTheme="fill"
-          [class.success-icon]="isInAllowedArea()"
-          [class.warning-icon]="!isInAllowedArea()">
-        </span>
-        <div class="location-text">
-          <strong>{{ selectedLocation.address }}</strong>
-          <nz-tag
-            class="district-tag"
-            *ngIf="selectedLocation.district"
-            [nzColor]="isInAllowedArea() ? 'green' : 'orange'">
-            {{ selectedLocation.district }}
-          </nz-tag>
+  @if (selectedLocation) {
+    <div class="selected-location">
+      <nz-card size="small" class="location-card" [class.invalid-location]="!isInAllowedArea()">
+        <div class="location-info">
+          <span nz-icon
+            [nzType]="isInAllowedArea() ? 'check-circle' : 'warning'"
+            nzTheme="fill"
+            [class.success-icon]="isInAllowedArea()"
+            [class.warning-icon]="!isInAllowedArea()">
+          </span>
+          <div class="location-text">
+            <strong>{{ selectedLocation.address }}</strong>
+            @if (selectedLocation.district) {
+              <nz-tag
+                class="district-tag"
+                [nzColor]="isInAllowedArea() ? 'green' : 'orange'">
+                {{ selectedLocation.district }}
+              </nz-tag>
+            }
+          </div>
         </div>
-      </div>
-      <div class="coordinates">
-        <small>Coordonate: {{ selectedLocation.latitude.toFixed(6) }}, {{ selectedLocation.longitude.toFixed(6) }}</small>
-      </div>
-    </nz-card>
+        <div class="coordinates">
+          <small>Coordonate: {{ selectedLocation.latitude.toFixed(6) }}, {{ selectedLocation.longitude.toFixed(6) }}</small>
+        </div>
+      </nz-card>
 
-    <!-- Location Restriction Warning -->
-    <nz-alert
-      *ngIf="getLocationRestrictionMessage()"
-      nzType="warning"
-      [nzMessage]="getLocationRestrictionMessage()"
-      nzShowIcon
-      class="restriction-alert">
-    </nz-alert>
-  </div>
+      <!-- Location Restriction Warning -->
+      @if (getLocationRestrictionMessage()) {
+        <nz-alert
+          nzType="warning"
+          [nzMessage]="getLocationRestrictionMessage()"
+          nzShowIcon
+          class="restriction-alert">
+        </nz-alert>
+      }
+    </div>
+  }
 
   <!-- Instruction Text -->
-  <p class="instruction-text" *ngIf="isMapLoaded">
+  @if (isMapLoaded) {
+    <p class="instruction-text">
     <span nz-icon nzType="info-circle" nzTheme="outline"></span>
     Poți da click pe hartă sau trage markerul pentru a ajusta locația exactă.
   </p>
+  }
 
   <!-- Action Buttons -->
   <div class="action-buttons">

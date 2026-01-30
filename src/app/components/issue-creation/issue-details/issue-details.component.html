@@ -39,25 +39,31 @@
     <nz-card nzTitle="Rezumat problemă" class="summary-card">
       <div class="summary-content">
 
-        <div class="summary-item" *ngIf="selectedCategory">
-          <div class="summary-label">Categorie</div>
-          <div class="summary-value">
-            <span nz-icon [nzType]="selectedCategory.icon" nzTheme="outline" class="category-icon"></span>
-            {{ selectedCategory.name }}
+        @if (selectedCategory) {
+          <div class="summary-item">
+            <div class="summary-label">Categorie</div>
+            <div class="summary-value">
+              <span nz-icon [nzType]="selectedCategory.icon" nzTheme="outline" class="category-icon"></span>
+              {{ selectedCategory.name }}
+            </div>
           </div>
-        </div>
+        }
 
-        <div class="summary-item" *ngIf="uploadedPhotos.length > 0">
-          <div class="summary-label">Fotografii</div>
-          <div class="summary-value">
-            <nz-tag nzColor="blue">{{ uploadedPhotos.length }} fotografii încărcate</nz-tag>
+        @if (uploadedPhotos.length > 0) {
+          <div class="summary-item">
+            <div class="summary-label">Fotografii</div>
+            <div class="summary-value">
+              <nz-tag nzColor="blue">{{ uploadedPhotos.length }} fotografii încărcate</nz-tag>
+            </div>
           </div>
-        </div>
+        }
 
-        <div class="summary-item" *ngIf="currentLocation">
-          <div class="summary-label">Locație</div>
-          <div class="summary-value">{{ currentLocation.address }}</div>
-        </div>
+        @if (currentLocation) {
+          <div class="summary-item">
+            <div class="summary-label">Locație</div>
+            <div class="summary-value">{{ currentLocation.address }}</div>
+          </div>
+        }
 
       </div>
     </nz-card>
@@ -129,7 +135,9 @@
             <nz-form-label [nzSpan]="24" nzFor="urgency">Nivel de urgență</nz-form-label>
             <nz-form-control [nzSpan]="24">
               <nz-select formControlName="urgency" id="urgency" nzPlaceHolder="Cât de urgentă este această problemă?">
-                <nz-option *ngFor="let opt of urgencyOptions" [nzValue]="opt.value" [nzLabel]="opt.label + ' - ' + opt.description"></nz-option>
+                @for (opt of urgencyOptions; track opt.value) {
+                  <nz-option [nzValue]="opt.value" [nzLabel]="opt.label + ' - ' + opt.description"></nz-option>
+                }
               </nz-select>
             </nz-form-control>
           </nz-form-item>
@@ -158,16 +166,22 @@
                 [disabled]="!detailsForm.valid || isEnhancingAI || isAIEnhanced"
                 (click)="enhanceWithAI()"
                 class="enhance-btn">
-                <span nz-icon nzType="robot" *ngIf="!isEnhancingAI"></span>
-                <span nz-icon nzType="loading" *ngIf="isEnhancingAI"></span>
+                @if (!isEnhancingAI) {
+                  <span nz-icon nzType="robot"></span>
+                }
+                @if (isEnhancingAI) {
+                  <span nz-icon nzType="loading"></span>
+                }
                 {{ isEnhancingAI ? 'Se îmbunătățește...' : 'Îmbunătățește cu AI' }}
               </button>
               <p class="ai-helper-text">Opțional: Lasă AI-ul să îmbunătățească textul introdus</p>
             </div>
-            <div class="ai-success" *ngIf="isAIEnhanced">
-              <span nz-icon nzType="check-circle" nzTheme="fill" class="ai-check"></span>
-              <span>Text îmbunătățit cu AI</span>
-            </div>
+            @if (isAIEnhanced) {
+              <div class="ai-success">
+                <span nz-icon nzType="check-circle" nzTheme="fill" class="ai-check"></span>
+                <span>Text îmbunătățit cu AI</span>
+              </div>
+            }
           </div>
 
         </form>

@@ -1,13 +1,16 @@
 <div class="bg-background">
   <div class="container mx-auto p-4 max-w-6xl">
     <!-- Loading State -->
-    <div *ngIf="isLoading$ | async" class="text-center py-12">
-      <i nz-icon nzType="loading" nzTheme="outline" nzSpin class="text-oxford-blue text-4xl mb-4"></i>
-      <p class="text-oxford-blue">Se încarcă detaliile problemei...</p>
-    </div>
+    @if (isLoading$ | async) {
+      <div class="text-center py-12">
+        <i nz-icon nzType="loading" nzTheme="outline" nzSpin class="text-oxford-blue text-4xl mb-4"></i>
+        <p class="text-oxford-blue">Se încarcă detaliile problemei...</p>
+      </div>
+    }
 
     <!-- Issue Details -->
-    <div *ngIf="(issue$ | async) as issue" class="space-y-6">
+    @if (issue$ | async; as issue) {
+    <div class="space-y-6">
       <!-- Main Content Grid -->
       <nz-row [nzGutter]="24">
         <!-- Left Column - Issue Details (2 cols) -->
@@ -18,9 +21,11 @@
               <div class="flex items-start justify-between mb-4">
                 <div class="flex-1">
                   <h1 class="text-2xl font-bold text-oxford-blue">
-                    <nz-tag *ngIf="issue.urgency | isUrgent" nzColor="error" class="mr-2">
-                      URGENT
-                    </nz-tag>{{ issue.title }}
+                    @if (issue.urgency | isUrgent) {
+                      <nz-tag nzColor="error" class="mr-2">
+                        URGENT
+                      </nz-tag>
+                    }{{ issue.title }}
                   </h1>
                 </div>
                 <div class="text-right">
@@ -44,7 +49,8 @@
             </nz-card>
 
             <!-- Photos Gallery -->
-            <nz-card *ngIf="issue.photos && issue.photos.length > 0">
+            @if (issue.photos && issue.photos.length > 0) {
+            <nz-card>
               <div class="flex items-center justify-between mb-4">
                 <div class="flex items-center">
                   <i nz-icon nzType="picture" nzTheme="outline" class="text-oxford-blue text-xl mr-2"></i>
@@ -60,7 +66,8 @@
                 </button>
               </div>
               <!-- Progress bar when downloading -->
-              <div *ngIf="downloadProgress && isDownloading" class="mb-4">
+              @if (downloadProgress && isDownloading) {
+              <div class="mb-4">
                 <nz-progress
                   [nzPercent]="downloadProgress.percentage"
                   [nzStatus]="downloadProgress.phase === 'error' ? 'exception' : 'active'"
@@ -68,8 +75,10 @@
                 </nz-progress>
                 <p class="text-xs text-oxford-blue opacity-75 mt-1">{{ downloadProgress.message }}</p>
               </div>
+              }
               <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                <a *ngFor="let photo of issue.photos; let i = index" [href]="photo.url"
+                @for (photo of issue.photos; track photo.url; let i = $index) {
+                <a [href]="photo.url"
                   target="_blank"
                   class="photo-gallery-item relative cursor-pointer group block"
                   [attr.data-glightbox]="'title: Fotografie ' + (i + 1) + '; description: ' + (photo.description || issue.title)">
@@ -80,8 +89,10 @@
                       class="text-white opacity-0 group-hover:opacity-100 transition-opacity text-2xl"></i>
                   </div>
                 </a>
+                }
               </div>
             </nz-card>
+            }
 
             <!-- Description Tabs -->
             <nz-card>
@@ -93,14 +104,20 @@
                 </nz-tab>
                 <nz-tab nzTitle="Rezultat Dorit">
                   <div class="p-6">
-                    <p *ngIf="issue.desiredOutcome" class="text-oxford-blue whitespace-pre-wrap">{{ issue.desiredOutcome }}</p>
-                    <p *ngIf="!issue.desiredOutcome" class="text-gray-500">Nu a fost specificat un rezultat dorit.</p>
+                    @if (issue.desiredOutcome) {
+                      <p class="text-oxford-blue whitespace-pre-wrap">{{ issue.desiredOutcome }}</p>
+                    } @else {
+                      <p class="text-gray-500">Nu a fost specificat un rezultat dorit.</p>
+                    }
                   </div>
                 </nz-tab>
                 <nz-tab nzTitle="Impact Comunitar">
                   <div class="p-6">
-                    <p *ngIf="issue.communityImpact" class="text-oxford-blue whitespace-pre-wrap">{{ issue.communityImpact }}</p>
-                    <p *ngIf="!issue.communityImpact" class="text-gray-500">Nu a fost specificat impactul comunitar.</p>
+                    @if (issue.communityImpact) {
+                      <p class="text-oxford-blue whitespace-pre-wrap">{{ issue.communityImpact }}</p>
+                    } @else {
+                      <p class="text-gray-500">Nu a fost specificat impactul comunitar.</p>
+                    }
                   </div>
                 </nz-tab>
               </nz-tabset>
@@ -114,23 +131,30 @@
                 <i nz-icon nzType="environment" nzTheme="outline" class="text-oxford-blue"></i>
               </ng-template>
               <div class="mt-4">
-                <div *ngIf="!isMapLoaded && !mapLoadError" class="text-center py-8">
-                  <i nz-icon nzType="loading" nzTheme="outline" nzSpin class="text-oxford-blue text-3xl mb-2"></i>
-                  <p class="text-oxford-blue opacity-75">Se încarcă harta...</p>
-                </div>
-                <div *ngIf="mapLoadError" class="text-center py-8">
-                  <i nz-icon nzType="close-circle" nzTheme="outline" class="text-orange-web text-3xl mb-2"></i>
-                  <p class="text-oxford-blue font-semibold mb-2">Harta nu poate fi încărcată</p>
-                  <p class="text-oxford-blue opacity-75 text-sm">
-                    Verifică că ai configurat cheia API Google Maps în <code>src/environments/environment.ts</code>
-                  </p>
-                </div>
-                <google-map *ngIf="isMapLoaded && !mapLoadError" height="400px" width="100%" [center]="mapCenter"
-                  [options]="mapOptions" class="rounded-lg overflow-hidden shadow-inner">
+                @if (!isMapLoaded && !mapLoadError) {
+                  <div class="text-center py-8">
+                    <i nz-icon nzType="loading" nzTheme="outline" nzSpin class="text-oxford-blue text-3xl mb-2"></i>
+                    <p class="text-oxford-blue opacity-75">Se încarcă harta...</p>
+                  </div>
+                }
+                @if (mapLoadError) {
+                  <div class="text-center py-8">
+                    <i nz-icon nzType="close-circle" nzTheme="outline" class="text-orange-web text-3xl mb-2"></i>
+                    <p class="text-oxford-blue font-semibold mb-2">Harta nu poate fi încărcată</p>
+                    <p class="text-oxford-blue opacity-75 text-sm">
+                      Verifică că ai configurat cheia API Google Maps în <code>src/environments/environment.ts</code>
+                    </p>
+                  </div>
+                }
+                @if (isMapLoaded && !mapLoadError) {
+                  <google-map height="400px" width="100%" [center]="mapCenter"
+                    [options]="mapOptions" class="rounded-lg overflow-hidden shadow-inner">
 
-                  <map-marker *ngIf="markerPosition" #markerElement [position]="markerPosition"
-                    [options]="markerOptions" (mapClick)="openInfoWindow()">
-                  </map-marker>
+                    @if (markerPosition) {
+                      <map-marker #markerElement [position]="markerPosition"
+                        [options]="markerOptions" (mapClick)="openInfoWindow()">
+                      </map-marker>
+                    }
 
                   <map-info-window #infoWindow>
                     <div class="p-3 max-w-xs">
@@ -146,7 +170,8 @@
                       </nz-tag>
                     </div>
                   </map-info-window>
-                </google-map>
+                  </google-map>
+                }
               </div>
             </nz-card>
 
@@ -201,8 +226,8 @@
             </nz-card>
 
             <!-- Authorities List -->
+            @if (issue.authorities && issue.authorities.length > 0) {
             <nz-card
-              *ngIf="issue.authorities && issue.authorities.length > 0"
               nzSize="small">
               <nz-card-meta nzTitle="Autorități Responsabile" [nzAvatar]="authIcon">
               </nz-card-meta>
@@ -210,14 +235,16 @@
                 <i nz-icon nzType="bank" nzTheme="outline" class="text-oxford-blue"></i>
               </ng-template>
               <div class="text-sm mt-4">
-                <ng-container *ngFor="let authority of issue.authorities; let last = last">
+                @for (authority of issue.authorities; track authority.name; let last = $last) {
                   <div class="flex justify-between items-center">
                     <span class="text-oxford-blue">{{ authority.name }}</span>
                     <i nz-icon [nzType]="authority.isPredefined ? 'bank' : 'user'" nzTheme="outline"
                        class="text-oxford-blue opacity-50"></i>
                   </div>
-                  <nz-divider *ngIf="!last" class="my-2"></nz-divider>
-                </ng-container>
+                  @if (!last) {
+                    <nz-divider class="my-2"></nz-divider>
+                  }
+                }
               </div>
               <!-- Single Email Campaign Button -->
               <div class="mt-4">
@@ -230,10 +257,11 @@
                 </button>
               </div>
             </nz-card>
+            }
 
             <!-- No Authorities Message (legacy issues only) -->
-            <nz-card
-              *ngIf="!issue.authorities || issue.authorities.length === 0">
+            @if (!issue.authorities || issue.authorities.length === 0) {
+            <nz-card>
               <nz-card-meta nzTitle="Autorități Responsabile" [nzAvatar]="authIcon">
               </nz-card-meta>
               <ng-template #authIcon>
@@ -246,6 +274,7 @@
                 </p>
               </div>
             </nz-card>
+            }
 
             <!-- Share Section -->
             <nz-card nzSize="small">
@@ -281,7 +310,8 @@
                   </button>
                 </nz-space>
                 <!-- QR Poster for physical distribution -->
-                <div *ngIf="issue.status | isActive" class="mt-4 pt-4 border-t border-gray-200">
+                @if (issue.status | isActive) {
+                <div class="mt-4 pt-4 border-t border-gray-200">
                   <p class="text-oxford-blue opacity-75 mb-3 text-center text-xs">
                     Sau tipărește un poster cu cod QR:
                   </p>
@@ -293,6 +323,7 @@
                     Deschide Poster QR
                   </button>
                 </div>
+                }
               </div>
             </nz-card>
 
@@ -326,9 +357,11 @@
         </nz-col>
       </nz-row>
     </div>
+    }
 
     <!-- Not Found -->
-    <div *ngIf="!(isLoading$ | async) && !(issue$ | async)" class="text-center py-12">
+    @if (!(isLoading$ | async) && !(issue$ | async)) {
+    <div class="text-center py-12">
       <i nz-icon nzType="close-circle" nzTheme="outline" class="text-oxford-blue text-6xl mb-4 opacity-50"></i>
       <h3 class="text-oxford-blue text-xl font-semibold mb-2">Problema nu a fost găsită</h3>
       <p class="text-oxford-blue opacity-75 mb-6">
@@ -339,5 +372,6 @@
         Înapoi la Lista de Probleme
       </button>
     </div>
+    }
   </div>
 </div>

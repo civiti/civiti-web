@@ -1,26 +1,9 @@
 <nz-spin [nzSpinning]="isLoading">
   <div class="admin-dashboard-container">
 
-    <!-- Header Section -->
-    <div class="admin-header">
-      <div class="header-content">
-        <div class="admin-welcome">
-          <nz-avatar
-            [nzSrc]="(user$ | async)?.photoUrl || undefined"
-            [nzText]="(displayName$ | async)?.charAt(0)"
-            nzSize="large"
-            class="admin-avatar">
-          </nz-avatar>
-          <div class="welcome-text">
-            <h1>Panou de Administrare</h1>
-            <p>Bine ai venit, {{ displayName$ | async }}!</p>
-          </div>
-        </div>
-      </div>
-    </div>
-
     <!-- Quick Stats -->
-    <div class="stats-section" *ngIf="statistics$ | async as stats">
+    @if (statistics$ | async; as stats) {
+    <div class="stats-section">
       <div nz-row [nzGutter]="[16, 16]">
 
         <div nz-col [nzSpan]="12" [nzSm]="6">
@@ -78,6 +61,7 @@
 
       </div>
     </div>
+    }
 
     <!-- Quick Actions -->
     <div class="actions-section">
@@ -124,7 +108,8 @@
     </div>
 
     <!-- Statistics Details -->
-    <div class="details-section" *ngIf="statistics$ | async as stats">
+    @if (statistics$ | async; as stats) {
+    <div class="details-section">
       <div nz-row [nzGutter]="[24, 24]">
 
         <!-- Today's Activity -->
@@ -175,37 +160,50 @@
         <!-- Issues by Category -->
         <div nz-col [nzSpan]="24" [nzMd]="12">
           <nz-card nzTitle="Probleme pe categorii" class="category-card">
-            <div class="category-list" *ngIf="stats.issuesByCategory">
-              <div *ngFor="let item of stats.issuesByCategory | keyvalue" class="category-item">
-                <span class="category-name">{{ getCategoryLabel(item.key) }}</span>
-                <nz-tag>{{ item.value }}</nz-tag>
+            @if (stats.issuesByCategory) {
+              <div class="category-list">
+                @for (item of stats.issuesByCategory | keyvalue; track item.key) {
+                  <div class="category-item">
+                    <span class="category-name">{{ getCategoryLabel(item.key) }}</span>
+                    <nz-tag>{{ item.value }}</nz-tag>
+                  </div>
+                }
+                @if ((stats.issuesByCategory | keyvalue)?.length === 0) {
+                  <nz-empty
+                    nzNotFoundImage="simple"
+                    nzNotFoundContent="Nicio problemă">
+                  </nz-empty>
+                }
               </div>
-              <nz-empty *ngIf="(stats.issuesByCategory | keyvalue)?.length === 0"
-                        nzNotFoundImage="simple"
-                        nzNotFoundContent="Nicio problemă">
-              </nz-empty>
-            </div>
+            }
           </nz-card>
         </div>
 
         <!-- Issues by Urgency -->
         <div nz-col [nzSpan]="24" [nzMd]="12">
           <nz-card nzTitle="Probleme pe urgență" class="urgency-card">
-            <div class="urgency-list" *ngIf="stats.issuesByUrgency">
-              <div *ngFor="let item of stats.issuesByUrgency | keyvalue" class="urgency-item">
-                <span class="urgency-name">{{ getUrgencyLabel(item.key) }}</span>
-                <nz-tag [nzColor]="getUrgencyColor(item.key)">{{ item.value }}</nz-tag>
+            @if (stats.issuesByUrgency) {
+              <div class="urgency-list">
+                @for (item of stats.issuesByUrgency | keyvalue; track item.key) {
+                  <div class="urgency-item">
+                    <span class="urgency-name">{{ getUrgencyLabel(item.key) }}</span>
+                    <nz-tag [nzColor]="getUrgencyColor(item.key)">{{ item.value }}</nz-tag>
+                  </div>
+                }
+                @if ((stats.issuesByUrgency | keyvalue)?.length === 0) {
+                  <nz-empty
+                    nzNotFoundImage="simple"
+                    nzNotFoundContent="Nicio problemă">
+                  </nz-empty>
+                }
               </div>
-              <nz-empty *ngIf="(stats.issuesByUrgency | keyvalue)?.length === 0"
-                        nzNotFoundImage="simple"
-                        nzNotFoundContent="Nicio problemă">
-              </nz-empty>
-            </div>
+            }
           </nz-card>
         </div>
 
       </div>
     </div>
+    }
 
   </div>
 </nz-spin>

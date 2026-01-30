@@ -1,78 +1,12 @@
+:host {
+  display: flex;
+  flex-direction: column;
+}
+
 .dashboard-container {
-  min-height: 100vh;
+  flex: 1;
   background: var(--platinum);
   padding: 1.5rem;
-}
-
-.dashboard-header {
-  background: linear-gradient(135deg, var(--oxford-blue) 0%, #1a2b4f 100%);
-  color: var(--white);
-  padding: 2rem;
-  border-radius: 16px;
-  margin-bottom: 2rem;
-  box-shadow: 0 8px 24px rgba(20, 33, 61, 0.15);
-}
-
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.user-welcome {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.user-avatar {
-  border: 3px solid rgba(255, 255, 255, 0.2);
-}
-
-.welcome-text {
-  h1 {
-    font-size: 1.8rem;
-    font-weight: 700;
-    margin: 0;
-    color: var(--white);
-  }
-
-  p {
-    margin: 0;
-    opacity: 0.9;
-    font-size: 1rem;
-  }
-}
-
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  
-  button.ant-btn,
-  :deep(button.ant-btn),
-  nz-button button.ant-btn {
-    color: var(--white);
-    border-color: rgba(255, 255, 255, 0.3);
-  }
-}
-
-.issues-nav-button.ant-btn,
-:deep(.issues-nav-button.ant-btn),
-nz-button.issues-nav-button button.ant-btn {
-  background-color: rgba(252, 163, 17, 0.15);
-  border-color: rgba(252, 163, 17, 0.5);
-  color: var(--orange-web);
-  transition: all 0.3s ease;
-  
-  &:hover,
-  &:focus {
-    background-color: var(--orange-web);
-    color: white;
-    border-color: var(--orange-web);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(252, 163, 17, 0.3);
-  }
 }
 
 .gamification-section {
@@ -533,12 +467,6 @@ nz-button.issues-nav-button button.ant-btn {
     padding: 1rem;
   }
 
-  .header-content {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
   .impact-overview {
     flex-direction: column;
     gap: 1rem;
@@ -547,10 +475,6 @@ nz-button.issues-nav-button button.ant-btn {
   .progress-info {
     margin-left: 0;
     width: 100%;
-  }
-
-  .welcome-text h1 {
-    font-size: 1.5rem;
   }
 
   .action-item {

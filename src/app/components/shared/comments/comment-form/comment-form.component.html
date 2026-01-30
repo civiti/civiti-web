@@ -1,12 +1,12 @@
-<div class="comment-form" [class.reply-form]="isReply" [class.edit-form]="isEdit">
+<div class="comment-form" [class.reply-form]="isReply()" [class.edit-form]="isEdit()">
   <nz-textarea-count [nzMaxCharacterCount]="maxLength">
     <textarea
       nz-input
       [(ngModel)]="content"
-      [placeholder]="placeholder"
-      [nzAutosize]="{ minRows: isReply ? 2 : 3, maxRows: 8 }"
+      [placeholder]="placeholder()"
+      [nzAutosize]="{ minRows: isReply() ? 2 : 3, maxRows: 8 }"
       [maxlength]="maxLength"
-      [disabled]="submitting"
+      [disabled]="submitting()"
     ></textarea>
   </nz-textarea-count>
 
@@ -15,25 +15,28 @@
       {{ remainingChars }} caractere rămase
     </span>
     <div class="buttons">
-      <button
-        *ngIf="isReply || isEdit"
-        nz-button
-        nzSize="small"
-        (click)="onCancel()"
-        [disabled]="submitting"
-      >
-        Anulează
-      </button>
+      @if (isReply() || isEdit()) {
+        <button
+          nz-button
+          nzSize="small"
+          (click)="onCancel()"
+          [disabled]="submitting()"
+        >
+          Anulează
+        </button>
+      }
       <button
         nz-button
         nzType="primary"
         nzSize="small"
-        [disabled]="!isValid || submitting"
-        [nzLoading]="submitting"
+        [disabled]="!isValid || submitting()"
+        [nzLoading]="submitting()"
         (click)="onSubmit()"
       >
-        <i *ngIf="!submitting" nz-icon nzType="send" nzTheme="outline"></i>
-        {{ submitLabel }}
+        @if (!submitting()) {
+          <i nz-icon nzType="send" nzTheme="outline"></i>
+        }
+        {{ submitLabel() }}
       </button>
     </div>
   </div>

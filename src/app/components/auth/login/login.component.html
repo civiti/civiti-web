@@ -20,15 +20,16 @@
         </div>
 
         <!-- Error Alert -->
-        <nz-alert
-          *ngIf="error$ | async as error"
-          [nzMessage]="error"
-          nzType="error"
-          nzShowIcon
-          nzCloseable
-          (nzOnClose)="clearError()"
-          class="error-alert">
-        </nz-alert>
+        @if (error$ | async; as error) {
+          <nz-alert
+            [nzMessage]="error"
+            nzType="error"
+            nzShowIcon
+            nzCloseable
+            (nzOnClose)="clearError()"
+            class="error-alert">
+          </nz-alert>
+        }
 
         <!-- Google OAuth Option -->
         <div class="oauth-section">
