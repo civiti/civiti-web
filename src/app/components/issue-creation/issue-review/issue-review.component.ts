@@ -29,6 +29,7 @@ import {
   URGENCY_COLORS
 } from '../../../types/civica-api.types';
 import { generateIssueTitle } from '../issue-title.util';
+import { clearIssueCreationSession } from '../issue-session.util';
 
 interface SelectedAuthority {
   /** Server authority ID (only for predefined authorities) */
@@ -229,13 +230,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
   }
 
   private clearSessionData(): void {
-    sessionStorage.removeItem('civica_selected_category');
-    sessionStorage.removeItem('civica_uploaded_photos');
-    sessionStorage.removeItem('civica_current_location');
-    sessionStorage.removeItem('civica_complete_issue_data');
-    sessionStorage.removeItem('civica_selected_authorities');
-    sessionStorage.removeItem('civica_issue_title');
-    sessionStorage.removeItem('civica_issue_title_customized');
+    clearIssueCreationSession();
   }
 
   createAnotherIssue(): void {

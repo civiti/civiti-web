@@ -8,6 +8,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import * as AuthActions from './auth.actions';
 import { AuthService } from '../../services/auth.service';
 import { ApiService } from '../../services/api.service';
+import { clearIssueCreationSession } from '../../components/issue-creation/issue-session.util';
 
 @Injectable()
 export class AuthEffects {
@@ -372,13 +373,7 @@ export class AuthEffects {
    * Called on logout to prevent data leakage between users.
    */
   private clearIssueCreationData(): void {
-    sessionStorage.removeItem('civica_selected_category');
-    sessionStorage.removeItem('civica_uploaded_photos');
-    sessionStorage.removeItem('civica_current_location');
-    sessionStorage.removeItem('civica_complete_issue_data');
-    sessionStorage.removeItem('civica_selected_authorities');
-    sessionStorage.removeItem('civica_issue_title');
-    sessionStorage.removeItem('civica_issue_title_customized');
+    clearIssueCreationSession();
     sessionStorage.removeItem('civica_last_user_id');
   }
 
