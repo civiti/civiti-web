@@ -168,6 +168,7 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
     } else {
       sessionStorage.removeItem('civica_issue_title');
     }
+    sessionStorage.setItem('civica_issue_title_customized', String(this.isTitleCustomized));
 
     this.router.navigate(['/create-issue/photo']);
   }
@@ -192,8 +193,8 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
     const savedTitle = sessionStorage.getItem('civica_issue_title');
     if (savedTitle) {
       this.issueTitle = savedTitle;
-      this.isTitleCustomized = true;
     }
+    this.isTitleCustomized = sessionStorage.getItem('civica_issue_title_customized') === 'true';
   }
 
   changeLocation(): void {

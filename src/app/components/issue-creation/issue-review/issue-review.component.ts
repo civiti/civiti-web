@@ -235,6 +235,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
     sessionStorage.removeItem('civica_complete_issue_data');
     sessionStorage.removeItem('civica_selected_authorities');
     sessionStorage.removeItem('civica_issue_title');
+    sessionStorage.removeItem('civica_issue_title_customized');
   }
 
   createAnotherIssue(): void {
