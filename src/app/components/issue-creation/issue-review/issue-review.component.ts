@@ -86,7 +86,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
     const issueDataString = sessionStorage.getItem('civica_complete_issue_data');
     if (issueDataString) {
       this.issueData = JSON.parse(issueDataString);
-      this.issueTitle = this.generateIssueTitle();
+      this.issueTitle = this.resolveIssueTitle();
       console.log('[ISSUE REVIEW] Loaded complete issue data:', this.issueData);
     } else {
       console.warn('[ISSUE REVIEW] No complete issue data found, redirecting...');
@@ -171,7 +171,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
 
     // Prepare issue data for submission using the API format
     const issueToSubmit: CreateIssueRequest = {
-      title: this.generateIssueTitle(),
+      title: this.resolveIssueTitle(),
       description: this.issueData.description,
       category: this.issueData.category.id as IssueCategory,
       address: this.issueData.location.address,
@@ -218,7 +218,7 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
       });
   }
 
-  private generateIssueTitle(): string {
+  private resolveIssueTitle(): string {
     const savedTitle = sessionStorage.getItem('civica_issue_title');
     if (savedTitle) return savedTitle;
 
