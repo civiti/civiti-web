@@ -377,6 +377,8 @@ export class AuthEffects {
     sessionStorage.removeItem('civica_current_location');
     sessionStorage.removeItem('civica_complete_issue_data');
     sessionStorage.removeItem('civica_selected_authorities');
+    sessionStorage.removeItem('civica_issue_title');
+    sessionStorage.removeItem('civica_issue_title_customized');
     sessionStorage.removeItem('civica_last_user_id');
   }
 

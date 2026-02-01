@@ -175,6 +175,8 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
 
   onTitleChange(): void {
     this.isTitleCustomized = true;
+    sessionStorage.setItem('civica_issue_title', this.issueTitle);
+    sessionStorage.setItem('civica_issue_title_customized', 'true');
   }
 
   resetTitle(): void {
