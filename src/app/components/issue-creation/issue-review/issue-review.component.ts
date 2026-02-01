@@ -28,6 +28,7 @@ import {
   URGENCY_LEVELS,
   URGENCY_COLORS
 } from '../../../types/civica-api.types';
+import { generateIssueTitle } from '../issue-title.util';
 
 interface SelectedAuthority {
   /** Server authority ID (only for predefined authorities) */
@@ -221,9 +222,10 @@ export class IssueReviewComponent implements OnInit, OnDestroy {
     const savedTitle = sessionStorage.getItem('civica_issue_title');
     if (savedTitle) return savedTitle;
 
-    const category = this.issueData.category.name;
-    const location = this.issueData.location.address.split(',')[0]; // Get street name
-    return `Problemă de ${category} pe ${location}`;
+    return generateIssueTitle(
+      this.issueData.category.name,
+      this.issueData.location.address
+    );
   }
 
   private clearSessionData(): void {

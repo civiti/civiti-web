@@ -23,6 +23,7 @@ import { selectIsAuthenticated } from '../../../store/auth/auth.selectors';
 import { CategoryService, CategoryInfo } from '../../../services/category.service';
 import { LocationPickerModalComponent } from '../../shared/location-picker-modal/location-picker-modal.component';
 import { LocationData } from '../../../types/location.types';
+import { generateIssueTitle } from '../issue-title.util';
 
 @Component({
   selector: 'app-issue-type-selection',
@@ -164,6 +165,8 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
     sessionStorage.setItem('civica_current_location', JSON.stringify(this.currentLocation));
     if (this.issueTitle) {
       sessionStorage.setItem('civica_issue_title', this.issueTitle);
+    } else {
+      sessionStorage.removeItem('civica_issue_title');
     }
 
     this.router.navigate(['/create-issue/photo']);
@@ -179,9 +182,10 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
   }
 
   private generateDefaultTitle(): string {
-    const category = this.selectedCategory?.name || '';
-    const location = this.currentLocation?.address.split(',')[0] || '';
-    return `Problemă de ${category} pe ${location}`;
+    return generateIssueTitle(
+      this.selectedCategory?.name || '',
+      this.currentLocation?.address || ''
+    );
   }
 
   private loadSavedTitle(): void {
