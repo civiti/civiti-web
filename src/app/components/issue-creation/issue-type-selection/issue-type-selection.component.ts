@@ -16,6 +16,7 @@ import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzInputModule } from 'ng-zorro-antd/input';
+import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 import { AppState } from '../../../store/app.state';
@@ -42,6 +43,7 @@ import { generateIssueTitle } from '../issue-title.util';
     NzTagModule,
     NzModalModule,
     NzInputModule,
+    NzSelectModule,
     NzToolTipModule
   ],
   templateUrl: './issue-type-selection.component.html',
@@ -126,6 +128,13 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
     this.currentLocation = null;
   }
 
+  onMobileCategorySelect(name: string): void {
+    const category = this.categories.find(c => c.name === name);
+    if (category) {
+      this.selectCategory(category);
+    }
+  }
+
   selectCategory(category: CategoryInfo): void {
     this.selectedCategory = category;
     console.log('[TIP PROBLEMĂ] Categorie selectată:', category.name);
@@ -208,7 +217,7 @@ export class IssueTypeSelectionComponent implements OnInit, OnDestroy {
     const modalRef = this.modalService.create({
       nzTitle: 'Selectează Locația',
       nzContent: LocationPickerModalComponent,
-      nzWidth: 700,
+      nzWidth: window.innerWidth < 576 ? '95vw' : 700,
       nzMaskClosable: false,
       nzData: {
         config: {

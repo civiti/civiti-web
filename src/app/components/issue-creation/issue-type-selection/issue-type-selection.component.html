@@ -59,6 +59,26 @@
       <p>Selectează categoria care se potrivește cel mai bine cu preocuparea ta. Aceasta ne ajută să direcționăm raportul către autoritățile competente.</p>
     </div>
 
+    <!-- Mobile dropdown (shown <576px) -->
+    <div class="categories-dropdown">
+      <nz-select
+        nzPlaceHolder="Selectează categoria"
+        [ngModel]="selectedCategory?.name"
+        (ngModelChange)="onMobileCategorySelect($event)"
+        nzSize="large"
+        style="width: 100%">
+        @for (cat of categories; track cat.name) {
+          <nz-option [nzValue]="cat.name" [nzLabel]="cat.name" />
+        }
+      </nz-select>
+      @if (selectedCategory) {
+        <p style="margin-top: 0.5rem; color: rgba(20, 33, 61, 0.7); font-size: 0.9rem;">
+          {{ selectedCategory.description }}
+        </p>
+      }
+    </div>
+
+    <!-- Desktop card grid (hidden <576px) -->
     <div class="categories-grid">
       <div nz-row [nzGutter]="[16, 16]">
         

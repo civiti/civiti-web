@@ -219,6 +219,26 @@
   }
 }
 
+// Mobile: hide step descriptions, compact stepper
+@media (max-width: 576px) {
+  ::ng-deep .registration-steps {
+    .ant-steps-item-description {
+      display: none;
+    }
+
+    .ant-steps-item-title {
+      font-size: 12px;
+    }
+
+    .ant-steps-item-icon {
+      width: 28px;
+      height: 28px;
+      line-height: 28px;
+      font-size: 13px;
+    }
+  }
+}
+
 // Form validation styles
 :deep(.ant-form-item-has-error) {
   .ant-input {

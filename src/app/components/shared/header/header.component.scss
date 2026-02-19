@@ -122,3 +122,25 @@
     }
   }
 }
+
+// Mobile: icon-only auth buttons
+@media (max-width: 576px) {
+  .auth-button-text {
+    display: none;
+  }
+
+  nz-page-header-extra button.auth-button.ant-btn,
+  nz-page-header-extra .auth-button {
+    min-width: 40px;
+    min-height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    i[nz-icon] {
+      margin-right: 0;
+      font-size: 18px;
+    }
+  }
+}

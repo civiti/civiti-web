@@ -57,3 +57,6 @@ src/environments/google-maps-config.ts
 # Auto-generated environment files
 src/environments/environment.ts
 src/environments/environment.prod.ts
+
+.vercel
+.env*.local

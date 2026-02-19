@@ -115,6 +115,24 @@ button[mat-raised-button] {
   }
 }
 
+// Mobile: smaller counters and tighter spacing
+@media (max-width: 576px) {
+  .email-counter-number,
+  .vote-counter-number {
+    font-size: 2rem;
+  }
+
+  .container {
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+
+  // Ensure photo gallery items don't get too small
+  .grid.grid-cols-2 {
+    gap: 0.5rem;
+  }
+}
+
 // Photo gallery overlay - transparent by default, dark on hover
 .photo-overlay {
   background-color: transparent;

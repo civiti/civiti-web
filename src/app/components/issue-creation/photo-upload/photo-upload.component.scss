@@ -344,6 +344,20 @@ p.upload-note {
     text-align: left;
   }
 
+  .step-number {
+    width: 32px;
+    height: 32px;
+    font-size: 0.95rem;
+  }
+
+  .step-label {
+    font-size: 0.75rem;
+  }
+
+  .progress-line {
+    margin: 0 0.5rem;
+  }
+
   .mock-upload-area {
     padding: 2rem 1rem;
   }
@@ -358,5 +372,51 @@ p.upload-note {
 
   .photo-image {
     height: 100px;
+  }
+}
+
+@media (max-width: 576px) {
+  .photo-upload-container {
+    padding: 0.75rem;
+  }
+
+  .step-label {
+    display: none;
+  }
+
+  .step-number {
+    width: 28px;
+    height: 28px;
+    font-size: 0.85rem;
+  }
+
+  .progress-line {
+    margin: 0 0.25rem;
+  }
+
+  .page-title {
+    font-size: 1.5rem;
+  }
+
+  .page-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .page-header {
+    margin-bottom: 1rem;
+  }
+
+  .nav-buttons {
+    flex-direction: column-reverse;
+    gap: 0.75rem;
+  }
+
+  .nav-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .nav-spacer {
+    display: none;
   }
 }
