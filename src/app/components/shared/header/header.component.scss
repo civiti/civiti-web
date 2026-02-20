@@ -40,78 +40,10 @@
     opacity: 0.85;
     margin-top: 2px;
   }
-
-  // Auth buttons in navbar
-  nz-page-header-extra button.auth-button.ant-btn,
-  nz-page-header-extra .auth-button {
-    color: white;
-    background-color: transparent;
-    border-color: rgba(255, 255, 255, 0.3);
-    transition: all 0.3s ease;
-
-    i[nz-icon] {
-      color: currentColor;
-    }
-
-    &:hover,
-    &:focus {
-      color: var(--oxford-blue);
-      background-color: white;
-      border-color: white;
-      transform: translateY(-1px);
-    }
-
-    &.register-button {
-      background-color: var(--orange-web);
-      border-color: var(--orange-web);
-      color: white;
-
-      &:hover,
-      &:focus {
-        background-color: white;
-        color: var(--orange-web);
-        border-color: white;
-        transform: translateY(-1px);
-      }
-    }
-  }
-}
-
-// User avatar dropdown in navbar
-.user-avatar-dropdown {
-  display: flex;
-  align-items: center;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 24px;
-  transition: background-color 0.2s ease;
-
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .dropdown-arrow {
-    color: white;
-    font-size: 12px;
-    margin-left: 6px;
-  }
-
-  nz-avatar {
-    border: 2px solid rgba(255, 255, 255, 0.3);
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.6);
-    }
-  }
 }
 
 // Responsive adjustments
 @media (max-width: 768px) {
-  .auth-button {
-    font-size: 12px;
-    padding: 4px 8px;
-  }
-
   .navbar {
     ::ng-deep .ant-page-header-heading-title {
       font-size: 16px;
@@ -119,28 +51,6 @@
 
     .header-subtitle {
       font-size: 0.75rem;
-    }
-  }
-}
-
-// Mobile: icon-only auth buttons
-@media (max-width: 576px) {
-  .auth-button-text {
-    display: none;
-  }
-
-  nz-page-header-extra button.auth-button.ant-btn,
-  nz-page-header-extra .auth-button {
-    min-width: 40px;
-    min-height: 40px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-
-    i[nz-icon] {
-      margin-right: 0;
-      font-size: 18px;
     }
   }
 }

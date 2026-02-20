@@ -1,52 +1,6 @@
 <div class="location-container">
 
-  <!-- Auth buttons - top right -->
-  @if (!(isAuthenticated$ | async)) {
-  <div class="auth-buttons">
-    <a class="auth-link" (click)="navigateToLogin()">
-      <span nz-icon nzType="login" nzTheme="outline"></span>
-      Conectează-te
-    </a>
-    <a class="auth-link auth-link-primary" (click)="navigateToRegister()">
-      <span nz-icon nzType="user-add" nzTheme="outline"></span>
-      Înregistrează-te
-    </a>
-  </div>
-  }
-
-  <!-- User dropdown - top right (authenticated) -->
-  @if (isAuthenticated$ | async) {
-  <div class="user-menu">
-    <div
-      nz-dropdown
-      [nzDropdownMenu]="userMenu"
-      nzTrigger="click"
-      nzPlacement="bottomRight"
-      class="user-avatar-dropdown"
-    >
-      <nz-avatar
-        [nzSrc]="(user$ | async)?.photoUrl || undefined"
-        [nzText]="(displayName$ | async)?.charAt(0)"
-        [nzSize]="36"
-        class="user-avatar">
-      </nz-avatar>
-      <span nz-icon nzType="caret-down" nzTheme="fill" class="dropdown-arrow"></span>
-    </div>
-    <nz-dropdown-menu #userMenu="nzDropdownMenu">
-      <ul nz-menu>
-        <li nz-menu-item (click)="navigateToDashboard()">
-          <span nz-icon nzType="dashboard" nzTheme="outline"></span>
-          Panou
-        </li>
-        <li nz-menu-divider></li>
-        <li nz-menu-item (click)="logout()">
-          <span nz-icon nzType="logout" nzTheme="outline"></span>
-          Deconectare
-        </li>
-      </ul>
-    </nz-dropdown-menu>
-  </div>
-  }
+  <app-auth-buttons class="corner-auth" />
 
   <!-- Main Card -->
   <div class="location-card-wrapper">

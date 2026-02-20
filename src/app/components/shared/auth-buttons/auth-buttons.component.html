@@ -1,0 +1,67 @@
+@if (!(isAuthenticated$ | async)) {
+  <div class="auth-buttons-row">
+    <button
+      nz-button
+      nzType="text"
+      nzSize="small"
+      class="auth-button"
+      (click)="navigateToLogin()"
+    >
+      <i nz-icon nzType="login" nzTheme="outline"></i>
+      <span class="auth-btn-text">Conectează-te</span>
+    </button>
+    <button
+      nz-button
+      nzType="default"
+      nzSize="small"
+      class="auth-button register-button"
+      (click)="navigateToRegister()"
+    >
+      <i nz-icon nzType="user-add" nzTheme="outline"></i>
+      <span class="auth-btn-text">Înregistrează-te</span>
+    </button>
+  </div>
+}
+
+@if (isAuthenticated$ | async) {
+  <div
+    nz-dropdown
+    [nzDropdownMenu]="userMenu"
+    nzTrigger="click"
+    nzPlacement="bottomRight"
+    class="user-avatar-dropdown"
+  >
+    <nz-avatar
+      [nzSrc]="(user$ | async)?.photoUrl || undefined"
+      [nzText]="(displayName$ | async)?.charAt(0)"
+      [nzSize]="40"
+      class="cursor-pointer">
+    </nz-avatar>
+    <i nz-icon nzType="caret-down" nzTheme="fill" class="dropdown-arrow"></i>
+  </div>
+  <nz-dropdown-menu #userMenu="nzDropdownMenu">
+    <ul nz-menu>
+      <li nz-menu-item (click)="navigateToDashboard()">
+        <i nz-icon nzType="dashboard" nzTheme="outline" class="mr-2"></i>
+        Panou
+      </li>
+      @if (showIssuesLink()) {
+        <li nz-menu-item (click)="navigateToIssues()">
+          <i nz-icon nzType="unordered-list" nzTheme="outline" class="mr-2"></i>
+          Probleme
+        </li>
+      }
+      @if (showAdminLink() && (canAccessAdmin$ | async)) {
+        <li nz-menu-item (click)="navigateToAdmin()">
+          <i nz-icon nzType="setting" nzTheme="outline" class="mr-2"></i>
+          Administrare
+        </li>
+      }
+      <li nz-menu-divider></li>
+      <li nz-menu-item (click)="logout()">
+        <i nz-icon nzType="logout" nzTheme="outline" class="mr-2"></i>
+        Deconectare
+      </li>
+    </ul>
+  </nz-dropdown-menu>
+}
