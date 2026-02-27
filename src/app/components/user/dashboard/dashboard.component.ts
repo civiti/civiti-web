@@ -131,40 +131,6 @@ export class DashboardComponent implements OnInit {
     });
   }
 
-  getLevelTitle(level: number | null): string {
-    if (!level) return 'Începător civic';
-
-    const titles = [
-      'Începător civic',
-      'Contribuitor comunitar',
-      'Avocat de cartier',
-      'Campion comunitar',
-      'Lider civic',
-      'Erou comunitar'
-    ];
-
-    return titles[Math.min(level - 1, titles.length - 1)];
-  }
-
-  getBadgeColor(rarity: string | null): string {
-    // Map rarity values to colors
-    // The backend uses string rarity values, we'll map common rarities
-    const colors: { [key: string]: string } = {
-      'common': 'default',
-      'uncommon': 'blue',
-      'rare': 'gold',
-      'epic': 'purple',
-      'legendary': 'red',
-      // Also keep old tier mappings for backward compatibility
-      'bronze': 'default',
-      'silver': 'blue',
-      'gold': 'gold',
-      'platinum': 'purple'
-    };
-
-    return colors[rarity?.toLowerCase() ?? ''] || 'default';
-  }
-
   getBadgeIcon(category: string, rarity: string | null): string {
     // Override with rarity for special badges
     const rarityLower = rarity?.toLowerCase();

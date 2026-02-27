@@ -25,9 +25,7 @@ import * as UserIssuesActions from '../../../store/user-issues/user-issues.actio
 import * as UserIssuesSelectors from '../../../store/user-issues/user-issues.selectors';
 import { UserIssuesStatusFilter } from '../../../store/user-issues/user-issues.state';
 import {
-  IssueItem,
-  IssueStatus,
-  isActiveStatus
+  IssueItem
 } from '../../../types/civica-api.types';
 import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsCancelledPipe, IsRejectedPipe } from '../../../pipes/status.pipe';
 import { DaysSincePipe } from '../../../pipes/date.pipe';
@@ -110,36 +108,6 @@ export class MyIssuesComponent implements OnInit {
     ];
   }
 
-  private normalizeStatus(status: string): IssueStatus {
-    // Map backend status values to our IssueStatus type (case-insensitive)
-    const statusMap: Record<string, IssueStatus> = {
-      'unspecified': 'Unspecified',
-      'draft': 'Draft',
-      'submitted': 'Submitted',
-      'underreview': 'UnderReview',
-      'active': 'Active',
-      'resolved': 'Resolved',
-      'rejected': 'Rejected',
-      'cancelled': 'Cancelled'
-    };
-    return statusMap[status.toLowerCase()] || 'Unspecified';
-  }
-
-  isActive(status: IssueStatus | string): boolean {
-    const normalized = this.normalizeStatus(status);
-    return isActiveStatus(normalized);
-  }
-
-  isRejected(status: IssueStatus | string): boolean {
-    const normalized = this.normalizeStatus(status);
-    return normalized === 'Rejected';
-  }
-
-  isCancelled(status: IssueStatus | string): boolean {
-    const normalized = this.normalizeStatus(status);
-    return normalized === 'Cancelled';
-  }
-
   viewIssueDetails(issueId: string): void {
     this.router.navigate(['/issue', issueId]);
   }
@@ -178,12 +146,6 @@ export class MyIssuesComponent implements OnInit {
 
   navigateToCreateIssue(): void {
     this.router.navigate(['/create-issue']);
-  }
-
-  getDaysSinceCreation(createdAt: string): number {
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - new Date(createdAt).getTime());
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
   onImageError(event: Event): void {

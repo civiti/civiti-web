@@ -273,17 +273,6 @@ export class IssuesListComponent implements OnInit {
     });
   }
 
-  getDaysSince(date: string | Date): string {
-    const days = this.getDaysSinceNumber(date);
-    return days.toString();
-  }
-
-  private getDaysSinceNumber(date: string | Date): number {
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - new Date(date).getTime());
-    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  }
-
   getIssueImage(issue: IssueItem): string {
     if (issue.mainPhotoUrl) {
       return issue.mainPhotoUrl;

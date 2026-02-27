@@ -385,22 +385,6 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         imgElement.src = '/images/placeholders/issue-placeholder.svg';
     }
 
-    getDaysSince(date: string): string {
-        const now = new Date();
-        const diffTime = Math.abs(now.getTime() - new Date(date).getTime());
-        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-        return diffDays.toString();
-    }
-
-    /**
-     * Check if issue is in a terminal state (email actions should be disabled)
-     * Terminal states: resolved, cancelled
-     */
-    isTerminalState(issue: IssueDetailResponse): boolean {
-        const status = (issue.status || '').toLowerCase();
-        return status === 'resolved' || status === 'cancelled';
-    }
-
     /**
      * Check if user cannot vote on this issue.
      * Returns true if: not authenticated, is own issue, or issue is in terminal state.

@@ -165,45 +165,6 @@ export class ApprovalInterfaceComponent implements OnInit {
     this.message.info('Datele au fost reîmprospătate');
   }
 
-  getCategoryColor(categoryId: string): string {
-    const colors: { [key: string]: string } = {
-      'infrastructure': 'orange',
-      'environment': 'green',
-      'transportation': 'blue',
-      'public-services': 'purple',
-      'safety': 'red',
-      'other': 'default'
-    };
-    return colors[categoryId] || 'default';
-  }
-
-  getUrgencyStatus(urgency: string): 'default' | 'processing' | 'success' | 'error' | 'warning' {
-    const statuses: { [key: string]: 'default' | 'processing' | 'success' | 'error' | 'warning' } = {
-      'low': 'default',
-      'medium': 'processing',
-      'high': 'warning',
-      'urgent': 'error'
-    };
-    return statuses[urgency] || 'default';
-  }
-
-  getTimeAgo(date: string): string {
-    const now = new Date();
-    const diffInHours = Math.floor((now.getTime() - new Date(date).getTime()) / (1000 * 60 * 60));
-
-    if (diffInHours < 1) return 'acum';
-    if (diffInHours === 1) return 'acum 1 oră';
-    if (diffInHours < 24) return `acum ${diffInHours} ore`;
-
-    const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays === 1) return 'acum 1 zi';
-    if (diffInDays < 7) return `acum ${diffInDays} zile`;
-
-    const diffInWeeks = Math.floor(diffInDays / 7);
-    if (diffInWeeks === 1) return 'acum 1 săpt.';
-    return `acum ${diffInWeeks} săpt.`;
-  }
-
   viewIssueDetails(issue: AdminIssueListItem): void {
     console.log('[ADMIN] View issue details:', issue.id);
     this.router.navigate(['/issue', issue.id]);
