@@ -269,6 +269,8 @@
     nzTitle="Revizuire sesizare"
     [nzWidth]="600"
     [nzFooter]="null"
+    [nzClosable]="!isProcessing"
+    [nzMaskClosable]="!isProcessing"
     (nzOnCancel)="closeDecisionModal()"
     nzClass="decision-modal">
 

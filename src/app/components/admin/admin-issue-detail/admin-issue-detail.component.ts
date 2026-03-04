@@ -143,6 +143,7 @@ export class AdminIssueDetailComponent implements OnInit {
 
   closeDecisionModal(): void {
     this.isDecisionModalVisible = false;
+    this.isProcessing = false;
     this.decisionForm.reset();
   }
 
