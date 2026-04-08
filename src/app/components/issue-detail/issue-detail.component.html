@@ -220,7 +220,7 @@
                         [nz-tooltip]="getVoteTooltip(issue)"
                         (click)="toggleVote(issue)">
                   <i nz-icon nzType="like" [nzTheme]="issue.hasVoted ? 'fill' : 'outline'" class="mr-2"></i>
-                  {{ issue.hasVoted ? 'Ai votat' : 'Votează' }}
+                  <span>{{ issue.hasVoted ? 'Ai votat' : 'Votează' }}</span>
                 </button>
               </div>
             </nz-card>
@@ -253,7 +253,7 @@
                         [nz-tooltip]="(issue.status | isTerminalState) ? 'Problema a fost închisă' : ''"
                         (click)="openEmailCampaignModal(issue)">
                   <i nz-icon nzType="mail" nzTheme="outline" class="mr-2"></i>
-                  {{ (issue.status | isTerminalState) ? 'Închisă' : 'Trimite Mail' }}
+                  <span>{{ (issue.status | isTerminalState) ? 'Închisă' : 'Trimite Mail' }}</span>
                 </button>
               </div>
             </nz-card>
@@ -320,7 +320,7 @@
                     nz-tooltip nzTooltipTitle="Deschide poster PDF cu cod QR pentru tipărire"
                     (click)="downloadPoster(issue)">
                     <i nz-icon nzType="qrcode" nzTheme="outline" class="mr-2"></i>
-                    Deschide Poster QR
+                    <span>Deschide Poster QR</span>
                   </button>
                 </div>
                 }
@@ -369,7 +369,7 @@
       </p>
       <button nz-button nzType="primary" (click)="goBack()">
         <i nz-icon nzType="arrow-left" nzTheme="outline" class="mr-2"></i>
-        Înapoi la Lista de Probleme
+        <span>Înapoi la Lista de Probleme</span>
       </button>
     </div>
     }

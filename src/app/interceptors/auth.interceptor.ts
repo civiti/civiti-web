@@ -13,7 +13,8 @@
  */
 
 import { HttpInterceptorFn, HttpErrorResponse, HttpRequest, HttpHandlerFn, HttpEvent } from '@angular/common/http';
-import { inject } from '@angular/core';
+import { inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { catchError, switchMap, filter, take } from 'rxjs/operators';
 import { throwError, Observable, BehaviorSubject } from 'rxjs';
 import { SupabaseAuthService } from '../services/supabase-auth.service';
@@ -80,8 +81,16 @@ function isPublicEndpoint(req: HttpRequest<any>): boolean {
 }
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  // During SSR there is no authenticated user and no browser storage, so
+  // never attempt to read a token or handle 401 refreshes on the server.
+  // Requests that require auth on the server would indicate a bug elsewhere
+  // (server-rendered routes should only hit public endpoints).
+  if (!isPlatformBrowser(inject(PLATFORM_ID))) {
+    return next(req);
+  }
+
   const authService = inject(SupabaseAuthService);
-  
+
   // Only add auth header for API requests
   if (!req.url.startsWith(environment.apiUrl)) {
     return next(req);

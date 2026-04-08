@@ -135,7 +135,7 @@
           <div class="filter-item filter-clear">
             <button nz-button nzType="text" (click)="clearFilters()">
               <span nz-icon nzType="close-circle"></span>
-              Șterge filtrele
+              <span>Șterge filtrele</span>
             </button>
           </div>
           }
@@ -224,15 +224,15 @@
             </div>
 
             <!-- Action Button -->
-            <button 
-              nz-button 
-              nzType="primary" 
+            <button
+              nz-button
+              nzType="primary"
               nzBlock
               class="mt-4"
               (click)="viewIssueDetails(issue.id); $event.stopPropagation()"
             >
               <i nz-icon nzType="eye" nzTheme="outline" class="mr-2"></i>
-              Vezi Detalii
+              <span>Vezi Detalii</span>
             </button>
           </ng-template>
         </nz-card>
