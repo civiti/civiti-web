@@ -1,7 +1,7 @@
 import { inject, Injectable, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { SupabaseClient, User } from '@supabase/supabase-js';
-import { Observable, from, BehaviorSubject, ReplaySubject, throwError } from 'rxjs';
+import { Observable, from, of, BehaviorSubject, ReplaySubject, throwError } from 'rxjs';
 import { map, catchError, tap, filter, take, switchMap } from 'rxjs/operators';
 import { resetTokenRefreshState } from '../interceptors/auth.interceptor';
 import { SupabaseClientService } from './supabase-client.service';
@@ -220,6 +220,14 @@ export class SupabaseAuthService {
   }
 
   signOut(): Observable<void> {
+    // signOut is a browser-only flow: it touches localStorage tokens and
+    // tears down a session that only exists on the client. Make the contract
+    // explicit so any accidental SSR call is a silent no-op instead of a
+    // runtime crash on `localStorage`.
+    if (!this.isBrowser) {
+      return of(undefined);
+    }
+
     return from(this.supabase.auth.signOut()).pipe(
       map(({ error }) => {
         if (error) {
@@ -270,6 +278,14 @@ export class SupabaseAuthService {
   }
 
   refreshToken(): Observable<string> {
+    // Token refresh is strictly a browser concern: there is no Supabase
+    // session on the server (persistSession is disabled) and any localStorage
+    // write would throw. Fail fast with an explicit error instead of relying
+    // on caller paths to never reach here during SSR.
+    if (!this.isBrowser) {
+      return throwError(() => new Error('refreshToken is unavailable during SSR'));
+    }
+
     return from(this.supabase.auth.refreshSession()).pipe(
       map(({ data, error }) => {
         if (error) {

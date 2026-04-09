@@ -29,6 +29,7 @@ const SITEMAP_FETCH_TIMEOUT_MS = 5000;
 interface SitemapIssue {
   id: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 interface PagedIssuesResponse {
@@ -61,6 +62,11 @@ async function fetchPublicIssues(): Promise<SitemapIssue[]> {
     throw new Error(`Issues API returned ${res.status}`);
   }
   const data = (await res.json()) as PagedIssuesResponse;
+  if (data.totalPages > 1) {
+    console.warn(
+      `[sitemap] Indexed ${data.items?.length ?? 0} of ${data.totalItems} issues (pageSize cap at ${SITEMAP_ISSUE_PAGE_SIZE}). Add pagination before this becomes load-bearing for SEO.`,
+    );
+  }
   return data.items ?? [];
 }
 
@@ -81,7 +87,7 @@ function buildSitemapXml(issues: SitemapIssue[]): string {
   const issueEntries = issues
     .map((issue) => {
       const loc = `${SITE_URL}/issue/${xmlEscape(issue.id)}`;
-      const lastmod = new Date(issue.createdAt).toISOString();
+      const lastmod = new Date(issue.updatedAt ?? issue.createdAt).toISOString();
       return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>`;
     })
     .join('\n');
