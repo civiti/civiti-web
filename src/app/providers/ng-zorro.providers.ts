@@ -81,14 +81,13 @@ import {
   UnorderedListOutline
 } from '@ant-design/icons-angular/icons';
 
+// The `theme` field was removed: it triggered NG-ZORRO's runtime CSS-variable
+// injection (`NzConfigService: SSR do not support dynamic theme with css
+// variables.`), which does nothing on the server and then causes a visible
+// flash during hydration on the client. All of these colors are already baked
+// into the compiled CSS by `src/theme.less` (which imports the NG-ZORRO LESS
+// theme and overrides its variables), so the runtime config was redundant.
 export const ngZorroConfig = provideNzConfig({
-  theme: {
-    primaryColor: '#FCA311',
-    infoColor: '#1890ff',
-    successColor: '#28A745',
-    warningColor: '#FCA311',
-    errorColor: '#DC3545',
-  },
   message: {
     nzTop: 24,
     nzDuration: 3000,

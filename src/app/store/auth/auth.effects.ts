@@ -1,7 +1,8 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Router } from '@angular/router';
-import { of } from 'rxjs';
+import { EMPTY, of } from 'rxjs';
 import { map, catchError, switchMap, tap } from 'rxjs/operators';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
@@ -17,6 +18,7 @@ export class AuthEffects {
   private apiService = inject(ApiService);
   private router = inject(Router);
   private message = inject(NzMessageService);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   // Google OAuth Effects
   loginWithGoogle$ = createEffect(() =>
@@ -241,11 +243,16 @@ export class AuthEffects {
   );
 
   // Load User from Storage on App Init
+  // Skipped entirely on the server — there is no browser storage and no
+  // authenticated user during SSR, so the effect is a no-op there.
   loadUserFromStorage$ = createEffect(() =>
     this.actions$.pipe(
       ofType(AuthActions.loadUserFromStorage),
-      switchMap(() =>
-        this.authService.getCurrentUser().pipe(
+      switchMap(() => {
+        if (!this.isBrowser) {
+          return EMPTY;
+        }
+        return this.authService.getCurrentUser().pipe(
           switchMap(userData => {
             if (userData) {
               // Try to get user profile from backend
@@ -280,12 +287,12 @@ export class AuthEffects {
           }),
           catchError(error => {
             console.error('Load user error:', error);
-            return of(AuthActions.loadUserFromStorageFailure({ 
-              error: error.message || 'Nu s-au putut încărca datele utilizatorului' 
+            return of(AuthActions.loadUserFromStorageFailure({
+              error: error.message || 'Nu s-au putut încărca datele utilizatorului'
             }));
           })
-        )
-      )
+        );
+      })
     )
   );
 
@@ -373,6 +380,7 @@ export class AuthEffects {
    * Called on logout to prevent data leakage between users.
    */
   private clearIssueCreationData(): void {
+    if (!this.isBrowser) return;
     clearIssueCreationSession();
     sessionStorage.removeItem('civica_last_user_id');
   }
@@ -382,6 +390,7 @@ export class AuthEffects {
    * Prevents one user from seeing another user's issue creation progress.
    */
   private clearDataIfUserChanged(newUserId: string): void {
+    if (!this.isBrowser) return;
     const lastUserId = sessionStorage.getItem('civica_last_user_id');
 
     if (lastUserId && lastUserId !== newUserId) {

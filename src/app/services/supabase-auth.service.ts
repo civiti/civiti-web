@@ -1,6 +1,7 @@
-import { inject, Injectable } from '@angular/core';
+import { inject, Injectable, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { SupabaseClient, User } from '@supabase/supabase-js';
-import { Observable, from, BehaviorSubject, ReplaySubject, throwError } from 'rxjs';
+import { Observable, from, of, BehaviorSubject, ReplaySubject, throwError } from 'rxjs';
 import { map, catchError, tap, filter, take, switchMap } from 'rxjs/operators';
 import { resetTokenRefreshState } from '../interceptors/auth.interceptor';
 import { SupabaseClientService } from './supabase-client.service';
@@ -29,6 +30,8 @@ export interface SupabaseAuthResponse {
 })
 export class SupabaseAuthService {
   private readonly supabaseClientService = inject(SupabaseClientService);
+  private readonly platformId = inject(PLATFORM_ID);
+  private readonly isBrowser = isPlatformBrowser(this.platformId);
   private supabase: SupabaseClient;
   private currentUser$ = new BehaviorSubject<SupabaseAuthUser | null>(null);
   private authReady$ = new ReplaySubject<boolean>(1);
@@ -36,12 +39,20 @@ export class SupabaseAuthService {
   constructor() {
     this.supabase = this.supabaseClientService.getClient();
 
+    if (!this.isBrowser) {
+      // On the server there is no authenticated user and no browser storage.
+      // Signal that the initial auth check is complete immediately so that
+      // anything waiting on authReady$ doesn't hang during SSR.
+      this.authReady$.next(true);
+      return;
+    }
+
     // Listen for auth state changes
     this.supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN' && session?.user) {
         const user = this.mapSupabaseUserToAuthUser(session.user);
         this.currentUser$.next(user);
-        
+
         // Store tokens
         if (session.access_token) {
           localStorage.setItem('civica_access_token', session.access_token);
@@ -97,11 +108,18 @@ export class SupabaseAuthService {
   // ============================================
 
   signInWithGoogle(): Observable<SupabaseAuthResponse> {
+    // OAuth is a browser-only flow; redirectTo must reference window.location.
+    // This method is only ever invoked from user interactions in the browser,
+    // but we guard anyway so SSR type-checking and analysis stay happy.
+    const redirectTo = this.isBrowser
+      ? window.location.origin + '/auth/callback'
+      : undefined;
+
     return from(
       this.supabase.auth.signInWithOAuth({
         provider: 'google',
         options: {
-          redirectTo: window.location.origin + '/auth/callback'
+          redirectTo
         }
       })
     ).pipe(
@@ -202,6 +220,14 @@ export class SupabaseAuthService {
   }
 
   signOut(): Observable<void> {
+    // signOut is a browser-only flow: it touches localStorage tokens and
+    // tears down a session that only exists on the client. Make the contract
+    // explicit so any accidental SSR call is a silent no-op instead of a
+    // runtime crash on `localStorage`.
+    if (!this.isBrowser) {
+      return of(undefined);
+    }
+
     return from(this.supabase.auth.signOut()).pipe(
       map(({ error }) => {
         if (error) {
@@ -229,6 +255,9 @@ export class SupabaseAuthService {
   // ============================================
 
   getAccessToken(): string | null {
+    if (!this.isBrowser) {
+      return null;
+    }
     return localStorage.getItem('civica_access_token');
   }
 
@@ -249,6 +278,14 @@ export class SupabaseAuthService {
   }
 
   refreshToken(): Observable<string> {
+    // Token refresh is strictly a browser concern: there is no Supabase
+    // session on the server (persistSession is disabled) and any localStorage
+    // write would throw. Fail fast with an explicit error instead of relying
+    // on caller paths to never reach here during SSR.
+    if (!this.isBrowser) {
+      return throwError(() => new Error('refreshToken is unavailable during SSR'));
+    }
+
     return from(this.supabase.auth.refreshSession()).pipe(
       map(({ data, error }) => {
         if (error) {
@@ -351,8 +388,12 @@ export class SupabaseAuthService {
   // ============================================
 
   resetPassword(email: string): Observable<void> {
+    const redirectTo = this.isBrowser
+      ? window.location.origin + '/auth/reset-password'
+      : undefined;
+
     return from(this.supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + '/auth/reset-password'
+      redirectTo
     })).pipe(
       map(({ error }) => {
         if (error) {

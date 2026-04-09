@@ -1,9 +1,13 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
 
 export const serverRoutes: ServerRoute[] = [
-  // Public pages — prerender for SEO
+  // Static public pages — build-time prerender for instant response
   { path: '', renderMode: RenderMode.Prerender },
   { path: 'location', renderMode: RenderMode.Prerender },
+  { path: 'privacy', renderMode: RenderMode.Prerender },
+  { path: 'terms', renderMode: RenderMode.Prerender },
+
+  // Dynamic public pages — server-rendered on demand for freshness
   { path: 'issues', renderMode: RenderMode.Server },
   { path: 'issue/:id', renderMode: RenderMode.Server },
 
