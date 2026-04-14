@@ -5,7 +5,7 @@
     "ng": "ng",
     "prestart": "node scripts/inject-env-vars.js && node scripts/build-guides.js",
     "start": "ng serve",
-    "start:dev": "node scripts/set-env.js --dev && node scripts/inject-env-vars.js && ng serve",
+    "start:dev": "node scripts/set-env.js --dev && node scripts/inject-env-vars.js && node scripts/build-guides.js && ng serve",
     "restore-placeholder": "node scripts/set-env.js --restore",
     "prebuild": "node scripts/inject-env-vars.js && node scripts/inject-api-key-simple.js && node scripts/build-guides.js",
     "build:guides": "node scripts/build-guides.js",
