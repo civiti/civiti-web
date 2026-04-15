@@ -19,6 +19,15 @@
       </div>
 
       <div class="footer-column">
+        <h3 class="footer-heading">Proiect</h3>
+        <ul class="footer-links">
+          <li><a routerLink="/despre">Despre Civiti</a></li>
+          <li><a [href]="appStoreUrl" target="_blank" rel="noopener">Aplicația mobilă</a></li>
+          <li><a [href]="githubUrl" target="_blank" rel="noopener">Cod sursă</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-column">
         <h3 class="footer-heading">Legal</h3>
         <ul class="footer-links">
           <li><a routerLink="/privacy">Confidențialitate</a></li>
@@ -32,6 +41,15 @@
     <div class="footer-bottom-inner">
       <span class="footer-brand">Civiti</span>
       <span class="footer-copy">Participare Civică pentru România · {{ currentYear }}</span>
+      <a
+        [href]="githubUrl"
+        target="_blank"
+        rel="noopener"
+        class="footer-github"
+        aria-label="Civiti pe GitHub"
+      >
+        <nz-icon nzType="github" nzTheme="outline"></nz-icon>
+      </a>
     </div>
   </div>
 </footer>

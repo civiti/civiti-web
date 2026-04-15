@@ -6,6 +6,7 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'location', renderMode: RenderMode.Prerender },
   { path: 'privacy', renderMode: RenderMode.Prerender },
   { path: 'terms', renderMode: RenderMode.Prerender },
+  { path: 'despre', renderMode: RenderMode.Prerender },
 
   // Guide listing — static content, prerendered at build time
   { path: 'ghid', renderMode: RenderMode.Prerender },

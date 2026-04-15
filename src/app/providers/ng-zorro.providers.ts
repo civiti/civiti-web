@@ -78,7 +78,11 @@ import {
   FileAddOutline,
   CheckSquareOutline,
   CaretDownFill,
-  UnorderedListOutline
+  UnorderedListOutline,
+  GithubOutline,
+  PlayCircleOutline,
+  MobileOutline,
+  GiftOutline
 } from '@ant-design/icons-angular/icons';
 
 // The `theme` field was removed: it triggered NG-ZORRO's runtime CSS-variable
@@ -174,7 +178,11 @@ const icons: IconDefinition[] = [
   FileAddOutline,
   CheckSquareOutline,
   CaretDownFill,
-  UnorderedListOutline
+  UnorderedListOutline,
+  GithubOutline,
+  PlayCircleOutline,
+  MobileOutline,
+  GiftOutline
 ];
 
 export const ngZorroIcons = provideNzIcons(icons);

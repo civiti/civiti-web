@@ -199,6 +199,21 @@ export const routes: Routes = [
       backUrl: '/bucuresti',
     }
   },
+  {
+    path: 'despre',
+    loadComponent: () => import('./components/about/despre.component').then(m => m.DespreComponent),
+    data: {
+      animation: 'DesprePage',
+      headerTitle: 'Despre Civiti',
+      showBackButton: true,
+      backUrl: '/location',
+      showFooter: true,
+      seo: {
+        title: 'Despre Civiti — Povestea platformei',
+        description: 'Cine este în spatele Civiti, de ce a fost creată platforma, cum funcționează și cum poți contribui. Proiect independent, open source, pentru cetățenii din România.',
+      }
+    }
+  },
   // Legal pages - public, no auth required (linked from mobile app for App Store review)
   {
     path: 'privacy',

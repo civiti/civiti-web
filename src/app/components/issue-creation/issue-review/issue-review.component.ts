@@ -1,5 +1,5 @@
-import { Component, OnInit, DestroyRef, inject } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, OnInit, DestroyRef, PLATFORM_ID, computed, inject } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -19,6 +19,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { AppState } from '../../../store/app.state';
 import * as UserActions from '../../../store/user/user.actions';
 import { ApiService } from '../../../services/api.service';
+import { DismissalService } from '../../../services/dismissal.service';
 import {
   CreateIssueRequest,
   UrgencyLevel,
@@ -29,6 +30,7 @@ import {
 } from '../../../types/civica-api.types';
 import { generateIssueTitle } from '../issue-title.util';
 import { clearIssueCreationSession } from '../issue-session.util';
+import { APP_STORE_URL } from '../../../constants/urls';
 
 interface SelectedAuthority {
   /** Server authority ID (only for predefined authorities) */
@@ -37,6 +39,8 @@ interface SelectedAuthority {
   name: string;
   isCustom: boolean;
 }
+
+const APP_NUDGE_KEY = 'app_nudge_post_submit';
 
 @Component({
   selector: 'app-issue-review',
@@ -59,12 +63,31 @@ interface SelectedAuthority {
 })
 export class IssueReviewComponent implements OnInit {
   private _destroyRef = inject(DestroyRef);
+  private _dismissal = inject(DismissalService);
+  private _platformId = inject(PLATFORM_ID);
 
   issueData: any = null;
   selectedAuthorities: SelectedAuthority[] = [];
   isSubmitting = false;
   isSubmitted = false;
   issueTitle = '';
+
+  readonly appStoreUrl = APP_STORE_URL;
+
+  /**
+   * iPadOS 13+ reports a Mac-like user agent, so also check for touch capability
+   * to catch iPads running desktop-mode Safari.
+   */
+  private readonly isIOS = isPlatformBrowser(this._platformId)
+    ? (() => {
+        const ua = navigator.userAgent;
+        if (/iPhone|iPad|iPod/i.test(ua)) return true;
+        return /Macintosh/i.test(ua) && navigator.maxTouchPoints > 1;
+      })()
+    : false;
+
+  private readonly nudgeDismissed = this._dismissal.isDismissed(APP_NUDGE_KEY);
+  readonly showAppNudge = computed(() => this.isIOS && !this.nudgeDismissed());
 
   constructor(
     private router: Router,
@@ -127,6 +150,10 @@ export class IssueReviewComponent implements OnInit {
   viewPhoto(photoUrl: string): void {
     console.log('[ISSUE REVIEW] View photo:', photoUrl);
     window.open(photoUrl, '_blank');
+  }
+
+  dismissAppNudge(): void {
+    this._dismissal.dismiss(APP_NUDGE_KEY);
   }
 
   submitIssue(): void {
