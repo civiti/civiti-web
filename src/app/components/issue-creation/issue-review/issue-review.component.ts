@@ -30,6 +30,7 @@ import {
 } from '../../../types/civica-api.types';
 import { generateIssueTitle } from '../issue-title.util';
 import { clearIssueCreationSession } from '../issue-session.util';
+import { APP_STORE_URL } from '../../../constants/urls';
 
 interface SelectedAuthority {
   /** Server authority ID (only for predefined authorities) */
@@ -40,7 +41,6 @@ interface SelectedAuthority {
 }
 
 const APP_NUDGE_KEY = 'app_nudge_post_submit';
-const APP_STORE_URL = 'https://apps.apple.com/ro/app/civiti/id6760908767';
 
 @Component({
   selector: 'app-issue-review',

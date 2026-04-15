@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { GUIDE_ARTICLES } from '../../../generated/guide-data';
+import { APP_STORE_URL, GITHUB_URL } from '../../../constants/urls';
 
 @Component({
   selector: 'app-footer',
@@ -13,6 +14,6 @@ import { GUIDE_ARTICLES } from '../../../generated/guide-data';
 export class FooterComponent {
   readonly guideArticles = GUIDE_ARTICLES.slice(0, 2);
   readonly currentYear = new Date().getFullYear();
-  readonly appStoreUrl = 'https://apps.apple.com/ro/app/civiti/id6760908767';
-  readonly githubUrl = 'https://github.com/civiti';
+  readonly appStoreUrl = APP_STORE_URL;
+  readonly githubUrl = GITHUB_URL;
 }

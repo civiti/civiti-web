@@ -1,7 +1,8 @@
-import { Component, OnDestroy, OnInit, inject } from '@angular/core';
+import { Component, DestroyRef, OnInit, inject } from '@angular/core';
 import { DOCUMENT } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
+import { APP_STORE_URL, GITHUB_URL, REVOLUT_URL } from '../../constants/urls';
 
 @Component({
   selector: 'app-despre',
@@ -10,21 +11,19 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
   templateUrl: './despre.component.html',
   styleUrl: './despre.component.scss',
 })
-export class DespreComponent implements OnInit, OnDestroy {
+export class DespreComponent implements OnInit {
   private readonly document = inject(DOCUMENT);
+  private readonly destroyRef = inject(DestroyRef);
 
-  readonly appStoreUrl = 'https://apps.apple.com/ro/app/civiti/id6760908767';
-  readonly githubUrl = 'https://github.com/civiti';
-  readonly revolutUrl = 'https://revolut.me/sorvas';
+  readonly appStoreUrl = APP_STORE_URL;
+  readonly githubUrl = GITHUB_URL;
+  readonly revolutUrl = REVOLUT_URL;
 
   private readonly jsonLdId = 'despre-page-jsonld';
 
   ngOnInit(): void {
     this.injectStructuredData();
-  }
-
-  ngOnDestroy(): void {
-    this.removeStructuredData();
+    this.destroyRef.onDestroy(() => this.removeStructuredData());
   }
 
   private injectStructuredData(): void {
