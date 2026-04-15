@@ -62,8 +62,21 @@
 .page-subtitle {
   font-size: 0.95rem;
   color: #666;
-  margin-bottom: 0;
+  margin-bottom: 0.75rem;
   line-height: 1.5;
+}
+
+.about-link {
+  display: inline-block;
+  font-size: 0.85rem;
+  color: var(--orange-web);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
 }
 
 // Form styling

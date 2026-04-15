@@ -650,3 +650,106 @@
     display: none;
   }
 }
+
+// Post-submit App Store nudge (iOS-only)
+.app-nudge {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  max-width: 520px;
+  margin: 1.5rem auto 0;
+  padding: 1.25rem;
+  background: var(--white);
+  border: 1px solid rgba(252, 163, 17, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(20, 33, 61, 0.06);
+  text-align: left;
+}
+
+.app-nudge-icon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: 50%;
+  background: rgba(252, 163, 17, 0.15);
+  color: var(--orange-web);
+  font-size: 1.25rem;
+}
+
+.app-nudge-body {
+  flex: 1;
+  min-width: 0;
+}
+
+.app-nudge-title {
+  font-family: var(--font-primary);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--oxford-blue);
+  margin-bottom: 0.25rem;
+}
+
+.app-nudge-text {
+  font-family: var(--font-primary);
+  font-size: 0.875rem;
+  color: #666;
+  margin: 0 0 0.75rem;
+  line-height: 1.5;
+}
+
+.app-nudge-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.app-nudge-primary {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--oxford-blue);
+  color: var(--white);
+  border-radius: 6px;
+  font-family: var(--font-primary);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s;
+
+  &:hover,
+  &:focus-visible {
+    background: #1d2d52;
+    color: var(--white);
+  }
+}
+
+.app-nudge-dismiss {
+  padding: 0.5rem 0.5rem;
+  background: transparent;
+  border: none;
+  font-family: var(--font-primary);
+  font-size: 0.875rem;
+  color: #888;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--oxford-blue);
+  }
+}
+
+@media (max-width: 480px) {
+  .app-nudge {
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+  }
+
+  .app-nudge-actions {
+    justify-content: space-between;
+  }
+}

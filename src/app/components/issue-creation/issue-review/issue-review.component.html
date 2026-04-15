@@ -71,6 +71,34 @@
             </button>
           </div>
 
+          @if (showAppNudge()) {
+            <div class="app-nudge" role="region" aria-label="Descarcă aplicația Civiti">
+              <div class="app-nudge-icon">
+                <span nz-icon nzType="mobile" nzTheme="outline"></span>
+              </div>
+              <div class="app-nudge-body">
+                <div class="app-nudge-title">Urmărește-ți problema din aplicație</div>
+                <p class="app-nudge-text">
+                  Primești notificări imediat ce problema ta este aprobată sau are actualizări — direct pe iPhone.
+                </p>
+                <div class="app-nudge-actions">
+                  <a
+                    [href]="appStoreUrl"
+                    target="_blank"
+                    rel="noopener"
+                    class="app-nudge-primary"
+                    (click)="dismissAppNudge()"
+                  >
+                    Descarcă din App Store →
+                  </a>
+                  <button type="button" class="app-nudge-dismiss" (click)="dismissAppNudge()">
+                    Mai târziu
+                  </button>
+                </div>
+              </div>
+            </div>
+          }
+
           <div class="next-steps">
             <h4>Ce urmează?</h4>
             <ul>

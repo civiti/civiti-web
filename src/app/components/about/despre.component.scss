@@ -1,0 +1,233 @@
+.despre-page {
+  background: var(--platinum);
+  min-height: 100vh;
+  padding: 2rem 1rem 4rem;
+}
+
+.despre-container {
+  max-width: 760px;
+  margin: 0 auto;
+  background: var(--white);
+  border-radius: 12px;
+  padding: 2.5rem 2rem;
+  box-shadow: 0 1px 3px rgba(20, 33, 61, 0.06);
+
+  @media (min-width: 768px) {
+    padding: 3rem 3rem;
+  }
+}
+
+.breadcrumb {
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+
+  a {
+    color: var(--color-text-muted);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--orange-web);
+    }
+  }
+
+  .breadcrumb-sep {
+    margin: 0 0.5rem;
+    opacity: 0.5;
+  }
+}
+
+.despre-header {
+  margin-bottom: 2rem;
+
+  h1 {
+    font-family: var(--font-primary);
+    font-size: var(--text-3xl);
+    font-weight: 700;
+    color: var(--oxford-blue);
+    margin: 0 0 0.75rem;
+    line-height: 1.2;
+  }
+
+  .despre-subtitle {
+    font-family: var(--font-primary);
+    font-size: var(--text-lg);
+    color: var(--color-text-muted);
+    margin: 0;
+    line-height: 1.5;
+  }
+}
+
+.video-section {
+  margin-bottom: 2.5rem;
+}
+
+.video-placeholder {
+  background: var(--platinum);
+  border: 2px dashed rgba(20, 33, 61, 0.15);
+  border-radius: 8px;
+  padding: 3rem 1.5rem;
+  text-align: center;
+  color: var(--color-text-muted);
+
+  .video-icon {
+    font-size: 3rem;
+    color: var(--oxford-blue);
+    opacity: 0.35;
+    margin-bottom: 0.75rem;
+  }
+
+  .video-placeholder-title {
+    font-family: var(--font-primary);
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--oxford-blue);
+    margin: 0 0 0.5rem;
+  }
+
+  .video-placeholder-sub {
+    font-family: var(--font-primary);
+    font-size: var(--text-sm);
+    margin: 0;
+    max-width: 420px;
+    margin-inline: auto;
+    line-height: 1.5;
+  }
+}
+
+.despre-story,
+.despre-app,
+.despre-opensource,
+.despre-support {
+  margin-bottom: 2.5rem;
+
+  h2 {
+    font-family: var(--font-primary);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--oxford-blue);
+    margin: 0 0 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+
+    nz-icon {
+      color: var(--orange-web);
+    }
+  }
+
+  p {
+    font-family: var(--font-primary);
+    font-size: var(--text-base);
+    color: var(--oxford-blue);
+    line-height: 1.7;
+    margin: 0 0 1rem;
+  }
+}
+
+.app-store-cta,
+.support-cta {
+  display: inline-block;
+  padding: 0.75rem 1.25rem;
+  border-radius: 8px;
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  font-weight: 600;
+  text-decoration: none;
+  transition: background 0.2s, transform 0.1s;
+
+  &:active {
+    transform: translateY(1px);
+  }
+}
+
+.app-store-cta {
+  background: var(--oxford-blue);
+  color: var(--white);
+
+  &:hover,
+  &:focus-visible {
+    background: #1d2d52;
+    color: var(--white);
+  }
+}
+
+.support-cta {
+  background: var(--orange-web);
+  color: var(--oxford-blue);
+
+  &:hover,
+  &:focus-visible {
+    background: #e59309;
+    color: var(--oxford-blue);
+  }
+}
+
+.inline-link {
+  font-family: var(--font-primary);
+  font-size: var(--text-base);
+  color: var(--orange-web);
+  text-decoration: none;
+  font-weight: 500;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: underline;
+  }
+}
+
+.despre-final-cta {
+  text-align: center;
+  padding: 2rem 1rem;
+  border-top: 1px solid rgba(20, 33, 61, 0.1);
+
+  h2 {
+    font-family: var(--font-primary);
+    font-size: var(--text-xl);
+    font-weight: 600;
+    color: var(--oxford-blue);
+    margin: 0 0 0.75rem;
+  }
+
+  p {
+    font-family: var(--font-primary);
+    font-size: var(--text-base);
+    color: var(--color-text-muted);
+    margin: 0 0 1.5rem;
+  }
+
+  .primary-cta {
+    display: inline-block;
+    padding: 0.875rem 1.75rem;
+    background: var(--orange-web);
+    color: var(--oxford-blue);
+    border-radius: 8px;
+    font-family: var(--font-primary);
+    font-size: var(--text-base);
+    font-weight: 600;
+    text-decoration: none;
+    transition: background 0.2s, transform 0.1s;
+
+    &:hover,
+    &:focus-visible {
+      background: #e59309;
+    }
+
+    &:active {
+      transform: translateY(1px);
+    }
+  }
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}

@@ -1,0 +1,101 @@
+<article class="despre-page">
+  <div class="despre-container">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a routerLink="/location">Acasă</a>
+      <span class="breadcrumb-sep">/</span>
+      <span aria-current="page">Despre</span>
+    </nav>
+
+    <header class="despre-header">
+      <h1>Despre Civiti</h1>
+      <p class="despre-subtitle">
+        Platformă independentă de participare civică, construită pentru cetățenii din România care vor să acționeze, nu doar să se plângă.
+      </p>
+    </header>
+
+    <section class="video-section" aria-labelledby="video-heading">
+      <h2 id="video-heading" class="visually-hidden">Video introducere</h2>
+      <div class="video-placeholder">
+        <nz-icon nzType="play-circle" nzTheme="outline" class="video-icon"></nz-icon>
+        <p class="video-placeholder-title">Video în pregătire</p>
+        <p class="video-placeholder-sub">
+          Urmează un scurt video în care fondatorul povestește de ce a construit Civiti și cum o poți folosi.
+        </p>
+      </div>
+    </section>
+
+    <section class="despre-story" aria-labelledby="story-heading">
+      <h2 id="story-heading">De ce Civiti</h2>
+      <p>
+        Civiti a pornit dintr-o frustrare simplă: în România, raportarea unei probleme locale — o groapă, un gunoi neridicat, un stâlp de iluminat stricat — înseamnă de obicei un drum la primărie, un formular nerezolvat sau un email trimis în gol. Autoritățile răspund mai des și mai rapid atunci când primesc presiune coordonată din partea mai multor cetățeni, nu mesaje izolate.
+      </p>
+      <p>
+        Civiti transformă reclamațiile individuale în campanii coordonate. Raportezi o problemă, alegi autoritățile responsabile, iar platforma te ajută să trimiți mesaje clare și eficiente — singur sau împreună cu alți cetățeni din zona ta.
+      </p>
+      <p>
+        Proiectul este independent, fără apartenență politică și construit de o persoană care crede că participarea civică nu ar trebui să fie un lux rezervat celor cu timp liber și conexiuni.
+      </p>
+    </section>
+
+    <section class="despre-app" aria-labelledby="app-heading">
+      <h2 id="app-heading">
+        <nz-icon nzType="mobile" nzTheme="outline"></nz-icon>
+        Civiti pe iPhone
+      </h2>
+      <p>
+        Aplicația mobilă Civiti îți permite să raportezi o problemă direct de pe stradă, cu fotografie și locație GPS, în câteva secunde. Pentru moment, aplicația este disponibilă doar pe iOS; versiunea pentru Android va veni mai târziu.
+      </p>
+      <a
+        [href]="appStoreUrl"
+        target="_blank"
+        rel="noopener"
+        class="app-store-cta"
+        aria-label="Descarcă aplicația Civiti din App Store"
+      >
+        Descarcă din App Store →
+      </a>
+    </section>
+
+    <section class="despre-opensource" aria-labelledby="opensource-heading">
+      <h2 id="opensource-heading">
+        <nz-icon nzType="github" nzTheme="outline"></nz-icon>
+        Cod deschis
+      </h2>
+      <p>
+        Civiti este un proiect open source. Codul platformei, al aplicației mobile și al serverului este public pe GitHub, iar oricine poate să-l inspecteze, să raporteze probleme sau să contribuie.
+      </p>
+      <a [href]="githubUrl" target="_blank" rel="noopener" class="inline-link">
+        Vezi proiectul pe GitHub →
+      </a>
+    </section>
+
+    <section class="despre-support" aria-labelledby="support-heading">
+      <h2 id="support-heading">
+        <nz-icon nzType="gift" nzTheme="outline"></nz-icon>
+        Susține proiectul
+      </h2>
+      <p>
+        Civiti este un proiect independent. Contribuțiile acoperă domeniul civiti.ro, serverele, contul Apple Developer și costurile API (Google Maps, Supabase). Platforma folosește modele AI pentru a ajuta cetățenii să-și formuleze mai clar problemele raportate, iar aceste servicii au cost per apel. Orice surplus intră în dezvoltarea platformei.
+      </p>
+      <a
+        [href]="revolutUrl"
+        target="_blank"
+        rel="noopener"
+        class="support-cta"
+        aria-label="Trimite o contribuție pe Revolut"
+      >
+        Trimite o contribuție pe Revolut →
+      </a>
+    </section>
+
+    <section class="despre-final-cta">
+      <h2>Ești gata să începi?</h2>
+      <p>
+        Alege orașul tău și vezi problemele raportate de alți cetățeni. Sau raportează tu una nouă.
+      </p>
+      <a routerLink="/location" class="primary-cta">
+        Raportează o problemă →
+      </a>
+    </section>
+  </div>
+</article>

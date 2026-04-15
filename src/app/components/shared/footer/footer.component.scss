@@ -13,8 +13,12 @@
   display: flex;
   gap: 3rem;
 
-  @media (max-width: 768px) {
+  @media (max-width: 960px) {
     flex-wrap: wrap;
+    gap: 2rem;
+  }
+
+  @media (max-width: 480px) {
     gap: 1.5rem;
   }
 }
@@ -22,6 +26,10 @@
 .footer-column {
   flex: 1;
   min-width: 0;
+
+  @media (max-width: 960px) {
+    flex-basis: calc(50% - 1rem);
+  }
 
   @media (max-width: 480px) {
     flex-basis: 100%;
@@ -88,4 +96,21 @@
   font-family: var(--font-primary);
   font-size: var(--text-xs);
   color: rgba(255, 255, 255, 0.4);
+}
+
+.footer-github {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: rgba(255, 255, 255, 0.5);
+  transition: color 0.2s;
+  font-size: 1.125rem;
+
+  &:hover,
+  &:focus-visible {
+    color: var(--orange-web);
+  }
 }
