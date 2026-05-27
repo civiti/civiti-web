@@ -1,4 +1,5 @@
 import { RenderMode, ServerRoute } from '@angular/ssr';
+import { GUIDE_ARTICLES } from './generated/guide-data';
 
 export const serverRoutes: ServerRoute[] = [
   // Static public pages — build-time prerender for instant response
@@ -8,12 +9,18 @@ export const serverRoutes: ServerRoute[] = [
   { path: 'terms', renderMode: RenderMode.Prerender },
   { path: 'despre', renderMode: RenderMode.Prerender },
 
-  // Guide listing — static content, prerendered at build time
+  // Guides — content is static (built from markdown into GUIDE_ARTICLES at
+  // build time), so prerender every slug instead of paying for SSR per request.
   { path: 'ghid', renderMode: RenderMode.Prerender },
+  {
+    path: 'ghid/:slug',
+    renderMode: RenderMode.Prerender,
+    getPrerenderParams: async () =>
+      GUIDE_ARTICLES.map((article) => ({ slug: article.slug })),
+  },
 
   // Dynamic public pages — server-rendered on demand for freshness
   { path: 'bucuresti', renderMode: RenderMode.Server },
-  { path: 'ghid/:slug', renderMode: RenderMode.Server },
   { path: 'issue/:id', renderMode: RenderMode.Server },
 
   // Auth pages — client-side only (no SEO value)
