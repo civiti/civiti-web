@@ -35,6 +35,8 @@ import {
   ActivityLogQueryParams,
   EnhanceTextRequest,
   EnhanceTextResponse,
+  PetitionBodyRequest,
+  PetitionBodyResponse,
   CategoryResponse,
   ActivityFeedItem,
   ActivityQueryParams,
@@ -153,6 +155,16 @@ export class ApiService {
    */
   enhanceIssueText(data: EnhanceTextRequest): Observable<EnhanceTextResponse> {
     return this.http.post<EnhanceTextResponse>(`${this.baseUrl}/issues/enhance-text`, data);
+  }
+
+  /**
+   * Generate an AI-composed, ready-to-copy petition body for an issue.
+   * POST /api/issues/{id}/petition-body
+   * Requires authentication. The AI writes only the argument core; the backend
+   * wraps it in the deterministic, legally-compliant scaffold before returning.
+   */
+  generatePetitionBody(issueId: string, data: PetitionBodyRequest = {}): Observable<PetitionBodyResponse> {
+    return this.http.post<PetitionBodyResponse>(`${this.baseUrl}/issues/${issueId}/petition-body`, data);
   }
 
   // ============================================
