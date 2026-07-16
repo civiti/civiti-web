@@ -1,12 +1,20 @@
-import { Component, inject, Inject, OnInit } from '@angular/core';
+import { Component, DestroyRef, inject, Inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { take, timeout } from 'rxjs';
 import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NgZorroModule } from '../../shared/ng-zorro.module';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
+import { selectIsAuthenticated } from '../../store/auth/auth.selectors';
+import { ApiService } from '../../services/api.service';
 import { IssueDetailResponse, IssueAuthorityResponse } from '../../types/civica-api.types';
+
+/** Max wait for the AI petition-body call before falling back to the template. */
+const AI_TIMEOUT_MS = 15000;
 
 export interface EmailModalData {
     issue: IssueDetailResponse;
@@ -23,6 +31,7 @@ interface EmailTemplate {
     standalone: true,
     imports: [
         CommonModule,
+        FormsModule,
         NgZorroModule
     ],
     templateUrl: './email-modal.component.html',
@@ -32,11 +41,28 @@ export class EmailModalComponent implements OnInit {
     private _store = inject(Store<AppState>);
     private _message = inject(NzMessageService);
     private _modalRef = inject(NzModalRef);
+    private _api = inject(ApiService);
+    private _destroyRef = inject(DestroyRef);
 
     issue: IssueDetailResponse;
     authorities: IssueAuthorityResponse[];
 
     emailTemplate: EmailTemplate | null = null;
+
+    /** The editable body shown in the textarea (AI-generated, or the template fallback). */
+    bodyModel = '';
+
+    /** Whether an AI generation request is in flight (drives the spinner). */
+    isGenerating = false;
+
+    /** True once the AI-composed body has replaced the deterministic template. */
+    aiGenerated = false;
+
+    /** True once the user has manually edited the body since the last generation. */
+    userHasEdited = false;
+
+    /** Only authenticated users can call the auth-gated AI endpoint. */
+    canUseAI = false;
 
     // Copy state tracking for button feedback
     copyStates = {
@@ -54,7 +80,65 @@ export class EmailModalComponent implements OnInit {
     }
 
     ngOnInit(): void {
+        // Build the deterministic template first so there is always a valid,
+        // legally-compliant body to copy — even for anonymous users or if the
+        // AI call fails/times out.
         this.generateEmailTemplate();
+        this.bodyModel = this.emailTemplate?.body ?? '';
+
+        // Authenticated users get the AI-composed body layered on top.
+        this._store.select(selectIsAuthenticated)
+            .pipe(take(1), takeUntilDestroyed(this._destroyRef))
+            .subscribe(isAuthenticated => {
+                this.canUseAI = isAuthenticated;
+                if (isAuthenticated) {
+                    this.generateWithAI(false);
+                }
+            });
+    }
+
+    /**
+     * Request an AI-composed petition body from the backend and swap it into the
+     * editable field. On any failure (error, timeout, empty response) the existing
+     * deterministic template already in `bodyModel` is kept — the user is never
+     * left without a valid body.
+     * @param isRegenerate whether this is a user-triggered regenerate (vs. initial load)
+     */
+    generateWithAI(isRegenerate: boolean): void {
+        if (this.isGenerating || !this.issue?.id) return;
+        this.isGenerating = true;
+
+        this._api.generatePetitionBody(this.issue.id, { regenerate: isRegenerate })
+            .pipe(timeout(AI_TIMEOUT_MS), takeUntilDestroyed(this._destroyRef))
+            .subscribe({
+                next: (response) => {
+                    this.isGenerating = false;
+                    if (response?.body?.trim()) {
+                        this.bodyModel = response.body;
+                        this.aiGenerated = true;
+                        this.userHasEdited = false;
+                        if (isRegenerate) {
+                            this._message.success('Textul a fost regenerat.');
+                        }
+                    } else if (isRegenerate) {
+                        this._message.info('Nu s-a primit un text nou. Am păstrat varianta curentă.');
+                    }
+                },
+                error: (error) => {
+                    this.isGenerating = false;
+                    // Silent fallback: keep whatever body is already in the field.
+                    console.error('[EMAIL MODAL] AI petition body generation failed:', error);
+                    if (isRegenerate) {
+                        this._message.error('Nu s-a putut regenera textul. Am păstrat varianta curentă.');
+                    }
+                }
+            });
+    }
+
+    /** Called by the editable textarea; marks the body as user-modified. */
+    onBodyChange(value: string): void {
+        this.bodyModel = value;
+        this.userHasEdited = true;
     }
 
     /**
@@ -156,11 +240,11 @@ ${currentDate}`;
     }
 
     /**
-     * Copy email body to clipboard
+     * Copy email body to clipboard (the current, possibly user-edited, text)
      */
     copyBody(): void {
-        if (!this.emailTemplate) return;
-        this.copyToClipboard(this.emailTemplate.body, 'body');
+        if (!this.bodyModel?.trim()) return;
+        this.copyToClipboard(this.bodyModel, 'body');
     }
 
     /**

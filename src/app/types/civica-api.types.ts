@@ -285,6 +285,27 @@ export interface EnhanceTextResponse {
   enhancedCommunityImpact: string;
 }
 
+/**
+ * Request payload for AI petition-body generation
+ * POST /api/issues/{id}/petition-body
+ * Requires authentication.
+ */
+export interface PetitionBodyRequest {
+  /** When true, bypass any server-side cache so the user gets a fresh variation. */
+  regenerate?: boolean;
+}
+
+/**
+ * Response from AI petition-body generation.
+ * `body` is the full, ready-to-copy Romanian petition: the deterministic,
+ * legally-compliant scaffold (identity block + O.G. 27/2002 clause + placeholders
+ * + sign-off) with an AI-composed argument core inserted. The model only writes
+ * the core; the scaffold is concatenated server-side so compliance is guaranteed.
+ */
+export interface PetitionBodyResponse {
+  body: string;
+}
+
 // ============================================
 // Response Interfaces
 // ============================================
@@ -847,6 +868,7 @@ export const API_ENDPOINTS = {
   ISSUE_BY_ID: (id: string) => `/api/issues/${id}`,
   TRACK_EMAIL: (id: string) => `/api/issues/${id}/email-sent`,
   ENHANCE_TEXT: '/api/issues/enhance-text',
+  PETITION_BODY: (id: string) => `/api/issues/${id}/petition-body`,
 
   // User Issue Management
   USER_ISSUE_BY_ID: (id: string) => `/api/user/issues/${id}`,

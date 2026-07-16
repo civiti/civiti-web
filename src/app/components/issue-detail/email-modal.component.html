@@ -54,19 +54,56 @@
       <div class="section-label">
         <span nz-icon nzType="file-text" nzTheme="outline" class="text-oxford-blue mr-2"></span>
         <strong class="text-oxford-blue">Mesaj:</strong>
+        @if (aiGenerated) {
+          <span class="ai-badge">
+            <span nz-icon nzType="robot" nzTheme="outline"></span>
+            <span>Îmbunătățit cu AI</span>
+          </span>
+        }
       </div>
-      <button
-        nz-button
-        nzSize="small"
-        [nzType]="copyStates.body ? 'primary' : 'default'"
-        (click)="copyBody()">
-        <span nz-icon [nzType]="copyStates.body ? 'check' : 'copy'" nzTheme="outline"></span>
-        {{ copyStates.body ? 'Copiat!' : 'Copiază' }}
-      </button>
+      <div class="body-actions">
+        @if (canUseAI) {
+          <button
+            nz-button
+            nzSize="small"
+            nz-popconfirm
+            nzPopconfirmTitle="Modificările tale vor fi înlocuite de textul regenerat. Continui?"
+            nzOkText="Da, regenerează"
+            nzCancelText="Renunță"
+            [nzCondition]="!userHasEdited"
+            (nzOnConfirm)="generateWithAI(true)"
+            [disabled]="isGenerating">
+            <span nz-icon [nzType]="isGenerating ? 'loading' : 'reload'" nzTheme="outline"></span>
+            <span>{{ isGenerating ? 'Se generează…' : 'Regenerează' }}</span>
+          </button>
+        }
+        <button
+          nz-button
+          nzSize="small"
+          [nzType]="copyStates.body ? 'primary' : 'default'"
+          [disabled]="isGenerating || !bodyModel.trim()"
+          (click)="copyBody()">
+          <span nz-icon [nzType]="copyStates.body ? 'check' : 'copy'" nzTheme="outline"></span>
+          <span>{{ copyStates.body ? 'Copiat!' : 'Copiază' }}</span>
+        </button>
+      </div>
     </div>
     <div class="body-display">
-      <pre class="email-body-text">{{ emailTemplate?.body }}</pre>
+      <nz-spin [nzSpinning]="isGenerating" nzTip="Se compune petiția…">
+        <textarea
+          nz-input
+          class="email-body-text-input"
+          [ngModel]="bodyModel"
+          (ngModelChange)="onBodyChange($event)"
+          [nzAutosize]="{ minRows: 12, maxRows: 22 }"
+          aria-label="Corpul petiției (editabil)">
+        </textarea>
+      </nz-spin>
     </div>
+    <p class="body-hint">
+      <span nz-icon nzType="edit" nzTheme="outline"></span>
+      Poți edita textul înainte de a-l copia.
+    </p>
   </nz-card>
 
   <!-- Collapsible Instructions -->
