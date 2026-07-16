@@ -187,7 +187,7 @@ export class EmailModalComponent implements OnInit {
 
         const body = `Către: [NUMELE AUTORITĂȚII]
 
-Subsemnatul/a [NUMELE TĂU COMPLET], CNP: [CNP-UL TĂU], domiciliat(ă) în [ADRESA TA DE DOMICILIU], email: [ADRESA TA DE EMAIL], telefon: [NUMĂRUL TĂU DE TELEFON], vă adresez prezenta petiție prin care solicit să luați măsuri în legătură cu următoarea problemă:
+Subsemnatul/a [NUMELE TĂU COMPLET], domiciliat(ă) în [ADRESA TA DE DOMICILIU], telefon: [NUMĂRUL TĂU DE TELEFON], vă adresez prezenta petiție prin care solicit să luați măsuri în legătură cu următoarea problemă:
 
 ${this.issue.title}
 
@@ -200,9 +200,9 @@ ${desiredOutcomeText}
 
 ${photosSection}Link către documentația completă: https://civiti.ro/issues/${this.issue.id}
 
-Conform O.G. 27/2002 privind reglementarea activității de soluționare a petițiilor, vă rog să îmi comunicați răspunsul la adresa de domiciliu menționată mai sus sau prin email la [ADRESA TA DE EMAIL], în termenul legal de 30 de zile.
+Conform O.G. 27/2002 privind reglementarea activității de soluționare a petițiilor, vă rog să îmi comunicați răspunsul la adresa de domiciliu menționată mai sus, în termenul legal de 30 de zile.
 
-De asemenea, vă rog să îmi comunicați numărul de înregistrare al acestei petiții pe adresa de email menționată mai sus, pentru a putea urmări soluționarea acesteia.
+De asemenea, vă rog să îmi comunicați numărul de înregistrare al acestei petiții, pentru a putea urmări soluționarea acesteia.
 
 Cu stimă,
 [NUMELE TĂU COMPLET]
