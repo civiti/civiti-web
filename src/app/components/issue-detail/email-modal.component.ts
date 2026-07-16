@@ -165,19 +165,14 @@ export class EmailModalComponent implements OnInit {
         if (this.issue.district) locationParts.push(this.issue.district);
         const locationString = locationParts.filter(Boolean).join(', ') || 'Locație nespecificată';
 
-        // Format dates as DD.MM.YYYY
-        const createdDate = this.formatDateRomanian(this.issue.createdAt);
-        const currentDate = this.formatDateRomanian(new Date().toISOString());
-
-        // Build community impact section if available
-        const communityImpactSection = this.issue.communityImpact?.trim()
-            ? `\n${this.issue.communityImpact.trim()}`
-            : '';
-
-        // Build desired outcome section
-        const desiredOutcomeText = this.issue.desiredOutcome?.trim()
-            ? this.issue.desiredOutcome.trim()
-            : 'Vă solicit să luați măsurile necesare pentru remedierea acestei probleme în cel mai scurt timp posibil.';
+        // Build the deterministic argument core (problem → impact → demand), mirroring the
+        // backend BuildFallbackCore so this fallback matches the server-composed body.
+        const coreParts: string[] = [];
+        if (this.issue.description?.trim()) coreParts.push(this.issue.description.trim());
+        if (this.issue.communityImpact?.trim()) coreParts.push(this.issue.communityImpact.trim());
+        coreParts.push(this.issue.desiredOutcome?.trim()
+            || 'Vă solicit să luați măsurile necesare pentru remedierea acestei probleme în cel mai scurt timp posibil.');
+        const core = coreParts.join('\n\n');
 
         // Build photos section
         const photoCount = this.issue.photos?.length || 0;
@@ -185,41 +180,26 @@ export class EmailModalComponent implements OnInit {
             ? `La prezenta petiție anexez ${photoCount} ${photoCount === 1 ? 'fotografie care documentează' : 'fotografii care documentează'} problema semnalată.\n`
             : '';
 
+        // Mirrors the backend AssemblePetitionBody scaffold (Civiti.Infrastructure
+        // ClaudeEnhancementService) so this fallback matches the server-composed body.
         const body = `Către: [NUMELE AUTORITĂȚII]
 
-Subsemnatul/a [NUMELE TĂU COMPLET], domiciliat(ă) în [ADRESA TA DE DOMICILIU], telefon: [NUMĂRUL TĂU DE TELEFON], vă adresez prezenta petiție prin care solicit să luați măsuri în legătură cu următoarea problemă:
+Subsemnatul/a [NUMELE TĂU COMPLET], cu domiciliul în [ADRESA TA DE DOMICILIU], vă adresez următoarea petiție:
 
-${this.issue.title}
-
+Problemă: ${this.issue.title}
 Locație: ${locationString}
-Data sesizării: ${createdDate}
 
-${this.issue.description}${communityImpactSection}
+${core}
 
-${desiredOutcomeText}
+${photosSection}Documentație completă: https://civiti.ro/issues/${this.issue.id}
 
-${photosSection}Link către documentația completă: https://civiti.ro/issues/${this.issue.id}
-
-Conform O.G. 27/2002 privind reglementarea activității de soluționare a petițiilor, vă rog să îmi comunicați răspunsul la adresa de domiciliu menționată mai sus, în termenul legal de 30 de zile.
-
-De asemenea, vă rog să îmi comunicați numărul de înregistrare al acestei petiții, pentru a putea urmări soluționarea acesteia.
+Conform O.G. 27/2002, vă rog să îmi comunicați numărul de înregistrare al petiției și răspunsul în termenul legal de 30 de zile.
 
 Cu stimă,
 [NUMELE TĂU COMPLET]
-${currentDate}`;
+Telefon: [NUMĂRUL TĂU DE TELEFON]`;
 
         this.emailTemplate = { subject, body };
-    }
-
-    /**
-     * Format ISO date string to Romanian format DD.MM.YYYY
-     */
-    private formatDateRomanian(isoDate: string): string {
-        const date = new Date(isoDate);
-        const day = date.getDate().toString().padStart(2, '0');
-        const month = (date.getMonth() + 1).toString().padStart(2, '0');
-        const year = date.getFullYear();
-        return `${day}.${month}.${year}`;
     }
 
     /**
