@@ -868,7 +868,6 @@ export const API_ENDPOINTS = {
   ISSUE_BY_ID: (id: string) => `/api/issues/${id}`,
   TRACK_EMAIL: (id: string) => `/api/issues/${id}/email-sent`,
   ENHANCE_TEXT: '/api/issues/enhance-text',
-  PETITION_BODY: (id: string) => `/api/issues/${id}/petition-body`,
 
   // User Issue Management
   USER_ISSUE_BY_ID: (id: string) => `/api/user/issues/${id}`,

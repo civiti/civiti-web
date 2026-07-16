@@ -113,6 +113,15 @@ export class EmailModalComponent implements OnInit {
             .subscribe({
                 next: (response) => {
                     this.isGenerating = false;
+
+                    // nz-spin overlays but does not lock the textarea, so the user can start
+                    // typing during the in-flight initial call. Never clobber a draft they've
+                    // begun. Regenerate is an explicit action (guarded by a popconfirm when the
+                    // body has been edited), so it is allowed to replace the current text.
+                    if (!isRegenerate && this.userHasEdited) {
+                        return;
+                    }
+
                     if (response?.body?.trim()) {
                         this.bodyModel = response.body;
                         this.aiGenerated = true;
