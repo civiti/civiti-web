@@ -49,21 +49,32 @@ export class SupabaseAuthService {
 
     // Listen for auth state changes
     this.supabase.auth.onAuthStateChange((event, session) => {
-      if (event === 'SIGNED_IN' && session?.user) {
-        const user = this.mapSupabaseUserToAuthUser(session.user);
-        this.currentUser$.next(user);
-
-        // Store tokens
-        if (session.access_token) {
-          localStorage.setItem('civica_access_token', session.access_token);
-        }
-        if (session.refresh_token) {
-          localStorage.setItem('civica_refresh_token', session.refresh_token);
-        }
-      } else if (event === 'SIGNED_OUT') {
+      if (event === 'SIGNED_OUT') {
         this.currentUser$.next(null);
         localStorage.removeItem('civica_access_token');
         localStorage.removeItem('civica_refresh_token');
+        return;
+      }
+
+      // Mirror the stored tokens on EVERY event that carries a session, not just
+      // SIGNED_IN. Supabase refreshes the JWT silently in the background and
+      // emits TOKEN_REFRESHED (also INITIAL_SESSION on restore, USER_UPDATED on
+      // profile change). Handling only SIGNED_IN left the copy in localStorage
+      // frozen at sign-in, so getAccessToken() served an expired JWT for the
+      // rest of the session. Endpoints that require auth papered over it by
+      // 401-ing into a refresh; endpoints where auth is optional return 200 as
+      // anonymous instead, so they silently lost personalisation (hasVoted) and
+      // blocked-author filtering with no error anywhere.
+      if (session?.user) {
+        const user = this.mapSupabaseUserToAuthUser(session.user);
+        this.currentUser$.next(user);
+      }
+
+      if (session?.access_token) {
+        localStorage.setItem('civica_access_token', session.access_token);
+      }
+      if (session?.refresh_token) {
+        localStorage.setItem('civica_refresh_token', session.refresh_token);
       }
     });
 
@@ -77,6 +88,19 @@ export class SupabaseAuthService {
       if (session?.user && !error) {
         const user = this.mapSupabaseUserToAuthUser(session.user);
         this.currentUser$.next(user);
+
+        // getSession() renews the JWT if the stored one has expired, so mirror
+        // the result rather than waiting for the TOKEN_REFRESHED event. On a
+        // returning visit that event can land after the page has already issued
+        // its first API call, which would send the stale token and lose
+        // personalisation for that request. authReady$ gates on this method, so
+        // writing here means callers never read a token this check could renew.
+        if (session.access_token) {
+          localStorage.setItem('civica_access_token', session.access_token);
+        }
+        if (session.refresh_token) {
+          localStorage.setItem('civica_refresh_token', session.refresh_token);
+        }
       }
     } catch (error) {
       console.error('Error checking existing session:', error);

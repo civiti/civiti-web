@@ -37,15 +37,58 @@ describe('AuthInterceptor Security Tests', () => {
     httpTestingController.verify();
   });
 
-  describe('Public Endpoint Access', () => {
+  describe('Auth-Optional Endpoint Access', () => {
     it('should allow GET /api/issues without authentication', () => {
       authService.getAccessToken.and.returnValue(null);
-      
+
       httpClient.get('https://api.civica.ro/api/issues').subscribe();
-      
+
       const req = httpTestingController.expectOne('https://api.civica.ro/api/issues');
       expect(req.request.headers.has('Authorization')).toBeFalse();
       req.flush([]);
+    });
+
+    // Regression guard. These endpoints do not REQUIRE auth, but the backend
+    // reads the JWT when present to populate hasVoted and to filter out issues
+    // by blocked authors. Skipping the header here silently downgrades signed-in
+    // users to an anonymous response — a 200, so nothing anywhere reports it.
+    it('should ATTACH the token to GET /api/issues when the user is signed in', () => {
+      authService.getAccessToken.and.returnValue('test-token');
+
+      httpClient.get('https://api.civica.ro/api/issues').subscribe();
+
+      const req = httpTestingController.expectOne('https://api.civica.ro/api/issues');
+      expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
+      req.flush([]);
+    });
+
+    it('should ATTACH the token to GET /api/issues/{id} when the user is signed in', () => {
+      authService.getAccessToken.and.returnValue('test-token');
+
+      httpClient.get('https://api.civica.ro/api/issues/123').subscribe();
+
+      const req = httpTestingController.expectOne('https://api.civica.ro/api/issues/123');
+      expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
+      req.flush({});
+    });
+
+    // A 401 from an endpoint where auth is optional must not end the session:
+    // the response is servable anonymously, so signing the user out over it
+    // would be a self-inflicted logout.
+    it('should NOT sign the user out when an auth-optional endpoint returns 401', () => {
+      authService.getAccessToken.and.returnValue('test-token');
+
+      httpClient.get('https://api.civica.ro/api/issues').subscribe({
+        next: () => fail('expected the 401 to surface as an error'),
+        error: (error) => expect(error.status).toBe(401)
+      });
+
+      httpTestingController
+        .expectOne('https://api.civica.ro/api/issues')
+        .flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
+
+      expect(authService.refreshToken).not.toHaveBeenCalled();
+      expect(authService.signOut).not.toHaveBeenCalled();
     });
 
     it('should allow GET /api/issues/{id} without authentication', () => {
