@@ -8,6 +8,11 @@ dotenv.config();
 // Get the API key from environment (try both new and old names for compatibility)
 const googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY || '';
 
+// Get the Cloud-based map style ID (required by AdvancedMarkerElement).
+// Not a secret - it ships in the client bundle, same as the API key.
+// Optional: when unset the map falls back to default styling, so never fail the build.
+const googleMapsMapId = process.env.GOOGLE_MAPS_MAP_ID || '';
+
 console.log('Pre-build API key injection...');
 console.log('Is Vercel environment:', process.env.VERCEL ? 'YES' : 'NO');
 
@@ -19,6 +24,12 @@ if (!googleMapsApiKey) {
 }
 
 console.log('API key found (length):', googleMapsApiKey.length);
+
+if (googleMapsMapId) {
+  console.log('Map ID found:', googleMapsMapId);
+} else {
+  console.warn('Warning: GOOGLE_MAPS_MAP_ID is not set - advanced markers will be unavailable');
+}
 
 // Update the TypeScript config file BEFORE build
 const configDir = path.join(__dirname, '../src/environments');
@@ -33,7 +44,8 @@ if (!fs.existsSync(configDir)) {
 console.log('Updating google-maps-config.ts...');
 const configContent = `// This file is auto-generated during build
 export const googleMapsConfig = {
-  apiKey: ${JSON.stringify(googleMapsApiKey)}
+  apiKey: ${JSON.stringify(googleMapsApiKey)},
+  mapId: ${JSON.stringify(googleMapsMapId)}
 };`;
 fs.writeFileSync(configPath, configContent, 'utf8');
 console.log('✓ Updated config file');

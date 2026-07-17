@@ -14,16 +14,25 @@ if (result.error) {
   console.log('Environment variables found:', keys);
 }
 
-// Get the Google Maps API key from environment variable (try both new and old names for compatibility)
-let googleMapsApiKey = process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY || '';
+// Remove quotes if they exist (in case someone wrapped the value in quotes)
+function stripWrappingQuotes(value) {
+  if (value.startsWith('"') && value.endsWith('"')) {
+    value = value.slice(1, -1);
+  }
+  if (value.startsWith("'") && value.endsWith("'")) {
+    value = value.slice(1, -1);
+  }
+  return value;
+}
 
-// Remove quotes if they exist (in case someone wrapped the key in quotes)
-if (googleMapsApiKey.startsWith('"') && googleMapsApiKey.endsWith('"')) {
-  googleMapsApiKey = googleMapsApiKey.slice(1, -1);
-}
-if (googleMapsApiKey.startsWith("'") && googleMapsApiKey.endsWith("'")) {
-  googleMapsApiKey = googleMapsApiKey.slice(1, -1);
-}
+// Get the Google Maps API key from environment variable (try both new and old names for compatibility)
+const googleMapsApiKey = stripWrappingQuotes(
+  process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY || ''
+);
+
+// Cloud-based map style ID (required by AdvancedMarkerElement).
+// Optional - when unset the map falls back to default styling, so never fail here.
+const googleMapsMapId = stripWrappingQuotes(process.env.GOOGLE_MAPS_MAP_ID || '');
 
 // Path to the source index.html
 const srcIndexPath = path.join(__dirname, '../src/index.html');
@@ -66,10 +75,15 @@ if (isDevelopment) {
   
   const configContent = `// This file is auto-generated - DO NOT COMMIT
 export const googleMapsConfig = {
-  apiKey: ${JSON.stringify(googleMapsApiKey)}
+  apiKey: ${JSON.stringify(googleMapsApiKey)},
+  mapId: ${JSON.stringify(googleMapsMapId)}
 };`;
   fs.writeFileSync(configPath, configContent, 'utf8');
   console.log('✓ Updated google-maps-config.ts for development');
+
+  if (!googleMapsMapId) {
+    console.warn('Warning: GOOGLE_MAPS_MAP_ID is not set - advanced markers will be unavailable');
+  }
   
   // Also update HTML as before
   let srcContent = fs.readFileSync(srcIndexPath, 'utf8');
@@ -137,7 +151,8 @@ export const googleMapsConfig = {
   
   const configContent = `// This file will be replaced during build
 export const googleMapsConfig = {
-  apiKey: ${JSON.stringify('YOUR_DEVELOPMENT_API_KEY')}
+  apiKey: ${JSON.stringify('YOUR_DEVELOPMENT_API_KEY')},
+  mapId: ${JSON.stringify('')}
 };`;
   fs.writeFileSync(configPath, configContent, 'utf8');
   console.log('✓ Placeholder restored in google-maps-config.ts');

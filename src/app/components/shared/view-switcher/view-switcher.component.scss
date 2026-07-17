@@ -1,0 +1,104 @@
+// Distance from the track's border to the thumb/options. The thumb geometry is
+// derived from this, so keep the two in sync via the variable.
+$track-inset: 4px;
+
+:host {
+  display: block;
+}
+
+// Segmented control track.
+// It sits inside the white .issues-control-panel, so the track is --platinum
+// (an inset "well") and the active thumb is --oxford-blue with white text —
+// the same language as .official-badge / .btn-secondary. --orange-web is kept
+// for CTAs and urgency, and would also fail contrast under white text.
+.view-switcher {
+  position: relative;
+  display: inline-grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0; // Load-bearing: the thumb math assumes two flush, equal halves
+  padding: $track-inset;
+  border: 1px solid var(--platinum);
+  border-radius: 10px;
+  background: var(--platinum);
+  font-family: var(--font-primary);
+}
+
+// Absolutely positioned, so it is not a grid item and never sizes the tracks.
+.view-switcher-thumb {
+  position: absolute;
+  top: $track-inset;
+  bottom: $track-inset;
+  left: $track-inset;
+  width: calc(50% - #{$track-inset});
+  border-radius: 7px;
+  background: var(--oxford-blue);
+  box-shadow: 0 1px 3px rgba(20, 33, 61, 0.24);
+  pointer-events: none;
+  // transform only — animating left/width would force layout every frame
+  transition: transform 0.2s ease;
+
+  &.is-harta {
+    transform: translateX(100%);
+  }
+}
+
+.view-switcher-option {
+  position: relative; // Paint above the thumb
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  min-height: 44px; // Comfortable touch target
+  padding: 0 1rem;
+  border: none;
+  border-radius: 7px;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: var(--text-sm);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wide);
+  color: var(--oxford-blue);
+  opacity: 0.7;
+  transition: color 0.2s ease, opacity 0.2s ease;
+
+  span[nz-icon] {
+    font-size: 1rem;
+    line-height: 1;
+  }
+
+  &:hover {
+    opacity: 1;
+  }
+
+  &.is-active {
+    color: var(--white);
+    opacity: 1;
+    cursor: default;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--oxford-blue);
+    outline-offset: 2px;
+    // The white spacer fills the outline offset, so the ring keeps >= 3:1
+    // (WCAG 1.4.11) even where it overlaps the --oxford-blue thumb next to it.
+    box-shadow: 0 0 0 2px var(--white);
+    opacity: 1;
+  }
+}
+
+// Full width on mobile: two equal halves the thumb still tracks exactly.
+@media (max-width: 768px) {
+  .view-switcher {
+    display: grid;
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .view-switcher-thumb,
+  .view-switcher-option {
+    transition: none;
+  }
+}

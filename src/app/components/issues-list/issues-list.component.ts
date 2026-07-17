@@ -1,6 +1,6 @@
-import { Component, inject, OnInit, DestroyRef, PLATFORM_ID } from '@angular/core';
+import { Component, inject, OnInit, DestroyRef, PLATFORM_ID, signal, computed, afterNextRender } from '@angular/core';
 import { Router, ActivatedRoute } from '@angular/router';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule, isPlatformBrowser, Location } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -30,6 +30,8 @@ import { BUCHAREST_LOCATION_BIAS } from '../../types/location.types';
 import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
 import { IsUrgentPipe } from '../../pipes/urgency.pipe';
 import { DaysSincePipe } from '../../pipes/date.pipe';
+import { ViewSwitcherComponent, ViewMode } from '../shared/view-switcher/view-switcher.component';
+import { IssuesMapComponent } from '../issues-map/issues-map.component';
 
 @Component({
   selector: 'app-issues-list',
@@ -54,6 +56,8 @@ import { DaysSincePipe } from '../../pipes/date.pipe';
     StatusColorPipe,
     IsUrgentPipe,
     DaysSincePipe,
+    ViewSwitcherComponent,
+    IssuesMapComponent,
   ],
   templateUrl: './issues-list.component.html',
   styleUrl: './issues-list.component.scss'
@@ -62,6 +66,7 @@ export class IssuesListComponent implements OnInit {
   private _router = inject(Router);
   private _route = inject(ActivatedRoute);
   private _store = inject(Store<AppState>);
+  private _location = inject(Location);
   private _modal = inject(NzModalService);
   private _platformId = inject(PLATFORM_ID);
   private _categoryService = inject(CategoryService);
@@ -109,8 +114,22 @@ export class IssuesListComponent implements OnInit {
   private _autocompleteService: google.maps.places.AutocompleteService | null = null;
   private _placesService: google.maps.places.PlacesService | null = null;
 
-  // City from location store
+  // City from location store. A signal as well as a field, because the map
+  // component takes it as a signal input.
   private _currentCity: string = DEFAULT_CITY;
+  readonly currentCity = signal<string>(DEFAULT_CITY);
+
+  /**
+   * Which stage the page is showing.
+   *
+   * MUST initialise to 'lista' and stay there for the first change-detection
+   * pass: the server always renders the list, so starting anywhere else makes
+   * the client's first pass disagree with the SSR'd DOM and Angular tears down
+   * the whole tree (NG0500). `?view=harta` is therefore applied in
+   * afterNextRender(), one frame later — see _applyViewFromUrl().
+   */
+  readonly viewMode = signal<ViewMode>('lista');
+  readonly isMapView = computed(() => this.viewMode() === 'harta');
 
   constructor() {
     this.issues$ = this._store.select(IssueSelectors.selectSortedIssues);
@@ -129,6 +148,12 @@ export class IssuesListComponent implements OnInit {
           this.sortBy = sortBy;
         }
       });
+
+    // Deliberately after the first render, never in ngOnInit: reading ?view=harta
+    // any earlier would set viewMode before hydration finishes and break the
+    // SSR/client DOM match. The cost is that a shared ?view=harta link shows the
+    // list for one frame before swapping.
+    afterNextRender(() => this._applyViewFromUrl());
   }
 
   ngOnInit(): void {
@@ -144,6 +169,7 @@ export class IssuesListComponent implements OnInit {
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe(city => {
         this._currentCity = city || DEFAULT_CITY;
+        this.currentCity.set(this._currentCity);
       });
 
     // Setup address search debounce
@@ -231,6 +257,46 @@ export class IssuesListComponent implements OnInit {
           }
         }));
       });
+  }
+
+  /** Read ?view=harta once, after hydration. */
+  private _applyViewFromUrl(): void {
+    const view = this._route.snapshot.queryParamMap.get('view');
+    if (view === 'harta') {
+      this.viewMode.set('harta');
+    }
+  }
+
+  /**
+   * Mirror the view mode into the URL so it can be shared and survives a reload.
+   *
+   * Location.replaceState() rather than router.navigate(): the Router reacts to
+   * a query-param change with a real navigation, which scrolls the page back to
+   * the top on every toggle. replaceState writes no history entry either, so
+   * Back leaves the page instead of un-toggling the view — correct, because a
+   * view mode is a preference, not a destination.
+   */
+  onViewModeChange(mode: ViewMode): void {
+    this.viewMode.set(mode);
+
+    const tree = this._router.createUrlTree([], {
+      relativeTo: this._route,
+      queryParams: { view: mode === 'harta' ? 'harta' : null },
+      queryParamsHandling: 'merge'
+    });
+    this._location.replaceState(this._router.serializeUrl(tree));
+  }
+
+  /** Map card primary action — jump to the issue's email campaign. */
+  onMapSendEmail(issue: IssueItem): void {
+    this._store.dispatch(IssueActions.selectIssue({ id: issue.id }));
+    this._router.navigate(['/issue', issue.id], { queryParams: { action: 'email' } });
+  }
+
+  /** Map asked to narrow the page to a sector. */
+  onMapFilterByDistrict(district: string): void {
+    this.selectedDistrict = district;
+    this.updateFiltersInUrl();
   }
 
   onPageChange(page: number): void {

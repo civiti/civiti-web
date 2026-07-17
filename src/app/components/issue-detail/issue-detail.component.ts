@@ -240,7 +240,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             this.initializeGoogleMaps().then(() => {
                 this.isMapLoaded = true;
 
-                // Get issue data and geocode address
+                // Get issue data and position the map on it
                 // Use filter to wait for non-null issue before taking the first value
                 this.issue$.pipe(
                     filter(issue => !!issue),
@@ -252,7 +252,19 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                         ...this.markerOptions,
                         title: issue.title
                     };
-                    // Geocode the address
+
+                    // Prefer the coordinates the backend already stores on the issue.
+                    // Geocoding the address instead spends a Google round-trip - fronted
+                    // by a retry loop with up to ~5s of exponential backoff - rediscovering
+                    // data that already arrived in the issue payload. That is dead latency
+                    // on every single detail view, and the map cannot settle until it
+                    // resolves. Geocoding stays as the fallback for issues that never had
+                    // coordinates set.
+                    if (this.hasValidCoordinates(issue)) {
+                        this.applyCoordinates(issue.latitude, issue.longitude);
+                        return;
+                    }
+
                     this.geocodeAddress(issue.address);
                 });
             }).catch(error => {
@@ -532,6 +544,56 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         });
     }
 
+    /**
+     * Whether the issue carries coordinates we can actually put a pin on.
+     *
+     * Latitude/longitude are non-nullable doubles server-side, so an issue whose
+     * coordinates were never set does not arrive as null - it arrives as 0. Zero is
+     * therefore a sentinel meaning "unset", not a measurement: (0, 0) is Null Island,
+     * ~500km off the coast of Ghana, and rendering it would both drop a pin in the
+     * Gulf of Guinea and drag the map centre into the Atlantic. No Civiti issue has a
+     * legitimate 0 in either component (Romania spans roughly lat 43-48, lng 20-30),
+     * so rejecting a zero on either axis costs us nothing real.
+     */
+    private hasValidCoordinates(issue: IssueDetailResponse): boolean {
+        return this.isValidCoordinate(issue.latitude) && this.isValidCoordinate(issue.longitude);
+    }
+
+    private isValidCoordinate(value: number): boolean {
+        return Number.isFinite(value) && value !== 0;
+    }
+
+    /**
+     * Point the map and the marker at a position we trust. Both the stored-coordinate
+     * path and the geocoded fallback funnel through here so they behave identically.
+     */
+    private applyCoordinates(lat: number, lng: number): void {
+        this.mapCenter = { lat, lng };
+        this.markerPosition = { lat, lng };
+
+        // Change detection is forced only in the browser. During SSR these are plain
+        // fields read by the render pass once the app stabilises, and forcing CD from
+        // this promise callback risks checking a view that is still being created.
+        if (isPlatformBrowser(this._platformId)) {
+            this._cdr.detectChanges();
+        }
+    }
+
+    /**
+     * The issue has no stored coordinates and the address could not be geocoded, so we
+     * genuinely do not know where it is. Show the map error state instead of leaving the
+     * marker on the default Bucharest centre - a map that confidently points at the wrong
+     * place reads as fact to the user and is worse than no map at all.
+     */
+    private handleLocationUnavailable(reason: string): void {
+        console.error(`Unable to position the issue map: ${reason}`);
+        this.mapLoadError = true;
+
+        if (isPlatformBrowser(this._platformId)) {
+            this._cdr.detectChanges();
+        }
+    }
+
     private geocodeAddress(address: string): void {
         if (!isPlatformBrowser(this._platformId) || !address) {
             return;
@@ -547,12 +609,10 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             this._geocodeRetryCount++;
             
             if (this._geocodeRetryCount >= this._maxGeocodeRetries) {
-                console.error(`Google Maps API failed to load after ${this._maxGeocodeRetries} attempts`);
-                // Fall back to default coordinates if available
-                this.fallbackToDefaultCoordinates();
+                this.handleLocationUnavailable(`Google Maps API failed to load after ${this._maxGeocodeRetries} attempts`);
                 return;
             }
-            
+
             console.warn(`Google Maps API not yet loaded, retrying... (attempt ${this._geocodeRetryCount}/${this._maxGeocodeRetries})`);
             // Retry after a delay with exponential backoff
             const delay = Math.min(500 * Math.pow(1.5, this._geocodeRetryCount - 1), 5000);
@@ -580,39 +640,17 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             geocoder.geocode({ address: address }, (results, status) => {
                 if (status === 'OK' && results && results[0]) {
                     const location = results[0].geometry.location;
-                    this.mapCenter = {
-                        lat: location.lat(),
-                        lng: location.lng()
-                    };
-                    this.markerPosition = {
-                        lat: location.lat(),
-                        lng: location.lng()
-                    };
                     // Mark this address as geocoded
                     this._geocodedAddress = address;
+                    this.applyCoordinates(location.lat(), location.lng());
                     console.log(`Geocoded address "${address}" to:`, this.mapCenter);
-                    console.log('Marker position updated to:', this.markerPosition);
-                    
-                    // Force change detection
-                    this._cdr.detectChanges();
-                    
+
                     // Info window will open on marker click instead of automatically
                 } else {
+                    // We only reach the geocoder when the issue carries no usable
+                    // coordinates, so there is nothing left to fall back to.
                     const errorMessage = this.getGeocodeErrorMessage(status);
-                    console.error('Geocode was not successful:', errorMessage);
-                    
-                    // Fall back to coordinates if available - use filter and take(1) to prevent multiple subscriptions
-                    this.issue$.pipe(
-                        filter(issue => !!issue),
-                        take(1),
-                        takeUntilDestroyed(this._destroyRef)
-                    ).subscribe(issue => {
-                        if (issue.latitude && issue.longitude) {
-                            this.mapCenter = { lat: issue.latitude, lng: issue.longitude };
-                            this.markerPosition = { lat: issue.latitude, lng: issue.longitude };
-                            this._cdr.detectChanges();
-                        }
-                    });
+                    this.handleLocationUnavailable(`geocoding "${address}" failed - ${errorMessage}`);
                 }
             });
         } catch (error) {
@@ -620,8 +658,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             this._geocodeRetryCount++;
             
             if (this._geocodeRetryCount >= this._maxGeocodeRetries) {
-                console.error('Max retry attempts reached for geocoding');
-                this.fallbackToDefaultCoordinates();
+                this.handleLocationUnavailable('max retry attempts reached while initializing the geocoder');
                 return;
             }
             
@@ -667,25 +704,6 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         }
     }
     
-    private fallbackToDefaultCoordinates(): void {
-        // Try to use coordinates from the issue if available
-        this.issue$.pipe(
-            filter(issue => !!issue),
-            take(1),
-            takeUntilDestroyed(this._destroyRef)
-        ).subscribe(issue => {
-            if (issue.latitude && issue.longitude) {
-                this.mapCenter = { lat: issue.latitude, lng: issue.longitude };
-                this.markerPosition = { lat: issue.latitude, lng: issue.longitude };
-                console.log('Using fallback coordinates from issue data');
-            } else {
-                // Use default Bucharest coordinates as last resort
-                console.log('Using default Bucharest coordinates');
-            }
-            this._cdr.detectChanges();
-        });
-    }
-
     // Social sharing methods
     private getIssueUrl(issue: IssueDetailResponse): string {
         if (!isPlatformBrowser(this._platformId)) {
