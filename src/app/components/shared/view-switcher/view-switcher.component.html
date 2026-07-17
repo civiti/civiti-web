@@ -1,0 +1,36 @@
+<!--
+  Toggle-button group (ARIA APG): both buttons stay in the tab order and are
+  activated with Enter/Space natively. Deliberately no arrow-key handling — that
+  belongs to a radiogroup with roving tabindex, and binding arrows here would
+  hijack page scrolling on a control whose markup promises no such behaviour.
+-->
+<div
+  class="view-switcher"
+  role="group"
+  aria-label="Mod de vizualizare"
+>
+  <!-- Sliding thumb, painted behind the options -->
+  <span class="view-switcher-thumb" [class.is-harta]="isHarta()" aria-hidden="true"></span>
+
+  <button
+    type="button"
+    class="view-switcher-option"
+    [class.is-active]="isLista()"
+    [attr.aria-pressed]="isLista()"
+    (click)="select('lista')"
+  >
+    <span nz-icon nzType="unordered-list" aria-hidden="true"></span>
+    <span class="option-label">Listă</span>
+  </button>
+
+  <button
+    type="button"
+    class="view-switcher-option"
+    [class.is-active]="isHarta()"
+    [attr.aria-pressed]="isHarta()"
+    (click)="select('harta')"
+  >
+    <span nz-icon nzType="environment" aria-hidden="true"></span>
+    <span class="option-label">Hartă</span>
+  </button>
+</div>

@@ -1,0 +1,152 @@
+<div class="issues-map__frame">
+  <!--
+    The Google map paints into a div created imperatively and re-adopted across
+    view toggles (see the BILLING INVARIANT in the .ts). This host is rendered
+    unconditionally and never behind @if: fitBounds reads a hidden or missing
+    canvas as 0x0 and then silently does nothing.
+  -->
+  <div #canvasHost class="issues-map__canvas-host"></div>
+
+  @switch (mapState()) {
+    @case ('no-map-id') {
+      <div class="issues-map__state issues-map__state--blocking" role="status">
+        <i nz-icon nzType="info-circle" nzTheme="outline" class="issues-map__state-icon"></i>
+        <p class="issues-map__state-title">Harta nu este configurată</p>
+        <p class="issues-map__state-text">
+          Lipsește identificatorul hărții (Map ID), așa că problemele nu pot fi afișate pe hartă.
+          Între timp le poți vedea în lista de probleme.
+        </p>
+      </div>
+    }
+
+    @case ('unavailable') {
+      <div class="issues-map__state issues-map__state--blocking" role="alert">
+        <i nz-icon nzType="warning" nzTheme="outline" class="issues-map__state-icon"></i>
+        <p class="issues-map__state-title">Harta nu a putut fi încărcată</p>
+        <p class="issues-map__state-text">
+          Verifică conexiunea la internet și încearcă din nou.
+        </p>
+        <button nz-button nzType="primary" (click)="retry()">
+          <i nz-icon nzType="reload" nzTheme="outline"></i>
+          <span>Încearcă din nou</span>
+        </button>
+      </div>
+    }
+
+    @default {
+      @if (isBusy()) {
+        <div class="issues-map__state issues-map__state--overlay" role="status">
+          <nz-spin nzSimple nzSize="large"></nz-spin>
+          <p class="issues-map__state-text">Se încarcă problemele pe hartă…</p>
+        </div>
+      } @else if (issuesError()) {
+        <div class="issues-map__state issues-map__state--overlay" role="alert">
+          <i nz-icon nzType="warning" nzTheme="outline" class="issues-map__state-icon"></i>
+          <p class="issues-map__state-title">{{ issuesError() }}</p>
+          <button nz-button nzType="primary" (click)="retry()">
+            <i nz-icon nzType="reload" nzTheme="outline"></i>
+            <span>Încearcă din nou</span>
+          </button>
+        </div>
+      } @else if (isEmpty()) {
+        <div class="issues-map__state issues-map__state--overlay" role="status">
+          <i nz-icon nzType="environment" nzTheme="outline" class="issues-map__state-icon"></i>
+          <p class="issues-map__state-title">Nicio problemă pe hartă</p>
+          <p class="issues-map__state-text">
+            Niciun rezultat pentru filtrele alese, sau problemele găsite nu au o locație pe hartă.
+            Încearcă să schimbi filtrele.
+          </p>
+        </div>
+      }
+    }
+  }
+
+  <!--
+    Our own card, not map-info-window: Google's InfoWindow cannot be styled to
+    the design system, and the primary action here is the whole point of the
+    platform. Anchored to the top of the map so it never covers Google's logo
+    (bottom-left) or its attribution and ToS links (bottom-right).
+  -->
+  @if (selectedIssue(); as issue) {
+    <article class="issues-map__card" aria-live="polite">
+      <header class="issues-map__card-head">
+        <div class="issues-map__card-tags">
+          <nz-tag [nzColor]="issue.status | statusColor">{{ issue.status | statusText }}</nz-tag>
+          @if (issue.urgency | isUrgent) {
+            <nz-tag nzColor="error">URGENT</nz-tag>
+          }
+        </div>
+
+        <button
+          nz-button
+          nzType="text"
+          nzSize="small"
+          class="issues-map__card-close"
+          aria-label="Închide detaliile problemei"
+          (click)="closeCard()"
+        >
+          <i nz-icon nzType="close-circle" nzTheme="outline"></i>
+        </button>
+      </header>
+
+      <h3 class="issues-map__card-title">{{ issue.title }}</h3>
+
+      <p class="issues-map__card-meta">
+        <i nz-icon nzType="environment" nzTheme="outline"></i>
+        <span class="issues-map__card-sector">{{ issue.district || issue.city }}</span>
+        @if (issue.address) {
+          <span class="issues-map__card-address">· {{ issue.address }}</span>
+        }
+      </p>
+
+      <ul class="issues-map__card-stats">
+        <li class="issues-map__stat">
+          <i nz-icon nzType="mail" nzTheme="outline"></i>
+          <span class="issues-map__stat-value">{{ issue.emailsSent }}</span>
+          <span class="issues-map__stat-label">emailuri</span>
+        </li>
+        <li class="issues-map__stat">
+          <i nz-icon nzType="like" nzTheme="outline"></i>
+          <span class="issues-map__stat-value">{{ issue.communityVotes }}</span>
+          <span class="issues-map__stat-label">voturi</span>
+        </li>
+        <li class="issues-map__stat">
+          <i nz-icon nzType="calendar" nzTheme="outline"></i>
+          <span class="issues-map__stat-value">{{ issue.createdAt | daysSince }}</span>
+          <span class="issues-map__stat-label">zile</span>
+        </li>
+      </ul>
+
+      <div class="issues-map__card-actions">
+        <button
+          nz-button
+          nzType="primary"
+          nzBlock
+          class="issues-map__card-primary"
+          (click)="requestEmail(issue)"
+        >
+          <i nz-icon nzType="mail" nzTheme="outline"></i>
+          <span>Trimite email</span>
+        </button>
+
+        <button nz-button nzBlock (click)="requestView(issue)">
+          <i nz-icon nzType="eye" nzTheme="outline"></i>
+          <span>Vezi problema</span>
+        </button>
+      </div>
+
+      @if (issue.district; as district) {
+        <button
+          nz-button
+          nzType="link"
+          nzSize="small"
+          class="issues-map__card-district"
+          (click)="requestDistrictFilter(district)"
+        >
+          <i nz-icon nzType="filter" nzTheme="outline"></i>
+          <span>Vezi toate problemele din {{ district }}</span>
+        </button>
+      }
+    </article>
+  }
+</div>

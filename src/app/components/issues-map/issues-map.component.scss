@@ -1,0 +1,395 @@
+// Issues map — pins for every issue matching the list's filters.
+//
+// This component uses ViewEncapsulation.None (see the .ts for why: the pins are
+// DOM we hand to Google, which re-parents it into its own overlay panes), so
+// these rules are global. Scoping is by naming convention instead: every
+// selector and keyframe below carries the `issues-map` BEM prefix, so nothing
+// here can match another component's markup. Keep it that way — a bare element
+// or utility selector in this file would leak across the whole app.
+
+.issues-map {
+  display: block;
+  font-family: var(--font-primary);
+
+  // ============================================
+  // Frame + canvas
+  // ============================================
+
+  &__frame {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    border: 1px solid var(--platinum);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    background: var(--platinum);
+
+    // svh, not dvh: dvh re-resolves as mobile browser chrome hides on scroll,
+    // which would reflow the map (and re-fit it) mid-gesture.
+    height: clamp(360px, 100svh - 18rem, 520px);
+
+    @media (min-width: 768px) {
+      height: clamp(460px, 100svh - 13rem, 760px);
+    }
+  }
+
+  &__canvas-host,
+  &__canvas {
+    width: 100%;
+    height: 100%;
+  }
+
+  // ============================================
+  // Pins (built in the .ts, styled only here)
+  // ============================================
+
+  &__pin {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    // The pin points at its coordinate: shift it up by half its height plus the
+    // tip so the tip, not the centre, sits on the position.
+    transform: translateY(-0.4rem);
+    cursor: pointer;
+    animation: issues-map-pin-in 220ms ease-out both;
+  }
+
+  &__pin-body {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: var(--white);
+    border: 2px solid var(--oxford-blue);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+    transition: transform 160ms ease-out, border-color 160ms ease-out;
+  }
+
+  &__pin-glyph {
+    font-size: 1rem;
+    line-height: 1;
+    // Emoji glyphs render on their own colour ramp; keep them from inheriting
+    // any of the map's text styling.
+    font-family: var(--font-primary);
+    user-select: none;
+  }
+
+  // The little triangle that anchors the circle to the coordinate.
+  &__pin-tip {
+    position: absolute;
+    bottom: -0.3rem;
+    left: 50%;
+    z-index: 0;
+    width: 0.55rem;
+    height: 0.55rem;
+    background: var(--oxford-blue);
+    transform: translateX(-50%) rotate(45deg);
+    border-radius: 0 0 2px 0;
+    transition: background-color 160ms ease-out;
+  }
+
+  // The urgency pulse. Sits behind the body and is invisible unless urgent.
+  &__pin-halo {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    border-radius: 50%;
+    background: var(--orange-web);
+    opacity: 0;
+  }
+
+  &__pin:hover &__pin-body,
+  &__pin:focus-visible &__pin-body {
+    transform: scale(1.12);
+  }
+
+  &__pin--resolved &__pin-body {
+    border-color: var(--color-success);
+  }
+
+  &__pin--resolved &__pin-tip {
+    background: var(--color-success);
+  }
+
+  &__pin--urgent &__pin-body {
+    border-color: var(--orange-web);
+  }
+
+  &__pin--urgent &__pin-tip {
+    background: var(--orange-web);
+  }
+
+  &__pin--urgent &__pin-halo {
+    animation: issues-map-pulse 2.2s ease-out infinite;
+  }
+
+  &__pin--selected {
+    z-index: 3;
+  }
+
+  &__pin--selected &__pin-body {
+    transform: scale(1.2);
+    border-color: var(--oxford-blue);
+    box-shadow: 0 0 0 4px var(--orange-web-20), 0 4px 10px rgba(0, 0, 0, 0.35);
+  }
+
+  // ============================================
+  // Loading / error / empty states
+  // ============================================
+
+  &__state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    text-align: center;
+    color: var(--color-text);
+  }
+
+  // Nothing usable underneath — cover the whole frame.
+  &__state--blocking {
+    position: absolute;
+    inset: 0;
+    z-index: 4;
+    background: var(--platinum);
+  }
+
+  // The map is fine, the data is not — keep the tiles faintly visible.
+  &__state--overlay {
+    position: absolute;
+    // Clear of the bottom strip: Google's logo (bottom-left) and its
+    // attribution / ToS links (bottom-right) must never be covered.
+    inset: 0 0 3rem 0;
+    z-index: 4;
+    background: rgba(229, 229, 229, 0.88);
+  }
+
+  &__state-icon {
+    font-size: var(--text-3xl);
+    color: var(--oxford-blue);
+    opacity: 0.55;
+  }
+
+  &__state-title {
+    margin: 0;
+    font-size: var(--text-base);
+    font-weight: 600;
+    color: var(--oxford-blue);
+  }
+
+  &__state-text {
+    margin: 0;
+    max-width: 28rem;
+    font-size: var(--text-sm);
+    color: var(--color-text-muted);
+  }
+
+  // ============================================
+  // Detail card
+  // ============================================
+
+  &__card {
+    position: absolute;
+    // Top-anchored on purpose: the whole bottom strip belongs to Google's logo,
+    // attribution and ToS links, and the zoom control.
+    top: 0.75rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    z-index: 5;
+    padding: 0.875rem 1rem 1rem;
+    border-radius: 8px;
+    background: var(--white);
+    border: 1px solid var(--platinum);
+    box-shadow: 0 6px 20px rgba(20, 33, 61, 0.22);
+    animation: issues-map-card-in 180ms ease-out both;
+
+    @media (min-width: 768px) {
+      right: auto;
+      width: 22rem;
+      left: 1rem;
+      top: 1rem;
+    }
+  }
+
+  &__card-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  &__card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+  }
+
+  button.issues-map__card-close.ant-btn {
+    flex: none;
+    color: var(--color-text-muted);
+
+    &:hover {
+      color: var(--oxford-blue);
+    }
+  }
+
+  &__card-title {
+    margin: 0.5rem 0 0.25rem;
+    font-size: var(--text-base);
+    font-weight: 600;
+    line-height: 1.35;
+    color: var(--oxford-blue);
+    // Long titles must not push the actions off the map.
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  &__card-meta {
+    display: flex;
+    align-items: baseline;
+    gap: 0.35rem;
+    margin: 0 0 0.75rem;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  &__card-sector {
+    font-weight: 500;
+    color: var(--oxford-blue);
+    white-space: nowrap;
+  }
+
+  &__card-address {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  &__card-stats {
+    display: flex;
+    gap: 1rem;
+    margin: 0 0 0.875rem;
+    padding: 0.5rem 0;
+    list-style: none;
+    border-top: 1px solid var(--platinum);
+    border-bottom: 1px solid var(--platinum);
+  }
+
+  &__stat {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: var(--text-xs);
+    color: var(--color-text-muted);
+  }
+
+  &__stat-value {
+    font-weight: 600;
+    color: var(--oxford-blue);
+  }
+
+  &__card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  // The platform's only real metric — make it unmistakably the primary action.
+  button.issues-map__card-primary.ant-btn {
+    font-weight: 600;
+  }
+
+  button.issues-map__card-district.ant-btn {
+    margin-top: 0.5rem;
+    padding-left: 0;
+    font-size: var(--text-xs);
+  }
+}
+
+// ============================================
+// Animations
+// ============================================
+
+@keyframes issues-map-pin-in {
+  from {
+    opacity: 0;
+    transform: translateY(-1.1rem) scale(0.6);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(-0.4rem) scale(1);
+  }
+}
+
+@keyframes issues-map-pulse {
+  0% {
+    opacity: 0.55;
+    transform: scale(1);
+  }
+
+  70% {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(2.1);
+  }
+}
+
+@keyframes issues-map-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.5rem);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// Reduced motion
+// ============================================
+//
+// Entrance animations, the urgency pulse and the card transition are all off.
+// The camera's fly-to easing is handled in the .ts (moveCamera / setCenter
+// instead of fitBounds / panTo) — fitBounds has no animation opt-out.
+
+@media (prefers-reduced-motion: reduce) {
+  .issues-map {
+    &__pin {
+      animation: none;
+      transform: translateY(-0.4rem);
+    }
+
+    &__pin-body,
+    &__pin-tip {
+      transition: none;
+    }
+
+    // Urgency still has to read without motion: a steady ring instead of a pulse.
+    &__pin--urgent &__pin-halo {
+      animation: none;
+      opacity: 0.4;
+      transform: scale(1.45);
+    }
+
+    &__card {
+      animation: none;
+    }
+  }
+}

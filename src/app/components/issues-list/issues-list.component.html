@@ -2,7 +2,7 @@
   <div class="container mx-auto p-4 max-w-6xl">
     <!-- Issues Control Panel -->
     <div class="issues-control-panel">
-      <!-- Header Row: Title -->
+      <!-- Header Row: Title + view switcher -->
       <div class="control-panel-header">
         <div class="header-info">
           <h1 class="sr-only">Probleme Active</h1>
@@ -11,12 +11,13 @@
           </h2>
           @if (paginationInfo$ | async; as pagination) {
             <p class="text-oxford-blue opacity-75 text-sm">
-              @if (pagination.totalCount > 0) {
+              @if (isMapView()) {
+                <span>Toate cele {{ pagination.totalCount }} pe hartă</span>
+              } @else if (pagination.totalCount > 0) {
                 <span>
                   Se afișează {{ pagination.startItem }}-{{ pagination.endItem }} din {{ pagination.totalCount }}
                 </span>
-              }
-              @if (pagination.totalCount === 0) {
+              } @else {
                 <span>
                   Alege o problemă și ajută la rezolvarea ei
                 </span>
@@ -24,6 +25,9 @@
             </p>
           }
         </div>
+
+        <!-- Not [(mode)]: the change must also write the URL, so it is handled. -->
+        <app-view-switcher [mode]="viewMode()" (modeChange)="onViewModeChange($event)" />
       </div>
 
       <!-- Filters Row -->
@@ -143,8 +147,8 @@
       </div>
     </div>
 
-    <!-- Loading State -->
-    @if (isLoading$ | async) {
+    <!-- Loading State — the map renders its own -->
+    @if (!isMapView() && (isLoading$ | async)) {
       <div class="text-center py-12">
         <i nz-icon nzType="loading" nzTheme="outline" nzSpin class="text-oxford-blue text-4xl mb-4"></i>
         <p class="text-oxford-blue">Se încarcă problemele...</p>
@@ -152,7 +156,7 @@
     }
 
     <!-- Issues Grid -->
-    @if (!(isLoading$ | async)) {
+    @if (!isMapView() && !(isLoading$ | async)) {
       <nz-row [nzGutter]="[16, 16]">
         @for (issue of issues$ | async; track issue.id) {
           <nz-col [nzXs]="24" [nzMd]="12" [nzLg]="8">
@@ -241,8 +245,27 @@
       </nz-row>
     }
 
+    <!--
+      Map stage. @defer (when isMapView()) is the intent gate: every
+      `new google.maps.Map()` is a billable Dynamic Maps load, so the map must
+      never mount on arrival. The list above stays the server-rendered default —
+      it is the crawlable content on this SEO route.
+    -->
+    @defer (when isMapView()) {
+      <app-issues-map
+        [city]="currentCity()"
+        [district]="selectedDistrict"
+        [category]="selectedCategory"
+        [address]="addressFilter"
+        [status]="selectedStatus"
+        (sendEmail)="onMapSendEmail($event)"
+        (viewIssue)="viewIssueDetails($event.id)"
+        (filterByDistrict)="onMapFilterByDistrict($event)"
+      />
+    }
+
     <!-- Empty State -->
-    @if (!(isLoading$ | async) && ((issues$ | async)?.length || 0) === 0) {
+    @if (!isMapView() && !(isLoading$ | async) && ((issues$ | async)?.length || 0) === 0) {
       <div>
         <nz-empty
           nzNotFoundContent="Nu au fost găsite probleme"
@@ -256,8 +279,8 @@
       </div>
     }
 
-    <!-- Pagination Section -->
-    @if (!(isLoading$ | async) && (paginationInfo$ | async); as pagination) {
+    <!-- Pagination Section — hidden in map view, which already shows every match -->
+    @if (!isMapView() && !(isLoading$ | async) && (paginationInfo$ | async); as pagination) {
       <div class="pagination-container mt-8 mb-20">
         @if (pagination.totalPages > 1) {
           <div class="bg-white rounded-lg shadow-sm border border-platinum p-4">
