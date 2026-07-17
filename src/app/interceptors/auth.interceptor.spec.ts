@@ -275,6 +275,9 @@ describe('AuthInterceptor Security Tests', () => {
       expect(queued.outcome()).toEqual(
         jasmine.objectContaining({ status: 401 })
       );
+      // An empty token throws into the same catchError as a rejected refresh,
+      // so the session is torn down here too.
+      expect(authService.signOut).toHaveBeenCalled();
     });
 
     it('should release queued requests when the session is reset mid-refresh', () => {
