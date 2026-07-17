@@ -246,22 +246,30 @@
     }
 
     <!--
-      Map stage. @defer (when isMapView()) is the intent gate: every
-      `new google.maps.Map()` is a billable Dynamic Maps load, so the map must
-      never mount on arrival. The list above stays the server-rendered default —
-      it is the crawlable content on this SEO route.
+      Map stage. Two conditions, doing two different jobs:
+      - @defer (when isMapView()) is the intent gate and code-split point: the
+        chunk loads and `new google.maps.Map()` fires only on the first switch to
+        the map, never on arrival. The list stays the server-rendered default —
+        the crawlable content on this SEO route.
+      - @if (isMapView()) then mounts the component only while the map tab is
+        active. Without it the deferred block, once loaded, would linger in the
+        DOM below the list when the user toggles back — showing both at once.
+        Unmounting is cheap: the map instance is held at module scope and
+        re-adopted on the next switch, so toggling back never re-bills.
     -->
     @defer (when isMapView()) {
-      <app-issues-map
-        [city]="currentCity()"
-        [district]="selectedDistrict"
-        [category]="selectedCategory"
-        [address]="addressFilter"
-        [status]="selectedStatus"
-        (sendEmail)="onMapSendEmail($event)"
-        (viewIssue)="viewIssueDetails($event.id)"
-        (filterByDistrict)="onMapFilterByDistrict($event)"
-      />
+      @if (isMapView()) {
+        <app-issues-map
+          [city]="currentCity()"
+          [district]="selectedDistrict"
+          [category]="selectedCategory"
+          [address]="addressFilter"
+          [status]="selectedStatus"
+          (sendEmail)="onMapSendEmail($event)"
+          (viewIssue)="viewIssueDetails($event.id)"
+          (filterByDistrict)="onMapFilterByDistrict($event)"
+        />
+      }
     }
 
     <!-- Empty State -->

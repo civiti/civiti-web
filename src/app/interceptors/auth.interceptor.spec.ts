@@ -1,9 +1,10 @@
 import { TestBed } from '@angular/core/testing';
 import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
-import { authInterceptor } from './auth.interceptor';
+import { authInterceptor, resetTokenRefreshState } from './auth.interceptor';
 import { SupabaseAuthService } from '../services/supabase-auth.service';
 import { environment } from '../../environments/environment';
+import { Subject, of } from 'rxjs';
 
 describe('AuthInterceptor Security Tests', () => {
   let httpClient: HttpClient;
@@ -187,14 +188,105 @@ describe('AuthInterceptor Security Tests', () => {
 
     it('should handle malformed URLs safely', () => {
       authService.getAccessToken.and.returnValue('test-token');
-      
+
       // Relative URL that might cause parsing issues
       httpClient.get('/api/user/profile').subscribe();
-      
+
       const req = httpTestingController.expectOne('/api/user/profile');
       // Should still add auth since it doesn't match public endpoints
       expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
       req.flush({});
+    });
+  });
+
+  // The refresh queue keeps module-level state (isRefreshingToken and the
+  // outcome subject), so each test resets it or it inherits the previous one's.
+  describe('Token Refresh Queue', () => {
+    const PROFILE = 'https://api.civica.ro/api/user/profile';
+    const SETTINGS = 'https://api.civica.ro/api/user/settings';
+    let refresh$: Subject<string>;
+
+    beforeEach(() => {
+      resetTokenRefreshState();
+      refresh$ = new Subject<string>();
+      authService.getAccessToken.and.returnValue('stale-token');
+      authService.refreshToken.and.returnValue(refresh$);
+      authService.signOut.and.returnValue(of(undefined));
+    });
+
+    /** Drives a request to a 401, so it either starts or joins the refresh. */
+    function fire(url: string): { outcome: () => unknown } {
+      let outcome: unknown = 'PENDING';
+      httpClient.get(url).subscribe({
+        next: () => (outcome = 'SUCCESS'),
+        error: (error) => (outcome = error)
+      });
+      httpTestingController
+        .expectOne(url)
+        .flush('Unauthorized', { status: 401, statusText: 'Unauthorized' });
+      return { outcome: () => outcome };
+    }
+
+    it('should retry a queued request once the refresh succeeds', () => {
+      fire(PROFILE);   // starts the refresh
+      const queued = fire(SETTINGS); // queues behind it
+
+      expect(queued.outcome()).toBe('PENDING');
+
+      refresh$.next('fresh-token');
+      refresh$.complete();
+
+      const retries = httpTestingController.match(
+        (r) => r.headers.get('Authorization') === 'Bearer fresh-token'
+      );
+      expect(retries.length).toBe(2);
+      retries.forEach((r) => r.flush({}));
+
+      expect(queued.outcome()).toBe('SUCCESS');
+    });
+
+    // Regression guard. A failed refresh used to emit the same value that meant
+    // "still refreshing", which waiters filtered out — so they never settled and
+    // the request hung forever rather than surfacing an error.
+    it('should ERROR a queued request when the refresh fails, never hang', () => {
+      fire(PROFILE);
+      const queued = fire(SETTINGS);
+
+      expect(queued.outcome()).toBe('PENDING');
+
+      refresh$.error(new Error('refresh rejected'));
+
+      expect(queued.outcome()).not.toBe('PENDING');
+      expect(queued.outcome()).toEqual(
+        jasmine.objectContaining({ status: 401 })
+      );
+      expect(authService.signOut).toHaveBeenCalled();
+    });
+
+    // Same hang, reached the other way: a refresh that resolves without a token.
+    it('should ERROR a queued request when the refresh returns no token', () => {
+      fire(PROFILE);
+      const queued = fire(SETTINGS);
+
+      refresh$.next('');
+      refresh$.complete();
+
+      expect(queued.outcome()).not.toBe('PENDING');
+      expect(queued.outcome()).toEqual(
+        jasmine.objectContaining({ status: 401 })
+      );
+      // An empty token throws into the same catchError as a rejected refresh,
+      // so the session is torn down here too.
+      expect(authService.signOut).toHaveBeenCalled();
+    });
+
+    it('should release queued requests when the session is reset mid-refresh', () => {
+      fire(PROFILE);
+      const queued = fire(SETTINGS);
+
+      resetTokenRefreshState();
+
+      expect(queued.outcome()).not.toBe('PENDING');
     });
   });
 });

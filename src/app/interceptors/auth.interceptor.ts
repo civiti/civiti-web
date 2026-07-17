@@ -26,9 +26,34 @@ import { throwError, Observable, BehaviorSubject } from 'rxjs';
 import { SupabaseAuthService } from '../services/supabase-auth.service';
 import { environment } from '../../environments/environment';
 
+/**
+ * Outcome of the in-flight token refresh, broadcast to requests queued behind it.
+ *
+ * Modelled explicitly rather than as `string | null`, because `null` had to mean
+ * both "still refreshing" and "refresh failed". Waiters filtered `null` out to
+ * skip the former and so discarded the latter, leaving every queued request
+ * hanging forever on a failed refresh.
+ */
+type RefreshOutcome =
+  | { status: 'pending' }
+  | { status: 'success'; token: string }
+  | { status: 'failed' };
+
+/** Settled outcomes — the states a queued request can actually act on. */
+type SettledOutcome = Exclude<RefreshOutcome, { status: 'pending' }>;
+
 // Token refresh state management
 let isRefreshingToken = false;
-const refreshTokenSubject = new BehaviorSubject<string | null>(null);
+const refreshOutcome$ = new BehaviorSubject<RefreshOutcome>({ status: 'pending' });
+
+/** Session-expired error handed to callers whose refresh could not be completed. */
+function sessionExpiredError(): HttpErrorResponse {
+  return new HttpErrorResponse({
+    error: 'Session expired. Please log in again.',
+    status: 401,
+    statusText: 'Unauthorized'
+  });
+}
 
 /**
  * Define endpoints where authentication is OPTIONAL
@@ -161,9 +186,12 @@ function handle401Error(
 ): Observable<HttpEvent<any>> {
 
   if (!isRefreshingToken) {
-    // First request to encounter 401 - start token refresh
+    // First request to encounter 401 - start token refresh.
+    // Both statements are synchronous, so any request that later observes
+    // isRefreshingToken === true is guaranteed to see 'pending' rather than the
+    // settled outcome of an earlier refresh.
     isRefreshingToken = true;
-    refreshTokenSubject.next(null);
+    refreshOutcome$.next({ status: 'pending' });
 
     return authService.refreshToken().pipe(
       switchMap((response: any) => {
@@ -175,18 +203,25 @@ function handle401Error(
           : response?.token || response?.access_token;
 
         if (!newToken) {
+          // Thrown, not returned: catchError below owns releasing the waiters
+          // and signing out, so a refresh that "succeeds" with no token takes
+          // exactly the same path as one that errors.
           throw new Error('No token received from refresh');
         }
 
         // Notify all waiting requests that refresh is complete
-        refreshTokenSubject.next(newToken);
+        refreshOutcome$.next({ status: 'success', token: newToken });
 
         // Retry the original request with the new token
         return next(addTokenToRequest(req, newToken));
       }),
       catchError((refreshError) => {
         isRefreshingToken = false;
-        refreshTokenSubject.next(null);
+
+        // Release the queued requests. This must be a distinct signal from
+        // 'pending': emitting the old placeholder left them waiting on a
+        // refresh that had already failed and would never emit again.
+        refreshOutcome$.next({ status: 'failed' });
 
         // If token refresh fails, log out the user
         console.error('Token refresh failed:', refreshError);
@@ -197,31 +232,22 @@ function handle401Error(
           error: (err) => console.error('Error during signout:', err)
         });
 
-        return throwError(() => new HttpErrorResponse({
-          error: 'Session expired. Please log in again.',
-          status: 401,
-          statusText: 'Unauthorized'
-        }));
+        return throwError(() => sessionExpiredError());
       })
     );
   } else {
     // Token refresh is already in progress
-    // Wait for the refresh to complete, then retry the request
-    return refreshTokenSubject.pipe(
-      filter(token => token !== null),
+    // Wait for the refresh to settle, then retry the request or fail with it
+    return refreshOutcome$.pipe(
+      filter((outcome): outcome is SettledOutcome => outcome.status !== 'pending'),
       take(1),
-      switchMap(token => {
-        if (!token) {
-          // Refresh failed, return error
-          return throwError(() => new HttpErrorResponse({
-            error: 'Session expired. Please log in again.',
-            status: 401,
-            statusText: 'Unauthorized'
-          }));
+      switchMap(outcome => {
+        if (outcome.status === 'failed') {
+          return throwError(() => sessionExpiredError());
         }
 
         // Retry the request with the new token
-        return next(addTokenToRequest(req, token));
+        return next(addTokenToRequest(req, outcome.token));
       })
     );
   }
@@ -230,8 +256,14 @@ function handle401Error(
 /**
  * Reset the token refresh state
  * This should be called when the user logs out
+ *
+ * Settles as 'failed' rather than 'pending': the session is gone, so anything
+ * queued behind the refresh can no longer succeed and must be released with an
+ * error. Emitting 'pending' here would leave those requests hanging — the very
+ * bug this state machine exists to prevent. The next 401 starts a fresh cycle
+ * by emitting 'pending' again, so the terminal state is not sticky.
  */
 export function resetTokenRefreshState(): void {
   isRefreshingToken = false;
-  refreshTokenSubject.next(null);
+  refreshOutcome$.next({ status: 'failed' });
 }
