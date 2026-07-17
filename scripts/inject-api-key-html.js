@@ -162,7 +162,8 @@ const configPath = path.join(__dirname, '../src/environments/google-maps-config.
 if (fs.existsSync(configPath)) {
   const placeholderConfig = `// This file will be replaced during build
 export const googleMapsConfig = {
-  apiKey: "YOUR_DEVELOPMENT_API_KEY"
+  apiKey: "YOUR_DEVELOPMENT_API_KEY",
+  mapId: ""
 };`;
   fs.writeFileSync(configPath, placeholderConfig, 'utf8');
   console.log('✓ Placeholder restored in google-maps-config.ts');
