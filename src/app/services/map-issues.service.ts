@@ -170,27 +170,29 @@ export class MapIssuesService {
    * Keep only issues we can honestly put on a map.
    *
    * `Issue.Latitude`/`Issue.Longitude` are non-nullable doubles server-side, so
-   * an issue whose coordinates were never set arrives as exactly 0/0. That is a
-   * sentinel, not data: (0, 0) is Null Island in the Gulf of Guinea, and one
-   * such pin would both lie to the user and drag fitBounds out into the
-   * Atlantic, zooming every real Bucharest pin off screen. The `IssueItem` type
-   * also marks the fields optional, so null/undefined mean "absent" too.
+   * an issue whose coordinates were never set arrives as exactly 0. That is a
+   * sentinel, not data, and a zero on *either* axis is enough to reject: no real
+   * Bucharest issue sits on the equator or the prime meridian (the city is near
+   * 44.4 / 26.1), so `lat=0, lng=26.1` is unset data pointing at the Gulf of
+   * Guinea just as much as `(0, 0)` is. Plotting it would both lie to the user
+   * and drag fitBounds out into the Atlantic, zooming every real pin off screen.
+   * This matches `isValidCoordinate` in the issue-detail map. The `IssueItem`
+   * type also marks the fields optional, so null/undefined mean "absent" too.
    */
   private static isPlottable(issue: IssueItem): issue is PlottableIssue {
     const lat = issue.latitude;
     const lng = issue.longitude;
 
-    if (lat === null || lat === undefined || lng === null || lng === undefined) {
-      return false;
-    }
-    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
-      return false;
-    }
-    if (lat === 0 && lng === 0) {
+    if (!MapIssuesService.isValidCoordinate(lat) || !MapIssuesService.isValidCoordinate(lng)) {
       return false;
     }
 
     return Math.abs(lat) <= 90 && Math.abs(lng) <= 180;
+  }
+
+  /** A coordinate we trust: finite and non-zero (0 is the unset sentinel). */
+  private static isValidCoordinate(value: number | null | undefined): value is number {
+    return value !== null && value !== undefined && Number.isFinite(value) && value !== 0;
   }
 
   /** Stable identity for a filter set, used for caching and de-duplication. */
