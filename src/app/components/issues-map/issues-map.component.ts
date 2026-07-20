@@ -66,18 +66,66 @@ const WORLD_PX = 256;
 const MAPS_POLL_INTERVAL_MS = 500;
 const MAPS_POLL_MAX_ATTEMPTS = 20;
 
+const SVG_NS = 'http://www.w3.org/2000/svg';
+
+/** The teardrop pin silhouette (viewBox 0 0 24 32); its tip is the anchor point. */
+const PIN_SHAPE_PATH = 'M12 2 C7 2 3 6 3 11 c0 7 9 20 9 20 s9 -13 9 -20 c0 -5 -4 -9 -9 -9 z';
+
+interface PinIconPart {
+  readonly tag: 'path' | 'rect' | 'circle' | 'polygon';
+  readonly attrs: Readonly<Record<string, string | number>>;
+  /**
+   * Omitted → white (the icon). 'accent' → filled with the pin colour, so it
+   * reads as a cut-out. 'stroke' → a pin-colour line with no fill.
+   */
+  readonly role?: 'accent' | 'stroke';
+}
+
 /**
- * Category glyph shown inside the pin. The pin body is white with a
- * status-coloured ring, so the glyph carries category and the ring carries
- * status/urgency — both read at a glance without a legend.
+ * Per-category icon, drawn white in a 24×24 box the marker centres inside the
+ * pin head. Each is a simple, recognisable silhouette; colour (from the .scss)
+ * plus shape distinguish the category at a glance, so the whole marker *is* the
+ * category. Replaces the old emoji glyphs, which rendered inconsistently across
+ * platforms and as tofu boxes wherever no emoji font was present.
  */
-const CATEGORY_GLYPHS: Record<IssueCategory, string> = {
-  Infrastructure: '🚧',
-  Environment: '🌳',
-  Transportation: '🚌',
-  PublicServices: '🏛',
-  Safety: '⚠',
-  Other: '📍'
+const CATEGORY_ICONS: Record<IssueCategory, readonly PinIconPart[]> = {
+  // Traffic cone.
+  Infrastructure: [
+    { tag: 'polygon', attrs: { points: '12,4 8,18 16,18' } },
+    { tag: 'rect', attrs: { x: 6, y: 18, width: 12, height: 2.6, rx: 1 } }
+  ],
+  // Leaf with a midrib.
+  Environment: [
+    { tag: 'path', attrs: { d: 'M5 19 C5 11 11 5 19 5 C19 13 13 19 5 19 Z' } },
+    { tag: 'path', attrs: { d: 'M8.2 16 L15.5 8.5', 'stroke-width': 1.5 }, role: 'stroke' }
+  ],
+  // Bus: body, window strip (cut-out) and two wheels.
+  Transportation: [
+    { tag: 'rect', attrs: { x: 4, y: 5, width: 16, height: 11, rx: 2.6 } },
+    { tag: 'rect', attrs: { x: 5.6, y: 7, width: 12.8, height: 3.6, rx: 1 }, role: 'accent' },
+    { tag: 'circle', attrs: { cx: 8, cy: 17, r: 1.9 } },
+    { tag: 'circle', attrs: { cx: 16, cy: 17, r: 1.9 } }
+  ],
+  // Classical institution: pediment, four columns and a base.
+  PublicServices: [
+    { tag: 'polygon', attrs: { points: '12,3.5 3.5,9 20.5,9' } },
+    { tag: 'rect', attrs: { x: 5, y: 10, width: 1.9, height: 7 } },
+    { tag: 'rect', attrs: { x: 9, y: 10, width: 1.9, height: 7 } },
+    { tag: 'rect', attrs: { x: 13.1, y: 10, width: 1.9, height: 7 } },
+    { tag: 'rect', attrs: { x: 17.1, y: 10, width: 1.9, height: 7 } },
+    { tag: 'rect', attrs: { x: 4, y: 17.4, width: 16, height: 2.3, rx: 0.6 } }
+  ],
+  // Shield with an exclamation cut-out.
+  Safety: [
+    { tag: 'path', attrs: { d: 'M12 3 L19 5.7 V11.6 C19 16 15.8 19.3 12 20.7 C8.2 19.3 5 16 5 11.6 V5.7 Z' } },
+    { tag: 'rect', attrs: { x: 11, y: 8, width: 2, height: 5, rx: 1 }, role: 'accent' },
+    { tag: 'rect', attrs: { x: 11, y: 14.4, width: 2, height: 2, rx: 1 }, role: 'accent' }
+  ],
+  // Flag.
+  Other: [
+    { tag: 'rect', attrs: { x: 6, y: 4, width: 1.7, height: 16, rx: 0.6 } },
+    { tag: 'path', attrs: { d: 'M7.7 5 L18 5 L15.5 8.2 L18 11.4 L7.7 11.4 Z' } }
+  ]
 };
 
 const MAP_OPTIONS: google.maps.MapOptions = {
@@ -412,40 +460,30 @@ export class IssuesMapComponent {
 
   /** Builds the pin DOM. Classes only — all of the styling lives in the .scss. */
   private buildPin(issue: PlottableIssue): HTMLElement {
-    const pin = document.createElement('div');
-    pin.className = 'issues-map__pin';
-
+    // The backend can send an issue whose category is absent or outside the
+    // typed union (enum drift), so fall back to a neutral marker rather than a
+    // broken one: the `--cat-*` class then matches no colour rule (--pin-color
+    // keeps its default) and buildMarkerSvg falls back to the Other icon.
+    const category = issue.category ?? 'Other';
     const isResolved = (issue.status || '').toLowerCase() === 'resolved';
+
+    const pin = document.createElement('div');
+    pin.className = `issues-map__pin issues-map__pin--cat-${category.toLowerCase()}`;
 
     if (issue.urgency === 'urgent') {
       pin.classList.add('issues-map__pin--urgent');
     }
-    if (isResolved) {
-      pin.classList.add('issues-map__pin--resolved');
-    }
 
+    // The urgency pulse sits behind the marker; invisible unless --urgent.
     const halo = document.createElement('span');
     halo.className = 'issues-map__pin-halo';
     halo.setAttribute('aria-hidden', 'true');
 
-    const body = document.createElement('span');
-    body.className = 'issues-map__pin-body';
+    pin.append(halo, this.buildMarkerSvg(category));
 
-    const glyph = document.createElement('span');
-    glyph.className = 'issues-map__pin-glyph';
-    glyph.setAttribute('aria-hidden', 'true');
-    glyph.textContent = CATEGORY_GLYPHS[issue.category] ?? CATEGORY_GLYPHS.Other;
-
-    const tip = document.createElement('span');
-    tip.className = 'issues-map__pin-tip';
-    tip.setAttribute('aria-hidden', 'true');
-
-    body.appendChild(glyph);
-    pin.append(halo, body, tip);
-
-    // Resolved pins keep their category glyph and gain a check badge in the
+    // Resolved pins keep their category marker and gain a check badge in the
     // corner, so the pin reads as "<category>, done" at a glance. The badge is
-    // decorative like the glyph and tip — the detail card carries the status
+    // decorative like the marker itself — the detail card carries the status
     // for assistive tech.
     if (isResolved) {
       const check = document.createElement('span');
@@ -455,6 +493,48 @@ export class IssuesMapComponent {
     }
 
     return pin;
+  }
+
+  /**
+   * The category marker: a colour-filled teardrop (the pin) with a white
+   * category icon, as one inline SVG — the whole marker is the category, colour
+   * and icon both. Colours live in the .scss (per-category `--pin-color`); this
+   * only lays out the geometry.
+   */
+  private buildMarkerSvg(category: IssueCategory): SVGSVGElement {
+    const svg = document.createElementNS(SVG_NS, 'svg');
+    svg.setAttribute('class', 'issues-map__pin-svg');
+    svg.setAttribute('viewBox', '0 0 24 32');
+    svg.setAttribute('aria-hidden', 'true');
+
+    const shape = document.createElementNS(SVG_NS, 'path');
+    shape.setAttribute('class', 'issues-map__pin-shape');
+    shape.setAttribute('d', PIN_SHAPE_PATH);
+    svg.appendChild(shape);
+
+    const icon = document.createElementNS(SVG_NS, 'g');
+    icon.setAttribute('class', 'issues-map__pin-icon');
+    // Centre the 24×24 icon box inside the head (viewBox centre ~12,11).
+    icon.setAttribute('transform', 'translate(5 4) scale(0.583)');
+
+    // Defensive fallback (see buildPin): an unknown runtime category has no
+    // icon entry, so use Other rather than iterating an undefined list.
+    for (const part of CATEGORY_ICONS[category] ?? CATEGORY_ICONS.Other) {
+      const el = document.createElementNS(SVG_NS, part.tag);
+      for (const [name, value] of Object.entries(part.attrs)) {
+        el.setAttribute(name, String(value));
+      }
+      if (part.role) {
+        el.setAttribute(
+          'class',
+          part.role === 'stroke' ? 'issues-map__pin-accent--stroke' : 'issues-map__pin-accent'
+        );
+      }
+      icon.appendChild(el);
+    }
+
+    svg.appendChild(icon);
+    return svg;
   }
 
   private onMarkerClick(
