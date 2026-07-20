@@ -460,6 +460,10 @@ export class IssuesMapComponent {
 
   /** Builds the pin DOM. Classes only — all of the styling lives in the .scss. */
   private buildPin(issue: PlottableIssue): HTMLElement {
+    // The backend can send an issue whose category is absent or outside the
+    // typed union (enum drift), so fall back to a neutral marker rather than a
+    // broken one: the `--cat-*` class then matches no colour rule (--pin-color
+    // keeps its default) and buildMarkerSvg falls back to the Other icon.
     const category = issue.category ?? 'Other';
     const isResolved = (issue.status || '').toLowerCase() === 'resolved';
 
@@ -468,9 +472,6 @@ export class IssuesMapComponent {
 
     if (issue.urgency === 'urgent') {
       pin.classList.add('issues-map__pin--urgent');
-    }
-    if (isResolved) {
-      pin.classList.add('issues-map__pin--resolved');
     }
 
     // The urgency pulse sits behind the marker; invisible unless --urgent.
@@ -516,6 +517,8 @@ export class IssuesMapComponent {
     // Centre the 24×24 icon box inside the head (viewBox centre ~12,11).
     icon.setAttribute('transform', 'translate(5 4) scale(0.583)');
 
+    // Defensive fallback (see buildPin): an unknown runtime category has no
+    // icon entry, so use Other rather than iterating an undefined list.
     for (const part of CATEGORY_ICONS[category] ?? CATEGORY_ICONS.Other) {
       const el = document.createElementNS(SVG_NS, part.tag);
       for (const [name, value] of Object.entries(part.attrs)) {
