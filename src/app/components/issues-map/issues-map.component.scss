@@ -42,90 +42,102 @@
   // Pins (built in the .ts, styled only here)
   // ============================================
 
+  // Each marker is one inline SVG: a colour-filled teardrop (the pin) with a
+  // white category icon. The whole marker is the category — colour and icon
+  // both. Per-category colour is a single `--pin-color` custom property set by
+  // the `--cat-*` modifier; the shape and its cut-out accents read it.
+  //
+  // AdvancedMarkerElement anchors content at its bottom centre, which is the
+  // teardrop's tip, so no manual offset is needed.
   &__pin {
     position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 2.25rem;
-    height: 2.25rem;
-    // The pin points at its coordinate: shift it up by half its height plus the
-    // tip so the tip, not the centre, sits on the position.
-    transform: translateY(-0.4rem);
+    display: block;
+    width: 2.5rem;
     cursor: pointer;
+    transform-origin: 50% 100%;
     animation: issues-map-pin-in 220ms ease-out both;
   }
 
-  &__pin-body {
+  &__pin-svg {
     position: relative;
     z-index: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    display: block;
     width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    background: var(--white);
-    border: 2px solid var(--oxford-blue);
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
-    transition: transform 160ms ease-out, border-color 160ms ease-out;
+    height: auto;
+    transform-origin: 50% 100%;
+    transition: transform 160ms ease-out;
+    filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.35));
   }
 
-  &__pin-glyph {
-    font-size: 1rem;
-    line-height: 1;
-    // Emoji glyphs render on their own colour ramp; keep them from inheriting
-    // any of the map's text styling.
-    font-family: var(--font-primary);
-    user-select: none;
+  &__pin-shape {
+    fill: var(--pin-color, #475569);
+    stroke: var(--white);
+    stroke-width: 1.2;
   }
 
-  // The little triangle that anchors the circle to the coordinate.
-  &__pin-tip {
-    position: absolute;
-    bottom: -0.3rem;
-    left: 50%;
-    z-index: 0;
-    width: 0.55rem;
-    height: 0.55rem;
-    background: var(--oxford-blue);
-    transform: translateX(-50%) rotate(45deg);
-    border-radius: 0 0 2px 0;
-    transition: background-color 160ms ease-out;
+  &__pin-icon {
+    fill: var(--white);
   }
 
-  // The urgency pulse. Sits behind the body and is invisible unless urgent.
+  // Cut-outs (bus windows, the shield mark) read as holes: the pin's own colour.
+  &__pin-accent {
+    fill: var(--pin-color, #475569);
+  }
+
+  &__pin-accent--stroke {
+    fill: none;
+    stroke: var(--pin-color, #475569);
+    stroke-linecap: round;
+  }
+
+  // Per-category colour. Distinct hues, none equal to the status colours
+  // (success green / urgency orange), so status never clashes with category.
+  &__pin--cat-infrastructure {
+    --pin-color: #b45309;
+  }
+  &__pin--cat-environment {
+    --pin-color: #0f766e;
+  }
+  &__pin--cat-transportation {
+    --pin-color: #1d4ed8;
+  }
+  &__pin--cat-publicservices {
+    --pin-color: #7c3aed;
+  }
+  &__pin--cat-safety {
+    --pin-color: #dc2626;
+  }
+  &__pin--cat-other {
+    --pin-color: #475569;
+  }
+
+  // The urgency pulse. Sits behind the marker, over the head, invisible unless urgent.
   &__pin-halo {
     position: absolute;
-    inset: 0;
+    top: 0.2rem;
+    left: 50%;
     z-index: 0;
+    width: 1.9rem;
+    height: 1.9rem;
+    margin-left: -0.95rem;
     border-radius: 50%;
     background: var(--orange-web);
     opacity: 0;
   }
 
-  &__pin:hover &__pin-body,
-  &__pin:focus-visible &__pin-body {
-    transform: scale(1.12);
+  &__pin:hover &__pin-svg,
+  &__pin:focus-visible &__pin-svg {
+    transform: scale(1.08);
   }
 
-  &__pin--resolved &__pin-body {
-    border-color: var(--color-success);
-  }
-
-  &__pin--resolved &__pin-tip {
-    background: var(--color-success);
-  }
-
-  // Check badge for resolved issues (added in the .ts), sitting on the pin's
-  // top-right on top of the green ring so "done" reads without opening the card.
+  // Check badge for resolved issues (added in the .ts), on the head's top-right.
   &__pin-check {
     position: absolute;
-    top: -0.15rem;
-    right: -0.15rem;
+    top: 0.05rem;
+    right: 0.2rem;
     z-index: 2;
-    width: 1rem;
-    height: 1rem;
+    width: 1.05rem;
+    height: 1.05rem;
     border-radius: 50%;
     background: var(--color-success);
     border: 1.5px solid var(--white);
@@ -146,14 +158,6 @@
     }
   }
 
-  &__pin--urgent &__pin-body {
-    border-color: var(--orange-web);
-  }
-
-  &__pin--urgent &__pin-tip {
-    background: var(--orange-web);
-  }
-
   &__pin--urgent &__pin-halo {
     animation: issues-map-pulse 2.2s ease-out infinite;
   }
@@ -162,10 +166,22 @@
     z-index: 3;
   }
 
-  &__pin--selected &__pin-body {
-    transform: scale(1.2);
-    border-color: var(--oxford-blue);
-    box-shadow: 0 0 0 4px var(--orange-web-20), 0 4px 10px rgba(0, 0, 0, 0.35);
+  &__pin--selected &__pin-svg {
+    transform: scale(1.12);
+  }
+
+  // A soft ring around the head marks the open pin.
+  &__pin--selected::before {
+    content: '';
+    position: absolute;
+    top: 0.05rem;
+    left: 50%;
+    z-index: 0;
+    width: 2.15rem;
+    height: 2.15rem;
+    margin-left: -1.075rem;
+    border-radius: 50%;
+    box-shadow: 0 0 0 4px var(--orange-web-20);
   }
 
   // ============================================
@@ -352,12 +368,12 @@
 @keyframes issues-map-pin-in {
   from {
     opacity: 0;
-    transform: translateY(-1.1rem) scale(0.6);
+    transform: translateY(-0.5rem) scale(0.6);
   }
 
   to {
     opacity: 1;
-    transform: translateY(-0.4rem) scale(1);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -402,11 +418,9 @@
   .issues-map {
     &__pin {
       animation: none;
-      transform: translateY(-0.4rem);
     }
 
-    &__pin-body,
-    &__pin-tip {
+    &__pin-svg {
       transition: none;
     }
 
@@ -414,7 +428,7 @@
     &__pin--urgent &__pin-halo {
       animation: none;
       opacity: 0.4;
-      transform: scale(1.45);
+      transform: scale(1.4);
     }
 
     &__card {
