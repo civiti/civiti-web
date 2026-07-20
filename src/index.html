@@ -32,6 +32,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cmkznjhbwmcgtbnynkft.supabase.co" />
+    <link rel="preconnect" href="https://statlark.com" />
 
     <link
       href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800&display=swap"
@@ -49,8 +50,13 @@
     <meta name="google-maps-api-key" content="YOUR_DEVELOPMENT_API_KEY" />
     <!-- Load Google Maps API - MOVED TO BODY END FOR ASYNC LOADING -->
 
-    <!-- Statlark analytics (privacy-friendly pageview tracker), loaded site-wide -->
-    <script defer src="https://statlark.com/script.js" data-website-id="sl_a996a66a"></script>
+    <!-- Statlark consent controller: gates the analytics tracker behind cookie
+         consent for EU/UK visitors and injects script.js itself only after the
+         visitor accepts. data-on-reject="cookieless" keeps anonymous,
+         cookie-free analytics for visitors who decline (no cookies, so the
+         banner's "no cookie until you choose" promise still holds). Do NOT also
+         load script.js — consent.js loads it. -->
+    <script defer src="https://statlark.com/consent.js" data-website-id="sl_a996a66a" data-policy="eu" data-on-reject="cookieless"></script>
   </head>
   <body>
     <app-root>
@@ -74,5 +80,58 @@
         v: "weekly",
       });
     </script>
+
+    <!-- Statlark cookie-consent banner (bar variant), shown only where consent
+         is required (EU/UK). Starts [hidden] to avoid a flash on load; consent.js
+         reveals it (removeAttribute) only for visitors who must choose, and wires
+         the buttons.
+         Do not add click handlers to the [data-slk-consent] elements. Copy is
+         localised (ro) and describes the analytics-only use accurately (no
+         payments/marketing on this site). Themed to the Civiti palette via the
+         documented --slk-consent-* custom properties. -->
+    <div class="slk-consent slk-consent--bar" hidden role="region" aria-label="Consimțământ pentru cookie-uri" style="--slk-consent-font:'Fira Sans',sans-serif;--slk-consent-fg:#14213d;--slk-consent-btn-bg:#14213d;--slk-consent-btn-hover:#0d1626">
+      <div class="slk-consent__inner">
+        <div class="slk-consent__msg">
+          <p class="slk-consent__text">Folosim un cookie de analiză pentru a măsura traficul pe site. Niciunul nu este activat până când nu alegi tu. <a class="slk-consent__link" href="/privacy">Politica de confidențialitate</a></p>
+          <details class="slk-consent__details">
+            <summary>Detalii</summary>
+            <p>Un singur cookie de analiză (de la Statlark), stocat doar pe acest site, reține vizita ta pentru a măsura traficul. Fără publicitate, fără urmărire între site-uri. Îți poți schimba alegerea oricând din „Setări cookie-uri”.</p>
+          </details>
+        </div>
+        <div class="slk-consent__actions">
+          <button type="button" data-slk-consent="reject">Refuz</button>
+          <button type="button" data-slk-consent="accept">Accept</button>
+        </div>
+      </div>
+      <style>
+      .slk-consent.slk-consent--bar{position:fixed;left:0;right:0;bottom:0;z-index:var(--slk-consent-z,2147483000);box-sizing:border-box;background:var(--slk-consent-bg,#fff);color:var(--slk-consent-fg,#232046);border-top:1px solid var(--slk-consent-border,#d7dee5);box-shadow:var(--slk-consent-shadow,0 -4px 16px rgba(35,32,70,.06));font:inherit;font-family:var(--slk-consent-font,inherit);font-size:var(--slk-consent-size,14px);line-height:1.5;padding:14px max(20px,env(safe-area-inset-right)) max(14px,env(safe-area-inset-bottom)) max(20px,env(safe-area-inset-left));animation:slk-consent-in .2s cubic-bezier(.22,1,.36,1)}
+      .slk-consent.slk-consent--bar[hidden]{display:none}
+      .slk-consent--bar *{box-sizing:border-box}
+      .slk-consent--bar .slk-consent__inner{max-width:1120px;margin:0 auto;display:flex;align-items:center;gap:16px 28px;flex-wrap:wrap}
+      .slk-consent--bar .slk-consent__msg{flex:1 1 400px;min-width:240px}
+      .slk-consent--bar p{margin:0;text-wrap:pretty}
+      .slk-consent--bar .slk-consent__link{color:var(--slk-consent-accent,var(--slk-consent-brand,#c24417));text-decoration:underline;text-underline-offset:2px}
+      .slk-consent--bar .slk-consent__link:hover{text-decoration-thickness:2px}
+      .slk-consent--bar .slk-consent__details summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;margin-top:4px;color:var(--slk-consent-muted,#5b6b8a);font-size:.93em;font-weight:600}
+      .slk-consent--bar .slk-consent__details summary::-webkit-details-marker{display:none}
+      .slk-consent--bar .slk-consent__details summary::before{content:"";width:.4em;height:.4em;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(-45deg);margin-right:.55em;transition:transform 160ms cubic-bezier(.22,1,.36,1)}
+      .slk-consent--bar .slk-consent__details[open] summary::before{transform:rotate(45deg) translate(-1px,-1px)}
+      .slk-consent--bar .slk-consent__details p{color:var(--slk-consent-muted,#5b6b8a);font-size:.93em;margin:.45em 0 0;max-width:70ch}
+      .slk-consent--bar .slk-consent__actions{display:flex;gap:10px;margin-left:auto;flex:none}
+      .slk-consent--bar .slk-consent__actions button{font:inherit;font-family:var(--slk-consent-font,inherit);font-size:1em;font-weight:600;line-height:1;min-height:44px;padding:.6em 1.5em;background:var(--slk-consent-btn-bg,var(--slk-consent-brand,#232046));color:var(--slk-consent-btn-fg,#fff);border:0;border-radius:var(--slk-consent-btn-radius,10px);cursor:pointer;transition:background 160ms cubic-bezier(.22,1,.36,1),transform 120ms cubic-bezier(.22,1,.36,1)}
+      .slk-consent--bar .slk-consent__actions button:hover{background:var(--slk-consent-btn-hover,var(--slk-consent-brand,#322f52))}
+      .slk-consent--bar .slk-consent__actions button:active{transform:translateY(.5px)}
+      .slk-consent--bar :is(button,summary,a):focus-visible{outline:2px solid var(--slk-consent-accent,var(--slk-consent-brand,#e55a2b));outline-offset:2px}
+      .slk-consent--bar .slk-consent__statlark{display:inline-flex;align-items:center;gap:.45em;margin-top:10px;font-size:.8em;color:var(--slk-consent-muted,#5b6b8a);text-decoration:none}
+      .slk-consent--bar .slk-consent__statlark:hover{text-decoration:underline}
+      .slk-consent--bar .slk-consent__statlark svg{width:1.3em;height:1.3em;flex:none}
+      .slk-consent--bar .slk-consent__statlark b{font-weight:700}
+      .slk-consent.slk-consent--dark{--slk-consent-bg:#232046;--slk-consent-fg:#fbf7f0;--slk-consent-muted:#9c9ab8;--slk-consent-border:#322f52;--slk-consent-accent:var(--slk-consent-brand,#ee6b3d);--slk-consent-btn-bg:var(--slk-consent-brand,#edf1f5);--slk-consent-btn-fg:#232046;--slk-consent-btn-hover:#fff;--slk-consent-shadow:0 -4px 16px rgba(0,0,0,.35)}
+      @keyframes slk-consent-in{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+      @media (max-width:600px){.slk-consent--bar .slk-consent__actions{width:100%;margin-left:0}.slk-consent--bar .slk-consent__actions button{flex:1 1 0}}
+      @media (prefers-reduced-motion:reduce){.slk-consent.slk-consent--bar{animation:none}.slk-consent--bar *{transition-duration:0s!important}}
+      @media print{.slk-consent.slk-consent--bar{display:none}}
+      </style>
+    </div>
   </body>
 </html>

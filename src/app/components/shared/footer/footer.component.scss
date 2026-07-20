@@ -159,3 +159,42 @@
     outline-offset: 2px;
   }
 }
+
+/* Statlark "Cookie settings" re-open control (wired by consent.js). Styled to
+   read as a quiet footer link, matching the sibling Legal links. consent.js
+   sets [hidden] where there is no consent choice to change (e.g. non-EU). */
+.slk-consent-reopen {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0;
+  background: none;
+  border: 0;
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  line-height: inherit;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.2s;
+
+  svg {
+    width: 1.1em;
+    height: 1.1em;
+    flex: none;
+  }
+
+  &:hover {
+    color: var(--orange-web);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--orange-web);
+    outline-offset: 2px;
+  }
+
+  // Class specificity beats the UA `[hidden]` rule, so restore it explicitly.
+  &[hidden] {
+    display: none;
+  }
+}
