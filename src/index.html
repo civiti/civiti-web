@@ -32,6 +32,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link rel="preconnect" href="https://cmkznjhbwmcgtbnynkft.supabase.co" />
+    <link rel="preconnect" href="https://statlark.com" />
 
     <link
       href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@400;500;600;700;800&display=swap"
@@ -81,12 +82,14 @@
     </script>
 
     <!-- Statlark cookie-consent banner (bar variant), shown only where consent
-         is required (EU/UK); consent.js toggles [hidden] and wires the buttons.
+         is required (EU/UK). Starts [hidden] to avoid a flash on load; consent.js
+         reveals it (removeAttribute) only for visitors who must choose, and wires
+         the buttons.
          Do not add click handlers to the [data-slk-consent] elements. Copy is
          localised (ro) and describes the analytics-only use accurately (no
          payments/marketing on this site). Themed to the Civiti palette via the
          documented --slk-consent-* custom properties. -->
-    <div class="slk-consent slk-consent--bar" role="region" aria-label="Consimțământ pentru cookie-uri" style="--slk-consent-font:'Fira Sans',sans-serif;--slk-consent-fg:#14213d;--slk-consent-btn-bg:#14213d;--slk-consent-btn-hover:#0d1626">
+    <div class="slk-consent slk-consent--bar" hidden role="region" aria-label="Consimțământ pentru cookie-uri" style="--slk-consent-font:'Fira Sans',sans-serif;--slk-consent-fg:#14213d;--slk-consent-btn-bg:#14213d;--slk-consent-btn-hover:#0d1626">
       <div class="slk-consent__inner">
         <div class="slk-consent__msg">
           <p class="slk-consent__text">Folosim un cookie de analiză pentru a măsura traficul pe site. Niciunul nu este activat până când nu alegi tu. <a class="slk-consent__link" href="/privacy">Politica de confidențialitate</a></p>
