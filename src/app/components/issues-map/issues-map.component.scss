@@ -117,6 +117,35 @@
     background: var(--color-success);
   }
 
+  // Check badge for resolved issues (added in the .ts), sitting on the pin's
+  // top-right on top of the green ring so "done" reads without opening the card.
+  &__pin-check {
+    position: absolute;
+    top: -0.15rem;
+    right: -0.15rem;
+    z-index: 2;
+    width: 1rem;
+    height: 1rem;
+    border-radius: 50%;
+    background: var(--color-success);
+    border: 1.5px solid var(--white);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+
+    // The tick itself: the right + bottom borders of a small rotated box. Drawn
+    // in CSS so it stays crisp at every zoom and needs no glyph font.
+    &::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0.22rem;
+      height: 0.42rem;
+      border: solid var(--white);
+      border-width: 0 0.125rem 0.125rem 0;
+      transform: translate(-50%, -60%) rotate(45deg);
+    }
+  }
+
   &__pin--urgent &__pin-body {
     border-color: var(--orange-web);
   }

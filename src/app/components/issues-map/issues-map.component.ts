@@ -415,10 +415,12 @@ export class IssuesMapComponent {
     const pin = document.createElement('div');
     pin.className = 'issues-map__pin';
 
+    const isResolved = (issue.status || '').toLowerCase() === 'resolved';
+
     if (issue.urgency === 'urgent') {
       pin.classList.add('issues-map__pin--urgent');
     }
-    if ((issue.status || '').toLowerCase() === 'resolved') {
+    if (isResolved) {
       pin.classList.add('issues-map__pin--resolved');
     }
 
@@ -440,6 +442,17 @@ export class IssuesMapComponent {
 
     body.appendChild(glyph);
     pin.append(halo, body, tip);
+
+    // Resolved pins keep their category glyph and gain a check badge in the
+    // corner, so the pin reads as "<category>, done" at a glance. The badge is
+    // decorative like the glyph and tip — the detail card carries the status
+    // for assistive tech.
+    if (isResolved) {
+      const check = document.createElement('span');
+      check.className = 'issues-map__pin-check';
+      check.setAttribute('aria-hidden', 'true');
+      pin.appendChild(check);
+    }
 
     return pin;
   }
