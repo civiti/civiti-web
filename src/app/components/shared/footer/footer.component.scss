@@ -81,6 +81,7 @@
   margin: 0 auto;
   padding: 1rem 1rem;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   gap: 0.5rem;
 }
@@ -99,7 +100,6 @@
 }
 
 .footer-github {
-  margin-left: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -112,5 +112,50 @@
   &:hover,
   &:focus-visible {
     color: var(--orange-web);
+  }
+}
+
+/* Statlark analytics attribution badge — "mono" variant from
+   https://statlark.com/docs/badge, themed to sit as a quiet footer link.
+   The mono mascot is a single-colour silhouette (fill: currentColor), so it
+   inherits the tint below; no Slark brand colours are altered. */
+.footer-bottom-inner .slk-badge {
+  margin-left: auto;
+}
+
+.slk-badge.slk-badge--mono {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0;
+  color: rgba(255, 255, 255, 0.7);
+  background: none;
+  border: 0;
+  font-family: var(--font-primary);
+  font-size: var(--text-sm);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  vertical-align: middle;
+  transition: color 0.2s;
+
+  svg {
+    width: 1.35em;
+    height: 1.35em;
+    flex: none;
+  }
+
+  b {
+    font-weight: 700;
+  }
+
+  &:hover {
+    color: var(--orange-web);
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--orange-web);
+    outline-offset: 2px;
   }
 }
