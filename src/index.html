@@ -51,8 +51,11 @@
 
     <!-- Statlark consent controller: gates the analytics tracker behind cookie
          consent for EU/UK visitors and injects script.js itself only after the
-         visitor accepts. Do NOT also load script.js — consent.js loads it. -->
-    <script defer src="https://statlark.com/consent.js" data-website-id="sl_a996a66a" data-policy="eu"></script>
+         visitor accepts. data-on-reject="cookieless" keeps anonymous,
+         cookie-free analytics for visitors who decline (no cookies, so the
+         banner's "no cookie until you choose" promise still holds). Do NOT also
+         load script.js — consent.js loads it. -->
+    <script defer src="https://statlark.com/consent.js" data-website-id="sl_a996a66a" data-policy="eu" data-on-reject="cookieless"></script>
   </head>
   <body>
     <app-root>
