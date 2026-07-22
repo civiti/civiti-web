@@ -30,7 +30,7 @@ import { IssueDetailResponse, isPubliclyViewableStatus } from '../../types/civic
 import { EmailModalComponent } from './email-modal.component';
 import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
 import { GoogleMapsConfigService } from '../../services/google-maps-config.service';
-import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsTerminalStatePipe } from '../../pipes/status.pipe';
+import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsTerminalStatePipe, IsOwnerEditablePipe } from '../../pipes/status.pipe';
 import { IsUrgentPipe } from '../../pipes/urgency.pipe';
 import { DaysSincePipe } from '../../pipes/date.pipe';
 import { CommentsComponent } from '../shared/comments/comments.component';
@@ -64,6 +64,7 @@ import { SeoService } from '../../services/seo.service';
         StatusColorPipe,
         IsActivePipe,
         IsTerminalStatePipe,
+        IsOwnerEditablePipe,
         IsUrgentPipe,
         DaysSincePipe,
         CommentsComponent,
@@ -395,6 +396,20 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         
         // Try local fallback image
         imgElement.src = '/images/placeholders/issue-placeholder.svg';
+    }
+
+    /**
+     * Whether the current viewer is the creator of this issue.
+     */
+    isOwner(issue: IssueDetailResponse): boolean {
+        return !!this._currentUserId && issue.user.id === this._currentUserId;
+    }
+
+    /**
+     * Navigate to the edit view for this issue (owner-only, owner-editable statuses).
+     */
+    editIssue(issue: IssueDetailResponse): void {
+        this._router.navigate(['/edit-issue', issue.id]);
     }
 
     /**
