@@ -149,6 +149,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   isLoading = true;
   isSaving = false;
   loadError: string | null = null;
+  private savedSuccessfully = false;
 
   editForm: FormGroup;
   categories: CategoryInfo[] = [];
@@ -194,8 +195,10 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       title: ['', [Validators.required, Validators.maxLength(ISSUE_TITLE_MAX)]],
       category: ['', [Validators.required]],
       description: ['', [Validators.required, Validators.minLength(DESCRIPTION_MIN), Validators.maxLength(DESCRIPTION_MAX)]],
-      desiredOutcome: ['', [Validators.required, Validators.minLength(DESCRIPTION_MIN), Validators.maxLength(TEXTAREA_MAX)]],
-      communityImpact: ['', [Validators.required, Validators.minLength(DESCRIPTION_MIN), Validators.maxLength(TEXTAREA_MAX)]],
+      // Optional in the API/response — not required, so a legacy issue that lacks
+      // them can still be edited. minLength only applies once the field is non-empty.
+      desiredOutcome: ['', [Validators.minLength(DESCRIPTION_MIN), Validators.maxLength(TEXTAREA_MAX)]],
+      communityImpact: ['', [Validators.minLength(DESCRIPTION_MIN), Validators.maxLength(TEXTAREA_MAX)]],
       urgency: ['medium'],
     });
     this.customEmailForm = this.fb.group({
@@ -313,9 +316,11 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   }
 
   private normalizeUrgency(value: string | undefined): UrgencyLevel {
-    const valid: UrgencyLevel[] = ['low', 'medium', 'high', 'urgent'];
+    // Preserve 'unspecified' — coercing it to 'medium' would silently change the
+    // field on save even when the owner never touched the urgency control.
+    const valid: UrgencyLevel[] = ['unspecified', 'low', 'medium', 'high', 'urgent'];
     const normalized = (value || '').toLowerCase() as UrgencyLevel;
-    return valid.includes(normalized) ? normalized : 'medium';
+    return valid.includes(normalized) ? normalized : 'unspecified';
   }
 
   /** Status-aware banner shown above the form. */
@@ -689,6 +694,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.isSaving = false;
+          this.savedSuccessfully = true; // keep ngOnDestroy from deleting the photos we just submitted
           this.message.success('Problema a fost retrimisă spre aprobare.');
           this.store.dispatch(UserIssuesActions.refreshUserIssues());
           this.router.navigate(['/my-issues']);
@@ -696,8 +702,14 @@ export class EditIssueComponent implements OnInit, OnDestroy {
         error: (error: HttpErrorResponse) => {
           this.isSaving = false;
           if (error.status === 409) {
-            this.message.error('Problema a fost modificată între timp. Reîncărcăm ultima versiune.');
-            this.loadIssue();
+            // Don't silently discard the owner's draft — let them decide.
+            this.modal.confirm({
+              nzTitle: 'Problema a fost modificată între timp',
+              nzContent: 'Un administrator sau o altă sesiune a modificat această problemă. Poți reîncărca ultima versiune (modificările tale nesalvate se vor pierde) sau poți rămâne pe pagină pentru a-ți copia modificările.',
+              nzOkText: 'Reîncarcă ultima versiune',
+              nzCancelText: 'Rămân pe pagină',
+              nzOnOk: () => this.loadIssue(),
+            });
             return;
           }
           console.error('[EditIssue] Nu s-a putut salva:', error);
@@ -711,12 +723,19 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Revoke any blob: preview URLs still in flight so they don't leak if the
-    // user navigates away mid-upload (takeUntilDestroyed tears down the upload
-    // pipeline before its success/error revocation can run).
     for (const photo of this.photos()) {
+      // Revoke any blob: preview URLs still in flight so they don't leak if the
+      // user navigates away mid-upload (takeUntilDestroyed tears down the upload
+      // pipeline before its success/error revocation can run).
       if (photo.url.startsWith('blob:')) {
         URL.revokeObjectURL(photo.url);
+      }
+      // If the edit was abandoned (not saved), delete photos we uploaded THIS
+      // session so they don't orphan in storage. Server-owned (existing) photos
+      // are left intact — the backend owns their lifecycle. Fire-and-forget:
+      // do NOT use takeUntilDestroyed here (we are already in destroy).
+      if (!this.savedSuccessfully && !photo.isExisting && photo.storagePath) {
+        this.storageService.deletePhotoWithRetry(photo.storagePath).subscribe({ error: () => {} });
       }
     }
   }

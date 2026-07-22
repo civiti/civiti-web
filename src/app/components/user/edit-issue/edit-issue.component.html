@@ -64,8 +64,8 @@
 
           <!-- Desired outcome -->
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired nzFor="desiredOutcome">Rezultatul dorit</nz-form-label>
-            <nz-form-control [nzSpan]="24" nzErrorTip="Descrie rezultatul dorit (cel puțin 10 caractere)">
+            <nz-form-label [nzSpan]="24" nzFor="desiredOutcome">Rezultatul dorit</nz-form-label>
+            <nz-form-control [nzSpan]="24" nzErrorTip="Dacă îl completezi, folosește cel puțin 10 caractere">
               <textarea
                 nz-input
                 id="desiredOutcome"
@@ -80,8 +80,8 @@
 
           <!-- Community impact -->
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired nzFor="communityImpact">Impactul asupra comunității</nz-form-label>
-            <nz-form-control [nzSpan]="24" nzErrorTip="Descrie impactul (cel puțin 10 caractere)">
+            <nz-form-label [nzSpan]="24" nzFor="communityImpact">Impactul asupra comunității</nz-form-label>
+            <nz-form-control [nzSpan]="24" nzErrorTip="Dacă îl completezi, folosește cel puțin 10 caractere">
               <textarea
                 nz-input
                 id="communityImpact"
@@ -98,7 +98,8 @@
           <nz-form-item>
             <nz-form-label [nzSpan]="24" nzFor="urgency">Urgență</nz-form-label>
             <nz-form-control [nzSpan]="24">
-              <nz-select id="urgency" formControlName="urgency" class="full-width">
+              <nz-select id="urgency" formControlName="urgency" class="full-width" nzPlaceHolder="Selectează urgența">
+                <nz-option nzValue="unspecified" nzLabel="Nespecificată"></nz-option>
                 @for (opt of urgencyOptions; track opt.value) {
                   <nz-option [nzValue]="opt.value" [nzLabel]="opt.label"></nz-option>
                 }
@@ -245,7 +246,9 @@
                     <span nz-icon nzType="plus"></span><span>Adaugă autoritate manual</span>
                   </button>
                 } @else {
-                  <form [formGroup]="customEmailForm" class="custom-email-form">
+                  <!-- Not a <form> — this sits inside the outer editor form, and nested
+                       forms are invalid HTML (they detach the outer form's submit). -->
+                  <div [formGroup]="customEmailForm" class="custom-email-form">
                     <input nz-input formControlName="email" placeholder="Email autoritate">
                     <input nz-input formControlName="name" placeholder="Nume (opțional)">
                     <div class="custom-email-actions">
@@ -254,7 +257,7 @@
                       </button>
                       <button nz-button nzType="text" type="button" (click)="toggleCustomEmailInput()">Anulează</button>
                     </div>
-                  </form>
+                  </div>
                 }
               </div>
             </nz-form-control>
