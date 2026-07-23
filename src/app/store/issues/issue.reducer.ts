@@ -1,6 +1,7 @@
 import { createReducer, on } from '@ngrx/store';
 import { initialIssueState, issueAdapter } from './issue.state';
 import * as IssueActions from './issue.actions';
+import { isPubliclyViewableStatus } from '../../types/civica-api.types';
 
 export const issueReducer = createReducer(
   initialIssueState,
@@ -197,6 +198,28 @@ export const issueReducer = createReducer(
           ...state.selectedIssueDetail,
           hasVoted
         }
+      };
+    }
+
+    return newState;
+  }),
+
+  // Issue Edited (owner resubmit) - reconcile the public list + selected detail
+  on(IssueActions.issueEdited, (state, { issue }) => {
+    let newState = state;
+
+    // An owner edit sends the issue back to moderation (Submitted/UnderReview), which is not
+    // publicly viewable. Drop it from the public list slice if it was there (e.g. an edited
+    // Active issue) so it doesn't linger as a stale "Activ" card until the next refetch.
+    if (state.entities[issue.id] && !isPubliclyViewableStatus(issue.status)) {
+      newState = issueAdapter.removeOne(issue.id, newState);
+    }
+
+    // Keep the selected detail in sync with the server's returned version.
+    if (state.selectedIssueDetail && state.selectedIssueDetail.id === issue.id) {
+      newState = {
+        ...newState,
+        selectedIssueDetail: issue
       };
     }
 

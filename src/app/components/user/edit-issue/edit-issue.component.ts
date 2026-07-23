@@ -55,6 +55,7 @@ import {
   isOwnerEditableStatus,
 } from '../../issue-creation/issue-field.constants';
 import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
+import * as IssueActions from '../../../store/issues/issue.actions';
 
 /** A photo in the edit form — either loaded from the server or freshly uploaded. */
 interface EditPhoto {
@@ -716,10 +717,13 @@ export class EditIssueComponent implements OnInit, OnDestroy {
     this.apiService.editUserIssue(this.issueId, payload)
       .pipe(takeUntilDestroyed(this._destroyRef))
       .subscribe({
-        next: () => {
+        next: (updated) => {
           this.isSaving = false;
           this.savedSuccessfully = true; // keep ngOnDestroy from deleting the photos we just submitted
           this.message.success('Problema a fost retrimisă spre aprobare.');
+          // Reconcile the public list slice (drop an edited Active issue that left public view)
+          // and the selected detail; then refresh the owner's list and navigate.
+          this.store.dispatch(IssueActions.issueEdited({ issue: updated }));
           this.store.dispatch(UserIssuesActions.refreshUserIssues());
           this.router.navigate(['/my-issues']);
         },
