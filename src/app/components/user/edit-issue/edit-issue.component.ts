@@ -747,7 +747,12 @@ export class EditIssueComponent implements OnInit, OnDestroy {
           nzContent: 'Un administrator sau o altă sesiune a modificat această problemă. Poți reîncărca ultima versiune (modificările tale nesalvate se vor pierde) sau poți rămâne pe pagină pentru a-ți copia modificările.',
           nzOkText: 'Reîncarcă ultima versiune',
           nzCancelText: 'Rămân pe pagină',
-          nzOnOk: () => this.loadIssue(),
+          nzOnOk: () => {
+            // Delete this session's uploads first — loadIssue() replaces the photo
+            // state and would otherwise orphan them in storage.
+            this.cleanupSessionUploads(true);
+            this.loadIssue();
+          },
         });
         return;
       case 400:
@@ -786,21 +791,25 @@ export class EditIssueComponent implements OnInit, OnDestroy {
     this.router.navigate(['/my-issues']);
   }
 
-  ngOnDestroy(): void {
+  /**
+   * Revoke blob previews and (when deleteStorage) delete storage objects for photos
+   * uploaded THIS session but not yet persisted to the issue (`!isExisting`). Server-owned
+   * existing photos are left intact — the backend owns their lifecycle. Called on abandon
+   * (ngOnDestroy) and before a 409 reload, which would otherwise drop these storagePaths
+   * and orphan the objects. Fire-and-forget: no takeUntilDestroyed (may run during destroy).
+   */
+  private cleanupSessionUploads(deleteStorage: boolean): void {
     for (const photo of this.photos()) {
-      // Revoke any blob: preview URLs still in flight so they don't leak if the
-      // user navigates away mid-upload (takeUntilDestroyed tears down the upload
-      // pipeline before its success/error revocation can run).
       if (photo.url.startsWith('blob:')) {
         URL.revokeObjectURL(photo.url);
       }
-      // If the edit was abandoned (not saved), delete photos we uploaded THIS
-      // session so they don't orphan in storage. Server-owned (existing) photos
-      // are left intact — the backend owns their lifecycle. Fire-and-forget:
-      // do NOT use takeUntilDestroyed here (we are already in destroy).
-      if (!this.savedSuccessfully && !photo.isExisting && photo.storagePath) {
+      if (deleteStorage && !photo.isExisting && photo.storagePath) {
         this.storageService.deletePhotoWithRetry(photo.storagePath).subscribe({ error: () => {} });
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    this.cleanupSessionUploads(!this.savedSuccessfully);
   }
 }
