@@ -397,6 +397,13 @@
     gap: 0.5rem;
     align-items: baseline;
     font-size: 0.85rem;
+    min-width: 0; // allow the text child to shrink & wrap instead of overflowing
+  }
+
+  .diff-text {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
   }
 
   .diff-tag {

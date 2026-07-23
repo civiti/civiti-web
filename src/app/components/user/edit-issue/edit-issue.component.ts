@@ -722,8 +722,11 @@ export class EditIssueComponent implements OnInit, OnDestroy {
           this.savedSuccessfully = true; // keep ngOnDestroy from deleting the photos we just submitted
           this.message.success('Problema a fost retrimisă spre aprobare.');
           // Reconcile the public list slice (drop an edited Active issue that left public view)
-          // and the selected detail; then refresh the owner's list and navigate.
-          this.store.dispatch(IssueActions.issueEdited({ issue: updated }));
+          // and the selected detail; then refresh the owner's list and navigate. Guard against a
+          // contract-violating empty body so a null payload can't throw out of the reducer.
+          if (updated) {
+            this.store.dispatch(IssueActions.issueEdited({ issue: updated }));
+          }
           this.store.dispatch(UserIssuesActions.refreshUserIssues());
           this.router.navigate(['/my-issues']);
         },

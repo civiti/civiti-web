@@ -145,6 +145,24 @@ export class AdminIssueDetailComponent implements OnInit {
       });
   }
 
+  // Romanian labels for enum values. Keyed lowercase so they match the camelCase the API
+  // returns (e.g. "publicServices") as well as any PascalCase value.
+  private static readonly CATEGORY_LABELS: Record<string, string> = {
+    infrastructure: 'Infrastructură',
+    environment: 'Mediu',
+    transportation: 'Transport',
+    publicservices: 'Servicii Publice',
+    safety: 'Siguranță',
+    other: 'Altele',
+  };
+  private static readonly URGENCY_LABELS: Record<string, string> = {
+    unspecified: 'Nespecificată',
+    low: 'Scăzută',
+    medium: 'Medie',
+    high: 'Ridicată',
+    urgent: 'Urgentă',
+  };
+
   /**
    * Build the re-review diff from the approved snapshot. Branch on the snapshot's PRESENCE
    * (not changedFields.length): a null snapshot means a genuine first review, so no diff.
@@ -156,25 +174,46 @@ export class AdminIssueDetailComponent implements OnInit {
     if (!snap) return;
 
     const changed = new Set(issue.changedFields ?? []);
+    const known = new Set<string>();
     const row = (key: string, label: string, before: string, after: string): void => {
+      known.add(key);
       if (changed.has(key)) this.diffRows.push({ label, before, after });
     };
-    const cap = (s: string | null | undefined): string =>
-      s ? s.charAt(0).toUpperCase() + s.slice(1) : '—';
-    const names = (list: { name: string }[] | undefined): string =>
-      (list ?? []).map(a => a.name).join(', ') || '—';
+    const catLabel = (v: string): string =>
+      AdminIssueDetailComponent.CATEGORY_LABELS[(v || '').toLowerCase()] || v || '—';
+    const urgLabel = (v: string): string =>
+      AdminIssueDetailComponent.URGENCY_LABELS[(v || '').toLowerCase()] || v || '—';
+    // Include the email so an email-only authority change is visible (name alone would hide it).
+    const authList = (list: { name: string; email: string }[] | undefined): string =>
+      (list ?? []).map(a => `${a.name} (${a.email})`).join('; ') || '—';
 
     row('title', 'Titlu', snap.title, issue.title);
-    row('category', 'Categorie', cap(snap.category), cap(issue.category));
-    row('urgency', 'Urgență', cap(snap.urgency), cap(issue.urgency));
+    row('category', 'Categorie', catLabel(snap.category), catLabel(issue.category));
+    row('urgency', 'Urgență', urgLabel(snap.urgency), urgLabel(issue.urgency));
     row('address', 'Adresă', snap.address, issue.address);
     row('district', 'Sector', snap.district || '—', issue.district || '—');
     row('location', 'Coordonate', `${snap.latitude}, ${snap.longitude}`, `${issue.latitude}, ${issue.longitude}`);
     row('description', 'Descriere', snap.description, issue.description);
     row('desiredOutcome', 'Rezultat dorit', snap.desiredOutcome || '—', issue.desiredOutcome || '—');
     row('communityImpact', 'Impact comunitar', snap.communityImpact || '—', issue.communityImpact || '—');
-    row('photos', 'Fotografii', `${snap.photoUrls?.length ?? 0} fotografii`, `${issue.photos?.length ?? 0} fotografii`);
-    row('authorities', 'Autorități', names(snap.authorities), names(issue.authorities));
+
+    // Photos: 'photos' is in changedFields for any change, incl. a same-count swap. Flag content
+    // change explicitly so an equal count doesn't read as "nothing changed".
+    const snapPhotos = snap.photoUrls?.length ?? 0;
+    const issuePhotos = issue.photos?.length ?? 0;
+    row('photos', 'Fotografii',
+      `${snapPhotos} fotografii`,
+      snapPhotos === issuePhotos ? `${issuePhotos} fotografii (conținut modificat)` : `${issuePhotos} fotografii`);
+
+    row('authorities', 'Autorități', authList(snap.authorities), authList(issue.authorities));
+
+    // Forward-compat: surface any changedFields value we don't explicitly map, so a real change
+    // never silently vanishes (and the panel never wrongly reads "no changes detected").
+    for (const key of changed) {
+      if (!known.has(key)) {
+        this.diffRows.push({ label: key, before: '—', after: 'Modificat' });
+      }
+    }
   }
 
   goBack(): void {

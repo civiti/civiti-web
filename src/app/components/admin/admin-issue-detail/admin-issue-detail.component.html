@@ -46,8 +46,12 @@
                 <div class="rereview-copy">
                   <h3>Reevaluare — editare a unei probleme deja aprobate</h3>
                   <p>
-                    Voturile și email-urile afișate au fost strânse pentru conținutul aprobat
-                    anterior. Verifică modificările de mai jos înainte de a aproba.
+                    Voturile și email-urile afișate au fost strânse pentru conținutul aprobat anterior.
+                    @if (diffRows.length > 0) {
+                      Verifică modificările de mai jos înainte de a aproba.
+                    } @else {
+                      Această retrimitere nu conține modificări de câmp detectate.
+                    }
                   </p>
                 </div>
               </div>
@@ -70,8 +74,6 @@
                     </div>
                   }
                 </div>
-              } @else {
-                <p class="empty-text">Nicio modificare de câmp detectată.</p>
               }
             </nz-card>
           }
