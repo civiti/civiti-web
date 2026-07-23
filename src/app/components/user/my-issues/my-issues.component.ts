@@ -27,7 +27,7 @@ import { UserIssuesStatusFilter } from '../../../store/user-issues/user-issues.s
 import {
   IssueItem
 } from '../../../types/civica-api.types';
-import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsCancelledPipe, IsRejectedPipe } from '../../../pipes/status.pipe';
+import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsCancelledPipe, IsRejectedPipe, IsOwnerEditablePipe } from '../../../pipes/status.pipe';
 import { DaysSincePipe } from '../../../pipes/date.pipe';
 
 @Component({
@@ -54,6 +54,7 @@ import { DaysSincePipe } from '../../../pipes/date.pipe';
     IsActivePipe,
     IsCancelledPipe,
     IsRejectedPipe,
+    IsOwnerEditablePipe,
     DaysSincePipe
   ],
   templateUrl: './my-issues.component.html',

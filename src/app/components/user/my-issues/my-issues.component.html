@@ -63,12 +63,12 @@
                     <i nz-icon nzType="eye" nzTheme="outline"></i> Vezi
                   </button>
 
-                  <!-- Edit button for rejected issues -->
-                  @if ((issue.status | isRejected)) {
+                  <!-- Edit button for owner-editable issues (rejected, active, pending review) -->
+                  @if ((issue.status | isOwnerEditable)) {
                     <button
-                            nz-button nzType="primary" nzSize="small"
+                            nz-button [nzType]="(issue.status | isRejected) ? 'primary' : 'default'" nzSize="small"
                             (click)="editIssue(issue)">
-                      <i nz-icon nzType="edit" nzTheme="outline"></i> Editează
+                      <span nz-icon nzType="edit" nzTheme="outline"></span><span> Editează</span>
                     </button>
                   }
 

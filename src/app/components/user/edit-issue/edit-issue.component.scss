@@ -36,6 +36,10 @@
   margin-bottom: 16px;
 }
 
+.full-width {
+  width: 100%;
+}
+
 // Form styling
 nz-form-item {
   margin-bottom: 24px;
@@ -54,7 +58,23 @@ nz-form-label {
   margin-top: 4px;
 }
 
-// Read-only location field
+// Location
+.location-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .readonly-field {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  button {
+    flex: 0 0 auto;
+  }
+}
+
 .readonly-field {
   display: flex;
   align-items: center;
@@ -64,13 +84,9 @@ nz-form-label {
   border-radius: 8px;
   color: var(--oxford-blue);
 
-  i {
+  span[nz-icon] {
     font-size: 16px;
     color: var(--orange-web);
-  }
-
-  span {
-    font-size: 14px;
   }
 }
 
@@ -79,14 +95,95 @@ nz-form-label {
   color: var(--oxford-blue);
   opacity: 0.6;
   margin-top: 8px;
-  margin-bottom: 0;
+  margin-bottom: 8px;
 }
 
-// Photo upload styling
-.upload-text {
-  margin-top: 8px;
-  font-size: 12px;
+// Photo grid
+.photo-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 12px;
+}
+
+.photo-tile {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 2px solid transparent;
+  background-color: rgba(229, 229, 229, 0.3);
+
+  &.is-primary {
+    border-color: var(--orange-web);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .photo-overlay {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(20, 33, 61, 0.45);
+    color: var(--white);
+    font-size: 22px;
+  }
+
+  .primary-badge {
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    background: var(--orange-web);
+    color: var(--white);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+
+  .photo-actions {
+    position: absolute;
+    bottom: 4px;
+    right: 4px;
+    display: flex;
+    gap: 2px;
+    background: rgba(255, 255, 255, 0.85);
+    border-radius: 6px;
+  }
+}
+
+.photo-add {
+  aspect-ratio: 1 / 1;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1px dashed var(--platinum);
+  border-radius: 8px;
+  background-color: rgba(229, 229, 229, 0.3);
   color: var(--oxford-blue);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+
+  &:hover {
+    border-color: var(--orange-web);
+  }
+
+  span[nz-icon] {
+    font-size: 22px;
+  }
+
+  .upload-text {
+    font-size: 12px;
+  }
 }
 
 .photo-hint {
@@ -97,27 +194,70 @@ nz-form-label {
   margin-bottom: 0;
 }
 
-// NG-ZORRO upload customization
-::ng-deep {
-  .ant-upload-list-picture-card {
-    .ant-upload-list-item {
-      border-radius: 8px;
-      overflow: hidden;
-    }
+// Authorities
+.selected-authorities {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
 
-    .ant-upload-list-item-info {
-      border-radius: 8px;
-    }
+.authority-search {
+  margin-bottom: 12px;
+}
+
+.authority-loading {
+  padding: 16px;
+  text-align: center;
+  color: var(--oxford-blue);
+  opacity: 0.7;
+}
+
+.authority-group {
+  margin-bottom: 16px;
+
+  .authority-group-title {
+    font-weight: 600;
+    color: var(--oxford-blue);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+}
+
+.authority-item {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  padding: 8px 4px;
+  width: 100%;
+  margin-left: 0;
+
+  .authority-name {
+    font-weight: 500;
+    color: var(--oxford-blue);
   }
 
-  .ant-upload.ant-upload-select-picture-card {
-    border-radius: 8px;
-    border-color: var(--platinum);
-    background-color: rgba(229, 229, 229, 0.3);
+  .authority-email {
+    font-size: 12px;
+    color: var(--oxford-blue);
+    opacity: 0.6;
+  }
+}
 
-    &:hover {
-      border-color: var(--orange-web);
-    }
+.custom-authority {
+  margin-top: 12px;
+}
+
+.custom-email-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  .custom-email-actions {
+    display: flex;
+    gap: 8px;
   }
 }
 
@@ -150,15 +290,22 @@ nz-form-label {
   }
 }
 
-// Responsive adjustments
+// Responsive
 @media (max-width: 576px) {
   .edit-issue-container {
     padding: 16px 12px;
   }
 
-  .edit-header {
-    h2 {
-      font-size: 20px;
+  .edit-header h2 {
+    font-size: 20px;
+  }
+
+  .location-row {
+    flex-direction: column;
+    align-items: stretch;
+
+    button {
+      width: 100%;
     }
   }
 

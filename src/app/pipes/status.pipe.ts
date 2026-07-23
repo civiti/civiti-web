@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { isOwnerEditableStatus } from '../components/issue-creation/issue-field.constants';
 
 /**
  * Pure pipe to transform issue status to display text.
@@ -113,5 +114,20 @@ export class IsTerminalStatePipe implements PipeTransform {
     if (!status) return false;
     const normalized = status.toLowerCase();
     return normalized === 'resolved' || normalized === 'cancelled';
+  }
+}
+
+/**
+ * Pure pipe: whether an issue in this status may be edited by its owner.
+ * Drives the Edit affordance on issue-detail, my-issues and dashboard so no surface drifts.
+ */
+@Pipe({
+  name: 'isOwnerEditable',
+  standalone: true,
+  pure: true
+})
+export class IsOwnerEditablePipe implements PipeTransform {
+  transform(status: string | null | undefined): boolean {
+    return isOwnerEditableStatus(status);
   }
 }

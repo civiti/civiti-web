@@ -247,12 +247,28 @@ export interface UpdateIssueStatusRequest {
   status: 'cancelled' | 'resolved'; // camelCase as expected by backend
 }
 
-/** Request to edit user's own issue */
+/**
+ * Request to edit user's own issue. Full replacement (PUT semantics) — the client
+ * always sends the complete editable field set. Mirrors the editable subset of
+ * CreateIssueRequest so validation can be shared with create on the backend.
+ */
 export interface EditUserIssueRequest {
-  title?: string;
-  description?: string;
+  title: string;
+  description: string;
+  category: IssueCategory;
+  address: string;
+  district: string;
+  latitude: number;
+  longitude: number;
+  urgency?: UrgencyLevel;
+  desiredOutcome?: string;
+  communityImpact?: string;
   photoUrls?: string[];
-  resubmit?: boolean; // If true, changes status back to Submitted
+  authorities?: IssueAuthorityInput[];
+  /** Always true in v1: re-enters the admin approval queue (status -> Submitted). */
+  resubmit: boolean;
+  /** Optimistic-concurrency guard: the updatedAt value the client loaded. Backend 409s on mismatch. */
+  expectedUpdatedAt?: string;
 }
 
 export interface BulkApproveRequest {

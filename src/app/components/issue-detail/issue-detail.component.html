@@ -183,6 +183,14 @@
         <!-- Right Column - Actions and Authorities -->
         <nz-col [nzXs]="24" [nzLg]="8">
           <div class="space-y-6">
+            <!-- Owner edit action (visible only to the creator, for editable statuses) -->
+            @if (isOwner(issue) && (issue.status | isOwnerEditable)) {
+              <button nz-button nzType="default" nzBlock class="owner-edit-button"
+                      (click)="editIssue(issue)">
+                <span nz-icon nzType="edit" nzTheme="outline"></span><span>Editează problema</span>
+              </button>
+            }
+
             <!-- Email Counter Card - PROMINENT -->
             <nz-card [nzBordered]="true" [class]="(issue.status | isTerminalState) ? 'bg-green-50 border-2 border-green-500' : 'bg-orange-web-20 border-2 border-orange-web'">
               <div class="text-center">
