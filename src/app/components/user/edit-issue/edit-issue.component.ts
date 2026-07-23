@@ -49,7 +49,6 @@ import {
   DESCRIPTION_MIN,
   DESCRIPTION_MAX,
   TEXTAREA_MAX,
-  MIN_AUTHORITIES,
   MAX_AUTHORITIES,
   MAX_PHOTOS,
   MAX_PHOTO_MB,
@@ -174,7 +173,9 @@ export class EditIssueComponent implements OnInit, OnDestroy {
 
   readonly isAtAuthorityLimit = computed(() => this.selectedAuthorities().length >= MAX_AUTHORITIES);
   readonly remainingAuthoritySlots = computed(() => MAX_AUTHORITIES - this.selectedAuthorities().length);
-  readonly hasEnoughAuthorities = computed(() => this.selectedAuthorities().length >= MIN_AUTHORITIES);
+  // No client-side authority minimum: issues created without authorities (e.g. via the
+  // MCP tool) are valid, and the backend enforces no minimum — a client minimum would
+  // lock those owners out of editing entirely.
 
   readonly groupedAuthorities = computed<AuthorityGroup[]>(() => {
     const filtered = this.filteredAuthorities();
@@ -233,7 +234,10 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   private loadCategories(): void {
     this.categoryService.getCategoriesWithInfo()
       .pipe(takeUntilDestroyed(this._destroyRef))
-      .subscribe(categories => (this.categories = categories));
+      .subscribe(categories => {
+        this.categories = categories;
+        this.reconcileCategoryValue();
+      });
   }
 
   private loadIssue(): void {
@@ -276,6 +280,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       communityImpact: issue.communityImpact || '',
       urgency: this.normalizeUrgency(issue.urgency),
     });
+    this.reconcileCategoryValue(); // in case categories already loaded
 
     // Location — response carries no city, default to București (MVP, matches create flow)
     this.location.set({
@@ -355,6 +360,22 @@ export class EditIssueComponent implements OnInit, OnDestroy {
 
   categoryIcon(id: string): string {
     return this.categories.find(c => c.id === id)?.icon || 'question-circle';
+  }
+
+  /**
+   * Snap the prefilled category to the exact option id (case-insensitively).
+   * GET /api/categories returns option values in PascalCase ("PublicServices"), but
+   * GET /api/issues/{id} serializes the enum in camelCase ("publicServices"); without
+   * this the select would fail to match and render blank. Runs both when categories
+   * load and after prefill, since the two arrive asynchronously.
+   */
+  private reconcileCategoryValue(): void {
+    const raw = this.editForm.get('category')?.value;
+    if (!raw || this.categories.length === 0) return;
+    const match = this.categories.find(c => c.id.toLowerCase() === String(raw).toLowerCase());
+    if (match && match.id !== raw) {
+      this.editForm.patchValue({ category: match.id }, { emitEvent: false });
+    }
   }
 
   // ---- Location --------------------------------------------------------------
@@ -618,14 +639,17 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       this.message.warning('Adaugă cel puțin o fotografie.');
       return;
     }
-    if (!this.hasEnoughAuthorities()) {
-      this.message.warning(`Selectează cel puțin ${MIN_AUTHORITIES} autoritate.`);
-      return;
-    }
-    if (!this.location()) {
+    const loc = this.location();
+    if (!loc) {
       this.message.warning('Selectează o locație.');
       return;
     }
+    if (!loc.district) {
+      // The backend requires a non-empty district; București addresses always carry a sector.
+      this.message.warning('Selectează o locație cu sector (sectorul este obligatoriu).');
+      return;
+    }
+    // No authority minimum here — see the note on isAtAuthorityLimit.
 
     const copy = this.buildConfirmCopy();
     this.modal.confirm({
@@ -701,21 +725,61 @@ export class EditIssueComponent implements OnInit, OnDestroy {
         },
         error: (error: HttpErrorResponse) => {
           this.isSaving = false;
-          if (error.status === 409) {
-            // Don't silently discard the owner's draft — let them decide.
-            this.modal.confirm({
-              nzTitle: 'Problema a fost modificată între timp',
-              nzContent: 'Un administrator sau o altă sesiune a modificat această problemă. Poți reîncărca ultima versiune (modificările tale nesalvate se vor pierde) sau poți rămâne pe pagină pentru a-ți copia modificările.',
-              nzOkText: 'Reîncarcă ultima versiune',
-              nzCancelText: 'Rămân pe pagină',
-              nzOnOk: () => this.loadIssue(),
-            });
-            return;
-          }
-          console.error('[EditIssue] Nu s-a putut salva:', error);
-          this.message.error('Eroare la salvare. Încercați din nou.');
+          this.handleSaveError(error);
         }
       });
+  }
+
+  private handleSaveError(error: HttpErrorResponse): void {
+    const body = error.error;
+    switch (error.status) {
+      case 409:
+        // Branch on the stable `code`, never the (localisable) message.
+        if (body?.code === 'ISSUE_NOT_EDITABLE') {
+          this.loadError = 'Această problemă nu mai poate fi editată.';
+          this.message.error(this.loadError);
+          return;
+        }
+        // ISSUE_EDIT_CONFLICT (or any other 409): nothing was written — let the owner
+        // decide whether to reload (losing their draft) or keep editing to copy it out.
+        this.modal.confirm({
+          nzTitle: 'Problema a fost modificată între timp',
+          nzContent: 'Un administrator sau o altă sesiune a modificat această problemă. Poți reîncărca ultima versiune (modificările tale nesalvate se vor pierde) sau poți rămâne pe pagină pentru a-ți copia modificările.',
+          nzOkText: 'Reîncarcă ultima versiune',
+          nzCancelText: 'Rămân pe pagină',
+          nzOnOk: () => this.loadIssue(),
+        });
+        return;
+      case 400:
+        // Handles both shapes: ValidationProblemDetails `errors` map and `{ error }`.
+        this.message.error(this.extractErrorMessage(body));
+        return;
+      case 403:
+        this.message.error(
+          body?.title === 'Account Deleted'
+            ? 'Contul tău a fost șters.'
+            : 'Nu ai permisiunea de a edita această problemă.'
+        );
+        return;
+      case 404:
+        this.loadError = 'Problema nu a fost găsită.';
+        this.message.error(this.loadError);
+        return;
+      default:
+        console.error('[EditIssue] Nu s-a putut salva:', error);
+        this.message.error('Eroare la salvare. Încercați din nou.');
+    }
+  }
+
+  /** Pull a human message from either 400 shape: a ValidationProblemDetails `errors`
+   *  map or a service-level `{ error }` body. */
+  private extractErrorMessage(body: any): string {
+    if (body?.errors && typeof body.errors === 'object') {
+      const messages = (Object.values(body.errors) as string[][]).flat();
+      if (messages.length) return messages.join(' ');
+    }
+    if (typeof body?.error === 'string') return body.error;
+    return 'Datele trimise nu sunt valide. Verifică și încearcă din nou.';
   }
 
   goBack(): void {

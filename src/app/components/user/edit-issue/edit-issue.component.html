@@ -182,10 +182,10 @@
 
           <!-- Authorities -->
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired>Autorități destinatare</nz-form-label>
+            <nz-form-label [nzSpan]="24">Autorități destinatare</nz-form-label>
             <nz-form-control [nzSpan]="24">
               <p class="field-hint">
-                Selectează între 1 și {{ MAX_AUTHORITIES }} autorități.
+                Poți selecta până la {{ MAX_AUTHORITIES }} autorități.
                 Mai poți adăuga {{ remainingAuthoritySlots() }}.
               </p>
 
@@ -273,7 +273,7 @@
               nzType="primary"
               type="submit"
               [nzLoading]="isSaving || isUploading()"
-              [disabled]="editForm.invalid || isSaving || isUploading()">
+              [disabled]="isSaving || isUploading()">
               <span nz-icon nzType="check" nzTheme="outline"></span>
               <span>{{ isUploading() ? 'Se încarcă fotografiile...' : 'Retrimite pentru aprobare' }}</span>
             </button>
