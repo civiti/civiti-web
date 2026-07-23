@@ -117,7 +117,16 @@
               <td>{{ i + 1 }}</td>
 
               <td>
-                <div class="issue-title">{{ issue.title }}</div>
+                <div class="issue-title">
+                  {{ issue.title }}
+                  @if (issue.isReReview) {
+                    <nz-tag nzColor="gold" class="rereview-tag"
+                            nz-tooltip
+                            nzTooltipTitle="Editare a unei probleme deja aprobate — deschide detaliile pentru a vedea modificările">
+                      Reevaluare
+                    </nz-tag>
+                  }
+                </div>
                 <div class="issue-description">{{ issue.address | slice:0:80 }}</div>
               </td>
 

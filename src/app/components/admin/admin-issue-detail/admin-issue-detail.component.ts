@@ -28,9 +28,17 @@ import { TimeAgoPipe } from '../../../pipes/date.pipe';
 import { ActionLabelPipe, ActionColorPipe, TimelineColorPipe } from '../../../pipes/admin.pipe';
 import {
   AdminIssueDetailResponse,
+  IssueApprovedSnapshot,
   ApproveIssueRequest,
   RejectIssueRequest
 } from '../../../types/civica-api.types';
+
+/** One field that changed between the last-approved snapshot and the pending edit. */
+interface DiffRow {
+  label: string;
+  before: string;
+  after: string;
+}
 
 @Component({
   selector: 'app-admin-issue-detail',
@@ -76,6 +84,10 @@ export class AdminIssueDetailComponent implements OnInit {
   issue: AdminIssueDetailResponse | null = null;
   isLoading = true;
   error: string | null = null;
+
+  // Re-review diff (set from approvedSnapshot on load)
+  isReReview = false;
+  diffRows: DiffRow[] = [];
 
   // Decision modal
   isDecisionModalVisible = false;
@@ -129,7 +141,40 @@ export class AdminIssueDetailComponent implements OnInit {
       .subscribe(issue => {
         this.issue = issue;
         this.isLoading = false;
+        this.buildDiff(issue);
       });
+  }
+
+  /**
+   * Build the re-review diff from the approved snapshot. Branch on the snapshot's PRESENCE
+   * (not changedFields.length): a null snapshot means a genuine first review, so no diff.
+   */
+  private buildDiff(issue: AdminIssueDetailResponse): void {
+    const snap: IssueApprovedSnapshot | null | undefined = issue.approvedSnapshot;
+    this.isReReview = snap != null;
+    this.diffRows = [];
+    if (!snap) return;
+
+    const changed = new Set(issue.changedFields ?? []);
+    const row = (key: string, label: string, before: string, after: string): void => {
+      if (changed.has(key)) this.diffRows.push({ label, before, after });
+    };
+    const cap = (s: string | null | undefined): string =>
+      s ? s.charAt(0).toUpperCase() + s.slice(1) : '—';
+    const names = (list: { name: string }[] | undefined): string =>
+      (list ?? []).map(a => a.name).join(', ') || '—';
+
+    row('title', 'Titlu', snap.title, issue.title);
+    row('category', 'Categorie', cap(snap.category), cap(issue.category));
+    row('urgency', 'Urgență', cap(snap.urgency), cap(issue.urgency));
+    row('address', 'Adresă', snap.address, issue.address);
+    row('district', 'Sector', snap.district || '—', issue.district || '—');
+    row('location', 'Coordonate', `${snap.latitude}, ${snap.longitude}`, `${issue.latitude}, ${issue.longitude}`);
+    row('description', 'Descriere', snap.description, issue.description);
+    row('desiredOutcome', 'Rezultat dorit', snap.desiredOutcome || '—', issue.desiredOutcome || '—');
+    row('communityImpact', 'Impact comunitar', snap.communityImpact || '—', issue.communityImpact || '—');
+    row('photos', 'Fotografii', `${snap.photoUrls?.length ?? 0} fotografii`, `${issue.photos?.length ?? 0} fotografii`);
+    row('authorities', 'Autorități', names(snap.authorities), names(issue.authorities));
   }
 
   goBack(): void {

@@ -38,6 +38,44 @@
       <nz-col [nzXs]="24" [nzLg]="16">
         <div class="column-stack">
 
+          <!-- Re-review diff (edit of already-approved content) -->
+          @if (isReReview) {
+            <nz-card class="detail-card rereview-card">
+              <div class="rereview-header">
+                <span nz-icon nzType="warning" nzTheme="fill" class="rereview-icon"></span>
+                <div class="rereview-copy">
+                  <h3>Reevaluare — editare a unei probleme deja aprobate</h3>
+                  <p>
+                    Voturile și email-urile afișate au fost strânse pentru conținutul aprobat
+                    anterior. Verifică modificările de mai jos înainte de a aproba.
+                  </p>
+                </div>
+              </div>
+
+              @if (diffRows.length > 0) {
+                <div class="diff-list">
+                  @for (row of diffRows; track row.label) {
+                    <div class="diff-row">
+                      <div class="diff-field">{{ row.label }}</div>
+                      <div class="diff-values">
+                        <div class="diff-before">
+                          <span class="diff-tag diff-tag-before">Aprobat</span>
+                          <span class="diff-text">{{ row.before }}</span>
+                        </div>
+                        <div class="diff-after">
+                          <span class="diff-tag diff-tag-after">Nou</span>
+                          <span class="diff-text">{{ row.after }}</span>
+                        </div>
+                      </div>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="empty-text">Nicio modificare de câmp detectată.</p>
+              }
+            </nz-card>
+          }
+
           <!-- Issue Header Card -->
           <nz-card class="detail-card">
             <div class="issue-title-section">

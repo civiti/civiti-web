@@ -325,3 +325,115 @@
     grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   }
 }
+
+// Re-review diff card
+.rereview-card {
+  border: 2px solid var(--orange-web);
+
+  .rereview-header {
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+
+    .rereview-icon {
+      color: var(--orange-web);
+      font-size: 1.5rem;
+      flex: 0 0 auto;
+      margin-top: 2px;
+    }
+
+    .rereview-copy {
+      h3 {
+        margin: 0 0 0.25rem;
+        color: var(--oxford-blue);
+        font-size: 1rem;
+        font-weight: 600;
+      }
+
+      p {
+        margin: 0;
+        color: var(--oxford-blue);
+        opacity: 0.75;
+        font-size: 0.85rem;
+      }
+    }
+  }
+}
+
+.diff-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.diff-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  gap: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--platinum);
+
+  &:first-child {
+    border-top: none;
+    padding-top: 0;
+  }
+
+  .diff-field {
+    font-weight: 600;
+    color: var(--oxford-blue);
+    font-size: 0.85rem;
+  }
+
+  .diff-values {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .diff-before,
+  .diff-after {
+    display: flex;
+    gap: 0.5rem;
+    align-items: baseline;
+    font-size: 0.85rem;
+  }
+
+  .diff-tag {
+    flex: 0 0 auto;
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .diff-tag-before {
+    background: rgba(20, 33, 61, 0.08);
+    color: var(--oxford-blue);
+  }
+
+  .diff-tag-after {
+    background: rgba(252, 163, 17, 0.18);
+    color: var(--orange-web);
+  }
+
+  .diff-before .diff-text {
+    color: var(--oxford-blue);
+    opacity: 0.7;
+    text-decoration: line-through;
+  }
+
+  .diff-after .diff-text {
+    color: var(--oxford-blue);
+    font-weight: 500;
+    word-break: break-word;
+  }
+}
+
+@media (max-width: 576px) {
+  .diff-row {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+}
