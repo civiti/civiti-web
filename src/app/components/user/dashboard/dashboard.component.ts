@@ -20,7 +20,7 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { StatusTextPipe, StatusColorPipe } from '../../../pipes/status.pipe';
+import { StatusTextPipe, StatusColorPipe, IsOwnerEditablePipe } from '../../../pipes/status.pipe';
 import { ActivityIconPipe, ActivityColorPipe } from '../../../pipes/activity.pipe';
 import { LevelTitlePipe, BadgeColorPipe } from '../../../pipes/dashboard.pipe';
 import { AppState } from '../../../store/app.state';
@@ -77,6 +77,7 @@ import {
     NzEmptyModule,
     StatusTextPipe,
     StatusColorPipe,
+    IsOwnerEditablePipe,
     ActivityIconPipe,
     ActivityColorPipe,
     LevelTitlePipe,
@@ -154,6 +155,10 @@ export class DashboardComponent implements OnInit {
 
   viewIssueDetails(issueId: string): void {
     this.router.navigate(['/issue', issueId]);
+  }
+
+  editIssue(issueId: string): void {
+    this.router.navigate(['/edit-issue', issueId]);
   }
 
   onIssueImageError(event: Event): void {

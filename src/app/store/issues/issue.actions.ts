@@ -120,3 +120,9 @@ export const syncVoteState = createAction(
   '[Issue Detail] Sync Vote State',
   props<{ issueId: string; hasVoted: boolean }>()
 );
+
+// Issue Edited (owner resubmit) - reconcile the public list slice + selected detail.
+export const issueEdited = createAction(
+  '[Issue Edit] Issue Edited',
+  props<{ issue: IssueDetailResponse }>()
+);

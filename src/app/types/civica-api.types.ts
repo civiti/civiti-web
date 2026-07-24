@@ -536,6 +536,28 @@ export interface AdminIssueListItem {
   photoCount: number;
   emailsSent: number;
   userName: string;
+  /** True when this pending item is an edit of already-approved content (re-review), not a new report. */
+  isReReview?: boolean;
+}
+
+/**
+ * Snapshot of the last approved version of an issue, returned on the admin detail when the
+ * pending issue is a re-review. Compare against the (pending) issue to see what the owner changed.
+ */
+export interface IssueApprovedSnapshot {
+  approvedAt: string;
+  title: string;
+  description: string;
+  category: IssueCategory;
+  address: string;
+  district?: string;
+  latitude: number;
+  longitude: number;
+  urgency: UrgencyLevel;
+  desiredOutcome?: string;
+  communityImpact?: string;
+  photoUrls: string[];
+  authorities: { name: string; email: string }[];
 }
 
 /**
@@ -608,6 +630,12 @@ export interface AdminIssueDetailResponse {
   authorities: IssueAuthorityResponse[];
   adminActions: AdminActionResponse[];
   emailsSent: number;
+
+  // Re-review diff — present (non-null) when this pending issue is an edit of previously-approved
+  // content. Branch on `approvedSnapshot !== null`, NOT on `changedFields.length` (an unchanged and a
+  // never-approved issue both return an empty/absent changedFields).
+  approvedSnapshot?: IssueApprovedSnapshot | null;
+  changedFields?: string[];
 }
 
 export interface IssueActionResponse {

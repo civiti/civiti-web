@@ -28,9 +28,17 @@ import { TimeAgoPipe } from '../../../pipes/date.pipe';
 import { ActionLabelPipe, ActionColorPipe, TimelineColorPipe } from '../../../pipes/admin.pipe';
 import {
   AdminIssueDetailResponse,
+  IssueApprovedSnapshot,
   ApproveIssueRequest,
   RejectIssueRequest
 } from '../../../types/civica-api.types';
+
+/** One field that changed between the last-approved snapshot and the pending edit. */
+interface DiffRow {
+  label: string;
+  before: string;
+  after: string;
+}
 
 @Component({
   selector: 'app-admin-issue-detail',
@@ -76,6 +84,10 @@ export class AdminIssueDetailComponent implements OnInit {
   issue: AdminIssueDetailResponse | null = null;
   isLoading = true;
   error: string | null = null;
+
+  // Re-review diff (set from approvedSnapshot on load)
+  isReReview = false;
+  diffRows: DiffRow[] = [];
 
   // Decision modal
   isDecisionModalVisible = false;
@@ -129,7 +141,79 @@ export class AdminIssueDetailComponent implements OnInit {
       .subscribe(issue => {
         this.issue = issue;
         this.isLoading = false;
+        this.buildDiff(issue);
       });
+  }
+
+  // Romanian labels for enum values. Keyed lowercase so they match the camelCase the API
+  // returns (e.g. "publicServices") as well as any PascalCase value.
+  private static readonly CATEGORY_LABELS: Record<string, string> = {
+    infrastructure: 'Infrastructură',
+    environment: 'Mediu',
+    transportation: 'Transport',
+    publicservices: 'Servicii Publice',
+    safety: 'Siguranță',
+    other: 'Altele',
+  };
+  private static readonly URGENCY_LABELS: Record<string, string> = {
+    unspecified: 'Nespecificată',
+    low: 'Scăzută',
+    medium: 'Medie',
+    high: 'Ridicată',
+    urgent: 'Urgentă',
+  };
+
+  /**
+   * Build the re-review diff from the approved snapshot. Branch on the snapshot's PRESENCE
+   * (not changedFields.length): a null snapshot means a genuine first review, so no diff.
+   */
+  private buildDiff(issue: AdminIssueDetailResponse): void {
+    const snap: IssueApprovedSnapshot | null | undefined = issue.approvedSnapshot;
+    this.isReReview = snap != null;
+    this.diffRows = [];
+    if (!snap) return;
+
+    const changed = new Set(issue.changedFields ?? []);
+    const known = new Set<string>();
+    const row = (key: string, label: string, before: string, after: string): void => {
+      known.add(key);
+      if (changed.has(key)) this.diffRows.push({ label, before, after });
+    };
+    const catLabel = (v: string): string =>
+      AdminIssueDetailComponent.CATEGORY_LABELS[(v || '').toLowerCase()] || v || '—';
+    const urgLabel = (v: string): string =>
+      AdminIssueDetailComponent.URGENCY_LABELS[(v || '').toLowerCase()] || v || '—';
+    // Include the email so an email-only authority change is visible (name alone would hide it).
+    const authList = (list: { name: string; email: string }[] | undefined): string =>
+      (list ?? []).map(a => `${a.name} (${a.email})`).join('; ') || '—';
+
+    row('title', 'Titlu', snap.title, issue.title);
+    row('category', 'Categorie', catLabel(snap.category), catLabel(issue.category));
+    row('urgency', 'Urgență', urgLabel(snap.urgency), urgLabel(issue.urgency));
+    row('address', 'Adresă', snap.address, issue.address);
+    row('district', 'Sector', snap.district || '—', issue.district || '—');
+    row('location', 'Coordonate', `${snap.latitude}, ${snap.longitude}`, `${issue.latitude}, ${issue.longitude}`);
+    row('description', 'Descriere', snap.description, issue.description);
+    row('desiredOutcome', 'Rezultat dorit', snap.desiredOutcome || '—', issue.desiredOutcome || '—');
+    row('communityImpact', 'Impact comunitar', snap.communityImpact || '—', issue.communityImpact || '—');
+
+    // Photos: 'photos' is in changedFields for any change, incl. a same-count swap. Flag content
+    // change explicitly so an equal count doesn't read as "nothing changed".
+    const snapPhotos = snap.photoUrls?.length ?? 0;
+    const issuePhotos = issue.photos?.length ?? 0;
+    row('photos', 'Fotografii',
+      `${snapPhotos} fotografii`,
+      snapPhotos === issuePhotos ? `${issuePhotos} fotografii (conținut modificat)` : `${issuePhotos} fotografii`);
+
+    row('authorities', 'Autorități', authList(snap.authorities), authList(issue.authorities));
+
+    // Forward-compat: surface any changedFields value we don't explicitly map, so a real change
+    // never silently vanishes (and the panel never wrongly reads "no changes detected").
+    for (const key of changed) {
+      if (!known.has(key)) {
+        this.diffRows.push({ label: key, before: '—', after: 'Modificat' });
+      }
+    }
   }
 
   goBack(): void {

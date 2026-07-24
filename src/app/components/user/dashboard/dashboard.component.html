@@ -165,6 +165,12 @@
                       </nz-tag>
                       <span class="email-count">{{ issue.emailsSent }} contribuții</span>
                     </div>
+                    @if (issue.status | isOwnerEditable) {
+                      <button nz-button nzType="link" nzSize="small" class="mini-edit-btn"
+                              (click)="$event.stopPropagation(); editIssue(issue.id)">
+                        <span nz-icon nzType="edit" nzTheme="outline"></span><span>Editează</span>
+                      </button>
+                    }
                   </div>
                 </div>
               }
