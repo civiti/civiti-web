@@ -4,10 +4,9 @@ import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { Store } from '@ngrx/store';
 import { HttpErrorResponse } from '@angular/common/http';
-import { of, from, merge, Subject } from 'rxjs';
-import { switchMap, catchError, toArray, debounceTime, tap } from 'rxjs/operators';
+import { of, from, merge } from 'rxjs';
+import { switchMap, catchError, toArray } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import imageCompression from 'browser-image-compression';
 
 // NG-ZORRO imports
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -30,12 +29,12 @@ import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { AppState } from '../../../store/app.state';
 import { ApiService } from '../../../services/api.service';
 import { StorageService, UploadResult } from '../../../services/storage.service';
+import { PhotoUploadService } from '../../../services/photo-upload.service';
 import { SupabaseAuthService } from '../../../services/supabase-auth.service';
 import { CategoryService, CategoryInfo } from '../../../services/category.service';
 import {
   IssueDetailResponse,
   IssueAuthorityInput,
-  AuthorityListResponse,
   EditUserIssueRequest,
   UrgencyLevel,
   URGENCY_OPTIONS,
@@ -44,14 +43,13 @@ import {
 import { LocationData } from '../../../types/location.types';
 import { DEFAULT_CITY } from '../../../data/romanian-locations';
 import { LocationPickerModalComponent } from '../../shared/location-picker-modal/location-picker-modal.component';
+import { AuthorityPickerComponent, SelectedAuthority } from '../../shared/authority-picker/authority-picker.component';
 import {
   ISSUE_TITLE_MAX,
   DESCRIPTION_MIN,
   DESCRIPTION_MAX,
   TEXTAREA_MAX,
-  MAX_AUTHORITIES,
   MAX_PHOTOS,
-  MAX_PHOTO_MB,
   isOwnerEditableStatus,
 } from '../../issue-creation/issue-field.constants';
 import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
@@ -65,25 +63,6 @@ interface EditPhoto {
   isPrimary: boolean;
   isExisting: boolean;  // true = loaded from server (backend owns blob GC on removal)
   isUploading: boolean;
-}
-
-/** A selected authority (predefined or custom). */
-interface SelectedAuthority {
-  authorityId?: string;
-  email: string;
-  name: string;
-  isCustom: boolean;
-}
-
-interface AuthorityGroup {
-  label: string;
-  icon: string;
-  authorities: AuthorityListResponse[];
-}
-
-function isValidEmail(email: string): boolean {
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  return emailRegex.test(email);
 }
 
 @Component({
@@ -109,6 +88,7 @@ function isValidEmail(email: string): boolean {
     NzSpinModule,
     NzToolTipModule,
     NzModalModule,
+    AuthorityPickerComponent,
   ],
   templateUrl: './edit-issue.component.html',
   styleUrls: ['./edit-issue.component.scss']
@@ -121,6 +101,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   private store = inject(Store<AppState>);
   private apiService = inject(ApiService);
   private storageService = inject(StorageService);
+  private photoUploadService = inject(PhotoUploadService);
   private authService = inject(SupabaseAuthService);
   private categoryService = inject(CategoryService);
   private message = inject(NzMessageService);
@@ -133,17 +114,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   readonly DESCRIPTION_MAX = DESCRIPTION_MAX;
   readonly TEXTAREA_MAX = TEXTAREA_MAX;
   readonly MAX_PHOTOS = MAX_PHOTOS;
-  readonly MAX_AUTHORITIES = MAX_AUTHORITIES;
   readonly urgencyOptions = URGENCY_OPTIONS;
-
-  // Compression settings (same as create/photo-upload flow)
-  private readonly compressionOptions = {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1920,
-    useWebWorker: true,
-    preserveExif: false,
-    initialQuality: 0.85,
-  };
 
   issueId = '';
   issue: IssueDetailResponse | null = null;
@@ -162,36 +133,12 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   // Location
   location = signal<LocationData | null>(null);
 
-  // Authorities
-  private readonly loadTrigger$ = new Subject<string>();
-  private issueCity = DEFAULT_CITY;
+  // Authorities — selection is two-way bound to app-authority-picker; city/district feed its
+  // query. No client-side minimum: issues created without authorities (e.g. via the MCP tool)
+  // are valid, and a client minimum would lock those owners out of editing.
+  issueCity = signal(DEFAULT_CITY);
   issueDistrict = signal('');
-  filteredAuthorities = signal<AuthorityListResponse[]>([]);
   selectedAuthorities = signal<SelectedAuthority[]>([]);
-  searchTerm = '';
-  isLoadingAuthorities = false;
-  showCustomEmailInput = false;
-  customEmailForm: FormGroup;
-
-  readonly isAtAuthorityLimit = computed(() => this.selectedAuthorities().length >= MAX_AUTHORITIES);
-  readonly remainingAuthoritySlots = computed(() => MAX_AUTHORITIES - this.selectedAuthorities().length);
-  // No client-side authority minimum: issues created without authorities (e.g. via the
-  // MCP tool) are valid, and the backend enforces no minimum — a client minimum would
-  // lock those owners out of editing entirely.
-
-  readonly groupedAuthorities = computed<AuthorityGroup[]>(() => {
-    const filtered = this.filteredAuthorities();
-    const municipal = filtered.filter(a => !a.district);
-    const district = filtered.filter(a => a.district);
-    const groups: AuthorityGroup[] = [];
-    if (municipal.length > 0) {
-      groups.push({ label: 'Autorități municipale', icon: 'bank', authorities: municipal });
-    }
-    if (district.length > 0) {
-      groups.push({ label: `Autorități ${this.issueDistrict() || 'locale'}`, icon: 'home', authorities: district });
-    }
-    return groups;
-  });
 
   constructor() {
     this.editForm = this.fb.group({
@@ -204,11 +151,6 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       communityImpact: ['', [Validators.minLength(DESCRIPTION_MIN), Validators.maxLength(TEXTAREA_MAX)]],
       urgency: ['medium'],
     });
-    this.customEmailForm = this.fb.group({
-      email: ['', [Validators.required, Validators.email]],
-      name: [''],
-    });
-    this.setupAuthorityStream();
     this.loadCategories();
   }
 
@@ -292,7 +234,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       city: DEFAULT_CITY,
       district: issue.district ?? null,
     });
-    this.issueCity = DEFAULT_CITY;
+    this.issueCity.set(DEFAULT_CITY);
     this.issueDistrict.set(issue.district || '');
 
     // Photos — map server photos, guarantee exactly one primary
@@ -309,17 +251,13 @@ export class EditIssueComponent implements OnInit, OnDestroy {
     }
     this.photos.set(photos);
 
-    // Authorities — rehydrate from the response
+    // Authorities — rehydrate from the response (the picker auto-loads its list from city/district)
     this.selectedAuthorities.set((issue.authorities || []).map(a => ({
       authorityId: a.authorityId,
       email: a.email,
       name: a.name,
       isCustom: !a.isPredefined,
     })));
-
-    // Load the authority picklist for this location
-    this.isLoadingAuthorities = true;
-    this.loadTrigger$.next('');
   }
 
   private normalizeUrgency(value: string | undefined): UrgencyLevel {
@@ -403,11 +341,9 @@ export class EditIssueComponent implements OnInit, OnDestroy {
     modalRef.afterClose.pipe(takeUntilDestroyed(this._destroyRef)).subscribe((result: LocationData | null) => {
       if (result) {
         this.location.set(result);
-        // Re-filter authorities for the (possibly new) district
-        this.issueCity = result.city || DEFAULT_CITY;
+        // Update city/district — the picker reloads authorities off its composite key.
+        this.issueCity.set(result.city || DEFAULT_CITY);
         this.issueDistrict.set(result.district || '');
-        this.isLoadingAuthorities = true;
-        this.loadTrigger$.next(this.searchTerm);
       }
     });
   }
@@ -443,12 +379,9 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   }
 
   private processFile(file: File) {
-    if (!file.type.startsWith('image/')) {
-      this.message.error(`${file.name} nu este un fișier imagine valid.`);
-      return of(null);
-    }
-    if (file.size > MAX_PHOTO_MB * 1024 * 1024) {
-      this.message.error(`${file.name} este prea mare. Dimensiunea maximă este de ${MAX_PHOTO_MB}MB.`);
+    const validation = this.photoUploadService.validate(file);
+    if (!validation.ok) {
+      this.message.error(validation.reason);
       return of(null);
     }
 
@@ -465,7 +398,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       isUploading: true,
     }]);
 
-    return from(this.compressImage(file)).pipe(
+    return from(this.photoUploadService.compress(file)).pipe(
       switchMap(compressed => this.storageService.uploadPhotoWithRetry(this.currentUserId!, compressed)),
       switchMap((result: UploadResult) => {
         // Photo removed mid-upload → clean the orphan
@@ -492,18 +425,6 @@ export class EditIssueComponent implements OnInit, OnDestroy {
     );
   }
 
-  private async compressImage(file: File): Promise<File> {
-    try {
-      const options = file.size < 500 * 1024
-        ? { ...this.compressionOptions, maxSizeMB: Infinity }
-        : this.compressionOptions;
-      return await imageCompression(file, options);
-    } catch (error) {
-      console.error('[EditIssue] Compresia a eșuat:', error);
-      throw new Error('Nu s-a putut procesa imaginea.');
-    }
-  }
-
   removePhoto(id: string): void {
     const photo = this.photos().find(p => p.id === id);
     if (!photo) return;
@@ -528,98 +449,6 @@ export class EditIssueComponent implements OnInit, OnDestroy {
 
   setPrimaryPhoto(id: string): void {
     this.photos.update(list => list.map(p => ({ ...p, isPrimary: p.id === id })));
-  }
-
-  // ---- Authorities -----------------------------------------------------------
-
-  private setupAuthorityStream(): void {
-    // NOTE: no distinctUntilChanged here — unlike the create wizard (which only
-    // re-triggers on search-text change), the edit flow re-triggers with an
-    // UNCHANGED search string on location-change and 409-reload. distinctUntilChanged
-    // would suppress those and leave the picker stuck loading with stale authorities.
-    this.loadTrigger$
-      .pipe(
-        debounceTime(300),
-        tap(() => (this.isLoadingAuthorities = true)),
-        switchMap(search => this.apiService.getAuthorities({
-          city: this.issueCity,
-          district: this.issueDistrict() || undefined,
-          search: search.trim() || undefined,
-        }).pipe(
-          catchError(error => {
-            console.error('[EditIssue] Nu s-au putut încărca autoritățile:', error);
-            this.message.warning('Nu s-au putut încărca autoritățile. Poți adăuga manual.');
-            return of([] as AuthorityListResponse[]);
-          })
-        )),
-        takeUntilDestroyed(this._destroyRef)
-      )
-      .subscribe(authorities => {
-        this.filteredAuthorities.set([...authorities]);
-        this.isLoadingAuthorities = false;
-      });
-  }
-
-  filterAuthorities(): void {
-    this.loadTrigger$.next(this.searchTerm);
-  }
-
-  isAuthoritySelected(authority: AuthorityListResponse): boolean {
-    return this.selectedAuthorities().some(a => a.authorityId === authority.id || a.email === authority.email);
-  }
-
-  toggleAuthority(authority: AuthorityListResponse): void {
-    const current = this.selectedAuthorities();
-    const index = current.findIndex(a => a.authorityId === authority.id || a.email === authority.email);
-    if (index >= 0) {
-      this.selectedAuthorities.update(list => list.filter((_, i) => i !== index));
-    } else {
-      if (this.isAtAuthorityLimit()) return;
-      this.selectedAuthorities.update(list => [...list, {
-        authorityId: authority.id,
-        email: authority.email,
-        name: authority.name,
-        isCustom: false,
-      }]);
-    }
-  }
-
-  toggleCustomEmailInput(): void {
-    this.showCustomEmailInput = !this.showCustomEmailInput;
-    if (!this.showCustomEmailInput) {
-      this.customEmailForm.reset();
-    }
-  }
-
-  addCustomAuthority(): void {
-    if (!this.customEmailForm.valid) {
-      Object.keys(this.customEmailForm.controls).forEach(key => this.customEmailForm.get(key)?.markAsTouched());
-      return;
-    }
-    const email = this.customEmailForm.get('email')?.value?.trim();
-    const name = this.customEmailForm.get('name')?.value?.trim() || email;
-
-    if (this.selectedAuthorities().some(a => a.email.toLowerCase() === email.toLowerCase())) {
-      this.message.warning('Această adresă de email este deja adăugată');
-      return;
-    }
-    if (this.isAtAuthorityLimit()) {
-      this.message.warning(`Poți selecta maximum ${MAX_AUTHORITIES} autorități`);
-      return;
-    }
-    if (!isValidEmail(email)) {
-      this.message.error('Adresa de email nu este validă');
-      return;
-    }
-
-    this.selectedAuthorities.update(list => [...list, { email, name, isCustom: true }]);
-    this.customEmailForm.reset();
-    this.showCustomEmailInput = false;
-    this.message.success('Autoritate adăugată cu succes');
-  }
-
-  removeAuthority(authority: SelectedAuthority): void {
-    this.selectedAuthorities.update(list => list.filter(a => a.email !== authority.email));
   }
 
   // ---- Submit ----------------------------------------------------------------
@@ -651,7 +480,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       this.message.warning('Selectează o locație cu sector (sectorul este obligatoriu).');
       return;
     }
-    // No authority minimum here — see the note on isAtAuthorityLimit.
+    // No authority minimum — an issue created without authorities must stay editable.
 
     const copy = this.buildConfirmCopy();
     this.modal.confirm({
@@ -691,7 +520,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
     this.isSaving = true;
 
     const loc = this.location()!;
-    const sortedPhotos = [...this.photos()].sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0));
+    const sortedPhotos = this.photoUploadService.sortPrimaryFirst(this.photos());
     const authorities: IssueAuthorityInput[] = this.selectedAuthorities().map(a =>
       a.authorityId && !a.isCustom
         ? { authorityId: a.authorityId }

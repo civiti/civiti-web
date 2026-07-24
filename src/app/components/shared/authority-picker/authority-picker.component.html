@@ -1,0 +1,194 @@
+<!-- Selected authorities summary -->
+@if (selected().length > 0) {
+  <div class="selected-authorities-section">
+    <nz-card class="selected-card">
+      <div class="selected-header">
+        <h3>
+          <span nz-icon nzType="check-circle" nzTheme="fill" class="selected-icon"></span>
+          Autorități selectate ({{ selected().length }}/{{ MAX_AUTHORITIES }})
+        </h3>
+        <span class="slots-remaining">
+          <span class="slots-count">{{ remainingSlots() }}</span>
+          <span class="slots-label">locuri rămase</span>
+        </span>
+      </div>
+      <div class="selected-tags">
+        @for (auth of selected(); track auth.email) {
+          <nz-tag
+            [nzMode]="'closeable'"
+            [nzColor]="auth.isCustom ? 'orange' : 'blue'"
+            (nzOnClose)="removeAuthority(auth)">
+            <span nz-icon [nzType]="auth.isCustom ? 'user' : 'bank'" class="tag-icon"></span>
+            {{ auth.name }}
+            @if (auth.isCustom) {
+              <span class="custom-badge">PERSONALIZAT</span>
+            }
+          </nz-tag>
+        }
+      </div>
+    </nz-card>
+  </div>
+}
+
+<!-- Search -->
+<div class="search-section">
+  <nz-input-group [nzPrefix]="prefixIcon" nzSize="large">
+    <input
+      nz-input
+      [ngModel]="searchTerm()"
+      (ngModelChange)="searchTerm.set($event)"
+      placeholder="Caută autorități după nume..." />
+  </nz-input-group>
+  <ng-template #prefixIcon>
+    <span nz-icon nzType="search"></span>
+  </ng-template>
+</div>
+
+<!-- Predefined authorities list -->
+<div class="authorities-section">
+  <nz-card [nzTitle]="cardTitle" class="authorities-card">
+    <ng-template #cardTitle>
+      <div class="authorities-card-title">
+        <span>Autorități pentru {{ city() }}</span>
+        @if (district()) {
+          <nz-tag nzColor="blue">{{ district() }}</nz-tag>
+        }
+      </div>
+    </ng-template>
+
+    <nz-alert
+      nzType="info"
+      nzMessage="Selectează autoritățile către care dorești să trimiți problema. Autoritățile de nivel municipal sunt afișate primele."
+      nzShowIcon
+      class="info-alert">
+    </nz-alert>
+
+    <nz-spin [nzSpinning]="isLoading()">
+      @if (filteredAuthorities().length > 0) {
+        <div class="authorities-list">
+          @for (group of groupedAuthorities(); track group.label) {
+            <div class="authority-group">
+              <div class="group-header">
+                <span nz-icon [nzType]="group.icon" class="group-icon"></span>
+                <span class="group-label">{{ group.label }}</span>
+                <span class="group-count">({{ group.authorities.length }})</span>
+              </div>
+
+              <div class="group-items">
+                @for (authority of group.authorities; track authority.id) {
+                  @let selectedRow = isAuthoritySelected(authority);
+                  @let disabledRow = isAtLimit() && !selectedRow;
+                  <div
+                    class="authority-item"
+                    [class.selected]="selectedRow"
+                    [class.disabled]="disabledRow"
+                    (click)="toggleAuthority(authority)">
+
+                    <div class="authority-checkbox">
+                      <label nz-checkbox
+                             [ngModel]="selectedRow"
+                             [nzDisabled]="disabledRow"
+                             (ngModelChange)="toggleAuthority(authority)"
+                             (click)="$event.stopPropagation()"></label>
+                    </div>
+
+                    <div class="authority-icon">
+                      <span nz-icon [nzType]="authority.district ? 'home' : 'bank'"></span>
+                    </div>
+
+                    <div class="authority-info">
+                      <div class="authority-name">{{ authority.name }}</div>
+                      <div class="authority-email">{{ authority.email }}</div>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (!isLoading() && filteredAuthorities().length === 0) {
+        <nz-empty
+          nzNotFoundContent="Nu s-au găsit autorități pentru această locație. Poți adăuga una personalizată mai jos.">
+        </nz-empty>
+      }
+    </nz-spin>
+  </nz-card>
+</div>
+
+<!-- Custom authority -->
+<div class="custom-authority-section">
+  <nz-card class="custom-card">
+    <div class="custom-header" (click)="toggleCustomEmailInput()">
+      <h3>
+        <span nz-icon nzType="plus-circle" nzTheme="outline"></span>
+        Adaugă autoritate personalizată
+      </h3>
+      <span nz-icon [nzType]="showCustomEmailInput() ? 'up' : 'down'"></span>
+    </div>
+
+    @if (showCustomEmailInput()) {
+      <div class="custom-form">
+        <nz-alert
+          nzType="info"
+          nzMessage="Autoritatea personalizată va fi folosită doar pentru această problemă"
+          nzShowIcon
+          class="custom-alert">
+        </nz-alert>
+
+        <!-- NOT a <form>: this component embeds inside edit's outer form and nested forms are
+             invalid HTML. Enter-to-add is preserved via (keydown.enter). -->
+        <div [formGroup]="customEmailForm">
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" nzFor="authEmail" nzRequired>
+              Adresă email autoritate
+            </nz-form-label>
+            <nz-form-control [nzSpan]="24" nzErrorTip="Introdu o adresă de email validă">
+              <nz-input-group [nzPrefix]="emailIcon">
+                <input
+                  nz-input
+                  formControlName="email"
+                  id="authEmail"
+                  placeholder="exemplu@autoritate.ro"
+                  (keydown.enter)="$event.preventDefault(); addCustomAuthority()" />
+              </nz-input-group>
+              <ng-template #emailIcon>
+                <span nz-icon nzType="mail"></span>
+              </ng-template>
+            </nz-form-control>
+          </nz-form-item>
+
+          <nz-form-item>
+            <nz-form-label [nzSpan]="24" nzFor="authName">
+              Nume autoritate (opțional)
+            </nz-form-label>
+            <nz-form-control [nzSpan]="24">
+              <nz-input-group [nzPrefix]="nameIcon">
+                <input
+                  nz-input
+                  formControlName="name"
+                  id="authName"
+                  placeholder="Ex: Primăria Sectorului X"
+                  (keydown.enter)="$event.preventDefault(); addCustomAuthority()" />
+              </nz-input-group>
+              <ng-template #nameIcon>
+                <span nz-icon nzType="bank"></span>
+              </ng-template>
+            </nz-form-control>
+          </nz-form-item>
+
+          <button
+            nz-button
+            nzType="dashed"
+            type="button"
+            [disabled]="!customEmailForm.valid || isAtLimit()"
+            class="add-custom-btn"
+            (click)="addCustomAuthority()">
+            <span nz-icon nzType="plus"></span><span>Adaugă autoritate</span>
+          </button>
+        </div>
+      </div>
+    }
+  </nz-card>
+</div>
