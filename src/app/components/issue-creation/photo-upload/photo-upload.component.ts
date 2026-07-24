@@ -29,9 +29,8 @@ import { NzGridModule } from 'ng-zorro-antd/grid';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
-import imageCompression from 'browser-image-compression';
-
 import { StorageService, UploadResult } from '../../../services/storage.service';
+import { PhotoUploadService } from '../../../services/photo-upload.service';
 import { SupabaseAuthService } from '../../../services/supabase-auth.service';
 import { CategoryInfo } from '../../../services/category.service';
 
@@ -89,15 +88,6 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
 
   readonly maxPhotos = 8;
 
-  // Compression settings for optimal storage/quality balance
-  private readonly compressionOptions = {
-    maxSizeMB: 1,              // Target max 1MB per image
-    maxWidthOrHeight: 1920,    // Maintain good detail for civic issues
-    useWebWorker: true,        // Non-blocking compression
-    preserveExif: false,       // Strip GPS/device data (privacy)
-    initialQuality: 0.85,      // 85% quality - visually identical
-  };
-
   selectedCategory: CategoryInfo | null = null;
   uploadedPhotos: PhotoData[] = [];
   isUploading = false;
@@ -113,7 +103,8 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
     private router: Router,
     private message: NzMessageService,
     private storageService: StorageService,
-    private authService: SupabaseAuthService
+    private authService: SupabaseAuthService,
+    private photoUploadService: PhotoUploadService
   ) {}
 
   ngOnInit(): void {
@@ -360,15 +351,10 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
    * Returns an Observable that completes when the file is processed.
    */
   private processFile(file: File) {
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      this.message.error(`${file.name} nu este un fișier imagine valid.`);
-      return of(null);
-    }
-
-    // Validate file size (10MB limit)
-    if (file.size > 10 * 1024 * 1024) {
-      this.message.error(`${file.name} este prea mare. Dimensiunea maximă este de 10MB.`);
+    // Validate type + size via the shared pipeline
+    const validation = this.photoUploadService.validate(file);
+    if (!validation.ok) {
+      this.message.error(validation.reason);
       return of(null);
     }
 
@@ -397,7 +383,7 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
       url: previewUrl,
       thumbnail: previewUrl,
       storagePath: '',  // Will be set after upload
-      quality: this.analyzePhotoQuality(file),
+      quality: this.photoUploadService.analyzeQuality(file),
       timestamp: new Date(),
       isPrimary: isFirstPhoto,  // First photo is primary by default
       metadata: {
@@ -509,43 +495,14 @@ export class PhotoUploadComponent implements OnInit, AfterViewInit, OnDestroy {
     return 'photo-' + Date.now() + '-' + Math.random().toString(36).substr(2, 5);
   }
 
-  private analyzePhotoQuality(file: File): 'low' | 'medium' | 'high' {
-    // Quality analysis based on file size
-    if (file.size > 2000000) return 'high'; // > 2MB
-    if (file.size > 500000) return 'medium'; // > 500KB
-    return 'low';
-  }
-
   /**
-   * Process image before upload: strips EXIF data (including GPS) for privacy,
-   * and compresses larger files to reduce storage costs and upload time.
+   * Compress + strip EXIF via the shared pipeline. The counter drives the isCompressing UI;
+   * the privacy hard-fail (throw, never fall back to the original) lives in PhotoUploadService.
    */
   private async compressImage(file: File): Promise<File> {
     this.compressingCount++;
     try {
-      // For small files, only strip EXIF without aggressive compression
-      const options = file.size < 500 * 1024
-        ? { ...this.compressionOptions, maxSizeMB: Infinity }  // Strip EXIF only
-        : this.compressionOptions;  // Full compression + EXIF strip
-
-      const processedFile = await imageCompression(file, options);
-
-      const originalSizeKB = Math.round(file.size / 1024);
-      const processedSizeKB = Math.round(processedFile.size / 1024);
-      const reduction = Math.round((1 - processedFile.size / file.size) * 100);
-
-      if (file.size < 500 * 1024) {
-        console.log(`[PHOTO UPLOAD] EXIF stripped from small file: ${file.name} (${originalSizeKB}KB)`);
-      } else {
-        console.log(`[PHOTO UPLOAD] Compressed: ${originalSizeKB}KB → ${processedSizeKB}KB (${reduction}% reduction)`);
-      }
-
-      return processedFile;
-    } catch (error) {
-      // PRIVACY: Do NOT fall back to original file - it may contain GPS/location data
-      // Fail the upload to protect user privacy
-      console.error('[PHOTO UPLOAD] Image processing failed:', error);
-      throw new Error(`Nu s-a putut procesa imaginea "${file.name}". Vă rugăm să încercați cu altă fotografie.`);
+      return await this.photoUploadService.compress(file);
     } finally {
       this.compressingCount--;
     }

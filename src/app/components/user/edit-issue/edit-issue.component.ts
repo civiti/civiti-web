@@ -7,7 +7,6 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { of, from, merge, Subject } from 'rxjs';
 import { switchMap, catchError, toArray, debounceTime, tap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import imageCompression from 'browser-image-compression';
 
 // NG-ZORRO imports
 import { NzCardModule } from 'ng-zorro-antd/card';
@@ -30,6 +29,7 @@ import { NzModalService } from 'ng-zorro-antd/modal';
 import { AppState } from '../../../store/app.state';
 import { ApiService } from '../../../services/api.service';
 import { StorageService, UploadResult } from '../../../services/storage.service';
+import { PhotoUploadService } from '../../../services/photo-upload.service';
 import { SupabaseAuthService } from '../../../services/supabase-auth.service';
 import { CategoryService, CategoryInfo } from '../../../services/category.service';
 import {
@@ -51,7 +51,6 @@ import {
   TEXTAREA_MAX,
   MAX_AUTHORITIES,
   MAX_PHOTOS,
-  MAX_PHOTO_MB,
   isOwnerEditableStatus,
 } from '../../issue-creation/issue-field.constants';
 import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
@@ -120,6 +119,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   private store = inject(Store<AppState>);
   private apiService = inject(ApiService);
   private storageService = inject(StorageService);
+  private photoUploadService = inject(PhotoUploadService);
   private authService = inject(SupabaseAuthService);
   private categoryService = inject(CategoryService);
   private message = inject(NzMessageService);
@@ -134,15 +134,6 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   readonly MAX_PHOTOS = MAX_PHOTOS;
   readonly MAX_AUTHORITIES = MAX_AUTHORITIES;
   readonly urgencyOptions = URGENCY_OPTIONS;
-
-  // Compression settings (same as create/photo-upload flow)
-  private readonly compressionOptions = {
-    maxSizeMB: 1,
-    maxWidthOrHeight: 1920,
-    useWebWorker: true,
-    preserveExif: false,
-    initialQuality: 0.85,
-  };
 
   issueId = '';
   issue: IssueDetailResponse | null = null;
@@ -442,12 +433,9 @@ export class EditIssueComponent implements OnInit, OnDestroy {
   }
 
   private processFile(file: File) {
-    if (!file.type.startsWith('image/')) {
-      this.message.error(`${file.name} nu este un fișier imagine valid.`);
-      return of(null);
-    }
-    if (file.size > MAX_PHOTO_MB * 1024 * 1024) {
-      this.message.error(`${file.name} este prea mare. Dimensiunea maximă este de ${MAX_PHOTO_MB}MB.`);
+    const validation = this.photoUploadService.validate(file);
+    if (!validation.ok) {
+      this.message.error(validation.reason);
       return of(null);
     }
 
@@ -464,7 +452,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
       isUploading: true,
     }]);
 
-    return from(this.compressImage(file)).pipe(
+    return from(this.photoUploadService.compress(file)).pipe(
       switchMap(compressed => this.storageService.uploadPhotoWithRetry(this.currentUserId!, compressed)),
       switchMap((result: UploadResult) => {
         // Photo removed mid-upload → clean the orphan
@@ -489,18 +477,6 @@ export class EditIssueComponent implements OnInit, OnDestroy {
         return of(null);
       })
     );
-  }
-
-  private async compressImage(file: File): Promise<File> {
-    try {
-      const options = file.size < 500 * 1024
-        ? { ...this.compressionOptions, maxSizeMB: Infinity }
-        : this.compressionOptions;
-      return await imageCompression(file, options);
-    } catch (error) {
-      console.error('[EditIssue] Compresia a eșuat:', error);
-      throw new Error('Nu s-a putut procesa imaginea.');
-    }
   }
 
   removePhoto(id: string): void {
@@ -690,7 +666,7 @@ export class EditIssueComponent implements OnInit, OnDestroy {
     this.isSaving = true;
 
     const loc = this.location()!;
-    const sortedPhotos = [...this.photos()].sort((a, b) => (b.isPrimary ? 1 : 0) - (a.isPrimary ? 1 : 0));
+    const sortedPhotos = this.photoUploadService.sortPrimaryFirst(this.photos());
     const authorities: IssueAuthorityInput[] = this.selectedAuthorities().map(a =>
       a.authorityId && !a.isCustom
         ? { authorityId: a.authorityId }
