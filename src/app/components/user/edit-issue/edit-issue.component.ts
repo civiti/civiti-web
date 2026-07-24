@@ -25,7 +25,7 @@ import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzModalService } from 'ng-zorro-antd/modal';
+import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 
 import { AppState } from '../../../store/app.state';
 import { ApiService } from '../../../services/api.service';
@@ -108,6 +108,7 @@ function isValidEmail(email: string): boolean {
     NzBadgeModule,
     NzSpinModule,
     NzToolTipModule,
+    NzModalModule,
   ],
   templateUrl: './edit-issue.component.html',
   styleUrls: ['./edit-issue.component.scss']
