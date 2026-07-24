@@ -151,7 +151,7 @@
                   formControlName="email"
                   id="authEmail"
                   placeholder="exemplu@autoritate.ro"
-                  (keydown.enter)="addCustomAuthority()" />
+                  (keydown.enter)="$event.preventDefault(); addCustomAuthority()" />
               </nz-input-group>
               <ng-template #emailIcon>
                 <span nz-icon nzType="mail"></span>
@@ -170,7 +170,7 @@
                   formControlName="name"
                   id="authName"
                   placeholder="Ex: Primăria Sectorului X"
-                  (keydown.enter)="addCustomAuthority()" />
+                  (keydown.enter)="$event.preventDefault(); addCustomAuthority()" />
               </nz-input-group>
               <ng-template #nameIcon>
                 <span nz-icon nzType="bank"></span>
