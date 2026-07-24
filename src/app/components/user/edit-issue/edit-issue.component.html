@@ -184,82 +184,10 @@
           <nz-form-item>
             <nz-form-label [nzSpan]="24">Autorități destinatare</nz-form-label>
             <nz-form-control [nzSpan]="24">
-              <p class="field-hint">
-                Poți selecta până la {{ MAX_AUTHORITIES }} autorități.
-                Mai poți adăuga {{ remainingAuthoritySlots() }}.
-              </p>
-
-              <!-- Selected authorities -->
-              @if (selectedAuthorities().length > 0) {
-                <div class="selected-authorities">
-                  @for (auth of selectedAuthorities(); track auth.email) {
-                    <nz-tag nzColor="blue" [nzMode]="'closeable'" (nzOnClose)="removeAuthority(auth)">
-                      <span nz-icon [nzType]="auth.isCustom ? 'user' : 'bank'" nzTheme="outline"></span>
-                      {{ auth.name }}
-                    </nz-tag>
-                  }
-                </div>
-              }
-
-              <!-- Search -->
-              <input
-                nz-input
-                class="authority-search"
-                placeholder="Caută o autoritate..."
-                [(ngModel)]="searchTerm"
-                [ngModelOptions]="{ standalone: true }"
-                (ngModelChange)="filterAuthorities()">
-
-              <!-- Authority list -->
-              @if (isLoadingAuthorities) {
-                <div class="authority-loading">
-                  <span nz-icon nzType="loading" nzSpin></span> Se încarcă autoritățile...
-                </div>
-              } @else {
-                @for (group of groupedAuthorities(); track group.label) {
-                  <div class="authority-group">
-                    <div class="authority-group-title">
-                      <span nz-icon [nzType]="group.icon" nzTheme="outline"></span> {{ group.label }}
-                    </div>
-                    @for (authority of group.authorities; track authority.id) {
-                      @let selected = isAuthoritySelected(authority);
-                      <label
-                        nz-checkbox
-                        class="authority-item"
-                        [nzChecked]="selected"
-                        [nzDisabled]="!selected && isAtAuthorityLimit()"
-                        (nzCheckedChange)="toggleAuthority(authority)">
-                        <span class="authority-name">{{ authority.name }}</span>
-                        <span class="authority-email">{{ authority.email }}</span>
-                      </label>
-                    }
-                  </div>
-                } @empty {
-                  <nz-empty nzNotFoundContent="Nicio autoritate găsită. Poți adăuga una manual."></nz-empty>
-                }
-              }
-
-              <!-- Custom authority -->
-              <div class="custom-authority">
-                @if (!showCustomEmailInput) {
-                  <button nz-button nzType="dashed" type="button" (click)="toggleCustomEmailInput()" [disabled]="isAtAuthorityLimit()">
-                    <span nz-icon nzType="plus"></span><span>Adaugă autoritate manual</span>
-                  </button>
-                } @else {
-                  <!-- Not a <form> — this sits inside the outer editor form, and nested
-                       forms are invalid HTML (they detach the outer form's submit). -->
-                  <div [formGroup]="customEmailForm" class="custom-email-form">
-                    <input nz-input formControlName="email" placeholder="Email autoritate">
-                    <input nz-input formControlName="name" placeholder="Nume (opțional)">
-                    <div class="custom-email-actions">
-                      <button nz-button nzType="primary" type="button" (click)="addCustomAuthority()">
-                        <span nz-icon nzType="check"></span><span>Adaugă</span>
-                      </button>
-                      <button nz-button nzType="text" type="button" (click)="toggleCustomEmailInput()">Anulează</button>
-                    </div>
-                  </div>
-                }
-              </div>
+              <app-authority-picker
+                [city]="issueCity()"
+                [district]="issueDistrict()"
+                [(selected)]="selectedAuthorities" />
             </nz-form-control>
           </nz-form-item>
 
