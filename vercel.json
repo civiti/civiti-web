@@ -1,5 +1,9 @@
 {
   "framework": "angular",
+  "trailingSlash": false,
+  "redirects": [
+    { "source": "/location", "destination": "/", "permanent": true }
+  ],
   "rewrites": [
     { "source": "/(.*)", "destination": "/api" }
   ],
