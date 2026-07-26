@@ -163,10 +163,28 @@
         <nz-card class="issue-card cursor-pointer"
                  (click)="viewIssueDetails(issue.id)"
                  [nzCover]="coverTemplate">
-          <nz-card-meta 
-            [nzTitle]="issue.title"
+          <nz-card-meta
+            [nzTitle]="titleTemplate"
             [nzDescription]="descriptionTemplate">
           </nz-card-meta>
+
+          <!--
+            The title is a real <h2><a routerLink>, not an anonymous div behind a
+            (click) handler. routerLink emits a genuine href into the
+            server-rendered HTML, which is the only way Googlebot can discover an
+            issue page — it does not click. Before this, /issue/:id pages existed
+            solely as sitemap entries with no inbound link anywhere on the site.
+
+            Anchoring the title rather than the whole card is deliberate: the
+            anchor text becomes the issue title ("Blocul V6, Calea 13
+            Septembrie"), which is where all the long-tail keyword signal lives.
+            The card keeps its own (click) so the whole surface stays clickable.
+          -->
+          <ng-template #titleTemplate>
+            <h2 class="issue-card-title">
+              <a [routerLink]="['/issue', issue.id]">{{ issue.title }}</a>
+            </h2>
+          </ng-template>
           
           <!-- Cover Template -->
           <ng-template #coverTemplate>
