@@ -182,7 +182,16 @@
           -->
           <ng-template #titleTemplate>
             <h2 class="issue-card-title">
-              <a [routerLink]="['/issue', issue.id]">{{ issue.title }}</a>
+              <!--
+                stopPropagation matters for modified clicks. On a plain click the
+                bubbled card handler is harmless (the router ignores a repeat
+                navigation to the same URL), but on Ctrl/Cmd/middle-click the
+                browser opens the issue in a new tab AND the card handler
+                navigates the current tab away. The action button below stops
+                propagation for the same reason.
+              -->
+              <a [routerLink]="['/issue', issue.id]"
+                 (click)="$event.stopPropagation()">{{ issue.title }}</a>
             </h2>
           </ng-template>
           
