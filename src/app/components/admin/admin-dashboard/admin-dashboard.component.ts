@@ -76,7 +76,7 @@ export class AdminDashboardComponent implements OnInit {
   }
 
   navigateToIssues(): void {
-    this.router.navigate(['/issues']);
+    this.router.navigate(['/bucuresti']);
   }
 
   getApprovalRateColor(rate: number): string {

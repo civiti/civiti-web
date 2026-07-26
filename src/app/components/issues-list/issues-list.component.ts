@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, DestroyRef, PLATFORM_ID, signal, computed, afterNextRender } from '@angular/core';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule, isPlatformBrowser, Location } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
@@ -38,6 +38,7 @@ import { IssuesMapComponent } from '../issues-map/issues-map.component';
   standalone: true,
   imports: [
     CommonModule,
+    RouterLink,
     ReactiveFormsModule,
     FormsModule,
     NzCardModule,

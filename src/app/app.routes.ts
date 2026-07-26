@@ -4,10 +4,21 @@ import { authGuard, adminGuard } from './guards';
 // Route structure based on ux.md user journey with lazy loading
 // Header config: headerTitle, showBackButton, backUrl, hideHeader
 export const routes: Routes = [
+  // Homepage. Must be a real component, not a redirect: a route with
+  // `redirectTo` cannot be prerendered, so `/` used to ship a bare CSR shell.
   {
     path: '',
-    redirectTo: '/location',
-    pathMatch: 'full'
+    pathMatch: 'full',
+    loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent),
+    data: {
+      animation: 'HomePage',
+      hideHeader: true,
+      showFooter: true,
+      seo: {
+        title: 'Sesizări către primărie, online și gratuit',
+        description: 'Raportează gropi, trotuare blocate, gunoi neridicat sau iluminat defect și trimite sesizarea prin email direct autorității responsabile. Gratuit, fără cont pentru vizualizare.',
+      }
+    }
   },
   // Authentication routes - hide header on auth pages
   {
@@ -128,20 +139,16 @@ export const routes: Routes = [
       }
     ]
   },
-  // Location selection route (landing page) - hide header on landing
+  // Legacy landing page. The city picker now lives on the homepage, so this
+  // only exists to catch links already in the wild. In production the 301 in
+  // vercel.json intercepts it before it ever reaches Angular; this route is the
+  // dev-server and in-app-navigation equivalent.
   {
     path: 'location',
-    loadComponent: () => import('./components/location-selection/location-selection.component').then(m => m.LocationSelectionComponent),
-    data: {
-      animation: 'LocationPage',
-      hideHeader: true,
-      showFooter: true,
-      seo: {
-        title: 'Selectează Localitatea',
-        description: 'Alege orașul tău pentru a vedea și raporta probleme locale. Platforma de participare civică pentru cetățenii din România.',
-      }
-    }
+    redirectTo: '',
+    pathMatch: 'full'
   },
+  // Never linked internally — kept for inbound links and the old sitemap entry.
   {
     path: 'issues',
     redirectTo: '/bucuresti',
@@ -197,6 +204,9 @@ export const routes: Routes = [
       headerTitle: 'Detalii Problemă',
       showBackButton: true,
       backUrl: '/bucuresti',
+      // Without this the footer is suppressed (app.ts gates on it), leaving
+      // issue pages with two outbound internal links on the entire document.
+      showFooter: true,
     }
   },
   {
@@ -206,7 +216,7 @@ export const routes: Routes = [
       animation: 'DesprePage',
       headerTitle: 'Despre Civiti',
       showBackButton: true,
-      backUrl: '/location',
+      backUrl: '/',
       showFooter: true,
       seo: {
         title: 'Despre Civiti — Povestea platformei',
@@ -244,6 +254,6 @@ export const routes: Routes = [
   // Fallback route
   {
     path: '**',
-    redirectTo: '/location'
+    redirectTo: ''
   }
 ];

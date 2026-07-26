@@ -7,6 +7,8 @@ import {
 import express from 'express';
 import { join } from 'node:path';
 import { environment } from './environments/environment';
+import { SITE_URL } from './app/constants/urls';
+import { GUIDE_ARTICLES } from './app/generated/guide-data';
 
 const browserDistFolder = join(import.meta.dirname, '../browser');
 
@@ -22,7 +24,6 @@ const angularApp = new AngularNodeAppEngine();
 // 1 hour via s-maxage so the backend is hit at most once per hour per region.
 // ============================================================================
 
-const SITE_URL = 'https://civiti.ro';
 // The backend clamps `pageSize` to a maximum of 100 (verified in
 // IssueEndpoints.cs), so requesting more just gets silently reduced. We
 // match the cap exactly and paginate to get everything.
@@ -104,30 +105,49 @@ async function fetchPublicIssues(): Promise<SitemapIssue[]> {
   return all;
 }
 
+/**
+ * One <url> entry. `<priority>` and `<changefreq>` are deliberately omitted —
+ * Google ignores both, and emitting them on pages we don't actually revisit at
+ * that cadence is noise. `<lastmod>` is emitted only where we have a real date;
+ * a fabricated one is worse than none, because Google learns to distrust the
+ * field across the whole sitemap.
+ */
+function urlEntry(loc: string, lastmod?: string): string {
+  const modLine = lastmod ? `\n    <lastmod>${xmlEscape(lastmod)}</lastmod>` : '';
+  return `  <url>\n    <loc>${loc}</loc>${modLine}\n  </url>`;
+}
+
 function buildSitemapXml(issues: SitemapIssue[]): string {
+  // Only URLs that resolve 200 with their own content belong here. Notably
+  // absent, and intentionally so:
+  //   /location — 301s to / (the city picker moved onto the homepage)
+  //   /issues   — has always been a redirect to /bucuresti
+  // Submitting a redirect asks Google to spend crawl budget learning it is a
+  // redirect, and on a domain this small that budget is the scarce resource.
   const staticEntries = [
-    { loc: `${SITE_URL}/`, changefreq: 'weekly', priority: '1.0' },
-    { loc: `${SITE_URL}/location`, changefreq: 'weekly', priority: '0.9' },
-    { loc: `${SITE_URL}/issues`, changefreq: 'daily', priority: '0.9' },
-    { loc: `${SITE_URL}/despre`, changefreq: 'monthly', priority: '0.7' },
-    { loc: `${SITE_URL}/privacy`, changefreq: 'yearly', priority: '0.3' },
-    { loc: `${SITE_URL}/terms`, changefreq: 'yearly', priority: '0.3' },
-  ]
-    .map(
-      (e) =>
-        `  <url>\n    <loc>${e.loc}</loc>\n    <changefreq>${e.changefreq}</changefreq>\n    <priority>${e.priority}</priority>\n  </url>`,
-    )
-    .join('\n');
+    `${SITE_URL}/`,
+    `${SITE_URL}/bucuresti`,
+    `${SITE_URL}/ghid`,
+    `${SITE_URL}/despre`,
+    `${SITE_URL}/privacy`,
+    `${SITE_URL}/terms`,
+  ].map((loc) => urlEntry(loc));
 
-  const issueEntries = issues
-    .map((issue) => {
-      const loc = `${SITE_URL}/issue/${xmlEscape(issue.id)}`;
-      const lastmod = new Date(issue.updatedAt ?? issue.createdAt).toISOString();
-      return `  <url>\n    <loc>${loc}</loc>\n    <lastmod>${lastmod}</lastmod>\n    <changefreq>weekly</changefreq>\n    <priority>0.7</priority>\n  </url>`;
-    })
-    .join('\n');
+  // Guides are the densest editorial content on the domain and were missing
+  // from the sitemap entirely. Built from the same generated module that
+  // app.routes.server.ts uses to prerender them, so the two cannot drift.
+  const guideEntries = GUIDE_ARTICLES.map((article) =>
+    urlEntry(`${SITE_URL}/ghid/${xmlEscape(article.slug)}`, article.publishedAt),
+  );
 
-  const body = [staticEntries, issueEntries].filter(Boolean).join('\n');
+  const issueEntries = issues.map((issue) =>
+    urlEntry(
+      `${SITE_URL}/issue/${xmlEscape(issue.id)}`,
+      new Date(issue.updatedAt ?? issue.createdAt).toISOString(),
+    ),
+  );
+
+  const body = [...staticEntries, ...guideEntries, ...issueEntries].join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${body}\n</urlset>\n`;
 }
@@ -146,15 +166,17 @@ app.get('/sitemap.xml', async (_req, res) => {
     res.status(200).send(xml);
   } catch (error) {
     console.error('[sitemap] Failed to build dynamic sitemap:', error);
-    // Fallback to static-only sitemap with a shorter cache window so a recovered
-    // backend takes effect quickly on the next crawl.
-    const xml = buildSitemapXml([]);
-    res.setHeader('Content-Type', 'application/xml; charset=utf-8');
-    res.setHeader(
-      'Cache-Control',
-      'public, s-maxage=300, stale-while-revalidate=3600',
-    );
-    res.status(200).send(xml);
+    // Fail CLOSED, not open. The previous behaviour served a truncated sitemap
+    // with HTTP 200, which authoritatively tells Google "the issue URLs I
+    // previously declared are gone" every time Railway is slow — and the
+    // s-maxage pinned that claim at the edge for the next 5 minutes.
+    //
+    // A 503 says "ask again later": Google retries and keeps the URL set from
+    // the last successful fetch intact. no-store keeps a transient backend
+    // blip from being cached as an outage.
+    res.setHeader('Cache-Control', 'no-store');
+    res.setHeader('Retry-After', '600');
+    res.status(503).send('Sitemap temporarily unavailable');
   }
 });
 

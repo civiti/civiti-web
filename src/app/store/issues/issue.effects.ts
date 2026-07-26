@@ -117,7 +117,7 @@ export class IssueEffects {
             console.log('[Issues Effects] Issue created successfully:', response);
             this.message.success('Problema a fost raportată cu succes!');
             // Navigate to the newly created issue or issues list
-            this.router.navigate(['/issues', response.id]);
+            this.router.navigate(['/issue', response.id]);
           }),
           map(response => IssueActions.createIssueSuccess({ response })),
           catchError(error => {

@@ -2,9 +2,14 @@ import { RenderMode, ServerRoute } from '@angular/ssr';
 import { GUIDE_ARTICLES } from './generated/guide-data';
 
 export const serverRoutes: ServerRoute[] = [
-  // Static public pages — build-time prerender for instant response
+  // Static public pages — build-time prerender for instant response.
+  // '' now resolves to HomeComponent. While it was a `redirectTo` route the
+  // extractor refused to prerender it and the build emitted no index.html at
+  // all, so the apex domain served a bare CSR shell.
   { path: '', renderMode: RenderMode.Prerender },
-  { path: 'location', renderMode: RenderMode.Prerender },
+  // 'location' is deliberately absent: it is a redirect now, and prerendering
+  // it would keep emitting a stale static file that wins over the vercel.json
+  // 301 (Vercel checks the filesystem before applying rewrites).
   { path: 'privacy', renderMode: RenderMode.Prerender },
   { path: 'terms', renderMode: RenderMode.Prerender },
   { path: 'despre', renderMode: RenderMode.Prerender },

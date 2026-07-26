@@ -1,0 +1,148 @@
+<div class="home">
+
+  <app-auth-buttons class="corner-auth" />
+
+  <!-- Hero -->
+  <section class="hero">
+    <img src="/images/logo/civiti-logo.svg" alt="Civiti" class="hero-logo" width="72" height="72" />
+
+    <h1 class="hero-title">Sesizări către primărie, online și gratuit</h1>
+
+    <p class="hero-lead">
+      Civiti este o platformă civică prin care cetățenii din România raportează problemele din
+      cartierul lor — gropi în asfalt, trotuare blocate, gunoi neridicat, iluminat public defect —
+      și trimit sesizarea, prin email, direct către autoritatea care răspunde de ele. O sesizare
+      singură se pierde ușor. Cincizeci de emailuri pe aceeași temă sunt greu de ignorat.
+    </p>
+
+    <div class="hero-actions">
+      <button nz-button nzType="primary" nzSize="large" class="hero-cta" (click)="enterCity()">
+        <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
+        <span>Vezi problemele din {{ defaultCity }}</span>
+      </button>
+      <a routerLink="/despre" class="hero-link">De ce există Civiti →</a>
+    </div>
+
+    <p class="hero-note">
+      <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+      Nu ai nevoie de cont pentru a vedea sesizările. Momentan acoperim {{ defaultCity }}.
+    </p>
+  </section>
+
+  <!-- How it works -->
+  <section class="section">
+    <h2>Cum funcționează</h2>
+    <ol class="steps">
+      <li>
+        <h3>Documentezi problema</h3>
+        <p>
+          Faci una-două fotografii, marchezi locația exactă pe hartă și descrii concret ce nu este
+          în regulă. Cu cât sesizarea e mai precisă, cu atât autoritatea are mai puține motive să o
+          claseze.
+        </p>
+      </li>
+      <li>
+        <h3>Alegi autoritățile responsabile</h3>
+        <p>
+          Civiti îți propune instituțiile care au competență pe tipul acela de problemă și pe zona
+          respectivă, ca sesizarea să nu ajungă la ghișeul greșit și să se piardă în redirecționări.
+        </p>
+      </li>
+      <li>
+        <h3>Trimiți emailul, iar problema rămâne publică</h3>
+        <p>
+          Platforma compune petiția în forma cerută de lege, tu o trimiți din contul tău, iar
+          sesizarea rămâne vizibilă pe site. Alți locuitori o pot vota și pot trimite la rândul lor
+          același email — presiunea colectivă este mecanismul care produce răspunsuri.
+        </p>
+      </li>
+    </ol>
+  </section>
+
+  <!-- The law -->
+  <section class="section">
+    <h2>Autoritatea are 30 de zile să îți răspundă</h2>
+    <p>
+      Nu este o formulă de politețe, este o obligație legală. Conform articolului 8 din
+      <strong>Ordonanța Guvernului nr. 27/2002</strong>, aprobată prin Legea 233/2002, instituția
+      publică trebuie să îți comunice un răspuns scris în termen de <strong>30 de zile</strong> de la
+      înregistrarea petiției.
+    </p>
+    <p>
+      Două lucruri merită știute dinainte. Primul: conform articolului 6, petițiile anonime sau cele
+      fără datele de identificare ale petiționarului <strong>se clasează fără răspuns</strong> — de
+      aceea Civiti îți cere numele real, chiar dacă îl afișăm doar acolo unde tu alegi. Al doilea:
+      dacă termenul expiră fără niciun răspuns, tăcerea este tratată drept refuz nejustificat în
+      sensul Legii 554/2004 și ai la dispoziție plângerea prealabilă, instanța de contencios
+      administrativ și sesizarea către Avocatul Poporului.
+    </p>
+  </section>
+
+  <!-- Who is responsible -->
+  <section class="section">
+    <h2>Cine răspunde de ce în {{ defaultCity }}</h2>
+    <p>
+      Cea mai frecventă cauză pentru care o sesizare rămâne fără efect este că a fost trimisă unei
+      instituții care nu are competență pe acel subiect. Împărțirea, pe scurt:
+    </p>
+    <ul class="responsibilities">
+      <li>
+        <strong>Primăria de sector</strong> — străzi secundare, trotuare, parcuri și spații verzi,
+        iluminat stradal, salubritate, autorizații de construire.
+      </li>
+      <li>
+        <strong>Primăria Municipiului București</strong> — bulevardele principale, transportul
+        public de suprafață (STB), termoficarea (Termoenergetica).
+      </li>
+      <li>
+        <strong>Administrația Străzilor</strong> — semafoare, marcaje rutiere și indicatoare pe
+        drumurile municipale.
+      </li>
+      <li>
+        <strong>Poliția Locală</strong> — parcări ilegale, comerț neautorizat, zgomot, curățenia
+        spațiilor publice.
+      </li>
+      <li>
+        <strong>ASPA</strong> — câinii fără stăpân și problemele legate de animale.
+      </li>
+    </ul>
+    <p class="responsibilities-note">
+      Metroul nu intră în competența Primăriei: este administrat de Metrorex, în subordinea
+      Ministerului Transporturilor.
+    </p>
+  </section>
+
+  <!-- Guides -->
+  <section class="section">
+    <h2>Ghiduri practice</h2>
+    <p>
+      Poți folosi platforma fără să citești nimic în prealabil. Dar dacă vrei să înțelegi cum
+      funcționează mecanismul legal — sau vrei să scrii singur o petiție, în afara Civiti — ghidurile
+      de mai jos sunt gratuite și nu cer cont.
+    </p>
+    <ul class="guide-links">
+      @for (guide of guides; track guide.slug) {
+        <li>
+          <a [routerLink]="['/ghid', guide.slug]">
+            <span class="guide-title">{{ guide.title }}</span>
+            <span class="guide-desc">{{ guide.description }}</span>
+          </a>
+        </li>
+      }
+    </ul>
+  </section>
+
+  <!-- Closing CTA -->
+  <section class="section closing">
+    <h2>Începe cu problema de la tine de pe stradă</h2>
+    <p>
+      Vezi ce au raportat deja ceilalți locuitori, votează sesizările care te afectează și pe ale
+      tale, sau adaugă una nouă.
+    </p>
+    <button nz-button nzType="primary" nzSize="large" (click)="enterCity()">
+      <span nz-icon nzType="environment" nzTheme="outline"></span>
+      <span>Deschide harta sesizărilor din {{ defaultCity }}</span>
+    </button>
+  </section>
+
+</div>
