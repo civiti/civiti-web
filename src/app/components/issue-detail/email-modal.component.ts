@@ -12,6 +12,7 @@ import * as IssueActions from '../../store/issues/issue.actions';
 import { selectIsAuthenticated } from '../../store/auth/auth.selectors';
 import { ApiService } from '../../services/api.service';
 import { IssueDetailResponse, IssueAuthorityResponse } from '../../types/civica-api.types';
+import { SITE_URL } from '../../constants/urls';
 
 /** Max wait for the AI petition-body call before falling back to the template. */
 const AI_TIMEOUT_MS = 15000;
@@ -191,7 +192,7 @@ Locație: ${locationString}
 
 ${core}
 
-${photosSection}Documentație completă: https://civiti.ro/issues/${this.issue.id}
+${photosSection}Documentație completă: ${SITE_URL}/issue/${this.issue.id}
 
 Conform O.G. 27/2002, vă rog să îmi comunicați numărul de înregistrare al petiției și răspunsul în termenul legal de 30 de zile.
 

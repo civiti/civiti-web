@@ -36,6 +36,7 @@ import { DaysSincePipe } from '../../pipes/date.pipe';
 import { CommentsComponent } from '../shared/comments/comments.component';
 import { PhotoDownloadService, PhotoDownloadProgress } from '../../services/photo-download.service';
 import { environment } from '../../../environments/environment';
+import { SITE_URL } from '../../constants/urls';
 import { SeoService } from '../../services/seo.service';
 
 @Component({
@@ -210,7 +211,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
                 if (!canView && !isAdmin && !isOwner) {
                     console.warn(`[ACCESS DENIED] Issue ${issue.id} has status "${issue.status}" - redirecting (not owner, not admin)`);
-                    this._router.navigate(['/issues']);
+                    this._router.navigate(['/bucuresti']);
                     return;
                 }
             });
@@ -227,12 +228,11 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                         : issue.description)
                     : `Problemă raportată: ${issue.title}`;
                 const primaryPhoto = issue.photos?.find(p => p.isPrimary)?.url || issue.photos?.[0]?.url;
-                const baseUrl = environment.production ? 'https://civiti.ro' : 'http://localhost:4200';
                 this._seo.updateMetaTags({
                     title: issue.title,
                     description,
                     ogImage: primaryPhoto,
-                    ogUrl: `${baseUrl}/issue/${issue.id}`,
+                    ogUrl: `${SITE_URL}/issue/${issue.id}`,
                     ogType: 'article',
                 });
             });
@@ -468,7 +468,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     goBack(): void {
-        this._router.navigate(['/issues']);
+        this._router.navigate(['/bucuresti']);
     }
 
     private async initializeGoogleMaps(): Promise<void> {
