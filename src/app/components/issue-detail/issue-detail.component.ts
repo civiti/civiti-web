@@ -37,7 +37,7 @@ import { CommentsComponent } from '../shared/comments/comments.component';
 import { PhotoDownloadService, PhotoDownloadProgress } from '../../services/photo-download.service';
 import { environment } from '../../../environments/environment';
 import { SITE_URL } from '../../constants/urls';
-import { SeoService } from '../../services/seo.service';
+import { SeoService, socialCardFromPhoto } from '../../services/seo.service';
 
 @Component({
     selector: 'app-issue-detail',
@@ -227,13 +227,17 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
                         ? issue.description.substring(0, 152) + '...'
                         : issue.description)
                     : `Problemă raportată: ${issue.title}`;
-                const primaryPhoto = issue.photos?.find(p => p.isPrimary)?.url || issue.photos?.[0]?.url;
+                const primaryPhoto = issue.photos?.find(p => p.isPrimary) ?? issue.photos?.[0];
                 this._seo.updateMetaTags({
                     title: issue.title,
                     description,
-                    ogImage: primaryPhoto,
+                    ogImage: socialCardFromPhoto(
+                        primaryPhoto?.url,
+                        primaryPhoto?.description?.trim() || issue.title,
+                    ),
                     ogUrl: `${SITE_URL}/issue/${issue.id}`,
                     ogType: 'article',
+                    publishedTime: issue.createdAt,
                 });
             });
 
