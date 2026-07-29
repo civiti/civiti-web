@@ -233,7 +233,9 @@ button.cta-navy.ant-btn {
   margin: 2.75rem 0 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  // `min(…, 100%)` floor: an auto-fit track cannot shrink below its minmax
+  // minimum, so a bare 280px floor overflows any container narrower than that.
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
   gap: 2.5rem;
 
   li {
@@ -304,9 +306,13 @@ button.cta-navy.ant-btn {
   }
 }
 
+// `min-width: 0` on both flex children: the panel's own padding leaves less
+// than 300px of content width below a 396px viewport, and a fixed minimum there
+// cannot shrink — it pushes the legal text out of the panel and scrolls the
+// whole page sideways on any 360-375px phone.
 .law-stat {
   flex: 0 1 260px;
-  min-width: 220px;
+  min-width: 0;
 }
 
 .law-stat-figure {
@@ -327,7 +333,7 @@ button.cta-navy.ant-btn {
 
 .law-copy {
   flex: 1 1 480px;
-  min-width: 300px;
+  min-width: 0;
 }
 
 // ---------------------------------------------------------------- lists
@@ -337,7 +343,7 @@ button.cta-navy.ant-btn {
   margin: 0 0 1.5rem;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   gap: 1rem;
 
   li {
@@ -383,7 +389,7 @@ button.cta-navy.ant-btn {
   margin: 0;
   padding: 0;
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
   gap: 1.25rem;
 
   a {
