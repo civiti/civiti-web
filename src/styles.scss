@@ -250,12 +250,16 @@ body .bg-background {
   opacity: 0.7;
 }
 
-// Hero section styling
-.hero {
-  background: var(--gradient-hero);
-  color: var(--white);
-}
-
+// Hero section styling.
+//
+// There is deliberately no global `.hero` rule. One used to paint
+// `--gradient-hero` here and set white text, left over from a design that no
+// longer exists. HomeComponent is the only thing still using the class and its
+// own styles are light-themed throughout, so the global silently gave `/` a
+// navy panel — and because the themed reset declares `h1..h6 { color }`
+// directly, the headline kept the dark colour rather than inheriting the white,
+// rendering #14213D on a gradient starting at #14213D. Style heroes from the
+// component that owns them.
 .hero-cta {
   background: var(--gradient-cta);
   color: var(--white);

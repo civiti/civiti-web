@@ -1,4 +1,9 @@
 .home {
+  // Containing block for .corner-auth. Without it the absolutely positioned
+  // auth control resolves against the initial containing block, which parks it
+  // in the viewport corner — on a wide monitor that is over a thousand pixels
+  // away from this 760px column.
+  position: relative;
   max-width: 760px;
   margin: 0 auto;
   padding: 2rem 1.25rem 4rem;
