@@ -1,39 +1,50 @@
 <div class="home">
 
-  <app-auth-buttons class="corner-auth" />
-
-  <!-- Hero -->
-  <section class="hero">
-    <img src="/images/logo/civiti-logo.svg" alt="Civiti" class="hero-logo" width="72" height="72" />
-
-    <h1 class="hero-title">Sesizări către primărie, online și gratuit</h1>
-
-    <p class="hero-lead">
-      Civiti este o platformă civică prin care cetățenii din România raportează problemele din
-      cartierul lor — gropi în asfalt, trotuare blocate, gunoi neridicat, iluminat public defect —
-      și trimit sesizarea, prin email, direct către autoritatea care răspunde de ele. O sesizare
-      singură se pierde ușor. Cincizeci de emailuri pe aceeași temă sunt greu de ignorat.
-    </p>
-
-    <div class="hero-actions">
-      <button nz-button nzType="primary" nzSize="large" class="hero-cta" (click)="enterCity()">
-        <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
-        <span>Vezi problemele din {{ defaultCity }}</span>
-      </button>
-      <a routerLink="/despre" class="hero-link">De ce există Civiti →</a>
+  <!-- Hero: full-bleed navy band carrying its own brand bar. The route sets
+       hideHeader, so this bar is the only navigation above the fold. -->
+  <header class="hero">
+    <div class="wrap hero-bar">
+      <a class="brand" routerLink="/" aria-label="Civiti — pagina principală">
+        <img src="/images/logo/civiti-mark-light.svg" alt="" width="34" height="34" />
+        <span class="brand-name">Civiti</span>
+      </a>
+      <app-auth-buttons />
     </div>
 
-    <p class="hero-note">
-      <span nz-icon nzType="info-circle" nzTheme="outline"></span>
-      Nu ai nevoie de cont pentru a vedea sesizările. Momentan acoperim {{ defaultCity }}.
-    </p>
-  </section>
+    <div class="wrap hero-body">
+      <p class="eyebrow eyebrow-on-dark">Platformă civică pentru România</p>
+
+      <h1 class="hero-title">Sesizări către primărie, online și gratuit</h1>
+
+      <p class="hero-lead">
+        Civiti este o platformă civică prin care cetățenii din România raportează problemele din
+        cartierul lor — gropi în asfalt, trotuare blocate, gunoi neridicat, iluminat public defect —
+        și trimit sesizarea, prin email, direct către autoritatea care răspunde de ele. O sesizare
+        singură se pierde ușor. Cincizeci de emailuri pe aceeași temă sunt greu de ignorat.
+      </p>
+
+      <div class="hero-actions">
+        <button nz-button nzSize="large" class="cta cta-accent" (click)="enterCity()">
+          <span>Vezi problemele din {{ defaultCity }}</span>
+          <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
+        </button>
+        <a routerLink="/despre" class="hero-link">De ce există Civiti →</a>
+      </div>
+
+      <p class="hero-note">
+        <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+        <span>Nu ai nevoie de cont pentru a vedea sesizările. Momentan acoperim {{ defaultCity }}.</span>
+      </p>
+    </div>
+  </header>
 
   <!-- How it works -->
-  <section class="section">
+  <section class="wrap section">
+    <p class="eyebrow">Procesul</p>
     <h2>Cum funcționează</h2>
     <ol class="steps">
       <li>
+        <span class="step-number">1</span>
         <h3>Documentezi problema</h3>
         <p>
           Faci una-două fotografii, marchezi locația exactă pe hartă și descrii concret ce nu este
@@ -42,6 +53,7 @@
         </p>
       </li>
       <li>
+        <span class="step-number">2</span>
         <h3>Alegi autoritățile responsabile</h3>
         <p>
           Civiti îți propune instituțiile care au competență pe tipul acela de problemă și pe zona
@@ -49,6 +61,7 @@
         </p>
       </li>
       <li>
+        <span class="step-number">3</span>
         <h3>Trimiți emailul, iar problema rămâne publică</h3>
         <p>
           Platforma compune petiția în forma cerută de lege, tu o trimiți din contul tău, iar
@@ -60,50 +73,60 @@
   </section>
 
   <!-- The law -->
-  <section class="section">
-    <h2>Autoritatea are 30 de zile să îți răspundă</h2>
-    <p>
-      Nu este o formulă de politețe, este o obligație legală. Conform articolului 8 din
-      <strong>Ordonanța Guvernului nr. 27/2002</strong>, aprobată prin Legea 233/2002, instituția
-      publică trebuie să îți comunice un răspuns scris în termen de <strong>30 de zile</strong> de la
-      înregistrarea petiției.
-    </p>
-    <p>
-      Două lucruri merită știute dinainte. Primul: conform articolului 6, petițiile anonime sau cele
-      fără datele de identificare ale petiționarului <strong>se clasează fără răspuns</strong> — de
-      aceea Civiti îți cere numele real, chiar dacă îl afișăm doar acolo unde tu alegi. Al doilea:
-      dacă termenul expiră fără niciun răspuns, tăcerea este tratată drept refuz nejustificat în
-      sensul Legii 554/2004 și ai la dispoziție plângerea prealabilă, instanța de contencios
-      administrativ și sesizarea către Avocatul Poporului.
-    </p>
+  <section class="wrap section law">
+    <div class="law-panel">
+      <div class="law-stat">
+        <span class="law-stat-figure">30</span>
+        <span class="law-stat-label">de zile — termenul legal de răspuns</span>
+      </div>
+      <div class="law-copy">
+        <h2>Autoritatea are 30 de zile să îți răspundă</h2>
+        <p>
+          Nu este o formulă de politețe, este o obligație legală. Conform articolului 8 din
+          <strong>Ordonanța Guvernului nr. 27/2002</strong>, aprobată prin Legea 233/2002, instituția
+          publică trebuie să îți comunice un răspuns scris în termen de <strong>30 de zile</strong> de la
+          înregistrarea petiției.
+        </p>
+        <p>
+          Două lucruri merită știute dinainte. Primul: conform articolului 6, petițiile anonime sau cele
+          fără datele de identificare ale petiționarului <strong>se clasează fără răspuns</strong> — de
+          aceea Civiti îți cere numele real, chiar dacă îl afișăm doar acolo unde tu alegi. Al doilea:
+          dacă termenul expiră fără niciun răspuns, tăcerea este tratată drept refuz nejustificat în
+          sensul Legii 554/2004 și ai la dispoziție plângerea prealabilă, instanța de contencios
+          administrativ și sesizarea către Avocatul Poporului.
+        </p>
+      </div>
+    </div>
   </section>
 
   <!-- Who is responsible -->
-  <section class="section">
+  <section class="wrap section">
+    <p class="eyebrow">Competențe</p>
     <h2>Cine răspunde de ce în {{ defaultCity }}</h2>
-    <p>
+    <p class="section-lead">
       Cea mai frecventă cauză pentru care o sesizare rămâne fără efect este că a fost trimisă unei
       instituții care nu are competență pe acel subiect. Împărțirea, pe scurt:
     </p>
     <ul class="responsibilities">
       <li>
-        <strong>Primăria de sector</strong> — străzi secundare, trotuare, parcuri și spații verzi,
-        iluminat stradal, salubritate, autorizații de construire.
+        <strong>Primăria de sector</strong>
+        <span>— străzi secundare, trotuare, parcuri și spații verzi, iluminat stradal, salubritate, autorizații de construire.</span>
       </li>
       <li>
-        <strong>Primăria Municipiului București</strong> — bulevardele principale, transportul
-        public de suprafață (STB), termoficarea (Termoenergetica).
+        <strong>Primăria Municipiului București</strong>
+        <span>— bulevardele principale, transportul public de suprafață (STB), termoficarea (Termoenergetica).</span>
       </li>
       <li>
-        <strong>Administrația Străzilor</strong> — semafoare, marcaje rutiere și indicatoare pe
-        drumurile municipale.
+        <strong>Administrația Străzilor</strong>
+        <span>— semafoare, marcaje rutiere și indicatoare pe drumurile municipale.</span>
       </li>
       <li>
-        <strong>Poliția Locală</strong> — parcări ilegale, comerț neautorizat, zgomot, curățenia
-        spațiilor publice.
+        <strong>Poliția Locală</strong>
+        <span>— parcări ilegale, comerț neautorizat, zgomot, curățenia spațiilor publice.</span>
       </li>
       <li>
-        <strong>ASPA</strong> — câinii fără stăpân și problemele legate de animale.
+        <strong>ASPA</strong>
+        <span>— câinii fără stăpân și problemele legate de animale.</span>
       </li>
     </ul>
     <p class="responsibilities-note">
@@ -113,33 +136,47 @@
   </section>
 
   <!-- Guides -->
-  <section class="section">
-    <h2>Ghiduri practice</h2>
-    <p>
-      Poți folosi platforma fără să citești nimic în prealabil. Dar dacă vrei să înțelegi cum
-      funcționează mecanismul legal — sau vrei să scrii singur o petiție, în afara Civiti — ghidurile
-      de mai jos sunt gratuite și nu cer cont.
-    </p>
-    <ul class="guide-links">
-      @for (guide of guides; track guide.slug) {
-        <li>
-          <a [routerLink]="['/ghid', guide.slug]">
-            <span class="guide-title">{{ guide.title }}</span>
-            <span class="guide-desc">{{ guide.description }}</span>
-          </a>
-        </li>
-      }
-    </ul>
+  <section class="resources">
+    <div class="wrap section">
+      <p class="eyebrow">Resurse</p>
+      <h2>Ghiduri practice</h2>
+      <p class="section-lead">
+        Poți folosi platforma fără să citești nimic în prealabil. Dar dacă vrei să înțelegi cum
+        funcționează mecanismul legal — sau vrei să scrii singur o petiție, în afara Civiti — ghidurile
+        de mai jos sunt gratuite și nu cer cont.
+      </p>
+      <ul class="guide-links">
+        @for (guide of guides; track guide.slug) {
+          <li>
+            <a [routerLink]="['/ghid', guide.slug]">
+              @if (guide.image) {
+                <img
+                  [src]="guide.image"
+                  [width]="guide.imageWidth"
+                  [height]="guide.imageHeight"
+                  alt=""
+                  loading="lazy" />
+              }
+              <span class="guide-body">
+                <span class="guide-title">{{ guide.title }}</span>
+                <span class="guide-desc">{{ guide.description }}</span>
+              </span>
+            </a>
+          </li>
+        }
+      </ul>
+    </div>
   </section>
 
   <!-- Closing CTA -->
-  <section class="section closing">
+  <section class="wrap section closing">
+    <img src="/images/logo/civiti-mark.svg" alt="" width="48" height="48" class="closing-mark" />
     <h2>Începe cu problema de la tine de pe stradă</h2>
     <p>
       Vezi ce au raportat deja ceilalți locuitori, votează sesizările care te afectează și pe ale
       tale, sau adaugă una nouă.
     </p>
-    <button nz-button nzType="primary" nzSize="large" (click)="enterCity()">
+    <button nz-button nzSize="large" class="cta cta-navy" (click)="enterCity()">
       <span nz-icon nzType="environment" nzTheme="outline"></span>
       <span>Deschide harta sesizărilor din {{ defaultCity }}</span>
     </button>

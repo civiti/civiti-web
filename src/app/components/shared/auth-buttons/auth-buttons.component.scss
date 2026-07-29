@@ -35,21 +35,24 @@ button.auth-button.ant-btn {
     transform: translateY(-1px);
   }
 
+  // Navy on --orange-web is 7.90:1. White on it was 2.02:1 — an AA failure
+  // everywhere this control renders, and it is now the most prominent button
+  // above the fold on `/`. Hover keeps navy, on white: 12.68:1.
   &.register-button {
     background-color: var(--orange-web);
     border-color: var(--orange-web);
-    color: white;
+    color: var(--oxford-blue);
 
     &:hover {
       background-color: white;
-      color: var(--orange-web);
+      color: var(--oxford-blue);
       border-color: white;
       transform: translateY(-1px);
     }
 
     &:focus-visible {
       background-color: white;
-      color: var(--orange-web);
+      color: var(--oxford-blue);
       border-color: white;
       transform: translateY(-1px);
     }

@@ -40,11 +40,56 @@
   --color-error: #DC3545;
   --color-info: var(--oxford-blue);
 
+  /* Text-safe accent.
+     --orange-web is 2.02:1 on white and 1.61:1 on --platinum: both fail WCAG AA
+     for text. This is 5.00:1 on white and 4.55:1 on --surface-muted. Use it for
+     orange *text* on a light surface; keep --orange-web for fills, borders,
+     large display type, and anything on --oxford-blue (7.90:1 there). */
+  --orange-web-dark: #9E6200;
+
+  /* Surfaces */
+  --surface-muted: #F4F4F4;
+
   /* Opacity Variants */
   --oxford-blue-90: rgba(20, 33, 61, 0.9);
   --oxford-blue-80: rgba(20, 33, 61, 0.8);
   --orange-web-90: rgba(252, 163, 17, 0.9);
   --orange-web-20: rgba(252, 163, 17, 0.2);
+
+  /* Ink on a light surface — all AA or better on --white */
+  --oxford-blue-82: rgba(20, 33, 61, 0.82);
+  --oxford-blue-68: rgba(20, 33, 61, 0.68);
+  --oxford-blue-65: rgba(20, 33, 61, 0.65);
+
+  /* Ink on --oxford-blue — all AA or better */
+  --white-82: rgba(255, 255, 255, 0.82);
+  --white-78: rgba(255, 255, 255, 0.78);
+  --white-55: rgba(255, 255, 255, 0.55);
+  --white-35: rgba(255, 255, 255, 0.35);
+  --white-18: rgba(255, 255, 255, 0.18);
+  --white-10: rgba(255, 255, 255, 0.1);
+  --white-05: rgba(255, 255, 255, 0.05);
+  --white-02: rgba(255, 255, 255, 0.02);
+
+  /* Accent washes — borders, glows and shadows, never text */
+  --orange-web-60: rgba(252, 163, 17, 0.6);
+  --orange-web-38: rgba(252, 163, 17, 0.38);
+  --orange-web-35: rgba(252, 163, 17, 0.35);
+  --orange-web-28: rgba(252, 163, 17, 0.28);
+  --orange-web-10: rgba(252, 163, 17, 0.1);
+  --orange-web-08: rgba(252, 163, 17, 0.08);
+
+  /* Radii */
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 14px;
+  --radius-xl: 18px;
+
+  /* Elevation */
+  --shadow-card: 0 10px 28px rgba(20, 33, 61, 0.1);
+  --shadow-cta-navy: 0 10px 26px rgba(20, 33, 61, 0.25);
+  --shadow-cta-orange: 0 6px 20px var(--orange-web-28);
+  --shadow-cta-orange-hover: 0 10px 26px var(--orange-web-38);
 
   /* Typography Scale (from Typography-Guide.md requirements) */
   --font-primary: "Fira Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
@@ -250,23 +295,10 @@ body .bg-background {
   opacity: 0.7;
 }
 
-// Hero section styling.
-//
-// There is deliberately no global `.hero` rule. One used to paint
-// `--gradient-hero` here and set white text, left over from a design that no
-// longer exists. HomeComponent is the only thing still using the class and its
-// own styles are light-themed throughout, so the global silently gave `/` a
-// navy panel — and because the themed reset declares `h1..h6 { color }`
-// directly, the headline kept the dark colour rather than inheriting the white,
-// rendering #14213D on a gradient starting at #14213D. Style heroes from the
-// component that owns them.
-.hero-cta {
-  background: var(--gradient-cta);
-  color: var(--white);
-  padding: 16px 32px;
-  font-weight: 700;
-  text-transform: uppercase;
-}
+// There are deliberately no global `.hero` / `.hero-cta` rules. Both were left
+// over from a design that no longer exists, and HomeComponent was their only
+// remaining consumer — `.hero` silently gave `/` a navy panel it never asked
+// for. Style heroes from the component that owns them.
 
 // GLightbox custom styling to match Civica theme
 .glightbox-clean {
