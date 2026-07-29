@@ -89,11 +89,9 @@ export class App implements OnInit {
       subtitle: data['headerSubtitle'] || null
     };
 
-    const seo = data['seo'];
-    if (seo) {
-      this._seo.updateMetaTags(seo);
-    } else {
-      this._seo.resetToDefaults();
-    }
+    // A no-op when the routed component has already published its own tags for
+    // this navigation — this runs on NavigationEnd, after that component's
+    // ngOnInit. See SeoService.applyRouteData.
+    this._seo.applyRouteData(data['seo']);
   }
 }
