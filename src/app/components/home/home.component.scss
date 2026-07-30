@@ -107,10 +107,35 @@
   color: var(--white);
 }
 
+// Two columns: copy beside the product shot. `min-width: 0` on both, never a
+// pixel floor — a floor cannot shrink, which is what pushed the legal panel off
+// narrow screens. They wrap to a single stack when there is no room.
 .hero-body {
   padding-top: 3.5rem;
   padding-bottom: 4.5rem;
-  text-align: center;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 3.5rem;
+}
+
+.hero-copy {
+  flex: 1 1 480px;
+  min-width: 0;
+}
+
+.hero-visual {
+  flex: 1 1 380px;
+  min-width: 0;
+  max-width: 560px;
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--white-18);
+  }
 }
 
 .hero-title {
@@ -125,7 +150,7 @@
 .hero-lead {
   font-size: 1.125rem;
   line-height: 1.7;
-  margin: 0 auto 2.25rem;
+  margin: 0 0 2.25rem;
   max-width: 58ch;
   color: var(--white-78);
 }
@@ -134,7 +159,6 @@
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
   gap: 1.5rem;
 }
 
@@ -163,7 +187,6 @@
   color: var(--white-55);
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.45rem;
 }
 

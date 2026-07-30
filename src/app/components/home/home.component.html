@@ -12,6 +12,7 @@
     </div>
 
     <div class="wrap hero-body">
+      <div class="hero-copy">
       <p class="eyebrow eyebrow-on-dark">Platformă civică pentru România</p>
 
       <h1 class="hero-title">Sesizări către primărie, online și gratuit</h1>
@@ -35,6 +36,18 @@
         <span nz-icon nzType="info-circle" nzTheme="outline"></span>
         <span>Nu ai nevoie de cont pentru a vedea sesizările. Momentan acoperim {{ defaultCity }}.</span>
       </p>
+      </div>
+
+      <!-- Above the fold, so eager and prioritised. Intrinsic dimensions are
+           declared to keep it out of the CLS budget. -->
+      <div class="hero-visual">
+        <img
+          src="/images/screenshots/harta-bucuresti.webp"
+          width="1120"
+          height="840"
+          fetchpriority="high"
+          alt="Harta sesizărilor din {{ defaultCity }}, cu problemele raportate de locuitori marcate pe străzi." />
+      </div>
     </div>
   </header>
 
