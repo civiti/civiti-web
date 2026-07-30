@@ -57,10 +57,13 @@ absolute URL, declared dimensions, alt text — so the artwork is the only thing
 
 | | |
 |---|---|
-| **Deliver** | `civiti-og-image.png` |
-| **Dimensions** | **1200 × 630** exactly. This ratio is declared in `og:image:width`/`height`; anything else makes the tags lie and breaks first-render on Facebook and LinkedIn. |
-| **Format** | PNG, opaque, **under 300 KB** — WhatsApp gives up on heavy images and falls back to a bare text link |
+| **Deliver** | `civiti-og-card.svg` — **artwork only, with all text converted to outlines** |
+| **Canvas** | `viewBox="0 0 1200 630"`. This ratio is declared in `og:image:width`/`height`; anything else makes the tags lie and breaks first-render on Facebook and LinkedIn. |
 | **Safe area** | Keep all text and the mark within the central **1080 × 566**. Some clients crop to 1.91:1 with slack at the edges, and X may re-crop toward square. |
+| **I handle** | Rasterising to an opaque PNG under 300 KB — WhatsApp gives up on heavy images and falls back to a bare text link. |
+
+**Outline the text.** This environment has no Fira Sans installed, so live `<text>` elements would
+rasterise in the wrong typeface. Converted to paths, the card renders exactly as you drew it.
 
 **Must contain:** the megaphone mark, the wordmark "Civiti" set in Fira Sans, and enough contrast to
 read as a thumbnail roughly 500 px wide in a chat list.
@@ -82,18 +85,18 @@ visitors to the website see it in the smart app banner sitting on a megaphone-br
 
 All of these are the **navy tile with the light mark** — same composition as `civiti-icon.svg`.
 
-| File | Size | Requirements |
-|---|---|---|
-| `icon.png` | **1024 × 1024** | iOS. **Fully opaque, no alpha channel** — the App Store rejects icons with transparency. Square, no pre-rounded corners: iOS applies its own mask. |
-| `android-icon-foreground.png` | **1024 × 1024** | Mark only, transparent background. Android masks to various shapes, so keep the mark inside the central **66%** safe zone — roughly a 676 px circle. |
-| `android-icon-background.png` | **1024 × 1024** | Flat `#14213D`, fully opaque. |
-| `android-icon-monochrome.png` | **1024 × 1024** | Single-colour silhouette on transparency for Android 13+ themed icons. The system tints it, so ship it solid white and do not rely on the orange arcs carrying meaning. |
-| `splash-icon.png` | **512 × 512** | Transparent background — the splash background colour is set in `app.config.ts`. |
-| `favicon.png` | **48 × 48** | Expo web favicon. Opaque tile. |
+**Deliver three SVGs, not six PNGs.** These are pure artwork with no type in them, so SVG is lossless
+and I can generate every platform raster at the exact size, opacity and colour depth each one needs.
 
-**Note the 66% safe zone on the Android foreground.** The mark's sound arcs sit near the right edge
-of the 64-unit viewBox; scaled naively into a 1024 square they will be clipped by circular masks.
-They need to be inset, not just scaled.
+| Deliver | Canvas | Notes |
+|---|---|---|
+| `civiti-icon-app.svg` | `0 0 1024 1024` | The full tile: opaque `#14213D` field, light mark. Square with no pre-rounded corners — iOS and Android both apply their own masks. Becomes the iOS `icon.png` and the Android background layer. |
+| `civiti-icon-foreground.svg` | `0 0 1024 1024` | Mark only, transparent field, for the Android adaptive foreground. **Keep the mark inside the central 66% — roughly a 676 px circle.** The sound arcs sit near the right edge of the mark's own viewBox, so scaled naively they get clipped by circular masks. They need insetting, not just scaling. |
+| `civiti-icon-mono.svg` | `0 0 1024 1024` | Solid-white silhouette on transparency, for Android 13+ themed icons. The system tints it a single colour, so the orange arcs cannot carry meaning here — the shape has to read on its own. |
+
+From those I generate: iOS `icon.png` at 1024² flattened with no alpha channel (the App Store
+rejects transparency), the three Android adaptive layers, `splash-icon.png` at 512², and the Expo
+web `favicon.png` at 48².
 
 ---
 
@@ -108,6 +111,14 @@ These exist and are wired up. Listed so you can match them, not remake them:
 
 ## Delivery
 
-Drop files into the design project at the paths above and I will wire them in. Flag anything where
-the constraints conflict with the composition you want — the dimensions and the opacity rules are
-platform requirements rather than preferences, but everything aesthetic is yours.
+Four SVGs in total: `civiti-og-card.svg`, `civiti-icon-app.svg`, `civiti-icon-foreground.svg`,
+`civiti-icon-mono.svg`. Drop them in the design project and I will rasterise, optimise and wire them
+into both repos.
+
+Vector sources only, please — no PNGs. Rasterising here means each platform gets exactly the size,
+alpha handling and weight it requires, and we keep an editable source for the next time something
+needs regenerating.
+
+Flag anything where these constraints fight the composition you want. The canvas ratios, the safe
+zones and the outlined text are platform requirements rather than preferences; everything aesthetic
+is yours.
