@@ -59,11 +59,18 @@ absolute URL, declared dimensions, alt text — so the artwork is the only thing
 |---|---|
 | **Deliver** | `civiti-og-card.svg` — **artwork only, with all text converted to outlines** |
 | **Canvas** | `viewBox="0 0 1200 630"`. This ratio is declared in `og:image:width`/`height`; anything else makes the tags lie and breaks first-render on Facebook and LinkedIn. |
-| **Safe area** | Keep all text and the mark within the central **1080 × 566**. Some clients crop to 1.91:1 with slack at the edges, and X may re-crop toward square. |
+| **Safe area** | The mark and the wordmark must both sit inside the central **630 × 630 square** (x 285–915). Secondary copy only needs the central 1080 × 566. |
 | **I handle** | Rasterising to an opaque PNG under 300 KB — WhatsApp gives up on heavy images and falls back to a bare text link. |
 
 **Outline the text.** This environment has no Fira Sans installed, so live `<text>` elements would
 rasterise in the wrong typeface. Converted to paths, the card renders exactly as you drew it.
+
+**Design it centred, and check it as a square.** WhatsApp's small preview — the layout it uses most
+of the time — renders a *square* thumbnail, which is a centre crop of the card. A left-aligned
+composition loses everything outside x 285–915, which is how the first version of this card shipped
+with the mark cropped clean off in every WhatsApp share. Before delivering, crop the card to its
+central square and confirm the brand still reads. Secondary copy getting sliced there is fine; the
+mark disappearing is not.
 
 **Must contain:** the megaphone mark, the wordmark "Civiti" set in Fira Sans, and enough contrast to
 read as a thumbnail roughly 500 px wide in a chat list.
