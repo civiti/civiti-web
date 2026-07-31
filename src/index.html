@@ -38,7 +38,18 @@
     <!-- Apple Smart App Banner (iOS Safari) -->
     <meta name="apple-itunes-app" content="app-id=6760908767" />
 
-    <link rel="icon" type="image/svg+xml" href="images/logo/civiti-logo.svg" />
+    <!-- Tab and home-screen icons.
+         The favicon is the filled tile rather than the bare mark: the mark's
+         body is --oxford-blue on transparency, which all but disappears against
+         a dark browser tab strip. The PNG is a fallback for contexts that will
+         not take an SVG icon.
+         apple-touch-icon must be opaque — iOS composites transparency
+         unpredictably — and iOS rounds the corners itself, so the source stays
+         square. Without this link iOS uses a screenshot of the page when
+         someone adds Civiti to their home screen. -->
+    <link rel="icon" type="image/svg+xml" href="images/logo/civiti-icon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="images/logo/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="images/logo/apple-touch-icon.png" />
 
     <!-- Preconnect to critical third-party origins -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
