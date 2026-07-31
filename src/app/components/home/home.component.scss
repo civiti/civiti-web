@@ -501,8 +501,14 @@ button.cta-navy.ant-btn {
   }
 }
 
+// Centred with auto margins, not by the section's `text-align`. Tailwind's
+// preflight sets `img { display: block }` globally, and a block-level image
+// ignores text-align — so this sat flush left while the heading and copy above
+// it were centred. The design has no preflight, which is why it looks right
+// there and wrong here.
 .closing-mark {
-  margin-bottom: 1.25rem;
+  display: block;
+  margin: 0 auto 1.25rem;
 }
 
 // ---------------------------------------------------------------- responsive
