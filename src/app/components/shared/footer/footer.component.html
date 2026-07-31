@@ -51,6 +51,13 @@
     <div class="footer-bottom-inner">
       <span class="footer-brand">Civiti</span>
       <span class="footer-copy">Participare Civică pentru România · {{ currentYear }}</span>
+      <!-- Author credit. rel="me" is the identity relation between a project
+           and the personal site of the person behind it; deliberately not
+           nofollow, since this is a genuine editorial link. -->
+      <span class="footer-author">
+        Construit de
+        <a [href]="authorUrl" target="_blank" rel="noopener me">{{ authorName }}</a>
+      </span>
       <!-- Statlark analytics attribution (mono variant). Styles live in the
            component SCSS; see https://statlark.com/docs/badge -->
       <a

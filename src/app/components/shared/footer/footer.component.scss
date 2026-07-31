@@ -99,6 +99,31 @@
   color: rgba(255, 255, 255, 0.4);
 }
 
+// The lead-in stays as quiet as the copyright beside it; the name itself is
+// lifted to the same weight the other footer links carry, so it reads as a
+// link rather than as more small print. 10.6:1 on --oxford-blue.
+.footer-author {
+  font-family: var(--font-primary);
+  font-size: var(--text-xs);
+  color: rgba(255, 255, 255, 0.4);
+
+  a {
+    color: var(--white-78);
+    text-decoration: none;
+
+    &:hover {
+      color: var(--orange-web);
+      text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--orange-web);
+      outline-offset: 2px;
+    }
+  }
+}
+
 .footer-github {
   display: inline-flex;
   align-items: center;

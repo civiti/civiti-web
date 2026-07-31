@@ -14,3 +14,10 @@ export const SITE_URL = 'https://civiti.ro';
 export const APP_STORE_URL = 'https://apps.apple.com/ro/app/civiti/id6760908767';
 export const GITHUB_URL = 'https://github.com/civiti';
 export const REVOLUT_URL = 'https://revolut.me/sorvas';
+
+/**
+ * Author credit. The `www` host is deliberate: the apex 308s to it, so linking
+ * the apex would put a redirect hop in front of every click.
+ */
+export const AUTHOR_NAME = 'Sorin Vasiliu';
+export const AUTHOR_URL = 'https://www.sorinvasiliu.ro';

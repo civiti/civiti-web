@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { GUIDE_ARTICLES } from '../../../generated/guide-data';
-import { APP_STORE_URL, GITHUB_URL } from '../../../constants/urls';
+import { APP_STORE_URL, AUTHOR_NAME, AUTHOR_URL, GITHUB_URL } from '../../../constants/urls';
 
 @Component({
   selector: 'app-footer',
@@ -16,4 +16,6 @@ export class FooterComponent {
   readonly currentYear = new Date().getFullYear();
   readonly appStoreUrl = APP_STORE_URL;
   readonly githubUrl = GITHUB_URL;
+  readonly authorName = AUTHOR_NAME;
+  readonly authorUrl = AUTHOR_URL;
 }
