@@ -38,15 +38,22 @@
       </p>
       </div>
 
-      <!-- Above the fold, so eager and prioritised. Intrinsic dimensions are
-           declared to keep it out of the CLS budget. -->
+      <!-- A real anchor, not a click handler on the image: middle-click and
+           open-in-new-tab keep working. It goes to the list, which is what the
+           CTA beside it does — routing to ?view=harta would instantiate a
+           Google Map on arrival and bypass the intent gate the issues list
+           deliberately puts in front of one.
+           The image is above the fold, so eager and prioritised, with intrinsic
+           dimensions declared to keep it out of the CLS budget. -->
       <div class="hero-visual">
-        <img
-          src="/images/screenshots/harta-bucuresti.webp"
-          width="1120"
-          height="840"
-          fetchpriority="high"
-          alt="Harta sesizărilor din {{ defaultCity }}, cu problemele raportate de locuitori marcate pe străzi." />
+        <a routerLink="/bucuresti" (click)="selectCity()">
+          <img
+            src="/images/screenshots/harta-bucuresti.webp"
+            width="1120"
+            height="840"
+            fetchpriority="high"
+            alt="Vezi harta sesizărilor din {{ defaultCity }}" />
+        </a>
       </div>
     </div>
   </header>

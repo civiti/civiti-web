@@ -136,12 +136,35 @@
   min-width: min(100%, 300px);
   max-width: 560px;
 
+  // Lift and brighten rather than a drop shadow — a shadow is invisible
+  // against --oxford-blue. Borrows the guide cards' hover language so the
+  // whole page reads one way.
+  a {
+    display: block;
+    border-radius: var(--radius-lg);
+    transition: transform 0.2s ease;
+
+    &:hover {
+      transform: translateY(-3px);
+    }
+
+    &:focus-visible {
+      outline: 2px solid var(--orange-web);
+      outline-offset: 4px;
+    }
+
+    &:hover img {
+      border-color: var(--orange-web-60);
+    }
+  }
+
   img {
     display: block;
     width: 100%;
     height: auto;
     border-radius: var(--radius-lg);
     border: 1px solid var(--white-18);
+    transition: border-color 0.2s ease;
   }
 }
 
@@ -545,13 +568,16 @@ button.cta-navy.ant-btn {
   button.cta.ant-btn,
   .guide-links a,
   .responsibilities li,
+  .hero-visual a,
+  .hero-visual img,
   .hero-link {
     transition: none;
   }
 
   button.cta.ant-btn:hover,
   button.cta.ant-btn:focus-visible,
-  .guide-links a:hover {
+  .guide-links a:hover,
+  .hero-visual a:hover {
     transform: none;
   }
 }

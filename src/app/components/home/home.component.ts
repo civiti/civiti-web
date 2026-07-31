@@ -39,10 +39,20 @@ export class HomeComponent {
    *  previously had only a single inbound internal link on the whole site. */
   readonly guides = GUIDE_ARTICLES;
 
-  enterCity(): void {
+  /**
+   * Selects the city without navigating, for callers that are already real
+   * links. Keeps the hero visual a genuine anchor — middle-click, open in new
+   * tab and keyboard activation all behave — while still seeding the location
+   * state that `enterCity()` would have set.
+   */
+  selectCity(): void {
     this._store.dispatch(
       LocationActions.setLocation({ county: 'B', city: DEFAULT_CITY, district: '' }),
     );
+  }
+
+  enterCity(): void {
+    this.selectCity();
     this._router.navigate(['/bucuresti']);
   }
 }
