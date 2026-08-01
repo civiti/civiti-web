@@ -80,6 +80,23 @@ export class IsActivePipe implements PipeTransform {
   }
 }
 
+/**
+ * Pure pipe to check if issue status is 'resolved'.
+ * Gates the owner's re-open affordance — the backend accepts a move back to Active only
+ * from Resolved, so any other status must not offer the button.
+ */
+@Pipe({
+  name: 'isResolved',
+  standalone: true,
+  pure: true
+})
+export class IsResolvedPipe implements PipeTransform {
+  transform(status: string | null | undefined): boolean {
+    if (!status) return false;
+    return status.toLowerCase() === 'resolved';
+  }
+}
+
 @Pipe({
   name: 'isCancelled',
   standalone: true,

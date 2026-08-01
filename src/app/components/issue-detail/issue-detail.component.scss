@@ -11,6 +11,34 @@
   margin-top: 1rem;
 }
 
+// Owner-only actions (edit / mark as solved / re-open), stacked tightly inside the
+// .space-y-6 column so they read as one group rather than three separate cards.
+.owner-actions > * + * {
+  margin-top: 0.75rem;
+}
+
+// Green reads as "resolved" throughout the app (see the statusColor pipe), so the solve
+// action gets it rather than the orange primary skin, which is already spoken for by the
+// email campaign CTA further down the same column. Doubling up the custom class with
+// .ant-btn out-specifies the global `body .ant-btn-default` rule without !important.
+button.owner-solve-button.ant-btn {
+  background-color: var(--color-success-strong);
+  border-color: var(--color-success-strong);
+  color: var(--white);
+
+  &:hover,
+  &:focus {
+    background-color: var(--color-success-strong-hover);
+    border-color: var(--color-success-strong-hover);
+    color: var(--white);
+  }
+
+  // ng-zorro renders the spinner and label in the button's own colour.
+  .anticon {
+    color: inherit;
+  }
+}
+
 .email-counter-number {
   font-size: 3rem;
   line-height: 1;

@@ -25,12 +25,14 @@ import { take, filter, takeUntil } from 'rxjs/operators';
 import { AppState } from '../../store/app.state';
 import * as IssueActions from '../../store/issues/issue.actions';
 import * as IssueSelectors from '../../store/issues/issue.selectors';
+import * as UserIssuesActions from '../../store/user-issues/user-issues.actions';
 import { selectIsAdmin, selectIsAuthInitialized, selectAuthUser, selectIsAuthenticated } from '../../store/auth/auth.selectors';
-import { IssueDetailResponse, isPubliclyViewableStatus } from '../../types/civica-api.types';
+import { IssueDetailResponse, isPubliclyViewableStatus, normalizeStatus } from '../../types/civica-api.types';
+import { isOwnerEditableStatus } from '../issue-creation/issue-field.constants';
 import { EmailModalComponent } from './email-modal.component';
 import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
 import { GoogleMapsConfigService } from '../../services/google-maps-config.service';
-import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsTerminalStatePipe, IsOwnerEditablePipe } from '../../pipes/status.pipe';
+import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsResolvedPipe, IsTerminalStatePipe, IsOwnerEditablePipe } from '../../pipes/status.pipe';
 import { IsUrgentPipe } from '../../pipes/urgency.pipe';
 import { DaysSincePipe } from '../../pipes/date.pipe';
 import { CommentsComponent } from '../shared/comments/comments.component';
@@ -64,6 +66,7 @@ import { SeoService, socialCardFromPhoto } from '../../services/seo.service';
         StatusTextPipe,
         StatusColorPipe,
         IsActivePipe,
+        IsResolvedPipe,
         IsTerminalStatePipe,
         IsOwnerEditablePipe,
         IsUrgentPipe,
@@ -106,6 +109,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
     // Voting state
     isVoting = signal(false);
+    // Owner status actions (mark as solved / re-open) in flight
+    isStatusUpdating = signal(false);
     private _actions$ = inject(Actions);
     private _currentUserId: string | null = null;
     private _currentIssueId: string | null = null;
@@ -167,6 +172,21 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             takeUntilDestroyed(this._destroyRef)
         ).subscribe(() => {
             this.isVoting.set(false);
+        });
+
+        // Same idea for the owner's status actions. The status itself lands in the store via the
+        // cross-slice cases in issue.reducer.ts; this only clears the button's spinner.
+        this._actions$.pipe(
+            ofType(
+                UserIssuesActions.markIssueAsSolvedSuccess,
+                UserIssuesActions.markIssueAsSolvedFailure,
+                UserIssuesActions.reopenIssueSuccess,
+                UserIssuesActions.reopenIssueFailure
+            ),
+            filter(action => action.issueId === this._currentIssueId),
+            takeUntilDestroyed(this._destroyRef)
+        ).subscribe(() => {
+            this.isStatusUpdating.set(false);
         });
 
         // Reinitialize gallery when issue data changes (only in browser)
@@ -410,10 +430,68 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     /**
+     * Whether the owner-actions block has anything to show. Guards the wrapper so an owner
+     * viewing a Cancelled (or Draft) issue doesn't get an empty div, which would still claim
+     * a .space-y-6 gap above the card below it.
+     */
+    hasOwnerActions(issue: IssueDetailResponse): boolean {
+        if (!this.isOwner(issue)) {
+            return false;
+        }
+
+        // Active is itself owner-editable, so the "mark as solved" case is already covered.
+        return isOwnerEditableStatus(issue.status) || normalizeStatus(issue.status) === 'Resolved';
+    }
+
+    /**
      * Navigate to the edit view for this issue (owner-only, owner-editable statuses).
      */
     editIssue(issue: IssueDetailResponse): void {
         this._router.navigate(['/edit-issue', issue.id]);
+    }
+
+    /**
+     * Mark this issue as resolved (owner-only, Active issues).
+     * Same confirmation and action as the button on the my-issues page.
+     */
+    markAsSolved(issue: IssueDetailResponse): void {
+        if (this.isStatusUpdating()) {
+            return;
+        }
+
+        this._modal.confirm({
+            nzTitle: 'Marchează ca rezolvată',
+            nzContent: `Ești sigur că problema "${issue.title}" a fost rezolvată de autorități?`,
+            nzOkText: 'Da, rezolvă',
+            nzCancelText: 'Înapoi',
+            nzOkType: 'primary',
+            nzOnOk: () => {
+                this.isStatusUpdating.set(true);
+                this._store.dispatch(UserIssuesActions.markIssueAsSolved({ issueId: issue.id }));
+            }
+        });
+    }
+
+    /**
+     * Re-open a resolved issue (owner-only). Goes straight back to Active with no admin
+     * re-review — the content was already approved and cannot have changed while resolved.
+     */
+    reopenIssue(issue: IssueDetailResponse): void {
+        if (this.isStatusUpdating()) {
+            return;
+        }
+
+        this._modal.confirm({
+            nzTitle: 'Redeschide problema',
+            nzContent: `Problema "${issue.title}" va reveni în starea activă și va fi din nou vizibilă public ca nerezolvată. Continui?`,
+            nzOkText: 'Da, redeschide',
+            nzCancelText: 'Înapoi',
+            nzOkType: 'primary',
+            nzOnOk: () => {
+                this.isStatusUpdating.set(true);
+                this._store.dispatch(UserIssuesActions.reopenIssue({ issueId: issue.id }));
+            }
+        });
     }
 
     /**

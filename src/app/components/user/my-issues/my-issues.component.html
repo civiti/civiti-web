@@ -82,6 +82,16 @@
                     </button>
                   }
 
+                  <!-- Reopen for resolved issues (back to Active, no admin re-review) -->
+                  @if ((issue.status | isResolved)) {
+                    <button
+                            nz-button nzType="default" nzSize="small"
+                            nz-tooltip nzTooltipTitle="Redeschide problema"
+                            (click)="reopenIssue(issue)">
+                      <span nz-icon nzType="reload" nzTheme="outline"></span><span> Redeschide</span>
+                    </button>
+                  }
+
                   <!-- Cancel for active issues -->
                   @if ((issue.status | isActive)) {
                     <button

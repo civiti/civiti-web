@@ -37,7 +37,26 @@ export const markIssueAsSolvedSuccess = createAction(
 
 export const markIssueAsSolvedFailure = createAction(
   '[User Issues] Mark Issue As Solved Failure',
-  props<{ error: string }>()
+  props<{ issueId: string; error: string }>()
+);
+
+// ============================================
+// Reopen Issue
+// ============================================
+
+export const reopenIssue = createAction(
+  '[User Issues] Reopen Issue',
+  props<{ issueId: string }>()
+);
+
+export const reopenIssueSuccess = createAction(
+  '[User Issues] Reopen Issue Success',
+  props<{ issueId: string }>()
+);
+
+export const reopenIssueFailure = createAction(
+  '[User Issues] Reopen Issue Failure',
+  props<{ issueId: string; error: string }>()
 );
 
 // ============================================
