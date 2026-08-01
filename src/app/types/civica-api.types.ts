@@ -242,9 +242,13 @@ export interface RequestChangesRequest {
  * Request to update an issue's status (for owner actions)
  * PUT /api/user/issues/{id}/status
  * Returns 204 No Content on success
+ *
+ * The backend enforces which transitions are legal: 'cancelled' from any non-terminal
+ * status, 'resolved' only from Active, and 'active' only from Resolved (re-opening an
+ * issue the owner had resolved). Cancelled is terminal.
  */
 export interface UpdateIssueStatusRequest {
-  status: 'cancelled' | 'resolved'; // camelCase as expected by backend
+  status: 'cancelled' | 'resolved' | 'active'; // camelCase as expected by backend
 }
 
 /**

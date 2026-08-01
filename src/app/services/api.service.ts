@@ -31,6 +31,7 @@ import {
   LeaderboardQueryParams,
   PaginationParams,
   EditUserIssueRequest,
+  UpdateIssueStatusRequest,
   AdminActivityLogEntry,
   ActivityLogQueryParams,
   EnhanceTextRequest,
@@ -224,12 +225,13 @@ export class ApiService {
   /**
    * Update issue status (cancel, resolve, or re-open)
    * PUT /api/user/issues/:id/status
-   * @param status - 'cancelled' | 'resolved' | 'active' (camelCase). The backend enforces the
-   *   transitions: 'resolved' only from Active, 'active' only from Resolved (re-opening), and
-   *   'cancelled' from any non-terminal status. Cancelled is terminal.
+   * @param status - see UpdateIssueStatusRequest for the accepted values and the transitions
+   *   the backend enforces. Derived from that interface rather than repeated, so the wire
+   *   contract and this signature cannot drift apart again.
    */
-  updateIssueStatus(issueId: string, status: 'cancelled' | 'resolved' | 'active'): Observable<void> {
-    return this.http.put<void>(`${this.baseUrl}/user/issues/${issueId}/status`, { status });
+  updateIssueStatus(issueId: string, status: UpdateIssueStatusRequest['status']): Observable<void> {
+    const body: UpdateIssueStatusRequest = { status };
+    return this.http.put<void>(`${this.baseUrl}/user/issues/${issueId}/status`, body);
   }
 
   /**
