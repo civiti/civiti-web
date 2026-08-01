@@ -35,6 +35,14 @@ export const userIssuesReducer = createReducer(
     }, state)
   ),
 
+  // Reopen Issue - a resolved issue goes straight back to Active
+  on(UserIssuesActions.reopenIssueSuccess, (state, { issueId }) =>
+    userIssuesAdapter.updateOne({
+      id: issueId,
+      changes: { status: 'Active' }
+    }, state)
+  ),
+
   // Cancel Issue - update status to Cancelled
   on(UserIssuesActions.cancelIssueSuccess, (state, { issueId }) =>
     userIssuesAdapter.updateOne({

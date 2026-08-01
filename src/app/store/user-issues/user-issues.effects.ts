@@ -49,7 +49,31 @@ export class UserIssuesEffects {
             const errorMsg = error.error?.error || 'Eroare la actualizarea statusului';
             this.message.error(errorMsg);
             return of(UserIssuesActions.markIssueAsSolvedFailure({
+              issueId,
               error: error.message || 'Failed to update status'
+            }));
+          })
+        )
+      )
+    )
+  );
+
+  // Reopen Issue - only the owner of a resolved issue may do this, and it goes
+  // straight back to Active with no admin re-review.
+  reopenIssue$ = createEffect(() =>
+    this.actions$.pipe(
+      ofType(UserIssuesActions.reopenIssue),
+      mergeMap(({ issueId }) =>
+        this.apiService.updateIssueStatus(issueId, 'active').pipe(
+          tap(() => this.message.success('Problema a fost redeschisă.')),
+          map(() => UserIssuesActions.reopenIssueSuccess({ issueId })),
+          catchError(error => {
+            console.error('[UserIssues Effects] Failed to reopen issue:', error);
+            const errorMsg = error.error?.error || 'Eroare la redeschiderea problemei';
+            this.message.error(errorMsg);
+            return of(UserIssuesActions.reopenIssueFailure({
+              issueId,
+              error: error.message || 'Failed to reopen issue'
             }));
           })
         )

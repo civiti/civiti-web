@@ -27,7 +27,7 @@ import { UserIssuesStatusFilter } from '../../../store/user-issues/user-issues.s
 import {
   IssueItem
 } from '../../../types/civica-api.types';
-import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsCancelledPipe, IsRejectedPipe, IsOwnerEditablePipe } from '../../../pipes/status.pipe';
+import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsResolvedPipe, IsCancelledPipe, IsRejectedPipe, IsOwnerEditablePipe } from '../../../pipes/status.pipe';
 import { DaysSincePipe } from '../../../pipes/date.pipe';
 
 @Component({
@@ -52,6 +52,7 @@ import { DaysSincePipe } from '../../../pipes/date.pipe';
     StatusTextPipe,
     StatusColorPipe,
     IsActivePipe,
+    IsResolvedPipe,
     IsCancelledPipe,
     IsRejectedPipe,
     IsOwnerEditablePipe,
@@ -127,6 +128,19 @@ export class MyIssuesComponent implements OnInit {
       nzOkType: 'primary',
       nzOnOk: () => {
         this.store.dispatch(UserIssuesActions.markIssueAsSolved({ issueId: issue.id }));
+      }
+    });
+  }
+
+  reopenIssue(issue: IssueItem): void {
+    this.modal.confirm({
+      nzTitle: 'Redeschide problema',
+      nzContent: `Problema "${issue.title}" va reveni în starea activă și va fi din nou vizibilă public ca nerezolvată. Continui?`,
+      nzOkText: 'Da, redeschide',
+      nzCancelText: 'Înapoi',
+      nzOkType: 'primary',
+      nzOnOk: () => {
+        this.store.dispatch(UserIssuesActions.reopenIssue({ issueId: issue.id }));
       }
     });
   }

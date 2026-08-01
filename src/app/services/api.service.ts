@@ -222,11 +222,13 @@ export class ApiService {
   }
 
   /**
-   * Update issue status (cancel or resolve)
+   * Update issue status (cancel, resolve, or re-open)
    * PUT /api/user/issues/:id/status
-   * @param status - 'cancelled' | 'resolved' (camelCase)
+   * @param status - 'cancelled' | 'resolved' | 'active' (camelCase). The backend enforces the
+   *   transitions: 'resolved' only from Active, 'active' only from Resolved (re-opening), and
+   *   'cancelled' from any non-terminal status. Cancelled is terminal.
    */
-  updateIssueStatus(issueId: string, status: 'cancelled' | 'resolved'): Observable<void> {
+  updateIssueStatus(issueId: string, status: 'cancelled' | 'resolved' | 'active'): Observable<void> {
     return this.http.put<void>(`${this.baseUrl}/user/issues/${issueId}/status`, { status });
   }
 

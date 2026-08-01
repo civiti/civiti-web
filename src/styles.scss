@@ -40,6 +40,14 @@
   --color-error: #DC3545;
   --color-info: var(--oxford-blue);
 
+  /* Fill-safe success.
+     --color-success is 3.13:1 against white: fine as a border, an icon or large display
+     type, but below WCAG AA (4.5:1) for button-sized white label text sitting on it. This
+     is 5.14:1 with white on top. Use it whenever green is the *fill* behind text; keep
+     --color-success for accents. -hover is the pressed/hover step down from it. */
+  --color-success-strong: #1E7E34;
+  --color-success-strong-hover: #186429;
+
   /* Text-safe accent.
      --orange-web is 2.02:1 on white and 1.61:1 on --platinum: both fail WCAG AA
      for text. This is 5.00:1 on white and 4.55:1 on --surface-muted. Use it for

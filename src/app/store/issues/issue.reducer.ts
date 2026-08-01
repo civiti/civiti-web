@@ -1,7 +1,30 @@
 import { createReducer, on } from '@ngrx/store';
-import { initialIssueState, issueAdapter } from './issue.state';
+import { IssueState, initialIssueState, issueAdapter } from './issue.state';
 import * as IssueActions from './issue.actions';
-import { isPubliclyViewableStatus } from '../../types/civica-api.types';
+import * as UserIssuesActions from '../user-issues/user-issues.actions';
+import { IssueStatus, isPubliclyViewableStatus } from '../../types/civica-api.types';
+
+/**
+ * Applies a status change to both the public list entity and the selected detail, whichever
+ * of them is currently holding this issue. Mirrors the shape used by the vote and email-count
+ * updates below.
+ */
+function patchIssueStatus(state: IssueState, issueId: string, status: IssueStatus): IssueState {
+  let newState = state;
+
+  if (state.entities[issueId]) {
+    newState = issueAdapter.updateOne({ id: issueId, changes: { status } }, newState);
+  }
+
+  if (state.selectedIssueDetail && state.selectedIssueDetail.id === issueId) {
+    newState = {
+      ...newState,
+      selectedIssueDetail: { ...state.selectedIssueDetail, status }
+    };
+  }
+
+  return newState;
+}
 
 export const issueReducer = createReducer(
   initialIssueState,
@@ -224,5 +247,17 @@ export const issueReducer = createReducer(
     }
 
     return newState;
-  })
+  }),
+
+  // Owner status changes are dispatched from the userIssues slice, but they are now triggered
+  // from the issue detail page too — where the status on screen comes from this slice. Without
+  // these, marking an issue solved at /issue/:id would leave the page showing "ACTIVĂ" until a
+  // refetch. Both Active and Resolved are publicly viewable, so the list membership is unchanged.
+  on(UserIssuesActions.markIssueAsSolvedSuccess, (state, { issueId }) =>
+    patchIssueStatus(state, issueId, 'Resolved')
+  ),
+
+  on(UserIssuesActions.reopenIssueSuccess, (state, { issueId }) =>
+    patchIssueStatus(state, issueId, 'Active')
+  )
 );
