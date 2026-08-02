@@ -17,6 +17,17 @@
   margin-top: 0.75rem;
 }
 
+// ng-zorro gives every .anticon `vertical-align: -0.125em` — a 2px drop at our 16px base —
+// and .ant-btn is inline-block, so the icon lands below the centre of the label beside it.
+// nzBlock doesn't help: .ant-btn-block only sets width. Laying the button out as a flex row
+// centres icon and label against each other instead of against a text baseline. The 8px
+// icon-to-label gap is a margin on the label span, so it survives the switch untouched.
+.owner-actions button.ant-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 // Green reads as "resolved" throughout the app (see the statusColor pipe), so the solve
 // action gets it rather than the orange primary skin, which is already spoken for by the
 // email campaign CTA further down the same column. Doubling up the custom class with
