@@ -2,14 +2,23 @@ import { createReducer, on } from '@ngrx/store';
 import { IssueState, initialIssueState, issueAdapter } from './issue.state';
 import * as IssueActions from './issue.actions';
 import * as UserIssuesActions from '../user-issues/user-issues.actions';
-import { IssueStatus, isPubliclyViewableStatus } from '../../types/civica-api.types';
+import { IssueDetailResponse, IssueStatus, isPubliclyViewableStatus } from '../../types/civica-api.types';
 
 /**
  * Applies a status change to both the public list entity and the selected detail, whichever
  * of them is currently holding this issue. Mirrors the shape used by the vote and email-count
  * updates below.
+ *
+ * @param detailChanges extra fields to patch onto the selected detail only — for state the
+ *   status change implies but the list entity has no room for. The list entity carries no
+ *   resolution fields, so patching them there would be meaningless.
  */
-function patchIssueStatus(state: IssueState, issueId: string, status: IssueStatus): IssueState {
+function patchIssueStatus(
+  state: IssueState,
+  issueId: string,
+  status: IssueStatus,
+  detailChanges: Partial<IssueDetailResponse> = {}
+): IssueState {
   let newState = state;
 
   if (state.entities[issueId]) {
@@ -19,7 +28,7 @@ function patchIssueStatus(state: IssueState, issueId: string, status: IssueStatu
   if (state.selectedIssueDetail && state.selectedIssueDetail.id === issueId) {
     newState = {
       ...newState,
-      selectedIssueDetail: { ...state.selectedIssueDetail, status }
+      selectedIssueDetail: { ...state.selectedIssueDetail, status, ...detailChanges }
     };
   }
 
@@ -257,7 +266,12 @@ export const issueReducer = createReducer(
     patchIssueStatus(state, issueId, 'Resolved')
   ),
 
+  // Re-opening deletes the resolution photo set server-side, so clearing it here is applying a
+  // known invariant rather than guessing: the alternative leaves the resolved section on screen,
+  // proof and all, for an issue the page has just relabelled ACTIVĂ. The resolve direction gets
+  // no such patch — the new photo ids and resolvedAt are the server's to mint, so the detail
+  // page refetches for them.
   on(UserIssuesActions.reopenIssueSuccess, (state, { issueId }) =>
-    patchIssueStatus(state, issueId, 'Active')
+    patchIssueStatus(state, issueId, 'Active', { resolvedAt: null, resolutionPhotos: [] })
   )
 );

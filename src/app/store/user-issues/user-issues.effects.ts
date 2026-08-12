@@ -40,8 +40,8 @@ export class UserIssuesEffects {
   markIssueAsSolved$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserIssuesActions.markIssueAsSolved),
-      mergeMap(({ issueId }) =>
-        this.apiService.updateIssueStatus(issueId, 'resolved').pipe(
+      mergeMap(({ issueId, resolutionPhotoUrls }) =>
+        this.apiService.updateIssueStatus(issueId, 'resolved', resolutionPhotoUrls).pipe(
           tap(() => this.message.success('Problema a fost marcată ca rezolvată!')),
           map(() => UserIssuesActions.markIssueAsSolvedSuccess({ issueId })),
           catchError(error => {

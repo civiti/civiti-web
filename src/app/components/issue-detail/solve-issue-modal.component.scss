@@ -1,0 +1,127 @@
+.solve-modal {
+  color: var(--oxford-blue);
+}
+
+.solve-question {
+  margin-bottom: 1.25rem;
+  font-size: 1rem;
+}
+
+// Separated from the question by a rule rather than a heading weight: the picker is optional,
+// and a second bold heading would read as a second thing being asked.
+.solve-proof {
+  padding-top: 1rem;
+  border-top: 1px solid var(--platinum);
+}
+
+.solve-proof-title {
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--oxford-blue);
+}
+
+.solve-proof-hint {
+  margin-bottom: 0.75rem;
+  font-size: var(--text-xs);
+  color: var(--oxford-blue-68);
+}
+
+// Fixed three-up so the tiles do not resize as photos are added, and so the row always shows
+// how many slots are left. maxPhotos is 3, so this never wraps.
+.proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 0.75rem;
+}
+
+.proof-tile {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  aspect-ratio: 4 / 3;
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.proof-tile-busy {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--oxford-blue-82);
+}
+
+.proof-tile-remove {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background-color: var(--oxford-blue-82);
+  color: var(--white);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    background-color: var(--oxford-blue);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+// A dashed slot rather than a button skin: it reads as an empty place for a photo, which is
+// what it is, and it does not compete with the modal's real footer actions.
+.proof-add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  aspect-ratio: 4 / 3;
+  border: 1px dashed var(--platinum);
+  border-radius: var(--radius-sm);
+  background-color: transparent;
+  font-size: var(--text-xs);
+  color: var(--oxford-blue-68);
+  cursor: pointer;
+
+  &:hover:not(:disabled) {
+    border-color: var(--orange-web);
+    color: var(--orange-web);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.solve-proof-empty {
+  margin-top: 0.75rem;
+  font-size: var(--text-xs);
+  color: var(--oxford-blue-68);
+}
+
+.proof-input {
+  display: none;
+}
+
+nz-alert {
+  display: block;
+  margin-top: 1rem;
+}

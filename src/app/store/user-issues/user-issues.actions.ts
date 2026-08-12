@@ -27,7 +27,12 @@ export const loadUserIssuesFailure = createAction(
 
 export const markIssueAsSolved = createAction(
   '[User Issues] Mark Issue As Solved',
-  props<{ issueId: string }>()
+  /**
+   * resolutionPhotoUrls carries the optional "after" photos the owner attached in the resolve
+   * modal — already uploaded to storage by then, so these are public URLs, not files. Optional
+   * because resolving without proof is the plain case and the my-issues card offers no picker.
+   */
+  props<{ issueId: string; resolutionPhotoUrls?: string[] }>()
 );
 
 export const markIssueAsSolvedSuccess = createAction(

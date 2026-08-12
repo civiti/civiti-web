@@ -228,9 +228,19 @@ export class ApiService {
    * @param status - see UpdateIssueStatusRequest for the accepted values and the transitions
    *   the backend enforces. Derived from that interface rather than repeated, so the wire
    *   contract and this signature cannot drift apart again.
+   * @param resolutionPhotoUrls - optional "after" photos, accepted by the backend only
+   *   alongside 'resolved'. Omitted from the body entirely when empty so a plain resolve stays
+   *   byte-identical to what this method has always sent.
    */
-  updateIssueStatus(issueId: string, status: UpdateIssueStatusRequest['status']): Observable<void> {
+  updateIssueStatus(
+    issueId: string,
+    status: UpdateIssueStatusRequest['status'],
+    resolutionPhotoUrls?: string[]
+  ): Observable<void> {
     const body: UpdateIssueStatusRequest = { status };
+    if (resolutionPhotoUrls?.length) {
+      body.resolutionPhotoUrls = resolutionPhotoUrls;
+    }
     return this.http.put<void>(`${this.baseUrl}/user/issues/${issueId}/status`, body);
   }
 
