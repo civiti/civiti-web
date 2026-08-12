@@ -179,12 +179,14 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             this.isVoting.set(false);
         });
 
-        // Same idea for the owner's status actions. The status itself lands in the store via the
-        // cross-slice cases in issue.reducer.ts; this only clears the button's spinner.
+        // Same idea for re-opening. The status itself lands in the store via the cross-slice
+        // cases in issue.reducer.ts; this only clears the button's spinner.
+        //
+        // Resolving is not here any more: it runs inside the solve modal, which owns its own
+        // submitting state, correlates on its own request id, and keeps the button behind an
+        // overlay for the whole round trip.
         this._actions$.pipe(
             ofType(
-                UserIssuesActions.markIssueAsSolvedSuccess,
-                UserIssuesActions.markIssueAsSolvedFailure,
                 UserIssuesActions.reopenIssueSuccess,
                 UserIssuesActions.reopenIssueFailure
             ),
@@ -464,9 +466,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
      * field stays optional so the two surfaces cannot drift apart.
      */
     markAsSolved(issue: IssueDetailResponse): void {
-        if (this.isStatusUpdating()) {
-            return;
-        }
+        // No isStatusUpdating guard: that signal tracks the re-open button, and the modal is a
+        // blocking overlay that owns re-entry for this path from the moment it opens.
 
         // Annotated rather than inferred: the footer callbacks below close over modalRef, so an
         // inferred type would be self-referential (TS7022).

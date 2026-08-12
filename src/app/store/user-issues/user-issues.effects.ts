@@ -40,16 +40,19 @@ export class UserIssuesEffects {
   markIssueAsSolved$ = createEffect(() =>
     this.actions$.pipe(
       ofType(UserIssuesActions.markIssueAsSolved),
-      mergeMap(({ issueId, resolutionPhotoUrls }) =>
+      // mergeMap, so a second resolve is not cancelled by a third. requestId is echoed on both
+      // outcomes below so a caller can pick out its own rather than whichever landed first.
+      mergeMap(({ issueId, requestId, resolutionPhotoUrls }) =>
         this.apiService.updateIssueStatus(issueId, 'resolved', resolutionPhotoUrls).pipe(
           tap(() => this.message.success('Problema a fost marcată ca rezolvată!')),
-          map(() => UserIssuesActions.markIssueAsSolvedSuccess({ issueId })),
+          map(() => UserIssuesActions.markIssueAsSolvedSuccess({ issueId, requestId })),
           catchError(error => {
             console.error('[UserIssues Effects] Failed to mark issue as solved:', error);
             const errorMsg = error.error?.error || 'Eroare la actualizarea statusului';
             this.message.error(errorMsg);
             return of(UserIssuesActions.markIssueAsSolvedFailure({
               issueId,
+              requestId,
               error: error.message || 'Failed to update status'
             }));
           })

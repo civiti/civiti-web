@@ -201,11 +201,17 @@ export class SolveIssueModalComponent implements OnDestroy {
 
         const urls = this.photos().map(p => p.url).filter(url => !url.startsWith('blob:'));
 
+        // Correlated on the request, not the issue. Everything this subscription decides is
+        // irreversible from the wrong outcome — closing the modal, triggering the refetch, and
+        // above all letting ngOnDestroy keep the uploaded objects — so it must not act on a
+        // sibling resolve of the same issue that happened to land first.
+        const requestId = UserIssuesActions.nextSolveRequestId();
+
         merge(
             this._actions$.pipe(ofType(UserIssuesActions.markIssueAsSolvedSuccess)),
             this._actions$.pipe(ofType(UserIssuesActions.markIssueAsSolvedFailure))
         ).pipe(
-            filter(action => action.issueId === this.issue.id),
+            filter(action => action.requestId === requestId),
             take(1),
             takeUntilDestroyed(this._destroyRef)
         ).subscribe(action => {
@@ -224,6 +230,7 @@ export class SolveIssueModalComponent implements OnDestroy {
 
         this._store.dispatch(UserIssuesActions.markIssueAsSolved({
             issueId: this.issue.id,
+            requestId,
             resolutionPhotoUrls: urls.length ? urls : undefined
         }));
     }
