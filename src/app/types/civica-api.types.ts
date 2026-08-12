@@ -249,6 +249,14 @@ export interface RequestChangesRequest {
  */
 export interface UpdateIssueStatusRequest {
   status: 'cancelled' | 'resolved' | 'active'; // camelCase as expected by backend
+  /**
+   * Optional "after" photos (max 3), accepted only alongside status 'resolved' — the backend
+   * rejects them on any other transition rather than dropping them silently.
+   *
+   * Replace-set semantics: every resolve rewrites the whole set, so omitting the field resolves
+   * with no proof photos at all, and re-opening deletes whatever was there.
+   */
+  resolutionPhotoUrls?: string[];
 }
 
 /**
@@ -411,7 +419,19 @@ export interface IssueDetailResponse {
   communityImpact?: string;
   createdAt: string;
   updatedAt: string;
+  /**
+   * When the issue entered the Resolved state it is in now; null for anything not currently
+   * resolved. Not `updatedAt`, which a later edit or vote also moves. Optional so the page
+   * keeps rendering against a backend that predates the field.
+   */
+  resolvedAt?: string | null;
   photos: IssuePhotoResponse[];
+  /**
+   * The author's optional "after" photos proving the issue was fixed. Present only while the
+   * issue is Resolved — re-opening deletes the set server-side — so the UI can render it on
+   * sight. Optional for the same deploy-skew reason as `resolvedAt`.
+   */
+  resolutionPhotos?: IssueResolutionPhotoResponse[];
   authorities: IssueAuthorityResponse[];
   user: UserBasicResponse;
 }
@@ -421,6 +441,17 @@ export interface IssuePhotoResponse {
   url: string;
   description?: string;
   isPrimary: boolean;
+  createdAt: string;
+}
+
+/**
+ * An "after" photo attached when the author resolved the issue. Deliberately not an
+ * IssuePhotoResponse: there is no primary in a resolution set.
+ */
+export interface IssueResolutionPhotoResponse {
+  id: string;
+  url: string;
+  description?: string;
   createdAt: string;
 }
 

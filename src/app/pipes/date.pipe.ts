@@ -64,3 +64,43 @@ export class FormatDateTimePipe implements PipeTransform {
     });
   }
 }
+
+/**
+ * How long an issue took to resolve, as a complete Romanian fragment INCLUDING the preposition:
+ * "în 153 de zile" / "într-o zi" / "în mai puțin de o zi".
+ *
+ * The preposition is part of the output for a grammar reason rather than a stylistic one:
+ * Romanian contracts "în" + "o zi" into "într-o zi", so a fixed label plus a bare value would
+ * render the broken "în o zi" at exactly one day. Callers print a label that stands alone
+ * ("Rezolvată") and let this supply the whole fragment.
+ *
+ * The plural takes "de" when the last two digits are 00 or 20-99: 19 zile, 20 de zile,
+ * 100 de zile, 101 zile, 120 de zile.
+ *
+ * Unlike its neighbours above this one never reads the clock — it compares two server-supplied
+ * timestamps — so it cannot render differently on the server and on the client after hydration.
+ *
+ * Returns '' when either end is missing, so the caller's @if drops the sentence entirely, and
+ * clamps a negative span (clock skew, or a backfilled resolvedAt) to the sub-day phrasing so it
+ * can never print "în -1 zile".
+ */
+@Pipe({
+  name: 'resolutionSpan',
+  standalone: true
+})
+export class ResolutionSpanPipe implements PipeTransform {
+  transform(from: string | Date | null | undefined, to: string | Date | null | undefined): string {
+    if (!from || !to) return '';
+
+    const start = new Date(from).getTime();
+    const end = new Date(to).getTime();
+    if (!Number.isFinite(start) || !Number.isFinite(end)) return '';
+
+    const days = Math.floor((end - start) / 86_400_000);
+    if (days < 1) return 'în mai puțin de o zi';
+    if (days === 1) return 'într-o zi';
+
+    const mod100 = days % 100;
+    return `în ${days} ${mod100 === 0 || mod100 >= 20 ? 'de zile' : 'zile'}`;
+  }
+}

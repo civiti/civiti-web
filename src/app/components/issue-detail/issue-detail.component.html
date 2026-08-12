@@ -29,10 +29,24 @@
                   </h1>
                 </div>
                 <div class="text-right">
-                  <div class="text-xs text-oxford-blue opacity-60">Raportată acum</div>
-                  <div class="text-lg font-semibold text-oxford-blue">
-                    {{ issue.createdAt | daysSince }} zile
-                  </div>
+                  <!-- A resolved issue stops counting. Left alone this is the loudest open-case
+                       signal on the page, and it would sit directly above a card announcing the
+                       issue is fixed. This surface owns the duration — the resolved card below
+                       deliberately does not restate it.
+                       The pipe supplies the preposition ("în 153 de zile" / "într-o zi")
+                       because Romanian contracts "în" + "o zi", so the label has to be
+                       grammatical standing on its own. -->
+                  @if ((issue.status | isResolved) && issue.resolvedAt) {
+                    <div class="text-xs text-oxford-blue opacity-60">Rezolvată</div>
+                    <div class="text-lg font-semibold resolution-span">
+                      {{ issue.createdAt | resolutionSpan: issue.resolvedAt }}
+                    </div>
+                  } @else {
+                    <div class="text-xs text-oxford-blue opacity-60">Raportată acum</div>
+                    <div class="text-lg font-semibold text-oxford-blue">
+                      {{ issue.createdAt | daysSince }} zile
+                    </div>
+                  }
                 </div>
               </div>
 
@@ -47,6 +61,125 @@
                 </nz-tag>
               </div>
             </nz-card>
+
+            <!-- Rezolvat: the closing chapter of the case file.
+                 Gated on isResolved and never isTerminalState — the latter is also true for
+                 CANCELLED, and an abandoned issue is not a success. Every resolved issue gets
+                 the band, so the state stays legible even when the owner attached no proof;
+                 the before/after only unfolds when there is something to show. Because the @if
+                 wraps the <nz-card> itself rather than a wrapper <div>, a non-resolved issue
+                 emits nothing at all and claims no 1.5rem `.space-y-6 > * + *` gap. -->
+            @if (issue.status | isResolved) {
+            <nz-card class="resolved-card">
+              <div class="resolved-head">
+                <i nz-icon nzType="check-circle" nzTheme="fill" class="resolved-head-icon"></i>
+                <div>
+                  <h2 class="resolved-title">Problema a fost rezolvată</h2>
+                  @if (issue.resolvedAt) {
+                    <p class="resolved-subtitle">
+                      Marcată ca rezolvată pe {{ issue.resolvedAt | date:'dd/MM/yyyy' }}
+                    </p>
+                  }
+                </div>
+              </div>
+
+              @if (issue.resolutionPhotos | mainPhoto; as afterPhoto) {
+                @if (issue.photos | mainPhoto; as beforePhoto) {
+                  <!-- Exactly one against one. Pairing photo 3 of the problem with photo 1 of
+                       the fix would invent a correspondence that does not exist; the leftover
+                       originals keep their own gallery card below, the leftover proof goes to
+                       the strip. That is what lets 3-before/1-after render without empty cells. -->
+                  <figure class="ba-pair">
+                    <div class="ba-row">
+                      <a [href]="beforePhoto.url" target="_blank"
+                         class="photo-gallery-item ba-figure group block"
+                         [attr.data-glightbox]="'title: Înainte; description: ' + issue.title">
+                        <img [src]="beforePhoto.url" [alt]="'Înainte de rezolvare: ' + issue.title"
+                             loading="lazy" (error)="onImageError($event)">
+                        <span class="ba-chip ba-chip--before">ÎNAINTE</span>
+                        <span class="photo-overlay absolute inset-0 flex items-center justify-center">
+                          <i nz-icon nzType="zoom-in" nzTheme="outline"
+                             class="text-white opacity-0 group-hover:opacity-100 transition-opacity text-2xl"></i>
+                        </span>
+                      </a>
+
+                      <a [href]="afterPhoto.url" target="_blank"
+                         class="photo-gallery-item ba-figure group block"
+                         [attr.data-glightbox]="'title: Acum; description: ' + (afterPhoto.description || issue.title)">
+                        <img [src]="afterPhoto.url" [alt]="'După rezolvare: ' + issue.title"
+                             loading="lazy" (error)="onImageError($event)">
+                        <span class="ba-chip ba-chip--after">ACUM</span>
+                        <span class="photo-overlay absolute inset-0 flex items-center justify-center">
+                          <i nz-icon nzType="zoom-in" nzTheme="outline"
+                             class="text-white opacity-0 group-hover:opacity-100 transition-opacity text-2xl"></i>
+                        </span>
+                      </a>
+
+                      <!-- aria-hidden: it restates what the two chips already say in words. -->
+                      <span class="ba-arrow" aria-hidden="true">
+                        <i nz-icon nzType="arrow-right" nzTheme="outline"></i>
+                      </span>
+                    </div>
+
+                    <figcaption class="ba-row ba-row--captions">
+                      <span class="ba-caption">Raportată pe {{ issue.createdAt | date:'dd/MM/yyyy' }}</span>
+                      <span class="ba-caption">
+                        @if (issue.resolvedAt) {
+                          Rezolvată pe {{ issue.resolvedAt | date:'dd/MM/yyyy' }}
+                        } @else {
+                          După rezolvare
+                        }
+                      </span>
+                    </figcaption>
+                  </figure>
+                } @else {
+                  <!-- Nothing to compare against: the issue was reported without photos, so the
+                       gallery card below is absent too. Drop the comparison framing rather than
+                       show half an empty pair. -->
+                  <p class="resolved-solo-note">
+                    Problema nu avea fotografii la raportare, așa că mai jos vezi doar cum arată acum.
+                  </p>
+                  <figure class="ba-solo">
+                    <a [href]="afterPhoto.url" target="_blank"
+                       class="photo-gallery-item ba-figure group block"
+                       [attr.data-glightbox]="'title: Acum; description: ' + (afterPhoto.description || issue.title)">
+                      <img [src]="afterPhoto.url" [alt]="'După rezolvare: ' + issue.title"
+                           loading="lazy" (error)="onImageError($event)">
+                      <span class="ba-chip ba-chip--after">ACUM</span>
+                      <span class="photo-overlay absolute inset-0 flex items-center justify-center">
+                        <i nz-icon nzType="zoom-in" nzTheme="outline"
+                           class="text-white opacity-0 group-hover:opacity-100 transition-opacity text-2xl"></i>
+                      </span>
+                    </a>
+                  </figure>
+                }
+
+                <!-- The 2nd and 3rd proof photos, in the pair's own column rhythm so the block
+                     resolves into a 2x2. The pipe returns null rather than [] when nothing is
+                     left, so this can never render as an empty wrapper. -->
+                @if (issue.resolutionPhotos | photosExcept: afterPhoto; as morePhotos) {
+                  <div class="ba-more">
+                    <p class="ba-more-title">Alte fotografii după rezolvare</p>
+                    <div class="ba-strip">
+                      @for (photo of morePhotos; track photo.id; let i = $index) {
+                        <a [href]="photo.url" target="_blank"
+                           class="photo-gallery-item ba-figure group block"
+                           [attr.data-glightbox]="'title: Acum; description: ' + (photo.description || issue.title)">
+                          <img [src]="photo.url"
+                               [alt]="'După rezolvare ' + (i + 2) + ': ' + issue.title"
+                               loading="lazy" (error)="onImageError($event)">
+                          <span class="photo-overlay absolute inset-0 flex items-center justify-center">
+                            <i nz-icon nzType="zoom-in" nzTheme="outline"
+                               class="text-white opacity-0 group-hover:opacity-100 transition-opacity text-2xl"></i>
+                          </span>
+                        </a>
+                      }
+                    </div>
+                  </div>
+                }
+              }
+            </nz-card>
+            }
 
             <!-- Photos Gallery -->
             @if (issue.photos && issue.photos.length > 0) {
@@ -197,8 +330,8 @@
 
                 <!-- Mark as solved, only while live (matches the backend's transition rule) -->
                 @if (issue.status | isActive) {
+                  <!-- No nzLoading: the modal opens on click and owns the submitting state. -->
                   <button nz-button nzType="default" nzBlock class="owner-solve-button"
-                          [nzLoading]="isStatusUpdating()"
                           (click)="markAsSolved(issue)">
                     <span nz-icon nzType="check-circle" nzTheme="outline"></span><span>Marchează ca rezolvată</span>
                   </button>
@@ -223,13 +356,27 @@
                 <div [class]="(issue.status | isTerminalState) ? 'email-counter-number text-green-600 font-bold mb-2' : 'email-counter-number text-orange-web font-bold mb-2'">
                   {{ issue.emailsSent }}
                 </div>
+                <!-- Three-way now that the page has a resolved card of its own: announcing
+                     "închisă" here while the left column announces "rezolvată" reads as two
+                     different outcomes. Cancelled keeps the original neutral wording — it is
+                     terminal but it is not a win. -->
                 <p class="text-oxford-blue font-semibold">
-                  {{ (issue.status | isTerminalState) ? 'Problema a fost închisă!' : 'Contribuții până acum' }}
+                  @if (issue.status | isResolved) {
+                    Contribuții până la rezolvare
+                  } @else if (issue.status | isTerminalState) {
+                    Problema a fost închisă!
+                  } @else {
+                    Contribuții până acum
+                  }
                 </p>
                 <p class="text-oxford-blue text-sm opacity-75 mt-2">
-                  {{ (issue.status | isTerminalState)
-                    ? 'Această problemă nu mai acceptă email-uri. Mulțumim tuturor celor care au contribuit!'
-                    : 'Fiecare email contează! Ajută și tu prin trimiterea unui email către autorități.' }}
+                  @if (issue.status | isResolved) {
+                    Aceste mesaje au ținut problema în atenția autorităților. Mulțumim!
+                  } @else if (issue.status | isTerminalState) {
+                    Această problemă nu mai acceptă email-uri. Mulțumim tuturor celor care au contribuit!
+                  } @else {
+                    Fiecare email contează! Ajută și tu prin trimiterea unui email către autorități.
+                  }
                 </p>
               </div>
             </nz-card>
@@ -383,6 +530,13 @@
                     {{ issue.status | statusText }}
                   </nz-tag>
                 </div>
+                @if ((issue.status | isResolved) && issue.resolvedAt) {
+                  <nz-divider class="my-2"></nz-divider>
+                  <div class="flex justify-between items-center">
+                    <span class="text-oxford-blue opacity-75">Data rezolvării:</span>
+                    <span class="text-oxford-blue">{{ issue.resolvedAt | date:'dd/MM/yyyy' }}</span>
+                  </div>
+                }
               </div>
             </nz-card>
           </div>

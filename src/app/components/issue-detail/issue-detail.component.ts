@@ -7,7 +7,7 @@ import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+import { NzModalModule, NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzCollapseModule } from 'ng-zorro-antd/collapse';
@@ -34,7 +34,9 @@ import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
 import { GoogleMapsConfigService } from '../../services/google-maps-config.service';
 import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsResolvedPipe, IsTerminalStatePipe, IsOwnerEditablePipe } from '../../pipes/status.pipe';
 import { IsUrgentPipe } from '../../pipes/urgency.pipe';
-import { DaysSincePipe } from '../../pipes/date.pipe';
+import { DaysSincePipe, ResolutionSpanPipe } from '../../pipes/date.pipe';
+import { MainPhotoPipe, PhotosExceptPipe } from '../../pipes/photo.pipe';
+import { SolveIssueModalComponent, SolveIssueModalData } from './solve-issue-modal.component';
 import { CommentsComponent } from '../shared/comments/comments.component';
 import { PhotoDownloadService, PhotoDownloadProgress } from '../../services/photo-download.service';
 import { environment } from '../../../environments/environment';
@@ -71,6 +73,9 @@ import { SeoService, socialCardFromPhoto } from '../../services/seo.service';
         IsOwnerEditablePipe,
         IsUrgentPipe,
         DaysSincePipe,
+        ResolutionSpanPipe,
+        MainPhotoPipe,
+        PhotosExceptPipe,
         CommentsComponent,
     ],
     templateUrl: './issue-detail.component.html',
@@ -174,12 +179,14 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
             this.isVoting.set(false);
         });
 
-        // Same idea for the owner's status actions. The status itself lands in the store via the
-        // cross-slice cases in issue.reducer.ts; this only clears the button's spinner.
+        // Same idea for re-opening. The status itself lands in the store via the cross-slice
+        // cases in issue.reducer.ts; this only clears the button's spinner.
+        //
+        // Resolving is not here any more: it runs inside the solve modal, which owns its own
+        // submitting state, correlates on its own request id, and keeps the button behind an
+        // overlay for the whole round trip.
         this._actions$.pipe(
             ofType(
-                UserIssuesActions.markIssueAsSolvedSuccess,
-                UserIssuesActions.markIssueAsSolvedFailure,
                 UserIssuesActions.reopenIssueSuccess,
                 UserIssuesActions.reopenIssueFailure
             ),
@@ -452,22 +459,60 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
 
     /**
      * Mark this issue as resolved (owner-only, Active issues).
-     * Same confirmation and action as the button on the my-issues page.
+     *
+     * A custom modal rather than the plain confirm the my-issues card still uses, because this
+     * is the surface where the owner can attach 1-3 "after" photos as proof. Attaching them is
+     * optional — confirming with none is exactly the old behaviour, and the action's photo
+     * field stays optional so the two surfaces cannot drift apart.
      */
     markAsSolved(issue: IssueDetailResponse): void {
-        if (this.isStatusUpdating()) {
-            return;
-        }
+        // No isStatusUpdating guard: that signal tracks the re-open button, and the modal is a
+        // blocking overlay that owns re-entry for this path from the moment it opens.
 
-        this._modal.confirm({
-            nzTitle: 'Marchează ca rezolvată',
-            nzContent: `Ești sigur că problema "${issue.title}" a fost rezolvată de autorități?`,
-            nzOkText: 'Da, rezolvă',
-            nzCancelText: 'Înapoi',
-            nzOkType: 'primary',
-            nzOnOk: () => {
-                this.isStatusUpdating.set(true);
-                this._store.dispatch(UserIssuesActions.markIssueAsSolved({ issueId: issue.id }));
+        // Annotated rather than inferred: the footer callbacks below close over modalRef, so an
+        // inferred type would be self-referential (TS7022).
+        const modalRef: NzModalRef<SolveIssueModalComponent, boolean> =
+            this._modal.create<SolveIssueModalComponent, SolveIssueModalData, boolean>({
+                nzTitle: 'Marchează ca rezolvată',
+                nzContent: SolveIssueModalComponent,
+                nzData: { issue, userId: this._currentUserId },
+                nzWidth: 640,
+                nzMaskClosable: true,
+                nzIconType: 'check-circle',
+                nzFooter: [
+                    {
+                        label: 'Înapoi',
+                        // Dead while the resolve is in flight. Leaving mid-PUT would tear the
+                        // modal down without knowing the outcome, and its cleanup would have to
+                        // choose between orphaning storage objects and breaking the images of a
+                        // resolve that just succeeded.
+                        disabled: (instance?: SolveIssueModalComponent): boolean =>
+                            instance?.isSubmitting() ?? false,
+                        onClick: () => modalRef.close(false)
+                    },
+                    {
+                        label: 'Da, rezolvă',
+                        type: 'primary',
+                        // Enabled from the moment the modal opens: confirming with no photos is
+                        // the skip, which is why there is no separate "sari peste" button. It
+                        // only goes dead while an upload is in flight (the URLs are not final
+                        // yet) or while the resolve itself is being submitted.
+                        loading: (instance?: SolveIssueModalComponent): boolean =>
+                            instance?.isSubmitting() ?? false,
+                        disabled: (instance?: SolveIssueModalComponent): boolean =>
+                            instance?.isBusy() ?? false,
+                        onClick: (instance?: SolveIssueModalComponent) => instance?.confirmSolve()
+                    }
+                ]
+            });
+
+        // Truthy only once the resolve has actually landed — the modal holds itself open until
+        // the effect reports back, so this GET cannot race the PUT and read pre-resolve state.
+        // Dispatched even when no photos were attached: resolvedAt is minted server-side and
+        // feeds the frozen counter, the resolved band and the info row.
+        modalRef.afterClose.pipe(take(1)).subscribe((result: boolean | undefined) => {
+            if (result) {
+                this._store.dispatch(IssueActions.loadIssue({ id: issue.id }));
             }
         });
     }

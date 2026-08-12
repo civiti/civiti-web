@@ -1,0 +1,61 @@
+<div class="solve-modal">
+  <p class="solve-question">
+    Confirmi că problema «{{ issue.title }}» a fost rezolvată de autorități?
+  </p>
+
+  <div class="solve-proof">
+    <h4 class="solve-proof-title">Adaugă dovada rezolvării (opțional)</h4>
+    <p class="solve-proof-hint">
+      Până la {{ maxPhotos }} fotografii care arată cum arată locul acum. Vor apărea public pe
+      pagina problemei, alături de fotografiile inițiale.
+    </p>
+
+    <div class="proof-grid">
+      @for (photo of photos(); track photo.id; let i = $index) {
+        <div class="proof-tile">
+          <img [src]="photo.url" [alt]="'Fotografie după rezolvare ' + (i + 1)">
+
+          @if (photo.isUploading) {
+            <div class="proof-tile-busy">
+              <nz-spin nzSimple nzSize="small"></nz-spin>
+            </div>
+          } @else {
+            <!-- The icon is the whole button, so the tooltip alone would leave it unnamed to a
+                 screen reader; the index is what distinguishes three identical controls. -->
+            <button type="button" class="proof-tile-remove"
+                    nz-tooltip nzTooltipTitle="Elimină fotografia"
+                    [attr.aria-label]="'Elimină fotografia ' + (i + 1)"
+                    [disabled]="isSubmitting()"
+                    (click)="removePhoto(photo.id)">
+              <span nz-icon nzType="delete" nzTheme="outline"></span>
+            </button>
+          }
+        </div>
+      }
+
+      @if (canAddMore()) {
+        <button type="button" class="proof-add"
+                [disabled]="isSubmitting()"
+                (click)="triggerFileInput()">
+          <span nz-icon nzType="plus" nzTheme="outline"></span>
+          <span>Adaugă</span>
+        </button>
+      }
+    </div>
+
+    @if (!hasPhotos()) {
+      <p class="solve-proof-empty">
+        Nicio fotografie adăugată. Poți marca problema ca rezolvată și fără dovadă.
+      </p>
+    }
+
+    <input id="resolution-photo-input" type="file" class="proof-input"
+           accept="image/*" multiple (change)="onFileSelected($event)">
+  </div>
+
+  @if (submitFailed()) {
+    <nz-alert nzType="error" nzShowIcon
+              nzMessage="Nu am putut marca problema ca rezolvată."
+              nzDescription="Fotografiile au rămas încărcate — încearcă din nou."></nz-alert>
+  }
+</div>

@@ -187,3 +187,185 @@ button[mat-raised-button] {
   margin-inline-end: 0;
 }
 
+
+// ── Rezolvat: înainte / acum ────────────────────────────────────────────────
+// A green border rather than a green fill: this card spans ~66% of the page width and the
+// right column's email-counter card already carries the bg-green-50 wash — two full green
+// panels in one viewport fight each other. Doubling the custom class with .ant-card
+// out-specifies the global `body .ant-card { border-color: var(--platinum) }` without
+// !important, the same technique used on button.owner-solve-button.ant-btn above.
+.resolved-card.ant-card {
+  border-color: var(--color-success);
+}
+
+.resolved-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.resolved-head-icon {
+  font-size: 1.75rem;
+  line-height: 1;
+  color: var(--color-success-strong);
+}
+
+.resolved-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--oxford-blue);
+}
+
+.resolved-subtitle {
+  margin-top: 0.125rem;
+  font-size: var(--text-xs);
+  color: var(--oxford-blue-68);
+}
+
+// Only present when proof photos follow, so the margin lives here rather than on .resolved-head
+// — a resolved issue without photos is just the band, with no trailing gap to explain.
+.ba-pair,
+.ba-solo,
+.resolved-solo-note {
+  margin-top: 1.25rem;
+}
+
+.resolved-solo-note {
+  font-size: 0.875rem;
+  color: var(--oxford-blue-68);
+}
+
+.resolved-solo-note + .ba-solo {
+  margin-top: 0.75rem;
+}
+
+// Deliberately NOT named `grid`. This file already carries an unscoped
+// `@media (max-width: 1024px) { .grid { grid-template-columns: 1fr } }`, which under emulated
+// encapsulation resolves to `.grid[_ngcontent-x]` and beats every Tailwind `grid-cols-*`
+// utility. Naming this `.ba-row` sidesteps it, which is the whole reason the pair survives at
+// tablet width: two small photos side by side still compare, two stacked photos do not.
+.ba-pair {
+  margin-bottom: 0;
+}
+
+.ba-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.75rem;
+}
+
+.ba-row--captions {
+  margin-top: 0.375rem;
+}
+
+.ba-figure {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+}
+
+// One shared aspect ratio is what makes the two halves comparable — a portrait "before" beside
+// a landscape "after" reads as two unrelated pictures. It also reserves the box before the
+// image loads, so the card cannot shift the gallery below it.
+.ba-figure img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.ba-solo {
+  margin-bottom: 0;
+
+  .ba-figure img {
+    aspect-ratio: 16 / 9;
+  }
+}
+
+.ba-chip {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  padding: 0.125rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  letter-spacing: var(--tracking-wider);
+  color: var(--white);
+}
+
+.ba-chip--before {
+  background-color: var(--oxford-blue-82);
+}
+
+// --color-success is only 3.13:1 on white, which fails AA under this label. -strong is the
+// fill-safe green documented in styles.scss for white text on green (5.14:1).
+.ba-chip--after {
+  background-color: var(--color-success-strong);
+}
+
+.ba-caption {
+  font-size: var(--text-xs);
+  color: var(--oxford-blue-68);
+}
+
+// Sits over the gutter so the pair reads as one move rather than two pictures. .ba-row is the
+// only positioned ancestor and holds nothing but the two equal-height figures, so top: 50% is
+// exactly the image mid-line — giving the captions their own row is what keeps that true.
+// pointer-events: none stops it stealing clicks from either photo anchor.
+.ba-arrow {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background-color: var(--white);
+  box-shadow: var(--shadow-card);
+  color: var(--color-success-strong);
+  pointer-events: none;
+}
+
+.ba-more {
+  margin-top: 1.25rem;
+}
+
+.ba-more-title {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--oxford-blue);
+}
+
+// The proof set caps at 3 and one is always the hero, so this holds at most two. Reusing the
+// pair's two-column rhythm makes the whole block resolve into a 2x2.
+.ba-strip {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+}
+
+// The frozen duration in the title card — the one green mark above the fold.
+.resolution-span {
+  color: var(--color-success-strong);
+}
+
+// Mirrors the existing `.grid.grid-cols-2 { gap: 0.5rem }` mobile rule so both photo blocks on
+// this page tighten together.
+@media (max-width: 576px) {
+  .ba-row,
+  .ba-strip {
+    gap: 0.5rem;
+  }
+
+  .ba-arrow {
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+}

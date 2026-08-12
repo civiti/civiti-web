@@ -127,7 +127,12 @@ export class MyIssuesComponent implements OnInit {
       nzCancelText: 'Înapoi',
       nzOkType: 'primary',
       nzOnOk: () => {
-        this.store.dispatch(UserIssuesActions.markIssueAsSolved({ issueId: issue.id }));
+        // This surface offers no photo picker and waits on no outcome, so the request id is
+        // only here to satisfy the contract the solve modal depends on.
+        this.store.dispatch(UserIssuesActions.markIssueAsSolved({
+          issueId: issue.id,
+          requestId: UserIssuesActions.nextSolveRequestId()
+        }));
       }
     });
   }
