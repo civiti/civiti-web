@@ -164,6 +164,27 @@
   font: inherit;
   font-weight: 600;
 
+  // NG-ZORRO gives .ant-card-meta-title `white-space: nowrap` plus an ellipsis, and that
+  // nowrap is inherited by this heading — so the title could never wrap, however much room
+  // the card had. Resetting it here is what lets .line-clamp-2 above do anything at all.
+  //
+  // Two lines rather than one because these titles are addresses ("Blocul V6, Calea 13
+  // Septembrie"): the part that gets cut is the part that says which place it is, so a
+  // one-line title reads as a generic street name on exactly the issues with the most
+  // specific locations.
+  white-space: normal;
+
+  // Both lines are reserved whether or not the title uses them, so the description, the
+  // location row and the stats grid stay level across the three cards in a grid row. Without
+  // it, one two-line title in a row would shunt its own card's content down alone.
+  // 2 lines x the 1.4 line-height set below.
+  min-height: 2.8em;
+  line-height: 1.4;
+
+  // A single unbroken token — a long street name, a pasted URL — would otherwise render as
+  // one overflowing line that the clamp cannot catch, and push past the card edge.
+  overflow-wrap: anywhere;
+
   a {
     color: inherit;
     text-decoration: none;
