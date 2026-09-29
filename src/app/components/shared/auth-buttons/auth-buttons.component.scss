@@ -42,6 +42,23 @@
   white-space: nowrap;
 }
 
+// The menu renders in the overlay container, but its items come from this
+// template, so these rules still reach them.
+.account-menu {
+  min-width: 200px;
+
+  li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .anticon {
+    color: var(--ink-500);
+    font-size: 16px;
+  }
+}
+
 .account-caret {
   font-size: 11px;
   color: var(--ink-500);
