@@ -60,19 +60,19 @@ export const routes: Routes = [
     path: 'dashboard',
     loadComponent: () => import('./components/user/dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [authGuard],
-    data: { animation: 'DashboardPage', headerTitle: 'Panou de Control', showBackButton: true, backUrl: '/bucuresti' }
+    data: { animation: 'DashboardPage', headerTitle: 'Panoul meu' }
   },
   {
     path: 'my-issues',
     loadComponent: () => import('./components/user/my-issues/my-issues.component').then(m => m.MyIssuesComponent),
     canActivate: [authGuard],
-    data: { animation: 'MyIssuesPage', headerTitle: 'Problemele Mele', showBackButton: true, backUrl: '/dashboard' }
+    data: { animation: 'MyIssuesPage', headerTitle: 'Problemele mele', showBackButton: true, backUrl: '/dashboard' }
   },
   {
     path: 'edit-issue/:id',
     loadComponent: () => import('./components/user/edit-issue/edit-issue.component').then(m => m.EditIssueComponent),
     canActivate: [authGuard],
-    data: { animation: 'EditIssuePage', headerTitle: 'Editează Problema', showBackButton: true, backUrl: '/my-issues' }
+    data: { animation: 'EditIssuePage', headerTitle: 'Editează problema', showBackButton: true, backUrl: '/my-issues' }
   },
   // Issue creation routes - requires authentication
   {
@@ -82,27 +82,27 @@ export const routes: Routes = [
       {
         path: '',
         loadComponent: () => import('./components/issue-creation/issue-type-selection/issue-type-selection.component').then(m => m.IssueTypeSelectionComponent),
-        data: { animation: 'CreateIssuePage', headerTitle: 'Raportează o Problemă', showBackButton: true, backUrl: '/bucuresti' }
+        data: { animation: 'CreateIssuePage', headerTitle: 'Raportează o problemă', showBackButton: true, backUrl: '/bucuresti' }
       },
       {
         path: 'photo',
         loadComponent: () => import('./components/issue-creation/photo-upload/photo-upload.component').then(m => m.PhotoUploadComponent),
-        data: { animation: 'PhotoUploadPage', headerTitle: 'Documentează Problema', showBackButton: true, backUrl: '/create-issue' }
+        data: { animation: 'PhotoUploadPage', headerTitle: 'Documentează problema', showBackButton: true, backUrl: '/create-issue' }
       },
       {
         path: 'details',
         loadComponent: () => import('./components/issue-creation/issue-details/issue-details.component').then(m => m.IssueDetailsComponent),
-        data: { animation: 'IssueDetailsPage', headerTitle: 'Detalii Problemă', showBackButton: true, backUrl: '/create-issue/photo' }
+        data: { animation: 'IssueDetailsPage', headerTitle: 'Detalii problemă', showBackButton: true, backUrl: '/create-issue/photo' }
       },
       {
         path: 'authorities',
         loadComponent: () => import('./components/issue-creation/authority-selection/authority-selection.component').then(m => m.AuthoritySelectionComponent),
-        data: { animation: 'AuthoritySelectionPage', headerTitle: 'Selectează Autorități', showBackButton: true, backUrl: '/create-issue/details' }
+        data: { animation: 'AuthoritySelectionPage', headerTitle: 'Selectează autoritățile', showBackButton: true, backUrl: '/create-issue/details' }
       },
       {
         path: 'review',
         loadComponent: () => import('./components/issue-creation/issue-review/issue-review.component').then(m => m.IssueReviewComponent),
-        data: { animation: 'IssueReviewPage', headerTitle: 'Verificare Finală', showBackButton: true, backUrl: '/create-issue/authorities' }
+        data: { animation: 'IssueReviewPage', headerTitle: 'Verificare finală', showBackButton: true, backUrl: '/create-issue/authorities' }
       }
     ]
   },
@@ -119,22 +119,22 @@ export const routes: Routes = [
       {
         path: 'dashboard',
         loadComponent: () => import('./components/admin/admin-dashboard/admin-dashboard.component').then(m => m.AdminDashboardComponent),
-        data: { animation: 'AdminDashboardPage', headerTitle: 'Panou de Administrare', showBackButton: true, backUrl: '/bucuresti' }
+        data: { animation: 'AdminDashboardPage', headerTitle: 'Panou de administrare' }
       },
       {
         path: 'approval',
         loadComponent: () => import('./components/admin/approval-interface/approval-interface.component').then(m => m.ApprovalInterfaceComponent),
-        data: { animation: 'AdminApprovalPage', headerTitle: 'Aprobare Probleme', showBackButton: true, backUrl: '/admin/dashboard', headerSubtitle: 'Revizuiește și aprobă sesizările comunității' }
+        data: { animation: 'AdminApprovalPage', headerTitle: 'Aprobare probleme', showBackButton: true, backUrl: '/admin/dashboard', headerSubtitle: 'Revizuiește și aprobă sesizările comunității' }
       },
       {
         path: 'issue/:id',
         loadComponent: () => import('./components/admin/admin-issue-detail/admin-issue-detail.component').then(m => m.AdminIssueDetailComponent),
-        data: { animation: 'AdminIssueDetailPage', headerTitle: 'Înapoi', showBackButton: true, backUrl: '/admin/approval' }
+        data: { animation: 'AdminIssueDetailPage', headerTitle: 'Revizuire problemă', showBackButton: true, backUrl: '/admin/approval' }
       },
       {
         path: 'activity',
         loadComponent: () => import('./components/admin/activity-log/activity-log.component').then(m => m.ActivityLogComponent),
-        data: { animation: 'AdminActivityPage', headerTitle: 'Jurnal Activitate', showBackButton: true, backUrl: '/admin/dashboard' }
+        data: { animation: 'AdminActivityPage', headerTitle: 'Jurnal de activitate', showBackButton: true, backUrl: '/admin/dashboard' }
       }
     ]
   },
@@ -158,7 +158,7 @@ export const routes: Routes = [
     loadComponent: () => import('./components/city-hub/city-hub.component').then(m => m.CityHubComponent),
     data: {
       animation: 'CityHubPage',
-      headerTitle: 'Probleme Active',
+      headerTitle: 'Probleme active',
       showFooter: true,
       seo: {
         title: 'Probleme Civice în București',
@@ -198,7 +198,7 @@ export const routes: Routes = [
     loadComponent: () => import('./components/issue-detail/issue-detail.component').then(m => m.IssueDetailComponent),
     data: {
       animation: 'DetailPage',
-      headerTitle: 'Detalii Problemă',
+      headerTitle: 'Detalii problemă',
       showBackButton: true,
       backUrl: '/bucuresti',
       // Without this the footer is suppressed (app.ts gates on it), leaving
