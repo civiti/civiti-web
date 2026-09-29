@@ -1,126 +1,96 @@
-<div class="registration-container">
-
-  <!-- Back Navigation -->
-  <a routerLink="/" class="back-link">
-    <span nz-icon nzType="arrow-left"></span>
-    Înapoi la probleme
+<app-auth-shell>
+  <a authTop routerLink="/" class="auth-back">
+    <span nz-icon nzType="arrow-left" nzTheme="outline" aria-hidden="true"></span>
+    <span>Înapoi</span>
   </a>
 
-  <!-- Registration Card -->
-  <div class="registration-card-wrapper">
-    <nz-card [nzBordered]="false" class="registration-card">
+  <header class="auth-head">
+    <h1 class="auth-title">Alătură-te comunității Civiti</h1>
+    <p class="auth-lead">Creează un cont pentru a raporta probleme și a face diferența în comunitatea ta.</p>
+  </header>
 
-      <!-- Card Header: Logo + Title -->
-      <div class="card-header">
-        <img src="/images/logo/civiti-mark.svg" alt="Civiti" class="logo" />
-        <h1 class="page-title">Alătură-te comunității Civiti</h1>
-        <p class="page-subtitle">Creează un cont pentru a raporta probleme și a face diferența în comunitatea ta</p>
-      </div>
+  <button
+    nz-button
+    nzSize="large"
+    nzBlock
+    type="button"
+    (click)="loginWithGoogle()">
+    <span nz-icon nzType="google" nzTheme="outline" aria-hidden="true"></span>
+    <span>Înregistrează-te cu Google</span>
+  </button>
 
-      <!-- Google OAuth -->
-      <div class="oauth-section">
-        <button
-          nz-button
-          nzType="primary"
-          nzSize="large"
-          nzBlock
-          class="google-oauth-btn"
-          (click)="loginWithGoogle()">
-          <span nz-icon nzType="google" nzTheme="outline"></span>
-          Înregistrează-te cu Google
-        </button>
+  <ul class="perks">
+    <li>
+      <span nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></span>
+      <span>Înregistrare rapidă în 10 secunde</span>
+    </li>
+    <li>
+      <span nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></span>
+      <span>Profilul se completează automat</span>
+    </li>
+  </ul>
 
-        <div class="oauth-benefits">
-          <div class="benefit-item">
-            <span nz-icon nzType="check-circle" class="benefit-icon"></span>
-            <span>Înregistrare rapidă în 10 secunde</span>
-          </div>
-          <div class="benefit-item">
-            <span nz-icon nzType="check-circle" class="benefit-icon"></span>
-            <span>Profilul se completează automat</span>
-          </div>
+  <p class="auth-or">sau</p>
+
+  <a
+    nz-button
+    nzType="primary"
+    nzSize="large"
+    nzBlock
+    routerLink="/auth/signup"
+    [queryParams]="{ returnUrl: returnUrl }">
+    <span nz-icon nzType="mail" nzTheme="outline" aria-hidden="true"></span>
+    <span>Înregistrează-te cu email</span>
+  </a>
+  <p class="auth-hint email-hint">Control complet asupra datelor tale. Proces ghidat pas cu pas.</p>
+
+  <p class="auth-alt">
+    Ai deja un cont?
+    <a routerLink="/auth/login" class="c-link">Conectează-te aici</a>
+  </p>
+
+  <section class="why c-card" aria-labelledby="why-title">
+    <h2 id="why-title" class="why-title">De ce să îți creezi un cont?</h2>
+    <ul class="why-list">
+      <li>
+        <span class="why-icon" aria-hidden="true"><span nz-icon nzType="aim" nzTheme="outline"></span></span>
+        <div>
+          <h3>Raportează probleme</h3>
+          <p>Semnalează probleme din comunitate cu fotografii și descrieri detaliate.</p>
         </div>
-
-        <nz-divider nzText="sau" nzOrientation="center"></nz-divider>
-      </div>
-
-      <!-- Email Registration -->
-      <div class="email-section">
-        <button
-          nz-button
-          nzType="default"
-          nzSize="large"
-          nzBlock
-          class="email-signup-btn"
-          routerLink="/auth/signup"
-          [queryParams]="{ returnUrl: returnUrl }">
-          <span nz-icon nzType="mail" nzTheme="outline"></span>
-          Înregistrează-te cu email
-        </button>
-
-        <p class="email-description">
-          Control complet asupra datelor tale. Proces ghidat pas cu pas.
-        </p>
-      </div>
-
-      <!-- Login Link -->
-      <div class="login-section">
-        <p>Ai deja un cont?
-          <a routerLink="/auth/login" class="login-link-text">Conectează-te aici</a>
-        </p>
-      </div>
-
-    </nz-card>
-
-    <!-- Benefits Section (outside card, below) -->
-    <div class="benefits-section">
-      <h3>De ce să îți creezi un cont?</h3>
-
-      <div class="benefits-grid">
-        <div class="benefit-card">
-          <div class="benefit-icon-large">
-            <span nz-icon nzType="aim" nzTheme="outline"></span>
-          </div>
-          <h4>Raportează probleme</h4>
-          <p>Semnalează probleme din comunitate cu fotografii și descrieri detaliate</p>
+      </li>
+      <li>
+        <span class="why-icon" aria-hidden="true"><span nz-icon nzType="line-chart" nzTheme="outline"></span></span>
+        <div>
+          <h3>Urmărește progresul</h3>
+          <p>Vezi statusul rapoartelor tale și primește actualizări în timp real.</p>
         </div>
-
-        <div class="benefit-card">
-          <div class="benefit-icon-large">
-            <span nz-icon nzType="line-chart" nzTheme="outline"></span>
-          </div>
-          <h4>Urmărește progresul</h4>
-          <p>Vezi status-ul rapoartelor tale și primește actualizări în timp real</p>
+      </li>
+      <li>
+        <span class="why-icon" aria-hidden="true"><span nz-icon nzType="trophy" nzTheme="outline"></span></span>
+        <div>
+          <h3>Câștigă recunoaștere</h3>
+          <p>Obține puncte și insigne pentru contribuția ta la comunitate.</p>
         </div>
-
-        <div class="benefit-card">
-          <div class="benefit-icon-large">
-            <span nz-icon nzType="trophy" nzTheme="outline"></span>
-          </div>
-          <h4>Câștigă recunoștere</h4>
-          <p>Obține puncte și badges pentru contribuția ta la comunitate</p>
+      </li>
+      <li>
+        <span class="why-icon" aria-hidden="true"><span nz-icon nzType="team" nzTheme="outline"></span></span>
+        <div>
+          <h3>Conectează-te</h3>
+          <p>Colaborează cu alți cetățeni pentru schimbări pozitive.</p>
         </div>
+      </li>
+    </ul>
+  </section>
 
-        <div class="benefit-card">
-          <div class="benefit-icon-large">
-            <span nz-icon nzType="team" nzTheme="outline"></span>
-          </div>
-          <h4>Conectează-te</h4>
-          <p>Colaborează cu alți cetățeni pentru schimbări pozitive</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Privacy Notice -->
-  <div class="privacy-notice">
-    <p>
-      <span nz-icon nzType="lock"></span>
+  <p class="privacy">
+    <span nz-icon nzType="lock" nzTheme="outline" aria-hidden="true"></span>
+    <span>
       Datele tale sunt protejate și nu vor fi partajate cu terți.
-      <a (click)="showPrivacyPolicy(); $event.preventDefault()" href="#" class="privacy-link">Citește politica de confidențialitate</a>
-    </p>
-  </div>
-</div>
+      <button type="button" class="c-link auth-linkbtn" (click)="showPrivacyPolicy()">Citește politica de confidențialitate</button>
+    </span>
+  </p>
+</app-auth-shell>
 
 <!-- Privacy Policy Modal Template -->
 <ng-template #privacyPolicyTemplate>
@@ -149,11 +119,10 @@
     <p>
       Problemele publicate pe platformă (descrieri, fotografii, locații generale) sunt vizibile public.
     </p>
-    <nz-alert
-      nzType="warning"
-      nzMessage="Utilizatorii sunt responsabili să nu publice date personale sensibile, date ale altor persoane fără consimțământ sau informații care pot încălca dreptul la viață privată."
-      nzShowIcon>
-    </nz-alert>
+    <div class="c-callout c-callout--signal">
+      <span nz-icon nzType="warning" nzTheme="outline" aria-hidden="true"></span>
+      <p>Utilizatorii sunt responsabili să nu publice date personale sensibile, date ale altor persoane fără consimțământ sau informații care pot încălca dreptul la viață privată.</p>
+    </div>
     <p>
       Administratorul își rezervă dreptul de a elimina conținutul care încalcă aceste reguli.
     </p>

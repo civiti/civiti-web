@@ -1,0 +1,426 @@
+// Unencapsulated (see the component). Every class here is prefixed `auth-`
+// and only rendered on the /auth routes, so nothing reaches other screens.
+
+.auth {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  min-height: 100vh;
+  min-height: 100dvh;
+  background: var(--paper);
+}
+
+// --- Brand panel (desktop only) ----------------------------------------------
+
+.auth-panel {
+  display: none;
+}
+
+.auth-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--ink-900);
+  text-decoration: none;
+}
+
+.auth-brand--light {
+  color: var(--white);
+}
+
+.auth-brand__word {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 750;
+  letter-spacing: var(--tracking-tight);
+}
+
+.auth-pitch__title {
+  max-width: 17ch;
+  margin: 0 0 var(--space-8);
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 1.1rem + 1.5vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: var(--tracking-tighter);
+  color: var(--white);
+}
+
+.auth-points {
+  display: grid;
+  gap: var(--space-4);
+  max-width: 40ch;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-3);
+  }
+}
+
+.auth-points__icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  margin-top: -3px;
+  border-radius: var(--radius-sm);
+  background: var(--white-10);
+  color: var(--signal-500);
+}
+
+.auth-deadline {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin: 0;
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--white-10);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.auth-deadline__figure {
+  color: var(--signal-500);
+  font-size: 3.5rem;
+  letter-spacing: -0.05em;
+}
+
+// --- Form side ---------------------------------------------------------------
+
+.auth-main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  padding: var(--space-3) var(--gutter) var(--space-12);
+}
+
+.auth-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+  min-height: 52px;
+}
+
+.auth-back {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  min-height: 44px;
+  padding: 0 var(--space-3);
+  border-radius: var(--radius-md);
+  color: var(--ink-600);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  text-decoration: none;
+
+  &:hover {
+    background: var(--paper-2);
+    color: var(--ink-900);
+  }
+}
+
+.auth-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+  padding-top: var(--space-6);
+
+  .auth--wide & {
+    max-width: 600px;
+  }
+}
+
+// --- Pieces shared by the screens ----------------------------------------------
+
+.auth-head {
+  margin-bottom: var(--space-8);
+}
+
+.auth-icon {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: var(--space-5);
+  border: 1px solid var(--signal-200);
+  border-radius: var(--radius-lg);
+  background: var(--signal-50);
+  color: var(--signal-text);
+  font-size: 24px;
+}
+
+.auth-icon--ok {
+  border-color: var(--ok-line);
+  background: var(--ok-wash);
+  color: var(--ok-text);
+}
+
+.auth-icon--bad {
+  border-color: var(--bad-line);
+  background: var(--bad-wash);
+  color: var(--bad-text);
+}
+
+.auth-title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.45rem + 0.9vw, 2.25rem);
+  line-height: 1.1;
+  letter-spacing: var(--tracking-tight);
+}
+
+.auth-lead {
+  margin: var(--space-3) 0 0;
+  color: var(--ink-600);
+}
+
+.auth-alert {
+  align-items: flex-start;
+  margin-bottom: var(--space-6);
+
+  p {
+    flex: 1;
+    margin: 0;
+  }
+}
+
+.auth-alert__close {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -3px -6px -3px 0;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: inherit;
+  cursor: pointer;
+
+  &:hover {
+    background: var(--bad-line);
+  }
+
+  .anticon {
+    margin: 0;
+  }
+}
+
+.auth-or {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin: var(--space-6) 0;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  font-weight: 600;
+
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--line-strong);
+  }
+}
+
+// Fields a notch taller than the app default: a form you fill in once.
+.auth-form {
+  .ant-form-item {
+    margin-bottom: var(--space-5);
+  }
+
+  .ant-form-item-label {
+    padding-bottom: 6px;
+  }
+
+  .ant-input:not(textarea),
+  .ant-input-affix-wrapper {
+    height: 46px;
+  }
+
+  .ant-input-affix-wrapper > input.ant-input {
+    height: auto;
+  }
+
+  .ant-form-item-extra {
+    margin-top: 6px;
+  }
+}
+
+// theme.less hands checkboxes the 8px small radius, which turns the 16px box
+// into a circle that reads as a radio button.
+.auth .ant-checkbox-inner {
+  border-radius: 4px;
+}
+
+.auth-hint,
+.auth-form .ant-form-item-extra {
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  line-height: 1.45;
+}
+
+.auth-hint {
+  margin: 6px 0 0;
+}
+
+.auth-eye {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  margin-right: -6px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--ink-500);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--paper-2);
+    color: var(--ink-900);
+  }
+}
+
+.auth-linkbtn {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.auth-alt {
+  margin: var(--space-8) 0 0;
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--line);
+  color: var(--ink-600);
+  font-size: var(--text-md);
+  text-align: center;
+}
+
+// Result screens: email sent, link expired, in progress.
+.auth-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+
+  .auth-lead {
+    max-width: 40ch;
+  }
+}
+
+.auth-email {
+  max-width: 100%;
+  margin: var(--space-4) 0 0;
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  font-weight: 650;
+  overflow-wrap: anywhere;
+}
+
+.auth-actions {
+  display: grid;
+  gap: var(--space-3);
+  width: 100%;
+  margin-top: var(--space-8);
+}
+
+.auth-help {
+  width: 100%;
+  margin-top: var(--space-6);
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--ink-600);
+  font-size: var(--text-sm);
+  text-align: left;
+
+  p {
+    margin: 0 0 var(--space-2);
+    color: var(--ink-900);
+    font-weight: 650;
+  }
+
+  ul {
+    margin: 0;
+    padding-left: 1.2em;
+  }
+}
+
+@media (min-width: 960px) {
+  .auth {
+    grid-template-columns: minmax(400px, 0.85fr) minmax(0, 1.15fr);
+  }
+
+  // The column is full height; its content sticks to the viewport while a
+  // long form scrolls beside it.
+  .auth-panel {
+    display: block;
+    background: var(--ink-900);
+    color: var(--white-78);
+  }
+
+  .auth-panel__inner {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: var(--space-10);
+    height: 100vh;
+    height: 100dvh;
+    padding: var(--space-8) clamp(2.5rem, 0.5rem + 3.5vw, 4.5rem) var(--space-10);
+    box-sizing: border-box;
+    overflow: hidden;
+
+    > * {
+      position: relative;
+      z-index: 1;
+    }
+
+    // The mark's two signal arcs, echoed faintly in the empty top corner.
+    &::after {
+      content: '';
+      position: absolute;
+      top: -160px;
+      right: -160px;
+      width: 320px;
+      height: 320px;
+      border: 2px solid var(--orange-web-20);
+      border-radius: 50%;
+      box-shadow: 0 0 0 70px var(--ink-900), 0 0 0 72px var(--orange-web-10);
+      pointer-events: none;
+    }
+  }
+
+  .auth-brand--compact {
+    display: none;
+  }
+
+  .auth-main {
+    padding: var(--space-8) clamp(2rem, 0.5rem + 3vw, 4rem) var(--space-16);
+  }
+
+  // Short forms sit in the optical centre; the long sign-up starts at the top.
+  .auth-body {
+    justify-content: center;
+    padding-top: var(--space-8);
+  }
+
+  .auth--wide .auth-body {
+    justify-content: flex-start;
+  }
+}

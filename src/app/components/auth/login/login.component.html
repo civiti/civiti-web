@@ -1,130 +1,97 @@
-<div class="login-container">
-
-  <!-- Back Navigation -->
-  <a routerLink="/auth/register" class="back-link">
-    <span nz-icon nzType="arrow-left"></span>
-    Înapoi
+<app-auth-shell>
+  <a authTop routerLink="/auth/register" class="auth-back">
+    <span nz-icon nzType="arrow-left" nzTheme="outline" aria-hidden="true"></span>
+    <span>Înapoi</span>
   </a>
 
-  <!-- Login Card -->
-  <div class="login-card-wrapper">
-    <nz-card [nzBordered]="false" class="login-card">
+  <nz-spin [nzSpinning]="(isLoading$ | async) || false">
+    <header class="auth-head">
+      <h1 class="auth-title">Bine ai revenit</h1>
+      <p class="auth-lead">Conectează-te pentru a continua să faci diferența în comunitatea ta.</p>
+    </header>
 
-      <nz-spin [nzSpinning]="(isLoading$ | async) || false">
+    @if (error$ | async; as error) {
+      <div class="c-callout c-callout--bad auth-alert" role="alert">
+        <span nz-icon nzType="exclamation-circle" nzTheme="outline" aria-hidden="true"></span>
+        <p>{{ error }}</p>
+        <button type="button" class="auth-alert__close" aria-label="Închide mesajul" (click)="clearError()">
+          <span nz-icon nzType="close" nzTheme="outline" aria-hidden="true"></span>
+        </button>
+      </div>
+    }
 
-        <!-- Card Header: Logo + Title -->
-        <div class="card-header">
-          <img src="/images/logo/civiti-mark.svg" alt="Civiti" class="logo" />
-          <h1 class="page-title">Bine ai revenit</h1>
-          <p class="page-subtitle">Conectează-te pentru a continua să faci diferența în comunitatea ta</p>
-        </div>
+    <button
+      nz-button
+      nzSize="large"
+      nzBlock
+      type="button"
+      (click)="loginWithGoogle()">
+      <span nz-icon nzType="google" nzTheme="outline" aria-hidden="true"></span>
+      <span>Continuă cu Google</span>
+    </button>
 
-        <!-- Error Alert -->
-        @if (error$ | async; as error) {
-          <nz-alert
-            [nzMessage]="error"
-            nzType="error"
-            nzShowIcon
-            nzCloseable
-            (nzOnClose)="clearError()"
-            class="error-alert">
-          </nz-alert>
-        }
+    <p class="auth-or">sau conectează-te cu email</p>
 
-        <!-- Google OAuth Option -->
-        <div class="oauth-section">
-          <button
-            nz-button
-            nzType="primary"
-            nzSize="large"
-            nzBlock
-            class="google-oauth-btn"
-            (click)="loginWithGoogle()">
-            <span nz-icon nzType="google" nzTheme="outline"></span>
-            Continuă cu Google
-          </button>
+    <form nz-form nzLayout="vertical" [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="auth-form">
+      <nz-form-item>
+        <nz-form-label nzFor="email" nzRequired>Adresă de email</nz-form-label>
+        <nz-form-control nzErrorTip="Te rugăm să introduci o adresă de email validă">
+          <input
+            nz-input
+            formControlName="email"
+            id="email"
+            type="email"
+            inputmode="email"
+            placeholder="nume@exemplu.ro"
+            autocomplete="email">
+        </nz-form-control>
+      </nz-form-item>
 
-          <nz-divider nzText="sau conectează-te cu email" nzOrientation="center"></nz-divider>
-        </div>
+      <nz-form-item>
+        <nz-form-label nzFor="password" nzRequired>Parolă</nz-form-label>
+        <nz-form-control nzErrorTip="Te rugăm să introduci parola">
+          <nz-input-group [nzSuffix]="passwordSuffix">
+            <input
+              nz-input
+              formControlName="password"
+              id="password"
+              [type]="passwordVisible ? 'text' : 'password'"
+              placeholder="Introdu parola"
+              autocomplete="current-password">
+          </nz-input-group>
+          <ng-template #passwordSuffix>
+            <button
+              type="button"
+              class="auth-eye"
+              [attr.aria-label]="passwordVisible ? 'Ascunde parola' : 'Arată parola'"
+              [attr.aria-pressed]="passwordVisible"
+              (click)="passwordVisible = !passwordVisible">
+              <span nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" nzTheme="outline" aria-hidden="true"></span>
+            </button>
+          </ng-template>
+        </nz-form-control>
+      </nz-form-item>
 
-        <!-- Login Form -->
-        <form nz-form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="options">
+        <label nz-checkbox formControlName="rememberMe">Ține-mă minte</label>
+        <a routerLink="/auth/forgot-password" class="c-link">Ai uitat parola?</a>
+      </div>
 
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzFor="email" nzRequired>Adresă de email</nz-form-label>
-            <nz-form-control [nzSpan]="24" nzErrorTip="Te rugăm să introduci o adresă de email validă">
-              <input
-                nz-input
-                formControlName="email"
-                id="email"
-                type="email"
-                placeholder="Introdu adresa de email"
-                autocomplete="email"
-                class="login-input">
-            </nz-form-control>
-          </nz-form-item>
+      <button
+        nz-button
+        nzType="primary"
+        nzSize="large"
+        nzBlock
+        type="submit"
+        [disabled]="!loginForm.valid">
+        <span>Conectare</span>
+        <span nz-icon nzType="arrow-right" nzTheme="outline" aria-hidden="true"></span>
+      </button>
+    </form>
 
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzFor="password" nzRequired>Parolă</nz-form-label>
-            <nz-form-control [nzSpan]="24" nzErrorTip="Te rugăm să introduci parola">
-              <nz-input-group [nzSuffix]="passwordSuffix">
-                <input
-                  nz-input
-                  formControlName="password"
-                  id="password"
-                  [type]="passwordVisible ? 'text' : 'password'"
-                  placeholder="Introdu parola"
-                  autocomplete="current-password"
-                  class="login-input">
-              </nz-input-group>
-              <ng-template #passwordSuffix>
-                <span
-                  nz-icon
-                  [nzType]="passwordVisible ? 'eye-invisible' : 'eye'"
-                  (click)="passwordVisible = !passwordVisible"
-                  class="password-toggle">
-                </span>
-              </ng-template>
-            </nz-form-control>
-          </nz-form-item>
-
-          <!-- Remember Me and Forgot Password -->
-          <div class="form-options">
-            <label nz-checkbox formControlName="rememberMe">
-              Ține-mă minte
-            </label>
-            <a routerLink="/auth/forgot-password" class="forgot-password-link">
-              Ai uitat parola?
-            </a>
-          </div>
-
-          <!-- Submit Button -->
-          <nz-form-item class="submit-section">
-            <nz-form-control [nzSpan]="24">
-              <button
-                nz-button
-                nzType="primary"
-                nzSize="large"
-                nzBlock
-                type="submit"
-                [disabled]="!loginForm.valid"
-                class="login-submit-btn">
-                <span nz-icon nzType="login"></span>
-                Conectare
-              </button>
-            </nz-form-control>
-          </nz-form-item>
-
-        </form>
-
-        <!-- Registration Link -->
-        <div class="registration-link">
-          <p>Nu ai încă un cont?
-            <a routerLink="/auth/register" class="registration-link-text">Creează un cont</a>
-          </p>
-        </div>
-
-      </nz-spin>
-    </nz-card>
-  </div>
-</div>
+    <p class="auth-alt">
+      Nu ai încă un cont?
+      <a routerLink="/auth/register" class="c-link">Creează un cont</a>
+    </p>
+  </nz-spin>
+</app-auth-shell>

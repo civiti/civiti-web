@@ -7,16 +7,14 @@ import { Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
+
+import { AuthShellComponent } from '../auth-shell/auth-shell.component';
 
 import { AppState } from '../../../store/app.state';
 import * as AuthActions from '../../../store/auth/auth.actions';
@@ -33,16 +31,13 @@ import {
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-    NzCardModule,
     NzButtonModule,
     NzFormModule,
     NzInputModule,
     NzCheckboxModule,
     NzIconModule,
-    NzAlertModule,
     NzSpinModule,
-    NzDividerModule,
-    NzTypographyModule
+    AuthShellComponent
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']

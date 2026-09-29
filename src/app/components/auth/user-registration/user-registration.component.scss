@@ -1,438 +1,237 @@
+// Layout, fields, alerts and result states come from the shared auth shell.
+
 :host {
+  display: block;
+}
+
+// --- Progress: three segments, the current one in signal --------------------
+
+.progress {
   display: flex;
-  flex-direction: column;
-}
+  gap: var(--space-2);
+  margin: calc(-1 * var(--space-2)) 0 var(--space-6);
+  padding: 0;
+  list-style: none;
 
-.registration-container {
-  flex: 1;
-  background: var(--platinum);
-  padding: 2rem 1rem;
-}
+  li {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+    padding-top: var(--space-3);
+    border-top: 3px solid var(--line-strong);
+    color: var(--ink-500);
+    font-size: var(--text-sm);
+    font-weight: 600;
 
-.registration-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
+    &.is-done {
+      border-top-color: var(--ink-900);
+      color: var(--ink-700);
+    }
 
-.back-btn {
-  position: absolute;
-  left: 1rem;
-  top: 1rem;
-  color: var(--oxford-blue);
-  font-weight: 600;
-}
-
-.page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--oxford-blue);
-  margin-bottom: 0.5rem;
-}
-
-.page-subtitle {
-  font-size: 1.1rem;
-  color: #666;
-  margin-bottom: 0;
-}
-
-.registration-form-container {
-  max-width: 600px;
-  margin: 0 auto;
-}
-
-.registration-form-card {
-  box-shadow: 0 8px 24px rgba(20, 33, 61, 0.1);
-  border-radius: 16px;
-}
-
-.registration-steps {
-  margin-bottom: 2rem;
-}
-
-.error-alert {
-  margin-bottom: 1.5rem;
-}
-
-.form-step {
-  margin-bottom: 2rem;
-}
-
-.step-title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: var(--oxford-blue);
-  margin-bottom: 0.5rem;
-}
-
-.step-description {
-  color: #666;
-  margin-bottom: 1.5rem;
-}
-
-.password-toggle {
-  cursor: pointer;
-  color: #666;
-  transition: color 0.3s ease;
-  
-  &:hover {
-    color: var(--oxford-blue);
+    &.is-current {
+      border-top-color: var(--signal-500);
+      color: var(--ink-900);
+    }
   }
 }
 
-.preferences-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 2rem;
+.progress-dot {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  background: var(--surface);
+  font-size: var(--text-xs);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+
+  .is-current & {
+    border-color: var(--ink-900);
+    background: var(--ink-900);
+    color: var(--white);
+  }
+
+  .is-done & {
+    border-color: var(--ok-line);
+    background: var(--ok-wash);
+    color: var(--ok-text);
+  }
 }
 
-:deep(.preferences-group .ant-checkbox-wrapper + .ant-checkbox-wrapper) {
-  margin-inline-start: 0;
+.progress-label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-.preference-item {
+// Selects match the shell's 46px auth inputs. Only this screen has selects.
+.auth-form .ant-select-single:not(.ant-select-customize-input) ::ng-deep {
+  .ant-select-selector {
+    height: 46px;
+    padding-inline: 12px;
+  }
+
+  .ant-select-selection-search-input {
+    height: 44px;
+  }
+
+  .ant-select-selection-item,
+  .ant-select-selection-placeholder {
+    line-height: 44px;
+  }
+}
+
+// --- Section cards ------------------------------------------------------------
+
+.section {
+  padding: var(--space-6);
+
+  + .section {
+    margin-top: var(--space-4);
+  }
+
+  .ant-form-item:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.section-head {
+  margin-bottom: var(--space-5);
+
+  .auth-hint {
+    margin-top: var(--space-1);
+  }
+}
+
+.prefs {
+  display: grid;
+}
+
+.pref {
   display: flex;
   align-items: flex-start;
-  gap: 0.75rem;
-  padding: 1rem 0;
-  border-bottom: 1px solid #f0f0f0;
-  cursor: pointer;
-  
+  margin: 0;
+  padding: var(--space-3) 0;
+
+  + .pref {
+    border-top: 1px solid var(--line);
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+
   &:last-child {
-    border-bottom: none;
+    padding-bottom: 0;
   }
 }
 
-.preference-content {
-  flex: 1;
+.pref-title {
+  display: block;
+  color: var(--ink-900);
+  font-size: var(--text-md);
+  font-weight: 650;
 }
 
-.preference-title {
-  font-weight: 600;
-  color: var(--oxford-blue);
-  margin-bottom: 0.25rem;
+.pref-desc {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  line-height: 1.45;
 }
 
-.preference-description {
-  font-size: 0.9rem;
-  color: #666;
-  line-height: 1.4;
-}
+.consent {
+  margin-bottom: var(--space-3);
 
-.terms-section {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
-  margin-top: 2rem;
-}
+  &:last-child {
+    margin-bottom: 0;
+  }
 
-.terms-checkbox {
-  font-size: 0.9rem;
-  color: #666;
-  
-  a {
-    color: var(--orange-web);
-    text-decoration: none;
-    font-weight: 600;
-    
-    &:hover {
-      text-decoration: underline;
-    }
+  // NZ reserves a 42px control row; a lone checkbox does not need it.
+  ::ng-deep .ant-form-item-control-input {
+    min-height: 0;
   }
 }
 
-.form-navigation {
-  display: flex;
-  align-items: center;
-  margin-top: 2rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid #f0f0f0;
-}
-
-.nav-spacer {
-  flex: 1;
-}
-
-.nav-btn {
-  font-weight: 600;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-.submit-btn {
-  background: var(--orange-web);
-  border-color: var(--orange-web);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-
-  &:hover {
-    background: #e8930f;
-    border-color: #e8930f;
-  }
-}
-
-.login-link {
-  text-align: center;
-  margin-top: 2rem;
-  
-  p {
-    margin: 0;
-    color: #666;
-    font-size: 0.95rem;
-  }
-}
-
-.login-link-text {
-  color: var(--orange-web);
-  font-weight: 600;
-  text-decoration: none;
-  
-  &:hover {
-    color: #e8930f;
-    text-decoration: underline;
-  }
-}
-
-// Mobile responsiveness
-@media (max-width: 768px) {
-  .registration-container {
-    padding: 1rem;
-  }
-
-  .page-title {
-    font-size: 2rem;
-  }
-
-  .back-btn {
-    position: relative;
-    left: auto;
-    top: auto;
-    margin-bottom: 1rem;
-  }
-
-  .registration-header {
-    text-align: left;
-  }
-}
-
-// Mobile: hide step descriptions, compact stepper
-@media (max-width: 576px) {
-  ::ng-deep .registration-steps {
-    .ant-steps-item-description {
-      display: none;
-    }
-
-    .ant-steps-item-title {
-      font-size: 12px;
-    }
-
-    .ant-steps-item-icon {
-      width: 28px;
-      height: 28px;
-      line-height: 28px;
-      font-size: 13px;
-    }
-  }
-}
-
-// Form validation styles
-:deep(.ant-form-item-has-error) {
-  .ant-input {
-    border-color: #DC3545;
-    
-    &:focus {
-      border-color: #DC3545;
-      box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2);
-    }
-  }
-}
-
-// Custom select and checkbox styles
-:deep(.ant-select-focused .ant-select-selector) {
-  border-color: var(--orange-web);
-  box-shadow: 0 0 0 2px rgba(252, 163, 17, 0.2);
-}
-
-:deep(.ant-checkbox-checked .ant-checkbox-inner) {
-  background-color: var(--orange-web);
-  border-color: var(--orange-web);
-}
-
-:deep(.ant-checkbox-wrapper:hover .ant-checkbox-inner) {
-  border-color: var(--orange-web);
-}
-
-// Email Confirmation Pending Styles
-.confirmation-pending-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: calc(100vh - 4rem);
-}
-
-.confirmation-card {
-  max-width: 500px;
+// "Check your email" keeps the short-form width and sits in the centre.
+.confirm {
   width: 100%;
-  box-shadow: 0 8px 24px rgba(20, 33, 61, 0.1);
-  border-radius: 16px;
+  max-width: 420px;
+  margin-inline: auto;
 }
 
-.confirmation-content {
-  text-align: center;
-  padding: 2rem 1rem;
-}
+// --- Step navigation ----------------------------------------------------------
 
-.confirmation-icon {
-  width: 80px;
-  height: 80px;
-  background: linear-gradient(135deg, var(--orange-web) 0%, #e8930f 100%);
-  border-radius: 50%;
+.nav {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0 auto 1.5rem;
+  gap: var(--space-3);
+  margin-top: var(--space-6);
+}
 
-  span {
-    font-size: 2.5rem;
-    color: white;
+.nav-next {
+  min-width: 180px;
+  margin-left: auto;
+}
+
+@media (min-width: 960px) {
+  .confirm {
+    margin-block: auto;
   }
 }
 
-.confirmation-title {
-  font-size: 2rem;
-  font-weight: 700;
-  color: var(--oxford-blue);
-  margin-bottom: 1rem;
-}
+@media (max-width: 480px) {
+  .section {
+    padding: var(--space-5) var(--space-4);
+  }
 
-.confirmation-message {
-  font-size: 1rem;
-  color: #666;
-  margin-bottom: 0.5rem;
-}
-
-.confirmation-email {
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: var(--oxford-blue);
-  background: #f8f9fa;
-  padding: 0.75rem 1rem;
-  border-radius: 8px;
-  margin-bottom: 1rem;
-  word-break: break-all;
-}
-
-.confirmation-instructions {
-  font-size: 0.95rem;
-  color: #666;
-  line-height: 1.6;
-  margin-bottom: 2rem;
-}
-
-.confirmation-actions {
-  margin-bottom: 2rem;
-
-  button {
-    font-weight: 600;
-    height: 48px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
+  .nav > * {
+    flex: 1;
+    min-width: 0;
   }
 }
 
-.confirmation-help {
-  background: #f8f9fa;
-  padding: 1.5rem;
-  border-radius: 8px;
-  text-align: left;
+// --- Policy and terms, rendered inside the modals ---------------------------
 
-  p {
-    font-weight: 600;
-    color: var(--oxford-blue);
-    margin-bottom: 0.75rem;
-  }
-
-  ul {
-    margin: 0;
-    padding-left: 1.25rem;
-
-    li {
-      font-size: 0.9rem;
-      color: #666;
-      margin-bottom: 0.5rem;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      a,
-      .link-button {
-        color: var(--orange-web);
-        font-weight: 600;
-        text-decoration: none;
-        background: none;
-        border: none;
-        padding: 0;
-        font-size: inherit;
-        cursor: pointer;
-
-        &:hover {
-          text-decoration: underline;
-        }
-      }
-    }
-  }
-}
-
-// Policy modal content styling
 .policy-content {
-  font-family: 'Fira Sans', sans-serif;
-  color: var(--oxford-blue);
-  line-height: 1.6;
+  font-size: var(--text-md);
 
   h3 {
-    color: var(--oxford-blue);
-    margin-top: 24px;
-    margin-bottom: 12px;
-    font-size: 1rem;
-    font-weight: 600;
+    margin: var(--space-6) 0 var(--space-2);
+    font-size: var(--text-base);
+    font-weight: 700;
   }
 
-  p {
-    margin-bottom: 12px;
+  p,
+  ul {
+    margin: 0 0 var(--space-3);
   }
 
   ul {
-    margin-left: 20px;
-    margin-top: 8px;
-    margin-bottom: 12px;
-
-    li {
-      margin-bottom: 4px;
-    }
+    padding-left: 1.25em;
   }
 
   a {
-    color: var(--orange-web);
+    color: var(--ink-900);
+    text-decoration-color: var(--signal-500);
+    text-underline-offset: 3px;
+  }
 
-    &:hover {
-      text-decoration: underline;
+  .c-callout {
+    margin-bottom: var(--space-3);
+
+    p {
+      margin: 0;
     }
   }
+}
 
-  nz-alert {
-    margin: 12px 0;
-  }
-
-  .policy-footer {
-    margin-top: 24px;
-    color: #666;
-    font-size: 12px;
-  }
+.policy-footer {
+  color: var(--ink-500);
+  font-size: var(--text-sm);
 }
