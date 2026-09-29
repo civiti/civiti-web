@@ -1,97 +1,120 @@
-<div class="legal-page">
-  <div class="legal-container">
-    <div class="legal-header">
-      <div class="logo-section">
-        <h1 class="brand-name">Civiti</h1>
-      </div>
-      <h2 class="page-title">Termeni și Condiții</h2>
-      <p class="last-updated">Ultima actualizare: Martie 2026</p>
-    </div>
+<div class="c-container c-page legal">
+  <header class="legal-head">
+    <p class="c-eyebrow">Document legal</p>
+    <h1 class="c-h1">Termeni și condiții</h1>
+    <p class="legal-updated">
+      <span nz-icon nzType="calendar" nzTheme="outline" aria-hidden="true"></span>
+      <span>Ultima actualizare: Martie 2026</span>
+    </p>
+  </header>
 
-    <div class="legal-content">
-      <p>
-        Acești termeni și condiții reglementează utilizarea platformei <strong>Civiti</strong>.
-        Prin crearea unui cont și utilizarea platformei, acceptați acești termeni.
-      </p>
+  <!-- Table of contents: static links to the section headings below. The
+       click handler scrolls in place; a plain fragment link would be turned
+       into a router navigation that scrolls back to the top. -->
+  <nav class="legal-toc" aria-labelledby="toc-heading">
+    <p id="toc-heading" class="c-eyebrow c-eyebrow--muted">Cuprins</p>
+    <ol>
+      <li><a href="/terms#scop" (click)="scrollToSection($event, 'scop')">Scopul platformei</a></li>
+      <li><a href="/terms#cont" (click)="scrollToSection($event, 'cont')">Contul de utilizator</a></li>
+      <li><a href="/terms#continut" (click)="scrollToSection($event, 'continut')">Conținut acceptabil</a></li>
+      <li><a href="/terms#autoritati" (click)="scrollToSection($event, 'autoritati')">Comunicarea cu autoritățile</a></li>
+      <li><a href="/terms#proprietate" (click)="scrollToSection($event, 'proprietate')">Proprietate intelectuală</a></li>
+      <li><a href="/terms#moderare" (click)="scrollToSection($event, 'moderare')">Moderare și eliminare conținut</a></li>
+      <li><a href="/terms#raspundere" (click)="scrollToSection($event, 'raspundere')">Limitarea răspunderii</a></li>
+      <li><a href="/terms#suspendare" (click)="scrollToSection($event, 'suspendare')">Suspendarea contului</a></li>
+      <li><a href="/terms#modificari" (click)="scrollToSection($event, 'modificari')">Modificări</a></li>
+      <li><a href="/terms#legislatie" (click)="scrollToSection($event, 'legislatie')">Legislație aplicabilă</a></li>
+      <li><a href="/terms#contact" (click)="scrollToSection($event, 'contact')">Contact</a></li>
+    </ol>
+  </nav>
 
-      <h3>1. Scopul platformei</h3>
-      <p>
-        Civiti este o platformă civică care permite cetățenilor să raporteze probleme din comunitate
-        și să coordoneze eforturi pentru rezolvarea acestora prin comunicare cu autoritățile locale.
-      </p>
+  <article class="legal-doc">
+    <p class="legal-intro">
+      Acești termeni și condiții reglementează utilizarea platformei <strong>Civiti</strong>.
+      Prin crearea unui cont și utilizarea platformei, acceptați acești termeni.
+    </p>
 
-      <h3>2. Contul de utilizator</h3>
-      <ul>
-        <li>Trebuie să furnizezi informații corecte și actualizate</li>
-        <li>Ești responsabil pentru securitatea contului tău</li>
-        <li>Un singur cont per persoană</li>
-        <li>Trebuie să ai cel puțin 16 ani pentru a utiliza platforma</li>
-      </ul>
+    <h2 id="scop" tabindex="-1">1. Scopul platformei</h2>
+    <p>
+      Civiti este o platformă civică care permite cetățenilor să raporteze probleme din comunitate
+      și să coordoneze eforturi pentru rezolvarea acestora prin comunicare cu autoritățile locale.
+    </p>
 
-      <h3>3. Conținut acceptabil</h3>
-      <p>Când raportezi probleme, te angajezi să:</p>
-      <ul>
-        <li>Furnizezi informații corecte și verificabile</li>
-        <li>Nu publici conținut fals, defăimător sau ilegal</li>
-        <li>Nu incluzi date personale ale terților fără consimțământ</li>
-        <li>Nu folosești platforma pentru spam sau publicitate</li>
-        <li>Respecți drepturile de autor pentru fotografii</li>
-      </ul>
+    <h2 id="cont" tabindex="-1">2. Contul de utilizator</h2>
+    <ul>
+      <li>Trebuie să furnizezi informații corecte și actualizate</li>
+      <li>Ești responsabil pentru securitatea contului tău</li>
+      <li>Un singur cont per persoană</li>
+      <li>Trebuie să ai cel puțin 16 ani pentru a utiliza platforma</li>
+    </ul>
 
-      <h3>4. Comunicarea cu autoritățile</h3>
-      <p>
-        Platforma facilitează trimiterea de emailuri către autorități. Ești responsabil pentru
-        conținutul mesajelor tale. Platforma nu garantează răspunsul sau acțiunea autorităților.
-      </p>
+    <h2 id="continut" tabindex="-1">3. Conținut acceptabil</h2>
+    <p>Când raportezi probleme, te angajezi să:</p>
+    <ul>
+      <li>Furnizezi informații corecte și verificabile</li>
+      <li>Nu publici conținut fals, defăimător sau ilegal</li>
+      <li>Nu incluzi date personale ale terților fără consimțământ</li>
+      <li>Nu folosești platforma pentru spam sau publicitate</li>
+      <li>Respecți drepturile de autor pentru fotografii</li>
+    </ul>
 
-      <h3>5. Proprietate intelectuală</h3>
-      <p>
-        Prin încărcarea de conținut pe platformă, acorzi Civiti o licență neexclusivă de a afișa
-        și distribui acest conținut în scopul funcționării platformei. Păstrezi drepturile de autor
-        asupra conținutului tău.
-      </p>
+    <h2 id="autoritati" tabindex="-1">4. Comunicarea cu autoritățile</h2>
+    <p>
+      Platforma facilitează trimiterea de emailuri către autorități. Ești responsabil pentru
+      conținutul mesajelor tale. Platforma nu garantează răspunsul sau acțiunea autorităților.
+    </p>
 
-      <h3>6. Moderare și eliminare conținut</h3>
-      <p>
-        Ne rezervăm dreptul de a elimina conținut care încalcă acești termeni sau care este
-        considerat inadecvat, fără notificare prealabilă.
-      </p>
+    <h2 id="proprietate" tabindex="-1">5. Proprietate intelectuală</h2>
+    <p>
+      Prin încărcarea de conținut pe platformă, acorzi Civiti o licență neexclusivă de a afișa
+      și distribui acest conținut în scopul funcționării platformei. Păstrezi drepturile de autor
+      asupra conținutului tău.
+    </p>
 
-      <h3>7. Limitarea răspunderii</h3>
-      <p>
-        Platforma este oferită „ca atare". Nu garantăm disponibilitatea continuă, rezolvarea
-        problemelor raportate sau acuratețea informațiilor furnizate de utilizatori.
-      </p>
+    <h2 id="moderare" tabindex="-1">6. Moderare și eliminare conținut</h2>
+    <p>
+      Ne rezervăm dreptul de a elimina conținut care încalcă acești termeni sau care este
+      considerat inadecvat, fără notificare prealabilă.
+    </p>
 
-      <h3>8. Suspendarea contului</h3>
-      <p>
-        Putem suspenda sau șterge contul tău în caz de încălcare a acestor termeni sau utilizare
-        abuzivă a platformei.
-      </p>
+    <h2 id="raspundere" tabindex="-1">7. Limitarea răspunderii</h2>
+    <p>
+      Platforma este oferită „ca atare". Nu garantăm disponibilitatea continuă, rezolvarea
+      problemelor raportate sau acuratețea informațiilor furnizate de utilizatori.
+    </p>
 
-      <h3>9. Modificări</h3>
-      <p>
-        Putem modifica acești termeni. Continuarea utilizării platformei după modificări
-        constituie acceptarea noilor termeni.
-      </p>
+    <h2 id="suspendare" tabindex="-1">8. Suspendarea contului</h2>
+    <p>
+      Putem suspenda sau șterge contul tău în caz de încălcare a acestor termeni sau utilizare
+      abuzivă a platformei.
+    </p>
 
-      <h3>10. Legislație aplicabilă</h3>
-      <p>
-        Acești termeni sunt guvernați de legislația din România. Orice dispută va fi soluționată
-        de instanțele competente din România.
-      </p>
+    <h2 id="modificari" tabindex="-1">9. Modificări</h2>
+    <p>
+      Putem modifica acești termeni. Continuarea utilizării platformei după modificări
+      constituie acceptarea noilor termeni.
+    </p>
 
-      <h3>11. Contact</h3>
-      <p>
-        Pentru întrebări legate de acești termeni: <a href="mailto:contact&#64;civiti.ro">contact&#64;civiti.ro</a>
-      </p>
-    </div>
+    <h2 id="legislatie" tabindex="-1">10. Legislație aplicabilă</h2>
+    <p>
+      Acești termeni sunt guvernați de legislația din România. Orice dispută va fi soluționată
+      de instanțele competente din România.
+    </p>
 
-    <div class="legal-footer">
-      <p>
-        Pentru întrebări: <a href="mailto:contact&#64;civiti.ro">contact&#64;civiti.ro</a>
-      </p>
-      <a routerLink="/" class="back-link">Înapoi la Civiti</a>
-    </div>
-  </div>
+    <h2 id="contact" tabindex="-1">11. Contact</h2>
+    <p>
+      Pentru întrebări legate de acești termeni: <a href="mailto:contact&#64;civiti.ro">contact&#64;civiti.ro</a>
+    </p>
+  </article>
+
+  <footer class="legal-foot">
+    <p>
+      <span nz-icon nzType="mail" nzTheme="outline" aria-hidden="true"></span>
+      <span>Pentru întrebări: <a href="mailto:contact&#64;civiti.ro" class="c-link">contact&#64;civiti.ro</a></span>
+    </p>
+    <a routerLink="/" class="c-btn">
+      <span nz-icon nzType="arrow-left" nzTheme="outline" aria-hidden="true"></span>
+      <span>Înapoi la Civiti</span>
+    </a>
+  </footer>
 </div>

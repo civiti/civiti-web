@@ -1,43 +1,89 @@
 @if (article) {
-  <div class="guide-page">
-    <div class="guide-container">
-      <div class="guide-header">
-        <div class="guide-breadcrumb">
-          <a routerLink="/ghid">Ghid Civic</a>
-          <span class="separator">/</span>
-          <span class="current">{{ categoryLabels[article.category] ?? article.category }}</span>
-        </div>
-        <h1 class="guide-title">{{ article.title }}</h1>
-        <p class="guide-description">{{ article.description }}</p>
-        <div class="guide-meta">
+  <article class="guide">
+    <header class="c-container c-container--narrow">
+      <nav class="guide-crumbs" aria-label="Breadcrumb">
+        <a routerLink="/ghid">Ghid civic</a>
+        <span class="guide-crumbs__sep" aria-hidden="true">/</span>
+        <span>{{ categoryLabels[article.category] ?? article.category }}</span>
+      </nav>
+
+      <h1 class="c-h1">{{ article.title }}</h1>
+      <p class="c-lead guide-lead">{{ article.description }}</p>
+
+      <p class="guide-meta">
+        <span class="guide-meta__item">
+          <span nz-icon nzType="clock-circle" nzTheme="outline" aria-hidden="true"></span>
           <span>{{ article.readingTime }}</span>
-          <span class="dot"></span>
-          <span>{{ article.publishedAt }}</span>
+        </span>
+        <span class="guide-meta__item">
+          <span nz-icon nzType="calendar" nzTheme="outline" aria-hidden="true"></span>
+          <span>Publicat pe <time [attr.datetime]="article.publishedAt">{{ article.publishedAt | date: 'd MMMM y' : '' : 'ro' }}</time></span>
+        </span>
+      </p>
+    </header>
+
+    @if (article.image) {
+      <div class="c-container c-container--narrow">
+        <div class="guide-hero">
+          <img
+            [src]="article.image"
+            [attr.width]="article.imageWidth"
+            [attr.height]="article.imageHeight"
+            alt=""
+            fetchpriority="high" />
         </div>
       </div>
+    }
 
-      <div class="guide-content" [innerHTML]="article.htmlContent | trustedHtml"></div>
-
-      <div class="guide-cta">
-        <h3 class="cta-title">Ai o problemă în cartierul tău?</h3>
-        <p class="cta-text">Raportează problema pe Civiti și noi te ajutăm să trimiți petiția direct către autoritățile responsabile.</p>
-        <a routerLink="/bucuresti" class="cta-button">Raportează o problemă</a>
-      </div>
-
-      @if (relatedArticles.length > 0) {
-        <div class="guide-related">
-          <h3 class="related-heading">Articole similare</h3>
-          <div class="related-grid">
-            @for (related of relatedArticles; track related.slug) {
-              <a [routerLink]="['/ghid', related.slug]" class="related-card">
-                <span class="related-category">{{ categoryLabels[related.category] ?? related.category }}</span>
-                <span class="related-title">{{ related.title }}</span>
-                <span class="related-meta">{{ related.readingTime }}</span>
-              </a>
-            }
-          </div>
-        </div>
-      }
+    <div class="c-container c-container--narrow">
+      <div class="c-prose guide-content" [innerHTML]="article.htmlContent | trustedHtml"></div>
     </div>
-  </div>
+
+    @if (relatedArticles.length > 0) {
+      <section class="guide-related" aria-labelledby="related-heading">
+        <div class="c-container c-container--narrow">
+          <div class="c-section-head">
+            <h2 id="related-heading" class="c-h3">Articole similare</h2>
+            <a routerLink="/ghid" class="c-link c-small">Toate ghidurile</a>
+          </div>
+          <ul class="related-grid">
+            @for (related of relatedArticles; track related.slug) {
+              <li>
+                <a [routerLink]="['/ghid', related.slug]" class="related-card">
+                  @if (related.image) {
+                    <div class="related-card__media">
+                      <img
+                        [src]="related.image"
+                        [attr.width]="related.imageWidth"
+                        [attr.height]="related.imageHeight"
+                        alt=""
+                        loading="lazy" />
+                    </div>
+                  }
+                  <div class="related-card__body">
+                    <span class="c-tag">{{ categoryLabels[related.category] ?? related.category }}</span>
+                    <span class="related-card__title">{{ related.title }}</span>
+                    <span class="related-card__meta">{{ related.readingTime }}</span>
+                  </div>
+                </a>
+              </li>
+            }
+          </ul>
+        </div>
+      </section>
+    }
+
+    <aside class="c-container c-container--narrow guide-cta-wrap" aria-labelledby="guide-cta-heading">
+      <div class="guide-cta">
+        <div class="guide-cta__copy">
+          <h2 id="guide-cta-heading" class="c-h2 guide-cta__title">Ai o problemă în cartierul tău?</h2>
+          <p>Raportează problema pe Civiti și noi te ajutăm să trimiți petiția direct către autoritățile responsabile.</p>
+        </div>
+        <a routerLink="/bucuresti" class="c-btn c-btn--signal c-btn--lg guide-cta__btn">
+          <span>Raportează o problemă</span>
+          <span nz-icon nzType="arrow-right" nzTheme="outline" aria-hidden="true"></span>
+        </a>
+      </div>
+    </aside>
+  </article>
 }

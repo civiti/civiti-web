@@ -1,146 +1,199 @@
+// Shared document layout for /privacy and /terms: title block, a sticky
+// table of contents on wide screens, and the text on a single sheet.
+
 :host {
+  display: block;
+}
+
+.legal {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  row-gap: var(--space-8);
+
+  @media (min-width: 1024px) {
+    grid-template-columns: 220px minmax(0, 760px);
+    grid-template-areas:
+      '.   head'
+      'toc doc'
+      '.   foot';
+    justify-content: center;
+    column-gap: clamp(3rem, 1rem + 4vw, 5rem);
+
+    .legal-head { grid-area: head; }
+    .legal-toc { grid-area: toc; }
+    .legal-doc { grid-area: doc; }
+    .legal-foot { grid-area: foot; }
+  }
+}
+
+// --- Title --------------------------------------------------------------------
+
+.legal-updated {
   display: flex;
-  flex-direction: column;
-}
-
-.legal-page {
-  flex: 1;
-  background: var(--platinum);
-  min-height: 100vh;
-  padding: 2rem 1rem;
-}
-
-.legal-container {
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-.legal-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.logo-section {
-  margin-bottom: 1rem;
-}
-
-.brand-name {
-  font-size: var(--text-3xl);
-  font-weight: 700;
-  color: var(--oxford-blue);
-  margin: 0;
-  letter-spacing: var(--tracking-wide);
-}
-
-.page-title {
-  font-size: var(--text-2xl);
-  font-weight: 600;
-  color: var(--oxford-blue);
-  margin: 0 0 0.5rem;
-}
-
-.last-updated {
+  align-items: center;
+  gap: var(--space-2);
+  margin: var(--space-4) 0 0;
+  color: var(--ink-500);
   font-size: var(--text-sm);
-  color: var(--color-text-muted);
-  margin: 0;
+  font-weight: 500;
 }
 
-.legal-content {
-  background: var(--white);
-  border-radius: 16px;
-  padding: 2rem;
-  box-shadow: 0 8px 24px rgba(20, 33, 61, 0.1);
-  color: var(--oxford-blue);
-  line-height: 1.7;
-  font-size: var(--text-base);
+// --- Table of contents --------------------------------------------------------
 
-  h3 {
-    color: var(--oxford-blue);
-    margin-top: 2rem;
-    margin-bottom: 0.75rem;
-    font-size: 1.1rem;
-    font-weight: 600;
+.legal-toc {
+  display: none;
+
+  @media (min-width: 1024px) {
+    display: block;
+    position: sticky;
+    top: calc(var(--header-h) + var(--space-6));
+    align-self: start;
+    max-height: calc(100vh - var(--header-h) - var(--space-12));
+    overflow-y: auto;
   }
 
-  p {
-    margin-bottom: 0.75rem;
+  ol {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    counter-reset: toc;
+    border-left: 1px solid var(--line);
   }
 
-  ul {
-    margin-left: 1.25rem;
-    margin-top: 0.5rem;
-    margin-bottom: 0.75rem;
-    padding-left: 0;
-
-    li {
-      margin-bottom: 0.25rem;
-    }
+  li {
+    counter-increment: toc;
   }
 
   a {
-    color: var(--orange-web);
+    display: flex;
+    gap: var(--space-2);
+    margin-left: -1px;
+    padding: 6px var(--space-3);
+    border-left: 2px solid transparent;
+    color: var(--ink-600);
+    font-size: var(--text-sm);
+    font-weight: 500;
+    line-height: 1.35;
+    text-decoration: none;
+    transition: color var(--dur) var(--ease), border-color var(--dur) var(--ease);
+
+    &::before {
+      content: counter(toc) '.';
+      flex: none;
+      min-width: 1.75em;
+      color: var(--ink-400);
+      font-variant-numeric: tabular-nums;
+    }
 
     &:hover {
-      text-decoration: underline;
+      border-left-color: var(--signal-500);
+      color: var(--ink-900);
     }
   }
 }
 
-.warning-box {
+// --- Document -----------------------------------------------------------------
+
+.legal-doc {
+  padding: clamp(1.25rem, 0.5rem + 3.5vw, 3rem);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--ink-800);
+  font-size: var(--text-base);
+  line-height: 1.75;
+
+  // Bottom margins on text blocks, top margin on headings: sibling margins
+  // collapse, so a heading always gets its larger gap above it.
+  p,
+  ul,
+  .legal-callout {
+    margin: 0 0 var(--space-4);
+  }
+
+  h2 {
+    margin: var(--space-10) 0 var(--space-3);
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    letter-spacing: var(--tracking-tight);
+    line-height: 1.25;
+    scroll-margin-top: calc(var(--header-h) + var(--space-6));
+
+    // Focused only programmatically, by the table of contents.
+    &:focus {
+      outline: none;
+    }
+  }
+
+  ul {
+    padding-left: 1.25em;
+    list-style: disc;
+
+    li + li {
+      margin-top: var(--space-1);
+    }
+
+    li::marker {
+      color: var(--signal-600);
+    }
+  }
+
+  strong {
+    color: var(--ink-900);
+    font-weight: 650;
+  }
+
+  em {
+    color: var(--ink-600);
+  }
+
+  a {
+    color: var(--ink-900);
+    font-weight: 600;
+    text-decoration: underline;
+    text-decoration-color: var(--signal-500);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    overflow-wrap: anywhere;
+
+    &:hover {
+      color: var(--signal-text-strong);
+      text-decoration-color: currentColor;
+    }
+  }
+}
+
+.legal-intro {
+  padding-bottom: var(--space-6);
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-700);
+  font-size: var(--text-lg);
+  line-height: 1.65;
+}
+
+.legal-doc .legal-callout p {
+  margin: 0;
+}
+
+// --- Footer -------------------------------------------------------------------
+
+.legal-foot {
   display: flex;
-  gap: 0.75rem;
-  align-items: flex-start;
-  background: rgba(252, 163, 17, 0.1);
-  border: 1px solid var(--orange-web);
-  border-radius: 8px;
-  padding: 1rem;
-  margin: 0.75rem 0;
-
-  .warning-icon {
-    font-size: 1.25rem;
-    flex-shrink: 0;
-    line-height: 1.5;
-  }
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-6);
 
   p {
+    display: flex;
+    align-items: baseline;
+    gap: var(--space-2);
     margin: 0;
+    color: var(--ink-600);
     font-size: var(--text-sm);
   }
-}
 
-.legal-footer {
-  text-align: center;
-  margin-top: 2rem;
-  padding-bottom: 2rem;
-
-  p {
-    color: var(--color-text-muted);
-    font-size: var(--text-sm);
-    margin-bottom: 1rem;
-
-    a {
-      color: var(--orange-web);
-
-      &:hover {
-        text-decoration: underline;
-      }
-    }
-  }
-}
-
-.back-link {
-  display: inline-block;
-  color: var(--oxford-blue);
-  font-weight: 600;
-  font-size: var(--text-sm);
-  text-decoration: none;
-  padding: 0.5rem 1.5rem;
-  border: 2px solid var(--oxford-blue);
-  border-radius: 8px;
-  transition: background-color 0.2s, color 0.2s;
-
-  &:hover {
-    background: var(--oxford-blue);
-    color: var(--white);
+  .anticon {
+    align-self: center;
   }
 }

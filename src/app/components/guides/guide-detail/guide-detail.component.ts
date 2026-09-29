@@ -1,16 +1,19 @@
 import { Component, OnInit, inject, DestroyRef } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { NzIconModule } from 'ng-zorro-antd/icon';
 import { GUIDE_ARTICLES, GuideArticle } from '../../../generated/guide-data';
 import { TrustedHtmlPipe } from '../../../pipes/trusted-html.pipe';
 import { SeoService, SocialImage } from '../../../services/seo.service';
 import { SITE_URL } from '../../../constants/urls';
 
 /**
- * Each guide ships its own illustration in `public/guides/`. The page itself
- * renders no `<img>`, so without this every guide unfurls behind the same
- * generic Civiti card. Dimensions come from the build-time measurement in
- * `scripts/build-guides.js`, never from a hardcoded guess.
+ * Each guide ships its own illustration in `public/guides/`. The page shows it
+ * as a decorative hero, but crawlers only unfurl what `og:image` declares, so
+ * without this every guide would share the same generic Civiti card.
+ * Dimensions come from the build-time measurement in `scripts/build-guides.js`,
+ * never from a hardcoded guess.
  */
 function socialCard(article: GuideArticle): SocialImage | undefined {
   if (!article.image) {
@@ -28,7 +31,7 @@ function socialCard(article: GuideArticle): SocialImage | undefined {
 @Component({
   selector: 'app-guide-detail',
   standalone: true,
-  imports: [RouterLink, TrustedHtmlPipe],
+  imports: [RouterLink, DatePipe, NzIconModule, TrustedHtmlPipe],
   templateUrl: './guide-detail.component.html',
   styleUrls: ['../_guide-content.scss', './guide-detail.component.scss'],
 })
