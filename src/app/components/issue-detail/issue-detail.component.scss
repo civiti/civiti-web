@@ -118,7 +118,7 @@
 
 .case-side {
   position: sticky;
-  top: calc(var(--header-h) + 44px + var(--space-5));
+  top: calc(var(--sticky-top) + var(--space-5));
 
   @media (max-width: 959px) {
     position: static;

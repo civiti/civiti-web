@@ -10,6 +10,7 @@ import { NzIconModule } from 'ng-zorro-antd/icon';
 
 import { ApiService } from '../../../services/api.service';
 import { CategoryLabelPipe } from '../../../pipes/category.pipe';
+import { UrgencyLabelPipe } from '../../../pipes/urgency.pipe';
 import { AdminStatisticsResponse } from '../../../types/civica-api.types';
 
 /** One bar of a horizontal CSS bar chart: its key, raw value and length relative to the largest value. */
@@ -51,6 +52,7 @@ export class BarRowsPipe implements PipeTransform {
     NzButtonModule,
     NzIconModule,
     CategoryLabelPipe,
+    UrgencyLabelPipe,
     BarRowsPipe
   ],
   templateUrl: './admin-dashboard.component.html',
@@ -66,15 +68,6 @@ export class AdminDashboardComponent implements OnInit {
 
   /** Severity order for the urgency chart, most severe first. */
   readonly urgencyOrder: readonly string[] = ['urgent', 'high', 'medium', 'low', 'unspecified'];
-
-  /** Romanian urgency labels, keyed lowercase to match the API's UrgencyLevel values. */
-  readonly urgencyLabels: Record<string, string> = {
-    unspecified: 'Nespecificată',
-    low: 'Scăzută',
-    medium: 'Medie',
-    high: 'Ridicată',
-    urgent: 'Urgentă'
-  };
 
   ngOnInit(): void {
     this.loadStatistics();
@@ -106,45 +99,5 @@ export class AdminDashboardComponent implements OnInit {
 
   navigateToIssues(): void {
     this.router.navigate(['/bucuresti']);
-  }
-
-  getApprovalRateColor(rate: number): string {
-    if (rate >= 80) return '#28A745';
-    if (rate >= 60) return '#FCA311';
-    return '#DC3545';
-  }
-
-  getCategoryLabel(category: string): string {
-    const labels: Record<string, string> = {
-      Infrastructure: 'Infrastructură',
-      Environment: 'Mediu',
-      Transportation: 'Transport',
-      PublicServices: 'Servicii Publice',
-      Safety: 'Siguranță',
-      Other: 'Altele'
-    };
-    return labels[category] || category;
-  }
-
-  getUrgencyLabel(urgency: string): string {
-    const labels: Record<string, string> = {
-      Unspecified: 'Nespecificat',
-      Low: 'Scăzută',
-      Medium: 'Medie',
-      High: 'Ridicată',
-      Urgent: 'Urgentă'
-    };
-    return labels[urgency] || urgency;
-  }
-
-  getUrgencyColor(urgency: string): string {
-    const colors: Record<string, string> = {
-      Unspecified: 'default',
-      Low: 'green',
-      Medium: 'blue',
-      High: 'orange',
-      Urgent: 'red'
-    };
-    return colors[urgency] || 'default';
   }
 }

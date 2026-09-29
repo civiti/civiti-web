@@ -118,10 +118,7 @@
                 <span class="c-tag">{{ categoryLabels[(issue.category | lowercase)] || (issue.category | categoryLabel) }}</span>
               </span>
               <span class="fact">
-                @let lvl = issue.urgency | lowercase;
-                <span class="c-tag" [class.c-tag--urgent]="lvl === 'urgent'" [class.c-tag--signal]="lvl === 'high'">
-                  {{ lvl === 'urgent' ? 'Urgentă' : 'Urgență ' + ((urgencyLabels[lvl] || issue.urgency) | lowercase) }}
-                </span>
+                <span class="c-tag" [attr.data-tone]="issue.urgency | urgencyTone">{{ issue.urgency | urgencyLabel:'tag' }}</span>
               </span>
               <span class="fact">
                 <span nz-icon nzType="picture" nzTheme="outline" aria-hidden="true"></span>
@@ -194,10 +191,7 @@
             <h3 class="c-h3 review__title">{{ selectedIssue.title }}</h3>
             <div class="review__tags">
               <span class="c-tag">{{ categoryLabels[(selectedIssue.category | lowercase)] || (selectedIssue.category | categoryLabel) }}</span>
-              @let slvl = selectedIssue.urgency | lowercase;
-              <span class="c-tag" [class.c-tag--urgent]="slvl === 'urgent'" [class.c-tag--signal]="slvl === 'high'">
-                {{ slvl === 'urgent' ? 'Urgentă' : 'Urgență ' + ((urgencyLabels[slvl] || selectedIssue.urgency) | lowercase) }}
-              </span>
+              <span class="c-tag" [attr.data-tone]="selectedIssue.urgency | urgencyTone">{{ selectedIssue.urgency | urgencyLabel:'tag' }}</span>
               @if (selectedIssue.isReReview) {
                 <span class="c-status" data-tone="pending">Reevaluare</span>
               }
@@ -228,22 +222,22 @@
           <nz-form-item>
             <nz-form-label nzRequired>Decizie</nz-form-label>
             <nz-form-control>
-              <nz-radio-group formControlName="decision" class="choices">
-                <label nz-radio nzValue="approve" class="choice" data-tone="ok">
-                  <span>
-                    <span nz-icon nzType="check-circle" nzTheme="outline" class="choice__icon" aria-hidden="true"></span>
+              <nz-radio-group formControlName="decision" class="c-radio-cards">
+                <label nz-radio nzValue="approve" class="c-radio-card" data-tone="ok">
+                  <span class="c-radio-card__title">
+                    <span nz-icon nzType="check-circle" nzTheme="outline" aria-hidden="true"></span>
                     <span>Aprobă</span>
                   </span>
                 </label>
-                <label nz-radio nzValue="reject" class="choice" data-tone="bad">
-                  <span>
-                    <span nz-icon nzType="close-circle" nzTheme="outline" class="choice__icon" aria-hidden="true"></span>
+                <label nz-radio nzValue="reject" class="c-radio-card" data-tone="bad">
+                  <span class="c-radio-card__title">
+                    <span nz-icon nzType="close-circle" nzTheme="outline" aria-hidden="true"></span>
                     <span>Respinge</span>
                   </span>
                 </label>
-                <label nz-radio nzValue="request_changes" class="choice" data-tone="info">
-                  <span>
-                    <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="choice__icon" aria-hidden="true"></span>
+                <label nz-radio nzValue="request_changes" class="c-radio-card" data-tone="info">
+                  <span class="c-radio-card__title">
+                    <span nz-icon nzType="exclamation-circle" nzTheme="outline" aria-hidden="true"></span>
                     <span>Solicită modificări</span>
                   </span>
                 </label>
@@ -293,18 +287,22 @@
     [(nzVisible)]="isBulkApprovalModalVisible"
     nzTitle="Aprobare în masă"
     [nzWidth]="520"
-    [nzOkText]="'Aprobă ' + selectedCount + ' probleme'"
+    [nzOkText]="'Aprobă ' + (selectedCount | roPlural:'problemă':'probleme')"
     nzCancelText="Anulează"
     [nzOkLoading]="isProcessing"
     (nzOnOk)="submitBulkApproval()"
     (nzOnCancel)="closeBulkApprovalModal()">
 
     <div *nzModalContent>
-      <div class="c-callout bulk-info">
+      <div class="c-callout c-callout--info bulk-info">
         <span nz-icon nzType="info-circle" nzTheme="outline"></span>
         <p>
-          Vei aproba <strong>{{ selectedCount }}</strong> probleme selectate.
-          Toate vor primi statusul „Activ” și vor fi vizibile public.
+          Vei aproba <strong>{{ selectedCount | roPlural:'problemă selectată':'probleme selectate' }}</strong>.
+          @if (selectedCount === 1) {
+            Va primi statusul „Activ” și va fi vizibilă public.
+          } @else {
+            Toate vor primi statusul „Activ” și vor fi vizibile public.
+          }
         </p>
       </div>
 

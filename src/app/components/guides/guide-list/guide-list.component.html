@@ -25,8 +25,8 @@
   <ul class="guide-grid">
     @if (featuredArticle(); as featured) {
       <li class="guide-grid__featured">
-        <a [routerLink]="['/ghid', featured.slug]" class="guide-card guide-card--featured">
-          <div class="guide-card__media">
+        <a [routerLink]="['/ghid', featured.slug]" class="c-guide-card guide-card--featured">
+          <div class="c-guide-card__media">
             @if (featured.image) {
               <img
                 [src]="featured.image"
@@ -36,19 +36,19 @@
                 fetchpriority="high" />
             }
           </div>
-          <div class="guide-card__body">
-            <div class="guide-card__top">
+          <div class="c-guide-card__body">
+            <div class="c-guide-card__top">
               <span class="c-tag c-tag--signal">{{ categoryLabels[featured.category] ?? featured.category }}</span>
               <span class="guide-card__flag">Recomandat</span>
             </div>
-            <h2 class="guide-card__title">{{ featured.title }}</h2>
-            <p class="guide-card__desc">{{ featured.description }}</p>
-            <p class="guide-card__meta">
+            <h2 class="c-guide-card__title">{{ featured.title }}</h2>
+            <p class="c-guide-card__desc">{{ featured.description }}</p>
+            <p class="c-guide-card__meta">
               <span>{{ featured.readingTime }}</span>
-              <span class="dot" aria-hidden="true"></span>
+              <span class="c-guide-card__dot" aria-hidden="true"></span>
               <time [attr.datetime]="featured.publishedAt">{{ featured.publishedAt | date: 'd MMMM y' : '' : 'ro' }}</time>
             </p>
-            <span class="guide-card__more">Citește ghidul <span aria-hidden="true">→</span></span>
+            <span class="c-guide-card__more">Citește ghidul <span aria-hidden="true">→</span></span>
           </div>
         </a>
       </li>
@@ -56,8 +56,8 @@
 
     @for (article of regularArticles(); track article.slug) {
       <li>
-        <a [routerLink]="['/ghid', article.slug]" class="guide-card">
-          <div class="guide-card__media">
+        <a [routerLink]="['/ghid', article.slug]" class="c-guide-card">
+          <div class="c-guide-card__media">
             @if (article.image) {
               <img
                 [src]="article.image"
@@ -67,18 +67,18 @@
                 loading="lazy" />
             }
           </div>
-          <div class="guide-card__body">
-            <div class="guide-card__top">
+          <div class="c-guide-card__body">
+            <div class="c-guide-card__top">
               <span class="c-tag">{{ categoryLabels[article.category] ?? article.category }}</span>
             </div>
-            <h2 class="guide-card__title">{{ article.title }}</h2>
-            <p class="guide-card__desc">{{ article.description }}</p>
-            <p class="guide-card__meta">
+            <h2 class="c-guide-card__title">{{ article.title }}</h2>
+            <p class="c-guide-card__desc">{{ article.description }}</p>
+            <p class="c-guide-card__meta">
               <span>{{ article.readingTime }}</span>
-              <span class="dot" aria-hidden="true"></span>
+              <span class="c-guide-card__dot" aria-hidden="true"></span>
               <time [attr.datetime]="article.publishedAt">{{ article.publishedAt | date: 'd MMMM y' : '' : 'ro' }}</time>
             </p>
-            <span class="guide-card__more">Citește ghidul <span aria-hidden="true">→</span></span>
+            <span class="c-guide-card__more">Citește ghidul <span aria-hidden="true">→</span></span>
           </div>
         </a>
       </li>

@@ -32,16 +32,6 @@
   margin-top: var(--space-3);
 }
 
-// Pending review: the informational tone (no global modifier for it yet).
-.banner--info {
-  border-color: var(--info-line);
-  background: var(--info-wash);
-
-  .anticon {
-    color: var(--info-text);
-  }
-}
-
 // --- Loading ----------------------------------------------------------------------
 
 .loading {

@@ -39,10 +39,7 @@
         <div class="detail-meta">
           <span class="c-status" [attr.data-tone]="issue.status | statusTone">{{ issue.status | statusText }}</span>
           <span class="c-tag">{{ categoryLabels[(issue.category | lowercase)] || (issue.category | categoryLabel) }}</span>
-          @let lvl = issue.urgency | lowercase;
-          <span class="c-tag" [class.c-tag--urgent]="lvl === 'urgent'" [class.c-tag--signal]="lvl === 'high'">
-            {{ lvl === 'urgent' ? 'Urgentă' : 'Urgență ' + ((urgencyLabels[lvl] || issue.urgency) | lowercase) }}
-          </span>
+          <span class="c-tag" [attr.data-tone]="issue.urgency | urgencyTone">{{ issue.urgency | urgencyLabel:'tag' }}</span>
           <span class="c-small c-muted">Trimisă {{ issue.createdAt | timeAgo | lowercase }}</span>
         </div>
       </div>
@@ -248,15 +245,15 @@
         @if (issue.adminNotes || issue.rejectionReason || issue.reviewedAt) {
           <section class="c-card c-card--pad" aria-labelledby="review-title">
             <h2 class="c-h3 card-title" id="review-title">Detalii revizuire</h2>
-            <dl class="rows">
+            <dl class="c-kv">
               @if (issue.reviewedBy) {
-                <div class="rows__item">
+                <div class="c-kv__row">
                   <dt>Revizuit de</dt>
                   <dd>{{ issue.reviewedBy }}</dd>
                 </div>
               }
               @if (issue.reviewedAt) {
-                <div class="rows__item">
+                <div class="c-kv__row">
                   <dt>Data revizuirii</dt>
                   <dd>{{ issue.reviewedAt | date:'dd/MM/yyyy HH:mm' }}</dd>
                 </div>
@@ -305,27 +302,23 @@
                 <nz-form-control nzErrorTip="Alege o decizie">
                   <nz-radio-group
                     formControlName="decision"
-                    class="choices"
+                    class="c-radio-cards"
                     role="radiogroup"
                     aria-labelledby="decision-title"
                     aria-required="true">
-                    <label nz-radio nzValue="approve" class="choice" data-tone="ok">
-                      <span class="choice__body">
-                        <span class="choice__title">
-                          <span nz-icon nzType="check-circle" nzTheme="outline" class="choice__icon" aria-hidden="true"></span>
-                          Aprobă
-                        </span>
-                        <span class="choice__hint">Sesizarea devine activă și vizibilă public.</span>
+                    <label nz-radio nzValue="approve" class="c-radio-card" data-tone="ok">
+                      <span class="c-radio-card__title">
+                        <span nz-icon nzType="check-circle" nzTheme="outline" aria-hidden="true"></span>
+                        Aprobă
                       </span>
+                      <span class="c-radio-card__hint">Sesizarea devine activă și vizibilă public.</span>
                     </label>
-                    <label nz-radio nzValue="reject" class="choice" data-tone="bad">
-                      <span class="choice__body">
-                        <span class="choice__title">
-                          <span nz-icon nzType="close-circle" nzTheme="outline" class="choice__icon" aria-hidden="true"></span>
-                          Respinge
-                        </span>
-                        <span class="choice__hint">Autorul vede motivul respingerii.</span>
+                    <label nz-radio nzValue="reject" class="c-radio-card" data-tone="bad">
+                      <span class="c-radio-card__title">
+                        <span nz-icon nzType="close-circle" nzTheme="outline" aria-hidden="true"></span>
+                        Respinge
                       </span>
+                      <span class="c-radio-card__hint">Autorul vede motivul respingerii.</span>
                     </label>
                   </nz-radio-group>
                 </nz-form-control>

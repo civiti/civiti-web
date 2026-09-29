@@ -1,9 +1,9 @@
 @if (article) {
   <article class="guide">
     <header class="c-container c-container--narrow">
-      <nav class="guide-crumbs" aria-label="Breadcrumb">
+      <nav class="c-breadcrumb guide-crumbs" aria-label="Breadcrumb">
         <a routerLink="/ghid">Ghid civic</a>
-        <span class="guide-crumbs__sep" aria-hidden="true">/</span>
+        <span class="c-breadcrumb__sep" aria-hidden="true">/</span>
         <span>{{ categoryLabels[article.category] ?? article.category }}</span>
       </nav>
 
@@ -49,9 +49,9 @@
           <ul class="related-grid">
             @for (related of relatedArticles; track related.slug) {
               <li>
-                <a [routerLink]="['/ghid', related.slug]" class="related-card">
+                <a [routerLink]="['/ghid', related.slug]" class="c-guide-card c-guide-card--compact">
                   @if (related.image) {
-                    <div class="related-card__media">
+                    <div class="c-guide-card__media">
                       <img
                         [src]="related.image"
                         [attr.width]="related.imageWidth"
@@ -60,10 +60,10 @@
                         loading="lazy" />
                     </div>
                   }
-                  <div class="related-card__body">
+                  <div class="c-guide-card__body">
                     <span class="c-tag">{{ categoryLabels[related.category] ?? related.category }}</span>
-                    <span class="related-card__title">{{ related.title }}</span>
-                    <span class="related-card__meta">{{ related.readingTime }}</span>
+                    <span class="c-guide-card__title">{{ related.title }}</span>
+                    <span class="c-guide-card__meta">{{ related.readingTime }}</span>
                   </div>
                 </a>
               </li>

@@ -17,6 +17,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 import { EnhanceTextRequest, URGENCY_OPTIONS } from '../../../types/civica-api.types';
 import { ApiService } from '../../../services/api.service';
 import { CategoryInfo } from '../../../services/category.service';
+import { RoPluralPipe } from '../../../pipes/plural.pipe';
 
 // Interface for photo data from session storage
 interface PhotoData {
@@ -49,7 +50,8 @@ interface PhotoData {
     NzInputModule,
     NzSelectModule,
     NzRadioModule,
-    NzSpinModule
+    NzSpinModule,
+    RoPluralPipe
   ],
   templateUrl: './issue-details.component.html',
   styleUrls: ['./issue-details.component.scss']

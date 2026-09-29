@@ -192,9 +192,9 @@
       <ul class="guide-links">
         @for (guide of guides; track guide.slug) {
           <li>
-            <a [routerLink]="['/ghid', guide.slug]" class="guide-card">
+            <a [routerLink]="['/ghid', guide.slug]" class="c-guide-card">
               @if (guide.image) {
-                <span class="guide-media">
+                <span class="c-guide-card__media">
                   <img
                     [src]="guide.image"
                     [width]="guide.imageWidth"
@@ -203,10 +203,10 @@
                     loading="lazy" />
                 </span>
               }
-              <span class="guide-body">
-                <span class="guide-title">{{ guide.title }}</span>
-                <span class="guide-desc">{{ guide.description }}</span>
-                <span class="guide-more" aria-hidden="true">Citește ghidul →</span>
+              <span class="c-guide-card__body">
+                <span class="c-guide-card__title">{{ guide.title }}</span>
+                <span class="c-guide-card__desc">{{ guide.description }}</span>
+                <span class="c-guide-card__more" aria-hidden="true">Citește ghidul →</span>
               </span>
             </a>
           </li>

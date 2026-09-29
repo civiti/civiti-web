@@ -24,6 +24,7 @@ import { StatusTextPipe, StatusTonePipe } from '../../pipes/status.pipe';
 import { CategoryIconPipe, CategoryLabelPipe } from '../../pipes/category.pipe';
 import { IsUrgentPipe } from '../../pipes/urgency.pipe';
 import { DaysSincePipe } from '../../pipes/date.pipe';
+import { RoPluralPipe } from '../../pipes/plural.pipe';
 import { ViewSwitcherComponent, ViewMode } from '../shared/view-switcher/view-switcher.component';
 import { IssuesMapComponent } from '../issues-map/issues-map.component';
 
@@ -46,6 +47,7 @@ import { IssuesMapComponent } from '../issues-map/issues-map.component';
     CategoryIconPipe,
     IsUrgentPipe,
     DaysSincePipe,
+    RoPluralPipe,
     ViewSwitcherComponent,
     IssuesMapComponent,
   ],

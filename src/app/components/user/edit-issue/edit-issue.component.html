@@ -44,7 +44,7 @@
       <div
         class="c-callout banner"
         [class.c-callout--signal]="banner.type === 'warning'"
-        [class.banner--info]="banner.type === 'info'">
+        [class.c-callout--info]="banner.type === 'info'">
         <span nz-icon [nzType]="banner.type === 'warning' ? 'exclamation-circle' : 'info-circle'" nzTheme="outline" aria-hidden="true"></span>
         <div>
           <p class="callout-title">{{ banner.message }}</p>

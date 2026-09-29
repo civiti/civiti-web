@@ -16,6 +16,7 @@ import { CategoryLabelPipe } from '../../../pipes/category.pipe';
 import { StatusTextPipe, StatusTonePipe } from '../../../pipes/status.pipe';
 import { TimeAgoPipe } from '../../../pipes/date.pipe';
 import { ActionLabelPipe, ActionTonePipe } from '../../../pipes/admin.pipe';
+import { UrgencyLabelPipe, UrgencyTonePipe, urgencyLabel } from '../../../pipes/urgency.pipe';
 import {
   AdminIssueDetailResponse,
   IssueApprovedSnapshot,
@@ -47,7 +48,9 @@ interface DiffRow {
     StatusTonePipe,
     TimeAgoPipe,
     ActionLabelPipe,
-    ActionTonePipe
+    ActionTonePipe,
+    UrgencyLabelPipe,
+    UrgencyTonePipe
   ],
   templateUrl: './admin-issue-detail.component.html',
   styleUrls: ['./admin-issue-detail.component.scss']
@@ -124,7 +127,7 @@ export class AdminIssueDetailComponent implements OnInit {
       });
   }
 
-  // Romanian labels for enum values. Keyed lowercase so they match the camelCase the API
+  // Romanian category labels. Keyed lowercase so they match the camelCase the API
   // returns (e.g. "publicServices") as well as any PascalCase value.
   private static readonly CATEGORY_LABELS: Record<string, string> = {
     infrastructure: 'Infrastructură',
@@ -134,17 +137,9 @@ export class AdminIssueDetailComponent implements OnInit {
     safety: 'Siguranță',
     other: 'Altele',
   };
-  private static readonly URGENCY_LABELS: Record<string, string> = {
-    unspecified: 'Nespecificată',
-    low: 'Scăzută',
-    medium: 'Medie',
-    high: 'Ridicată',
-    urgent: 'Urgentă',
-  };
 
-  // Template lookups (declared after the static maps they reuse).
+  // Template lookup (declared after the static map it reuses).
   readonly categoryLabels: Record<string, string> = AdminIssueDetailComponent.CATEGORY_LABELS;
-  readonly urgencyLabels: Record<string, string> = AdminIssueDetailComponent.URGENCY_LABELS;
 
   /**
    * Build the re-review diff from the approved snapshot. Branch on the snapshot's PRESENCE
@@ -164,8 +159,7 @@ export class AdminIssueDetailComponent implements OnInit {
     };
     const catLabel = (v: string): string =>
       AdminIssueDetailComponent.CATEGORY_LABELS[(v || '').toLowerCase()] || v || '—';
-    const urgLabel = (v: string): string =>
-      AdminIssueDetailComponent.URGENCY_LABELS[(v || '').toLowerCase()] || v || '—';
+    const urgLabel = (v: string): string => urgencyLabel(v) || '—';
     // Include the email so an email-only authority change is visible (name alone would hide it).
     const authList = (list: { name: string; email: string }[] | undefined): string =>
       (list ?? []).map(a => `${a.name} (${a.email})`).join('; ') || '—';

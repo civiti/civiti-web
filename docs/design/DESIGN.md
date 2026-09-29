@@ -73,6 +73,8 @@ new names.** When you touch a component, migrate it.
   `:focus-visible` outline.
 - Layout: `.c-container` (1200px + fluid gutter), `.c-container--narrow` (760px). Header height
   `--header-h` (64px) — use it for sticky offsets: `top: calc(var(--header-h) + var(--space-6))`.
+  On routes with a back row (`showBackButton`), use `--sticky-top` instead: the header, the
+  44px back row (`--back-row-h`) and their hairlines.
 
 ## Primitives (global, prefix `c-`)
 
@@ -95,7 +97,8 @@ new names.** When you touch a component, migrate it.
 <!-- --sm (34px) / default (42px) / --lg (52px), --block, --icon, --on-dark -->
 
 <span class="c-status" [attr.data-tone]="issue.status | statusTone">{{ issue.status | statusText }}</span>
-<span class="c-tag">Sector 2</span> <span class="c-tag c-tag--urgent">Urgent</span>
+<span class="c-tag">Sector 2</span> <span class="c-tag c-tag--urgent">Urgent</span>  <!-- also --signal, --info -->
+<span class="c-tag" [attr.data-tone]="issue.urgency | urgencyTone">{{ issue.urgency | urgencyLabel:'tag' }}</span>
 <button class="c-chip" [attr.aria-pressed]="isOn">Filtru</button>
 
 <div class="c-card c-card--pad">…</div>          <!-- also --interactive, --sunken, --dark -->
@@ -103,6 +106,7 @@ new names.** When you touch a component, migrate it.
 <div class="c-stat"><span class="c-stat__value">142</span><span class="c-stat__label">emailuri</span></div>
 <div class="c-meter"><div class="c-meter__fill" [style.width.%]="pct"></div></div>
 <div class="c-callout c-callout--signal"><span nz-icon nzType="info-circle"></span><p>…</p></div>
+<!-- callout tones: --signal, --info, --ok, --bad -->
 <div class="c-empty"><span class="c-empty__icon"><span nz-icon nzType="inbox"></span></span>
   <p class="c-empty__title">Nimic aici</p><p>Explanation.</p></div>
 <div class="c-skeleton" style="height:16px"></div>  <!-- loading placeholders -->
@@ -114,8 +118,49 @@ attributes in templates are not.)
 Also: `.c-prose` (long-form article text), `.c-link`, `.c-muted`, `.c-small`, `.c-lead`,
 `.c-divider`, `.c-stack` (vertical rhythm), `.c-sr-only`.
 
-Pipes for status/category presentation: `statusText` (sentence case label), `statusTone`
-(`active|resolved|pending|rejected|neutral` for `.c-status`), `categoryLabel`, `categoryIcon`.
+Shared patterns (usage comments sit next to each in `styles.scss`):
+
+```html
+<!-- Breadcrumb above a page title -->
+<nav class="c-breadcrumb" aria-label="Breadcrumb">
+  <a routerLink="/ghid">Ghid civic</a><span class="c-breadcrumb__sep" aria-hidden="true">/</span>
+  <span aria-current="page">Titlu</span>
+</nav>
+
+<!-- Key/value rows: label left, value right. --num for display numerals,
+     __row--stacked for a value too long to share the row. -->
+<dl class="c-kv"><div class="c-kv__row"><dt>Status</dt><dd>Activă</dd></div></dl>
+
+<!-- Horizontal bar list, --pct 0–100 of the largest value -->
+<ul class="c-bars" role="list"><li class="c-bars__row">
+  <span class="c-bars__label">Mediu</span>
+  <span class="c-bars__plot"><span class="c-bars__fill" [style.--pct]="row.pct"></span>
+    <span class="c-bars__value">12</span></span></li></ul>
+
+<!-- Radio cards: data-tone ok|bad|info tints the checked card (ink outline otherwise) -->
+<nz-radio-group class="c-radio-cards" formControlName="decision">
+  <label nz-radio nzValue="approve" class="c-radio-card" data-tone="ok">
+    <span class="c-radio-card__title">Aprobă</span>
+    <span class="c-radio-card__hint">Sesizarea devine publică.</span></label>
+</nz-radio-group>
+
+<!-- Guide teaser (home, /ghid, related guides); --compact for the two-up grid -->
+<a class="c-guide-card"><span class="c-guide-card__media"><img …></span>
+  <span class="c-guide-card__body"><span class="c-guide-card__title">…</span>
+    <span class="c-guide-card__desc">…</span><span class="c-guide-card__more">Citește ghidul →</span></span></a>
+```
+
+Presentation pipes (pure, in `src/app/pipes`):
+
+- Status/category: `statusText` (sentence case label), `statusTone`
+  (`active|resolved|pending|rejected|neutral` for `.c-status`), `categoryLabel`, `categoryIcon`.
+- Urgency: `urgencyLabel` ("Ridicată"; `urgencyLabel:'tag'` gives "Urgență ridicată"),
+  `urgencyTone` (`urgent|signal|info|neutral` for `.c-tag`'s `data-tone`).
+- Admin actions: `actionLabel` ("A aprobat", "A solicitat modificări"), `actionTone` (for `.c-status`).
+- Counts: `roPlural` agrees a number with its noun, `"de"` included:
+  `{{ n | roPlural:'punct':'puncte' }}` gives "1 punct", "19 puncte", "20 de puncte", "101 puncte".
+  The forms can be whole phrases ("fotografie încărcată" / "fotografii încărcate"). In TypeScript,
+  use `roCount()` from the same file.
 
 ## NG-ZORRO
 

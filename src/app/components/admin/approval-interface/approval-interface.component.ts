@@ -20,6 +20,8 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { ApiService } from '../../../services/api.service';
 import { CategoryLabelPipe } from '../../../pipes/category.pipe';
 import { TimeAgoPipe } from '../../../pipes/date.pipe';
+import { UrgencyLabelPipe, UrgencyTonePipe } from '../../../pipes/urgency.pipe';
+import { RoPluralPipe, roCount } from '../../../pipes/plural.pipe';
 import {
   AdminIssueListItem,
   AdminStatisticsResponse,
@@ -48,7 +50,10 @@ import {
     NzPaginationModule,
     NzCheckboxModule,
     CategoryLabelPipe,
-    TimeAgoPipe
+    TimeAgoPipe,
+    UrgencyLabelPipe,
+    UrgencyTonePipe,
+    RoPluralPipe
   ],
   templateUrl: './approval-interface.component.html',
   styleUrls: ['./approval-interface.component.scss']
@@ -83,15 +88,6 @@ export class ApprovalInterfaceComponent implements OnInit {
   // Queue list paging (presentation only: the whole queue is loaded at once)
   pageIndex = 1;
   readonly pageSize = 10;
-
-  /** Romanian urgency labels, keyed lowercase to match the API's UrgencyLevel values. */
-  readonly urgencyLabels: Record<string, string> = {
-    unspecified: 'Nespecificată',
-    low: 'Scăzută',
-    medium: 'Medie',
-    high: 'Ridicată',
-    urgent: 'Urgentă'
-  };
 
   /** Romanian category labels, keyed lowercase so PascalCase and camelCase API values both match. */
   readonly categoryLabels: Record<string, string> = {
@@ -406,10 +402,10 @@ export class ApprovalInterfaceComponent implements OnInit {
         next: (response) => {
           console.log('[ADMIN] Bulk approval completed:', response);
 
-          this.message.success(`${response.successfullyApproved} probleme aprobate cu succes`);
+          this.message.success(`${roCount(response.successfullyApproved, 'problemă aprobată', 'probleme aprobate')} cu succes`);
 
           if (response.failed > 0) {
-            this.message.warning(`${response.failed} probleme nu au putut fi aprobate`);
+            this.message.warning(roCount(response.failed, 'problemă nu a putut fi aprobată', 'probleme nu au putut fi aprobate'));
           }
 
           // Remove approved issues from the list

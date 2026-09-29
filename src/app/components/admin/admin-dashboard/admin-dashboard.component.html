@@ -69,12 +69,12 @@
       <!-- Throughput -->
       <section class="c-card c-card--pad panel" aria-labelledby="today-title">
         <h2 class="c-h3 panel__title" id="today-title">Activitate azi</h2>
-        <dl class="kv">
-          <div class="kv__row">
+        <dl class="c-kv c-kv--num">
+          <div class="c-kv__row">
             <dt>Probleme noi</dt>
             <dd>{{ stats.submissionsToday | number:'1.0-0':'ro' }}</dd>
           </div>
-          <div class="kv__row">
+          <div class="c-kv__row">
             <dt>Revizuite azi</dt>
             <dd>{{ stats.reviewedToday | number:'1.0-0':'ro' }}</dd>
           </div>
@@ -83,16 +83,16 @@
 
       <section class="c-card c-card--pad panel" aria-labelledby="week-title">
         <h2 class="c-h3 panel__title" id="week-title">Sumar săptămânal</h2>
-        <dl class="kv">
-          <div class="kv__row">
+        <dl class="c-kv c-kv--num">
+          <div class="c-kv__row">
             <dt>Probleme noi</dt>
             <dd>{{ stats.submissionsThisWeek | number:'1.0-0':'ro' }}</dd>
           </div>
-          <div class="kv__row">
+          <div class="c-kv__row">
             <dt>Revizuite</dt>
             <dd>{{ stats.reviewedThisWeek | number:'1.0-0':'ro' }}</dd>
           </div>
-          <div class="kv__row">
+          <div class="c-kv__row">
             <dt>Timp mediu de revizuire</dt>
             <dd>{{ stats.averageReviewTimeHours | number:'1.1-1':'ro' }} h</dd>
           </div>
@@ -104,13 +104,13 @@
         <h2 class="c-h3 panel__title" id="cat-title">Probleme pe categorii</h2>
         @let catRows = stats.issuesByCategory | barRows;
         @if (catRows.length > 0) {
-          <ul class="bars" role="list">
+          <ul class="c-bars" role="list">
             @for (row of catRows; track row.key) {
-              <li class="bars__row">
-                <span class="bars__label">{{ row.key | categoryLabel }}</span>
-                <span class="bars__plot">
-                  <span class="bars__fill" [style.--pct]="row.pct" aria-hidden="true"></span>
-                  <span class="bars__value">{{ row.value | number:'1.0-0':'ro' }}</span>
+              <li class="c-bars__row">
+                <span class="c-bars__label">{{ row.key | categoryLabel }}</span>
+                <span class="c-bars__plot">
+                  <span class="c-bars__fill" [style.--pct]="row.pct" aria-hidden="true"></span>
+                  <span class="c-bars__value">{{ row.value | number:'1.0-0':'ro' }}</span>
                 </span>
               </li>
             }
@@ -124,13 +124,13 @@
         <h2 class="c-h3 panel__title" id="urg-title">Probleme pe urgență</h2>
         @let urgRows = stats.issuesByUrgency | barRows:urgencyOrder;
         @if (urgRows.length > 0) {
-          <ul class="bars" role="list">
+          <ul class="c-bars" role="list">
             @for (row of urgRows; track row.key) {
-              <li class="bars__row">
-                <span class="bars__label">{{ urgencyLabels[(row.key | lowercase)] || row.key }}</span>
-                <span class="bars__plot">
-                  <span class="bars__fill" [style.--pct]="row.pct" aria-hidden="true"></span>
-                  <span class="bars__value">{{ row.value | number:'1.0-0':'ro' }}</span>
+              <li class="c-bars__row">
+                <span class="c-bars__label">{{ row.key | urgencyLabel }}</span>
+                <span class="c-bars__plot">
+                  <span class="c-bars__fill" [style.--pct]="row.pct" aria-hidden="true"></span>
+                  <span class="c-bars__value">{{ row.value | number:'1.0-0':'ro' }}</span>
                 </span>
               </li>
             }

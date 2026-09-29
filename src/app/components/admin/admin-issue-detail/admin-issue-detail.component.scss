@@ -1,7 +1,5 @@
 :host {
   display: block;
-  // Sticky offset: the global header plus its back/context row.
-  --sticky-top: calc(var(--header-h) + 45px);
 }
 
 // --- Head and layout ------------------------------------------------------------
@@ -274,64 +272,7 @@
   }
 }
 
-.choices {
-  display: grid;
-  gap: var(--space-2);
-  width: 100%;
-}
-
-label.choice.ant-radio-wrapper {
-  margin: 0;
-  padding: var(--space-3);
-  border: 1px solid var(--line-strong);
-  border-radius: var(--radius-md);
-
-  &[data-tone='ok'] { --tone: var(--ok-text); --wash: var(--ok-wash); }
-  &[data-tone='bad'] { --tone: var(--bad-text); --wash: var(--bad-wash); }
-
-  &.ant-radio-wrapper-checked {
-    border-color: var(--tone);
-    background: var(--wash);
-  }
-}
-
-.choice {
-  &__body {
-    display: grid;
-    gap: 2px;
-  }
-
-  &__title {
-    font-weight: 650;
-  }
-
-  &__icon {
-    color: var(--tone);
-  }
-
-  &__hint {
-    color: var(--ink-600);
-    font-size: var(--text-sm);
-  }
-}
-
 // --- Context cards --------------------------------------------------------------------
-
-.rows__item {
-  display: flex;
-  justify-content: space-between;
-  gap: var(--space-4);
-  font-size: var(--text-sm);
-
-  dt {
-    color: var(--ink-500);
-  }
-
-  dd {
-    margin: 0;
-    font-weight: 600;
-  }
-}
 
 .note-label {
   margin: var(--space-4) 0 var(--space-1);
