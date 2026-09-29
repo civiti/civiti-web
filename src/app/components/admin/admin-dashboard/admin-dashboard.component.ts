@@ -1,23 +1,46 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, OnInit, Pipe, PipeTransform, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { catchError, map, shareReplay } from 'rxjs/operators';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzStatisticModule } from 'ng-zorro-antd/statistic';
-import { NzGridModule } from 'ng-zorro-antd/grid';
+import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzAvatarModule } from 'ng-zorro-antd/avatar';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
-import { NzListModule } from 'ng-zorro-antd/list';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 
 import { ApiService } from '../../../services/api.service';
+import { CategoryLabelPipe } from '../../../pipes/category.pipe';
 import { AdminStatisticsResponse } from '../../../types/civica-api.types';
+
+/** One bar of a horizontal CSS bar chart: its key, raw value and length relative to the largest value. */
+interface BarRow {
+  key: string;
+  value: number;
+  pct: number;
+}
+
+/**
+ * Turns a `{ key: count }` map into bar-chart rows. Largest first, unless an explicit key
+ * order is given (urgency reads better in severity order than in count order).
+ */
+@Pipe({
+  name: 'barRows',
+  standalone: true,
+  pure: true
+})
+export class BarRowsPipe implements PipeTransform {
+  transform(counts: Record<string, number> | null | undefined, order?: readonly string[]): BarRow[] {
+    const entries = Object.entries(counts ?? {});
+    const max = Math.max(1, ...entries.map(([, value]) => value));
+    const rows = entries.map(([key, value]) => ({ key, value, pct: (value / max) * 100 }));
+    if (!order) return rows.sort((a, b) => b.value - a.value);
+    const rank = (key: string): number => {
+      const i = order.indexOf(key.toLowerCase());
+      return i === -1 ? order.length : i;
+    };
+    return rows.sort((a, b) => rank(a.key) - rank(b.key));
+  }
+}
 
 @Component({
   selector: 'app-admin-dashboard',
@@ -25,16 +48,10 @@ import { AdminStatisticsResponse } from '../../../types/civica-api.types';
   imports: [
     CommonModule,
     RouterModule,
-    NzCardModule,
-    NzStatisticModule,
-    NzGridModule,
+    NzButtonModule,
     NzIconModule,
-    NzSpinModule,
-    NzAvatarModule,
-    NzBadgeModule,
-    NzListModule,
-    NzEmptyModule,
-    NzTagModule
+    CategoryLabelPipe,
+    BarRowsPipe
   ],
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.scss']
@@ -46,6 +63,18 @@ export class AdminDashboardComponent implements OnInit {
   // Stats
   statistics$: Observable<AdminStatisticsResponse | null> = of(null);
   isLoading = true;
+
+  /** Severity order for the urgency chart, most severe first. */
+  readonly urgencyOrder: readonly string[] = ['urgent', 'high', 'medium', 'low', 'unspecified'];
+
+  /** Romanian urgency labels, keyed lowercase to match the API's UrgencyLevel values. */
+  readonly urgencyLabels: Record<string, string> = {
+    unspecified: 'Nespecificată',
+    low: 'Scăzută',
+    medium: 'Medie',
+    high: 'Ridicată',
+    urgent: 'Urgentă'
+  };
 
   ngOnInit(): void {
     this.loadStatistics();

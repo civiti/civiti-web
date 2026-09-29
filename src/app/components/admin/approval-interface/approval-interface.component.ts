@@ -5,28 +5,20 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzTableModule } from 'ng-zorro-antd/table';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzStatisticModule } from 'ng-zorro-antd/statistic';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
+import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 
 import { ApiService } from '../../../services/api.service';
-import { CategoryColorPipe } from '../../../pipes/category.pipe';
-import { UrgencyStatusPipe } from '../../../pipes/urgency.pipe';
+import { CategoryLabelPipe } from '../../../pipes/category.pipe';
 import { TimeAgoPipe } from '../../../pipes/date.pipe';
 import {
   AdminIssueListItem,
@@ -44,25 +36,17 @@ import {
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
-    NzTableModule,
-    NzTagModule,
     NzToolTipModule,
     NzModalModule,
     NzFormModule,
     NzInputModule,
-    NzSelectModule,
     NzRadioModule,
     NzSpinModule,
-    NzStatisticModule,
-    NzGridModule,
-    NzBadgeModule,
-    NzTypographyModule,
+    NzPaginationModule,
     NzCheckboxModule,
-    CategoryColorPipe,
-    UrgencyStatusPipe,
+    CategoryLabelPipe,
     TimeAgoPipe
   ],
   templateUrl: './approval-interface.component.html',
@@ -92,6 +76,29 @@ export class ApprovalInterfaceComponent implements OnInit {
   // Bulk approval modal state
   isBulkApprovalModalVisible = false;
   bulkApprovalNotes = '';
+
+  // Queue list paging (presentation only: the whole queue is loaded at once)
+  pageIndex = 1;
+  readonly pageSize = 10;
+
+  /** Romanian urgency labels, keyed lowercase to match the API's UrgencyLevel values. */
+  readonly urgencyLabels: Record<string, string> = {
+    unspecified: 'Nespecificată',
+    low: 'Scăzută',
+    medium: 'Medie',
+    high: 'Ridicată',
+    urgent: 'Urgentă'
+  };
+
+  /** Romanian category labels, keyed lowercase so PascalCase and camelCase API values both match. */
+  readonly categoryLabels: Record<string, string> = {
+    infrastructure: 'Infrastructură',
+    environment: 'Mediu',
+    transportation: 'Transport',
+    publicservices: 'Servicii publice',
+    safety: 'Siguranță',
+    other: 'Altele'
+  };
 
   constructor() {
     this.initializeForm();

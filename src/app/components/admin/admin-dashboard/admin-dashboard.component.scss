@@ -1,224 +1,261 @@
 :host {
+  display: block;
+}
+
+// --- Page head actions ------------------------------------------------------
+
+.head-actions {
+  align-items: center;
+}
+
+// Phones: the queue CTA leads, full width; the two quiet actions follow.
+@media (max-width: 639px) {
+  .head-actions {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+
+  :host .head-actions button.ant-btn {
+    width: 100%;
+  }
+
+  :host .head-actions button.head-cta.ant-btn {
+    order: -1;
+    height: auto;
+    min-height: 52px;
+    padding-block: var(--space-3);
+    white-space: normal;
+  }
+}
+
+// --- KPI tiles --------------------------------------------------------------
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-4);
+  margin-bottom: var(--space-6);
+
+  @media (max-width: 959px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-3);
+  }
+}
+
+.kpi {
+  position: relative;
   display: flex;
   flex-direction: column;
-}
+  gap: var(--space-4);
+  min-width: 0;
+  padding: var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 
-.admin-dashboard-container {
-  flex: 1;
-  background: var(--platinum);
-  padding: 1.5rem;
-}
+  // Label reads first, number under it; the DOM keeps "value, label" for screen readers.
+  .c-stat {
+    flex-direction: column-reverse;
+    gap: var(--space-2);
+    padding-right: 44px;
+  }
 
-// Stats Section
-.stats-section {
-  margin-bottom: 2rem;
+  &__icon {
+    position: absolute;
+    top: var(--space-4);
+    right: var(--space-4);
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border-radius: var(--radius-md);
+    background: var(--paper-2);
+    color: var(--ink-600);
+    font-size: 18px;
+  }
 
-  .stat-card {
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(20, 33, 61, 0.08);
-    transition: all 0.3s ease;
-    height: 100%;
+  &__meter {
+    margin-top: auto;
+  }
 
-    &:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(20, 33, 61, 0.15);
+  // The actionable number: signal wash, not a fill — the fill is the CTA's.
+  &--pending {
+    border-color: var(--signal-200);
+    background: var(--signal-50);
+
+    .kpi__icon {
+      background: var(--signal-100);
+      color: var(--signal-text-strong);
     }
+  }
 
-    ::ng-deep {
-      .ant-card-body {
-        padding: 1.25rem;
-      }
+  @media (max-width: 420px) {
+    padding: var(--space-4);
 
-      .ant-statistic-title {
-        font-size: 0.75rem;
-        color: #666;
-      }
-
-      .ant-statistic-content {
-        font-size: 1.5rem;
-        font-weight: 600;
-      }
-
-      .ant-statistic-content-prefix {
-        margin-right: 8px;
-        font-size: 1.25rem;
-      }
+    .c-stat__value {
+      font-size: var(--text-3xl);
     }
   }
 }
 
-// Actions Section
-.actions-section {
-  margin-bottom: 2rem;
+// Approval-rate meter: the track is a lighter step of the fill's own tone.
+.c-meter {
+  &[data-tone='ok'] {
+    background: var(--ok-wash);
 
-  .actions-card {
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(20, 33, 61, 0.08);
-
-    ::ng-deep .ant-card-head-title {
-      font-weight: 600;
-      color: var(--oxford-blue, #14213D);
-    }
+    .c-meter__fill { background: var(--ok-fill); }
   }
 
-  .quick-actions {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
+  &[data-tone='warn'] {
+    background: var(--signal-100);
   }
 
-  .action-item {
-    display: flex;
-    align-items: center;
-    padding: 1rem;
-    border-radius: 12px;
-    background: #f9f9f9;
-    cursor: pointer;
-    transition: all 0.2s ease;
+  &[data-tone='bad'] {
+    background: var(--bad-wash);
 
-    &:hover {
-      background: #f0f0f0;
-      transform: translateX(4px);
-    }
-
-    &.primary {
-      background: linear-gradient(135deg, #FCA311 0%, #e89500 100%);
-      color: white;
-
-      &:hover {
-        background: linear-gradient(135deg, #e89500 0%, #d18600 100%);
-      }
-
-      .action-icon {
-        background: rgba(255, 255, 255, 0.2);
-        color: white;
-
-        ::ng-deep .ant-badge-count {
-          background: white;
-          color: #FCA311;
-          font-weight: 600;
-        }
-      }
-
-      .action-content {
-        h4, p {
-          color: white;
-        }
-
-        p {
-          opacity: 0.9;
-        }
-      }
-
-      .action-arrow {
-        color: white;
-      }
-    }
-
-    .action-icon {
-      width: 48px;
-      height: 48px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: white;
-      border-radius: 12px;
-      margin-right: 1rem;
-      flex-shrink: 0;
-
-      ::ng-deep {
-        .anticon {
-          font-size: 1.5rem;
-          color: var(--oxford-blue, #14213D);
-        }
-      }
-    }
-
-    .action-content {
-      flex: 1;
-
-      h4 {
-        margin: 0;
-        font-weight: 600;
-        font-size: 1rem;
-        color: var(--oxford-blue, #14213D);
-      }
-
-      p {
-        margin: 0.25rem 0 0;
-        font-size: 0.875rem;
-        color: #666;
-      }
-    }
-
-    .action-arrow {
-      color: #999;
-      font-size: 1rem;
-    }
+    .c-meter__fill { background: var(--bad-fill); }
   }
 }
 
-// Details Section
-.details-section {
-  .activity-today-card,
-  .weekly-card,
-  .category-card,
-  .urgency-card {
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(20, 33, 61, 0.08);
-    height: 100%;
+// --- Panels -----------------------------------------------------------------
 
-    ::ng-deep .ant-card-head-title {
-      font-weight: 600;
-      color: var(--oxford-blue, #14213D);
-    }
+.panels {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+
+  @media (max-width: 759px) {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.panel {
+  min-width: 0;
+
+  &__title {
+    margin-bottom: var(--space-4);
   }
 
-  .activity-value {
-    font-weight: 600;
-    font-size: 1.125rem;
-    color: var(--oxford-blue, #14213D);
+  &__empty {
+    margin: 0;
+    color: var(--ink-500);
   }
 
-  .category-list,
-  .urgency-list {
+  @media (max-width: 420px) {
+    padding: var(--space-5);
+  }
+}
+
+// Key–value summary rows
+.kv {
+  margin: 0;
+
+  &__row {
     display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-  }
-
-  .category-item,
-  .urgency-item {
-    display: flex;
+    align-items: baseline;
     justify-content: space-between;
-    align-items: center;
-    padding: 0.5rem 0;
-    border-bottom: 1px solid #f0f0f0;
+    gap: var(--space-4);
+    padding-block: var(--space-3);
+    border-top: 1px solid var(--line);
+
+    &:first-child {
+      padding-top: 0;
+      border-top: 0;
+    }
 
     &:last-child {
-      border-bottom: none;
+      padding-bottom: 0;
     }
+  }
 
-    .category-name,
-    .urgency-name {
-      font-size: 0.875rem;
-      color: #333;
-    }
+  dt {
+    color: var(--ink-600);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ink-900);
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
 }
 
-// Responsive
-@media (max-width: 768px) {
-  .admin-dashboard-container {
-    padding: 1rem;
+// Horizontal bars: one ink series, 4px rounded data end, value at the tip.
+.bars {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+
+    @media (max-width: 420px) {
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+    }
   }
 
-  .action-item {
-    padding: 0.875rem;
+  &__label {
+    color: var(--ink-700);
+    font-weight: 550;
+    overflow-wrap: anywhere;
+  }
 
-    .action-icon {
-      width: 40px;
-      height: 40px;
-    }
+  &__plot {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  // --pct is 0–100; the bar may use the plot minus room for its value label.
+  &__fill {
+    flex: none;
+    width: calc((100% - 3.5rem) * var(--pct, 0) / 100);
+    min-width: 2px;
+    height: 12px;
+    border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+    background: var(--ink-700);
+  }
+
+  &__value {
+    color: var(--ink-900);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+// --- Loading / error ----------------------------------------------------------
+
+.sk-value {
+  width: 40%;
+  height: 36px;
+}
+
+.sk-label {
+  width: 60%;
+  height: 14px;
+}
+
+.sk-block {
+  height: 96px;
+  margin-top: var(--space-4);
+}
+
+.load-error {
+  align-items: center;
+
+  p {
+    flex: 1;
+    margin: 0;
   }
 }

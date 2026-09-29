@@ -1,10 +1,20 @@
-<div class="activity-log-container">
+<div class="c-container c-page">
+
+  <header class="c-page-head">
+    <div class="c-page-head__text">
+      <p class="c-eyebrow">Moderare</p>
+      <h1 class="c-h1">Jurnal activitate</h1>
+      <p class="c-lead">Deciziile de moderare: cine a decis, ce, când și cu ce notă.</p>
+    </div>
+  </header>
 
   <!-- Filters -->
-  <nz-card class="filters-card">
-    <div class="filters-row">
+  <div class="filters c-card" role="search" aria-label="Filtrează jurnalul">
+    <div class="filters__field">
+      <label class="filters__label" for="log-action">Acțiune</label>
       <nz-select
-        class="action-filter"
+        nzId="log-action"
+        class="filters__action"
         [(ngModel)]="selectedAction"
         (ngModelChange)="onFilterChange()"
         nzPlaceHolder="Toate acțiunile"
@@ -17,85 +27,111 @@
           ></nz-option>
         }
       </nz-select>
+    </div>
 
+    <div class="filters__field">
+      <label class="filters__label" for="log-range">Perioadă</label>
       <nz-range-picker
-        class="date-filter"
+        nzId="log-range"
+        class="filters__range"
         [(ngModel)]="dateRange"
         (ngModelChange)="onFilterChange()"
         nzFormat="dd/MM/yyyy"
       ></nz-range-picker>
+    </div>
 
+    <div class="filters__end">
       @if (selectedAction || dateRange?.length) {
-        <button
-          nz-button
-          nzType="default"
-          (click)="resetFilters()"
-        >
-          <i nz-icon nzType="reload"></i>
-          Resetează
+        <button nz-button nzType="text" (click)="resetFilters()">
+          <span nz-icon nzType="reload" nzTheme="outline"></span>
+          <span>Resetează</span>
         </button>
       }
+      <p class="filters__count" aria-live="polite">Total: <strong>{{ totalItems }}</strong></p>
     </div>
-  </nz-card>
+  </div>
 
-  <!-- Activity Timeline -->
-  <nz-card class="timeline-card">
-    <nz-spin [nzSpinning]="isLoading">
-      @if (activities.length > 0) {
-        <nz-timeline>
-          @for (activity of activities; track activity.id) {
-            <nz-timeline-item
-              [nzColor]="activity.actionType | timelineColor"
-            >
-              <div class="activity-item">
-                <div class="activity-header">
-                  <div class="admin-info">
-                    <span class="admin-name">{{ activity.adminName }}</span>
-                    <nz-tag [nzColor]="activity.actionType | actionColor" nzMode="default">
-                      {{ activity.actionType | actionLabel }}
-                    </nz-tag>
-                  </div>
-                  <span class="activity-time">{{ activity.createdAt | formatDateTime }}</span>
-                </div>
+  <!-- Activity list -->
+  <section class="log c-card" aria-labelledby="log-title" [attr.aria-busy]="isLoading">
+    <h2 class="c-sr-only" id="log-title">Înregistrări</h2>
 
-                <div class="activity-target">
-                  <span class="target-type">
-                    <i nz-icon nzType="file-text" nzTheme="outline"></i>
-                  </span>
-                  <span class="target-name">{{ activity | targetLabel }}</span>
-                </div>
+    @if (activities.length > 0) {
+      <ol class="log-list" [class.is-loading]="isLoading">
+        @for (activity of activities; track activity.id) {
+          @let meta = actionMeta[activity.actionType];
+          <li class="entry" [attr.data-tone]="meta?.tone || 'neutral'">
+            <span class="entry__node" aria-hidden="true"></span>
 
-                @if (activity.notes) {
-                  <div class="activity-details">
-                    <p>{{ activity.notes }}</p>
-                  </div>
-                }
+            <div class="entry__body">
+              <div class="entry__top">
+                <span class="c-status" [attr.data-tone]="meta?.tone || 'neutral'">{{ meta?.label || (activity.actionType | actionLabel) }}</span>
+                <a class="entry__issue" [routerLink]="['/admin/issue', activity.issueId]">{{ activity | targetLabel }}</a>
               </div>
-            </nz-timeline-item>
-          }
-        </nz-timeline>
-      }
 
-      @if (activities.length === 0 && !isLoading) {
-        <nz-empty
-          nzNotFoundImage="simple"
-          nzNotFoundContent="Nicio activitate găsită"
-        ></nz-empty>
-      }
-    </nz-spin>
+              <p class="entry__meta">
+                <span class="entry__who">
+                  <span nz-icon nzType="user" nzTheme="outline" aria-hidden="true"></span>
+                  <span><span class="c-sr-only">Administrator: </span>{{ activity.adminName }}</span>
+                </span>
+                @if (activity.previousStatus && activity.newStatus) {
+                  <span class="entry__status">
+                    <span class="c-sr-only">Stare: </span>{{ activity.previousStatus | statusText }}
+                    <span aria-hidden="true">→</span><span class="c-sr-only"> devine </span>
+                    {{ activity.newStatus | statusText }}
+                  </span>
+                }
+              </p>
+
+              @if (activity.notes) {
+                <p class="entry__notes">{{ activity.notes }}</p>
+              }
+            </div>
+
+            <time
+              class="entry__time"
+              [attr.datetime]="activity.createdAt"
+              [attr.title]="activity.createdAt | date:'d MMMM yyyy, HH:mm':'':'ro'">{{ activity.createdAt | formatDateTime }}</time>
+          </li>
+        }
+      </ol>
+    } @else if (isLoading) {
+      <ol class="log-list" aria-hidden="true">
+        @for (i of [1, 2, 3, 4, 5]; track i) {
+          <li class="entry">
+            <span class="entry__node"></span>
+            <div class="entry__body">
+              <div class="c-skeleton sk-line"></div>
+              <div class="c-skeleton sk-line sk-line--short"></div>
+            </div>
+          </li>
+        }
+      </ol>
+    } @else {
+      <div class="c-empty">
+        <span class="c-empty__icon"><span nz-icon nzType="history" nzTheme="outline"></span></span>
+        <p class="c-empty__title">Nicio activitate găsită</p>
+        @if (selectedAction || dateRange?.length) {
+          <p>Încearcă alte filtre sau resetează-le.</p>
+          <button nz-button class="empty-reset" (click)="resetFilters()">
+            <span nz-icon nzType="reload" nzTheme="outline"></span>
+            <span>Resetează</span>
+          </button>
+        }
+      </div>
+    }
 
     <!-- Pagination -->
     @if (totalItems > pageSize) {
-    <div class="pagination-container">
-      <nz-pagination
-        [nzPageIndex]="pageIndex"
-        [nzTotal]="totalItems"
-        [nzPageSize]="pageSize"
-        (nzPageIndexChange)="onPageChange($event)"
-        nzShowSizeChanger="false"
-      ></nz-pagination>
-    </div>
+      <div class="pager">
+        <nz-pagination
+          [nzPageIndex]="pageIndex"
+          [nzTotal]="totalItems"
+          [nzPageSize]="pageSize"
+          (nzPageIndexChange)="onPageChange($event)"
+          nzShowSizeChanger="false"
+        ></nz-pagination>
+      </div>
     }
-  </nz-card>
+  </section>
 
 </div>
