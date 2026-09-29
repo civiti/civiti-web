@@ -1,301 +1,245 @@
-<div class="issue-review-container">
-  
-  <!-- Header -->
-  <div class="page-header">
-    <h1 class="page-title">Verificare și trimitere</h1>
-    <p class="page-subtitle">Verifică sesizarea înainte de a o trimite către autorități</p>
-  </div>
+<div class="wz">
+  <div class="wz-main">
 
-  <!-- Progress Indicator -->
-  <div class="progress-indicator">
-    <div class="progress-step completed">
-      <div class="step-number">✓</div>
-      <div class="step-label">Tip problemă</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step completed">
-      <div class="step-number">✓</div>
-      <div class="step-label">Fotografii</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step completed">
-      <div class="step-number">✓</div>
-      <div class="step-label">Detalii</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step completed">
-      <div class="step-number">✓</div>
-      <div class="step-label">Autorități</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step active">
-      <div class="step-number">5</div>
-      <div class="step-label">Verificare</div>
-    </div>
-  </div>
+    <nav class="wz-progress" aria-label="Pașii raportării">
+      <p class="wz-count">Pasul 5 din 5<span class="wz-count__now"> · Verificare</span></p>
+      <ol class="wz-steps">
+        <li class="is-done"><span class="wz-steps__label"><span nz-icon nzType="check" nzTheme="outline"></span>Tip problemă<span class="c-sr-only"> (finalizat)</span></span></li>
+        <li class="is-done"><span class="wz-steps__label"><span nz-icon nzType="check" nzTheme="outline"></span>Fotografii<span class="c-sr-only"> (finalizat)</span></span></li>
+        <li class="is-done"><span class="wz-steps__label"><span nz-icon nzType="check" nzTheme="outline"></span>Detalii<span class="c-sr-only"> (finalizat)</span></span></li>
+        <li class="is-done"><span class="wz-steps__label"><span nz-icon nzType="check" nzTheme="outline"></span>Autorități<span class="c-sr-only"> (finalizat)</span></span></li>
+        <li
+          [class.is-current]="!isSubmitted"
+          [class.is-done]="isSubmitted"
+          [attr.aria-current]="isSubmitted ? null : 'step'">
+          <span class="wz-steps__label">
+            @if (isSubmitted) {
+              <span nz-icon nzType="check" nzTheme="outline"></span>
+            }
+            Verificare
+          </span>
+        </li>
+      </ol>
+    </nav>
 
-  <!-- Submission Success State -->
-  @if (isSubmitted) {
-    <div class="success-section">
-      <nz-result
-        nzStatus="success"
-        nzTitle="Problemă trimisă cu succes!"
-        nzSubTitle="Sesizarea ta a fost trimisă pentru verificare. Vei primi actualizări pe măsură ce trece prin procesul de aprobare.">
+    <!-- Submission success state -->
+    @if (isSubmitted) {
+      <section class="c-card c-card--pad done" aria-labelledby="done-title">
+        <span class="done__icon" aria-hidden="true">
+          <span nz-icon nzType="check" nzTheme="outline"></span>
+        </span>
+        <h1 class="c-h2" id="done-title">Problemă trimisă cu succes!</h1>
+        <p class="done__lead">Sesizarea ta a fost trimisă pentru verificare. Vei primi actualizări pe măsură ce trece prin procesul de aprobare.</p>
 
-        <div nz-result-extra>
-          <div class="success-stats">
-            <div class="stat-item">
-              <div class="stat-icon">🏆</div>
-              <div class="stat-info">
-                <div class="stat-title">Realizare deblocată!</div>
-                <div class="stat-description">Insignă începător civic</div>
+        <ul class="done__stats">
+          <li class="c-card c-card--sunken">
+            <span class="done__stat-icon" aria-hidden="true"><span nz-icon nzType="trophy" nzTheme="outline"></span></span>
+            <span>
+              <strong>Realizare deblocată!</strong>
+              <span>Insignă începător civic</span>
+            </span>
+          </li>
+          <li class="c-card c-card--sunken">
+            <span class="done__stat-icon" aria-hidden="true"><span nz-icon nzType="star" nzTheme="outline"></span></span>
+            <span>
+              <strong>Puncte câștigate</strong>
+              <span>+50 puncte de comunitate</span>
+            </span>
+          </li>
+        </ul>
+
+        <div class="done__actions">
+          <button nz-button nzType="primary" nzSize="large" routerLink="/dashboard">
+            <span nz-icon nzType="home" nzTheme="outline"></span>
+            <span>Mergi la panou</span>
+          </button>
+          <button nz-button nzType="default" nzSize="large" (click)="createAnotherIssue()">
+            <span nz-icon nzType="plus" nzTheme="outline"></span>
+            <span>Raportează altă problemă</span>
+          </button>
+        </div>
+
+        @if (showAppNudge()) {
+          <div class="c-callout app-nudge" role="region" aria-label="Descarcă aplicația Civiti">
+            <span nz-icon nzType="mobile" nzTheme="outline" aria-hidden="true"></span>
+            <div>
+              <p class="app-nudge__title">Urmărește-ți problema din aplicație</p>
+              <p>
+                Primești notificări imediat ce problema ta este aprobată sau are actualizări — direct pe iPhone.
+              </p>
+              <div class="app-nudge__actions">
+                <a
+                  [href]="appStoreUrl"
+                  target="_blank"
+                  rel="noopener"
+                  class="c-btn c-btn--ink c-btn--sm"
+                  (click)="dismissAppNudge()"
+                >
+                  Descarcă din App Store →
+                </a>
+                <button type="button" class="c-btn c-btn--ghost c-btn--sm" (click)="dismissAppNudge()">
+                  Mai târziu
+                </button>
               </div>
             </div>
-            <div class="stat-item">
-              <div class="stat-icon">⭐</div>
-              <div class="stat-info">
-                <div class="stat-title">Puncte câștigate</div>
-                <div class="stat-description">+50 puncte de comunitate</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="success-actions">
-            <button nz-button nzType="primary" nzSize="large" routerLink="/dashboard">
-              <span nz-icon nzType="home"></span>
-              Mergi la panou
-            </button>
-            <button nz-button nzType="default" nzSize="large" (click)="createAnotherIssue()">
-              <span nz-icon nzType="plus"></span>
-              Raportează altă problemă
-            </button>
-          </div>
-
-          @if (showAppNudge()) {
-            <div class="app-nudge" role="region" aria-label="Descarcă aplicația Civiti">
-              <div class="app-nudge-icon">
-                <span nz-icon nzType="mobile" nzTheme="outline"></span>
-              </div>
-              <div class="app-nudge-body">
-                <div class="app-nudge-title">Urmărește-ți problema din aplicație</div>
-                <p class="app-nudge-text">
-                  Primești notificări imediat ce problema ta este aprobată sau are actualizări — direct pe iPhone.
-                </p>
-                <div class="app-nudge-actions">
-                  <a
-                    [href]="appStoreUrl"
-                    target="_blank"
-                    rel="noopener"
-                    class="app-nudge-primary"
-                    (click)="dismissAppNudge()"
-                  >
-                    Descarcă din App Store →
-                  </a>
-                  <button type="button" class="app-nudge-dismiss" (click)="dismissAppNudge()">
-                    Mai târziu
-                  </button>
-                </div>
-              </div>
-            </div>
-          }
-
-          <div class="next-steps">
-            <h4>Ce urmează?</h4>
-            <ul>
-              <li>✓ Problema ta va fi revizuită de administratorii locali</li>
-              <li>✓ Vei primi notificări despre actualizări de stare</li>
-              <li>✓ Membrii comunității pot vota pentru a susține problema ta</li>
-              <li>✓ Distribuie sesizarea prietenilor pentru mai multă vizibilitate</li>
-            </ul>
-          </div>
-        </div>
-
-      </nz-result>
-    </div>
-  }
-
-  <!-- Review Content (shown before submission) -->
-  <nz-spin [nzSpinning]="isSubmitting">
-    @if (!isSubmitted && issueData) {
-    <div class="review-content">
-    
-    <!-- Issue Overview -->
-    <nz-card nzTitle="Prezentare generală a problemei" class="review-card">
-      <div class="issue-overview">
-
-        <div class="issue-title-display">
-          <h2 class="issue-title">{{ issueTitle }}</h2>
-        </div>
-
-        <div class="overview-header">
-          <div class="category-display">
-            <span class="category-icon" nz-icon [nzType]="issueData.category.icon" nzTheme="outline"></span>
-            <div class="category-info">
-              <h3>{{ issueData.category.name }}</h3>
-              <p>{{ issueData.category.description }}</p>
-            </div>
-          </div>
-
-          <div class="urgency-display">
-            <span class="urgency-label">Nivel urgență:</span>
-            <nz-badge [nzStatus]="getUrgencyStatus(issueData.urgency)" [nzText]="getUrgencyLabel(issueData.urgency)"></nz-badge>
-          </div>
-        </div>
-
-      </div>
-    </nz-card>
-
-    <!-- Issue Content -->
-    <nz-card nzTitle="Conținutul raportului" class="review-card">
-      <div class="issue-content-sections">
-        <div class="content-section">
-          <h4>Descrierea problemei</h4>
-          <div class="content-text">{{ issueData.description }}</div>
-        </div>
-
-        <div class="content-section">
-          <h4>Rezultatul dorit</h4>
-          <div class="content-text">{{ issueData.desiredOutcome }}</div>
-        </div>
-
-        <div class="content-section">
-          <h4>Impactul asupra comunității</h4>
-          <div class="content-text">{{ issueData.communityImpact }}</div>
-        </div>
-
-        @if (issueData.isAIEnhanced) {
-          <div class="ai-enhanced-badge">
-            <span nz-icon nzType="robot" nzTheme="outline"></span>
-            Text îmbunătățit cu AI
           </div>
         }
-      </div>
-    </nz-card>
 
-    <!-- Photos Review -->
-    <nz-card nzTitle="Fotografii" class="review-card">
-      <div class="photos-review">
-        <div class="photos-count">
-          <nz-badge [nzCount]="issueData.photos.length" nzShowZero>
-            <span nz-icon nzType="picture"></span>
-          </nz-badge>
-          <span>{{ issueData.photos.length }} fotografii atașate</span>
+        <div class="done__next">
+          <h2 class="c-h3">Ce urmează?</h2>
+          <ul>
+            <li><span nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></span><span>Problema ta va fi revizuită de administratorii locali</span></li>
+            <li><span nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></span><span>Vei primi notificări despre actualizări de stare</span></li>
+            <li><span nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></span><span>Membrii comunității pot vota pentru a susține problema ta</span></li>
+            <li><span nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></span><span>Distribuie sesizarea prietenilor pentru mai multă vizibilitate</span></li>
+          </ul>
         </div>
-        
-        <div class="photos-grid">
-          <div nz-row [nzGutter]="[16, 16]">
-            @for (photo of issueData.photos; track $index; let i = $index) {
-              <div
-                nz-col
-                [nzSpan]="12"
-                [nzSm]="8"
-                [nzMd]="6"
-                class="photo-col">
+      </section>
+    } @else {
+      <header class="wz-head">
+        <h1 class="c-h2">Verificare și trimitere</h1>
+        <p class="wz-lead">Verifică sesizarea înainte de a o trimite către autorități</p>
+      </header>
+    }
 
-                <div class="photo-preview" (click)="viewPhoto(photo.url)">
-                  <img [src]="photo.thumbnail || photo.url" [alt]="'Photo ' + (i + 1)" class="photo-image">
-                  <div class="photo-overlay">
-                    <span nz-icon nzType="eye"></span>
-                  </div>
-                </div>
+    <!-- Review content (shown before submission) -->
+    <nz-spin [nzSpinning]="isSubmitting" nzTip="Se trimite...">
+      @if (!isSubmitted && issueData) {
+        <article class="c-card case" aria-label="Sesizarea ta">
 
-              </div>
-            }
-          </div>
-        </div>
-      </div>
-    </nz-card>
+          <!-- Photos -->
+          <section class="case__sec" aria-labelledby="case-photos">
+            <div class="case__head">
+              <h2 class="c-eyebrow c-eyebrow--muted" id="case-photos">Fotografii · {{ issueData.photos.length }}</h2>
+              <a class="c-link case__edit" routerLink="/create-issue/photo">Editează<span class="c-sr-only"> fotografiile</span></a>
+            </div>
+            <ul class="strip">
+              @for (photo of issueData.photos; track $index; let i = $index) {
+                <li>
+                  <button
+                    type="button"
+                    class="strip__item"
+                    [attr.aria-label]="'Vezi fotografia ' + (i + 1)"
+                    (click)="viewPhoto(photo.url)">
+                    <img [src]="photo.thumbnail || photo.url" [alt]="'Fotografia ' + (i + 1)">
+                    @if (photo.isPrimary) {
+                      <span class="strip__badge">Principală</span>
+                    }
+                  </button>
+                </li>
+              }
+            </ul>
+          </section>
 
-    <!-- Target Authorities -->
-    <nz-card nzTitle="Autorități selectate" class="review-card">
-      <div class="authorities-review">
-        <div class="authorities-count">
-          <nz-badge [nzCount]="selectedAuthorities.length" nzShowZero>
-            <span nz-icon nzType="bank"></span>
-          </nz-badge>
-          <span>{{ selectedAuthorities.length }} autorități selectate</span>
-        </div>
+          <!-- The issue -->
+          <section class="case__sec" aria-labelledby="case-issue">
+            <div class="case__head">
+              <h2 class="c-eyebrow c-eyebrow--muted" id="case-issue">Sesizarea</h2>
+              <a class="c-link case__edit" routerLink="/create-issue">Editează<span class="c-sr-only"> titlul, categoria și locația</span></a>
+            </div>
+            <h3 class="case__title">{{ issueTitle }}</h3>
+            <div class="case__tags">
+              <span class="c-tag">
+                <span nz-icon [nzType]="issueData.category.icon" nzTheme="outline" aria-hidden="true"></span>
+                <span>{{ issueData.category.name }}</span>
+              </span>
+              <span class="c-tag urgency" [attr.data-tone]="getUrgencyStatus(issueData.urgency)">
+                Urgență: {{ getUrgencyLabel(issueData.urgency) }}
+              </span>
+            </div>
+            <p class="case__place">
+              <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>
+              <span><span class="c-sr-only">Locație: </span>{{ issueData.location.address }}</span>
+            </p>
+          </section>
 
-        <div class="authorities-list">
-          @for (auth of selectedAuthorities; track auth.email) {
-            <div class="authority-item">
-              <div class="authority-icon">
-                <span nz-icon [nzType]="auth.isCustom ? 'user' : 'bank'"></span>
-              </div>
-              <div class="authority-info">
-                <div class="authority-name">{{ auth.name }}</div>
-                <div class="authority-email">{{ auth.email }}</div>
-              </div>
-              @if (auth.isCustom) {
-                <nz-tag nzColor="orange">PERSONALIZAT</nz-tag>
+          <!-- Description -->
+          <section class="case__sec" aria-labelledby="case-details">
+            <div class="case__head">
+              <h2 class="c-eyebrow c-eyebrow--muted" id="case-details">Conținutul raportului</h2>
+              <a class="c-link case__edit" routerLink="/create-issue/details">Editează<span class="c-sr-only"> descrierea</span></a>
+            </div>
+
+            <div class="case__block">
+              <h3>Descrierea problemei</h3>
+              <p>{{ issueData.description }}</p>
+            </div>
+            <div class="case__block">
+              <h3>Rezultatul dorit</h3>
+              <p>{{ issueData.desiredOutcome }}</p>
+            </div>
+            <div class="case__block">
+              <h3>Impactul asupra comunității</h3>
+              <p>{{ issueData.communityImpact }}</p>
+            </div>
+
+            <div class="case__meta">
+              <span>
+                <span nz-icon nzType="clock-circle" nzTheme="outline" aria-hidden="true"></span>
+                <span>Când a fost observată: {{ getWhenLabel(issueData.whenOccurred) }}</span>
+              </span>
+              @if (issueData.isAIEnhanced) {
+                <span>
+                  <span nz-icon nzType="robot" nzTheme="outline" aria-hidden="true"></span>
+                  <span>Text îmbunătățit cu AI</span>
+                </span>
               }
             </div>
-          }
-        </div>
-      </div>
-    </nz-card>
+          </section>
 
-    <!-- Location & Additional Details -->
-    <nz-card nzTitle="Locație și detalii" class="review-card">
-      <div class="location-details">
-        
-        <div class="detail-row">
-          <div class="detail-label">
-            <span nz-icon nzType="environment"></span>
-            Locație
-          </div>
-          <div class="detail-value">{{ issueData.location.address }}</div>
-        </div>
+          <!-- Authorities -->
+          <section class="case__sec" aria-labelledby="case-auth">
+            <div class="case__head">
+              <h2 class="c-eyebrow c-eyebrow--muted" id="case-auth">Autorități selectate · {{ selectedAuthorities.length }}</h2>
+              <a class="c-link case__edit" routerLink="/create-issue/authorities">Editează<span class="c-sr-only"> autoritățile</span></a>
+            </div>
+            <ul class="recipients">
+              @for (auth of selectedAuthorities; track auth.email) {
+                <li>
+                  <span class="recipients__icon" aria-hidden="true">
+                    <span nz-icon [nzType]="auth.isCustom ? 'user' : 'bank'" nzTheme="outline"></span>
+                  </span>
+                  <span class="recipients__body">
+                    <span class="recipients__name">
+                      <span>{{ auth.name }}</span>
+                      @if (auth.isCustom) {
+                        <span class="c-tag c-tag--signal">Personalizat</span>
+                      }
+                    </span>
+                    <span class="recipients__email">{{ auth.email }}</span>
+                  </span>
+                </li>
+              }
+            </ul>
+          </section>
+        </article>
 
-        <div class="detail-row">
-          <div class="detail-label">
-            <span nz-icon nzType="clock-circle"></span>
-            Când a fost observată
-          </div>
-          <div class="detail-value">{{ getWhenLabel(issueData.whenOccurred) }}</div>
-        </div>
+        <p class="consent">Prin trimiterea acestei probleme, ești de acord că informațiile furnizate sunt corecte și consimți la partajarea acestui raport cu autoritățile locale pentru rezolvare.</p>
+      }
+    </nz-spin>
+  </div>
 
-      </div>
-    </nz-card>
+  @if (!isSubmitted && issueData) {
+    <div class="wz-bar">
+      <div class="wz-bar__inner">
+        <button nz-button nzType="default" nzSize="large" class="wz-bar__back" routerLink="/create-issue/authorities">
+          <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
+          <span>Înapoi</span>
+        </button>
 
-    <!-- Navigation -->
-    <div class="navigation-section">
-      <div class="nav-buttons">
+        <span class="wz-bar__spacer"></span>
+
         <button
           nz-button
-          nzType="default"
+          nzType="primary"
           nzSize="large"
-          routerLink="/create-issue/authorities"
-          class="nav-btn">
-          <span nz-icon nzType="arrow-left"></span>
-          Înapoi
-        </button>
-        
-        <div class="nav-spacer"></div>
-        
-        <button 
-          nz-button 
-          nzType="primary" 
-          nzSize="large"
+          class="wz-bar__next"
           [disabled]="isSubmitting"
-          (click)="submitIssue()"
-          class="nav-btn submit-btn">
-          @if (!isSubmitting) {
-            <span nz-icon nzType="upload"></span>
-          }
-          @if (isSubmitting) {
-            <span nz-icon nzType="loading"></span>
-          }
-          {{ isSubmitting ? 'Se trimite...' : 'Trimite problema' }}
+          (click)="submitIssue()">
+          <span nz-icon [nzType]="isSubmitting ? 'loading' : 'send'" nzTheme="outline"></span>
+          <span>{{ isSubmitting ? 'Se trimite...' : 'Trimite problema' }}</span>
         </button>
       </div>
-      
-      <div class="submission-note">
-        <p>Prin trimiterea acestei probleme, ești de acord că informațiile furnizate sunt corecte și consimți la partajarea acestui raport cu autoritățile locale pentru rezolvare.</p>
-      </div>
     </div>
-
-    </div>
-    }
-  </nz-spin>
+  }
 </div>

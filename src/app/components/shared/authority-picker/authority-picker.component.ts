@@ -6,15 +6,11 @@ import { of } from 'rxjs';
 import { debounceTime, distinctUntilChanged, switchMap, tap, catchError } from 'rxjs/operators';
 
 // NG-ZORRO
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
@@ -61,15 +57,11 @@ function isValidEmail(email: string): boolean {
     CommonModule,
     ReactiveFormsModule,
     FormsModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
     NzFormModule,
     NzInputModule,
     NzCheckboxModule,
-    NzTagModule,
-    NzAlertModule,
-    NzEmptyModule,
     NzSpinModule,
   ],
   templateUrl: './authority-picker.component.html',

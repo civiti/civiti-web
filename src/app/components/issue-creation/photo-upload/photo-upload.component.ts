@@ -17,16 +17,9 @@ import { takeUntil, switchMap, catchError, finalize, toArray } from 'rxjs/operat
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzUploadModule } from 'ng-zorro-antd/upload';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 import { StorageService, UploadResult } from '../../../services/storage.service';
@@ -56,15 +49,8 @@ interface PhotoData {
   imports: [
     CommonModule,
     RouterModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
-    NzUploadModule,
-    NzSpinModule,
-    NzTypographyModule,
-    NzAlertModule,
-    NzGridModule,
-    NzProgressModule,
     NzToolTipModule
   ],
   templateUrl: './photo-upload.component.html',

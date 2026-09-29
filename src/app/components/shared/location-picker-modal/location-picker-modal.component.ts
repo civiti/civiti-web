@@ -12,14 +12,10 @@ import {
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { NZ_MODAL_DATA, NzModalRef } from 'ng-zorro-antd/modal';
-import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { GoogleMap, MapMarker } from '@angular/google-maps';
 import { debounceTime } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -47,14 +43,10 @@ interface PlacePrediction {
   imports: [
     CommonModule,
     ReactiveFormsModule,
-    NzFormModule,
     NzInputModule,
     NzButtonModule,
     NzIconModule,
-    NzAlertModule,
     NzSpinModule,
-    NzCardModule,
-    NzTagModule,
     GoogleMap,
     MapMarker
   ],

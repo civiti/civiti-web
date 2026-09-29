@@ -1,97 +1,69 @@
-<div class="authority-selection-container">
+<div class="wz">
+  <div class="wz-main">
 
-  <!-- Header -->
-  <div class="page-header">
-    <h1 class="page-title">Selectează autoritățile</h1>
-    <p class="page-subtitle">Alege autoritățile relevante pentru problema ta (minimum 1, maximum 5)</p>
+    <nav class="wz-progress" aria-label="Pașii raportării">
+      <p class="wz-count">Pasul 4 din 5<span class="wz-count__now"> · Autorități</span></p>
+      <ol class="wz-steps">
+        <li class="is-done"><span class="wz-steps__label"><span nz-icon nzType="check" nzTheme="outline"></span>Tip problemă<span class="c-sr-only"> (finalizat)</span></span></li>
+        <li class="is-done"><span class="wz-steps__label"><span nz-icon nzType="check" nzTheme="outline"></span>Fotografii<span class="c-sr-only"> (finalizat)</span></span></li>
+        <li class="is-done"><span class="wz-steps__label"><span nz-icon nzType="check" nzTheme="outline"></span>Detalii<span class="c-sr-only"> (finalizat)</span></span></li>
+        <li class="is-current" aria-current="step"><span class="wz-steps__label">Autorități</span></li>
+        <li><span class="wz-steps__label">Verificare</span></li>
+      </ol>
+    </nav>
+
+    <header class="wz-head">
+      <h1 class="c-h2">Selectează autoritățile</h1>
+      <p class="wz-lead">Alege autoritățile relevante pentru problema ta (minimum 1, maximum 5)</p>
+    </header>
+
+    <!-- Context -->
+    <ul class="wz-context" aria-label="Context problemă">
+      @if (selectedCategory) {
+        <li>
+          <span nz-icon nzType="folder" nzTheme="outline"></span>
+          <span><span class="c-sr-only">Categorie: </span>{{ selectedCategory.name }}</span>
+        </li>
+      }
+      @if (currentLocation) {
+        <li>
+          <span nz-icon nzType="environment" nzTheme="outline"></span>
+          <span><span class="c-sr-only">Locație: </span>{{ currentLocation.address }}</span>
+        </li>
+      }
+    </ul>
+
+    <!-- Shared authority picker (selection two-way bound; persisted to session by the effect) -->
+    <app-authority-picker
+      [city]="issueCity()"
+      [district]="issueDistrict()"
+      [(selected)]="selectedAuthorities" />
   </div>
 
-  <!-- Progress Indicator -->
-  <div class="progress-indicator">
-    <div class="progress-step completed">
-      <div class="step-number">✓</div>
-      <div class="step-label">Tip problemă</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step completed">
-      <div class="step-number">✓</div>
-      <div class="step-label">Fotografii</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step completed">
-      <div class="step-number">✓</div>
-      <div class="step-label">Detalii</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step active">
-      <div class="step-number">4</div>
-      <div class="step-label">Autorități</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step">
-      <div class="step-number">5</div>
-      <div class="step-label">Verificare</div>
-    </div>
-  </div>
-
-  <!-- Summary of Context -->
-  <div class="summary-section">
-    <nz-card nzTitle="Context problemă" class="summary-card" nzSize="small">
-      <div class="summary-content">
-        @if (selectedCategory) {
-          <div class="summary-item">
-            <span nz-icon nzType="folder" class="summary-icon"></span>
-            <span class="summary-value">{{ selectedCategory.name }}</span>
-          </div>
-        }
-        @if (currentLocation) {
-          <div class="summary-item">
-            <span nz-icon nzType="environment" class="summary-icon"></span>
-            <span class="summary-value">{{ currentLocation.address }}</span>
-          </div>
-        }
-      </div>
-    </nz-card>
-  </div>
-
-  <!-- Shared authority picker (selection two-way bound; persisted to session by the effect) -->
-  <app-authority-picker
-    [city]="issueCity()"
-    [district]="issueDistrict()"
-    [(selected)]="selectedAuthorities" />
-
-  <!-- Navigation -->
-  <div class="navigation-section">
-    <div class="nav-buttons">
-      <button
-        nz-button
-        nzType="default"
-        nzSize="large"
-        (click)="goBack()"
-        class="nav-btn">
-        <span nz-icon nzType="arrow-left"></span>
-        Înapoi
+  <!-- Action bar -->
+  <div class="wz-bar">
+    <div class="wz-bar__inner">
+      <button nz-button nzType="default" nzSize="large" class="wz-bar__back" (click)="goBack()">
+        <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
+        <span>Înapoi</span>
       </button>
 
-      <div class="nav-spacer"></div>
+      @if (!canContinue()) {
+        <p class="wz-bar__hint">Selectează cel puțin {{ MIN_AUTHORITIES }} autoritate pentru a continua</p>
+      } @else {
+        <span class="wz-bar__spacer"></span>
+      }
 
       <button
         nz-button
         nzType="primary"
         nzSize="large"
+        class="wz-bar__next"
         [disabled]="!canContinue()"
-        (click)="continueToReview()"
-        class="nav-btn continue-btn">
-        Continuă cu verificarea
-        <span nz-icon nzType="arrow-right"></span>
+        (click)="continueToReview()">
+        <span>Continuă cu verificarea</span>
+        <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
       </button>
     </div>
-
-    @if (!canContinue()) {
-      <div class="requirement-note">
-        <p>Selectează cel puțin {{ MIN_AUTHORITIES }} autoritate pentru a continua</p>
-      </div>
-    }
   </div>
-
 </div>

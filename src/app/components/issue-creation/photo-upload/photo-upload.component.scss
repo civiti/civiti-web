@@ -1,426 +1,232 @@
-:host {
-  display: flex;
-  flex-direction: column;
-}
+@use '../wizard';
 
-.visually-hidden {
-  display: none;
-}
+@include wizard.frame;
+@include wizard.context;
+@include wizard.sections;
 
-.photo-upload-container {
-  flex: 1;
-  background: var(--platinum);
-  padding: 1.5rem;
-}
+// --- Drop zone ---
 
-.page-header {
-  text-align: center;
-  margin-bottom: 2rem;
-  max-width: 800px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.page-title {
-  font-size: 2.5rem;
-  font-weight: 700;
-  color: var(--oxford-blue);
-  margin-bottom: 0.5rem;
-}
-
-.page-subtitle {
-  font-size: 1.2rem;
-  color: #666;
-  margin-bottom: 0;
-  line-height: 1.4;
-}
-
-.progress-indicator {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 2rem;
-  max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-.progress-step {
+.drop {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-}
-
-.step-number {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: var(--platinum);
-  color: #666;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 1.1rem;
-  transition: all 0.3s ease;
-}
-
-.progress-step.active .step-number {
-  background: var(--orange-web);
-  color: var(--white);
-}
-
-.progress-step.completed .step-number {
-  background: #28A745;
-  color: var(--white);
-}
-
-.step-label {
-  font-size: 0.9rem;
-  color: #666;
-  font-weight: 500;
-}
-
-.progress-step.active .step-label,
-.progress-step.completed .step-label {
-  color: var(--oxford-blue);
-  font-weight: 600;
-}
-
-.progress-line {
-  flex: 1;
-  height: 2px;
-  background: var(--platinum);
-  margin: 0 1rem;
-}
-
-.category-info {
-  max-width: 800px;
-  margin: 0 auto 2rem auto;
-}
-
-.category-card {
-  border-radius: 8px;
-}
-
-.category-summary {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.category-icon {
-  font-size: 2rem;
-}
-
-.category-details {
-  h3 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--oxford-blue);
-    margin: 0 0 0.25rem 0;
-  }
-
-  p {
-    color: #666;
-    margin: 0;
-  }
-}
-
-.upload-section {
-  max-width: 800px;
-  margin: 0 auto 2rem auto;
-}
-
-.upload-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(20, 33, 61, 0.1);
-}
-
-.mock-upload-area {
-  border: 2px dashed var(--platinum);
-  border-radius: 12px;
-  padding: 3rem 2rem;
+  gap: var(--space-4);
+  width: 100%;
+  padding: var(--space-12) var(--space-6);
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: var(--ink-900);
+  font: inherit;
   text-align: center;
   cursor: pointer;
-  transition: all 0.3s ease;
-  background: #fafafa;
-
-  &:hover {
-    border-color: var(--orange-web);
-    background: rgba(252, 163, 17, 0.05);
-  }
-}
-
-.upload-icon {
-  font-size: 3rem;
-  color: var(--orange-web);
-  margin-bottom: 1rem;
-}
-
-.upload-text {
-  h4 {
-    font-size: 1.3rem;
-    font-weight: 600;
-    color: var(--oxford-blue);
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    color: #666;
-    margin-bottom: 0.5rem;
-  }
-}
-
-.upload-note {
-  font-size: 0.9rem;
-}
-
-// Use higher specificity to override default p styles
-p.upload-note {
-  color: #999;
-}
-
-.photo-grid {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid #f0f0f0;
-}
-
-.photo-count {
-  margin-bottom: 1rem;
-  text-align: center;
-
-  span {
-    background: var(--orange-web);
-    color: var(--white);
-    padding: 0.5rem 1rem;
-    border-radius: 20px;
-    font-weight: 600;
-    font-size: 0.9rem;
-  }
-}
-
-.photo-preview {
-  position: relative;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.15);
-
-    .photo-overlay {
-      opacity: 1;
-    }
-  }
-
-  // Primary photo styling
-  &.is-primary {
-    border: 2px solid var(--orange-web);
-    box-shadow: 0 2px 12px rgba(252, 163, 17, 0.3);
-
-    &:hover {
-      box-shadow: 0 8px 24px rgba(252, 163, 17, 0.4);
-    }
-  }
-}
-
-.primary-badge {
-  position: absolute;
-  top: 8px;
-  left: 8px;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  background: var(--orange-web);
-  color: var(--white);
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-
-  span[nz-icon] {
-    font-size: 0.875rem;
-  }
-}
-
-.photo-gallery-item {
-  display: block;
-  text-decoration: none;
-}
-
-.photo-image {
-  width: 100%;
-  height: 120px;
-  object-fit: cover;
-  display: block;
-}
-
-.photo-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.photo-actions {
-  display: flex;
-  gap: 0.5rem;
-}
-
-.navigation-section {
-  max-width: 800px;
-  margin: 0 auto;
-  padding-top: 2rem;
-  border-top: 1px solid #e0e0e0;
-}
-
-.nav-buttons {
-  display: flex;
-  align-items: center;
-  margin-bottom: 1rem;
-}
-
-.nav-spacer {
-  flex: 1;
-}
-
-.nav-btn {
-  font-weight: 600;
-  height: 40px;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-}
-
-// Use ::ng-deep with higher specificity to override NG-ZORRO button styles
-:host ::ng-deep button.continue-btn.ant-btn {
-  background: var(--orange-web);
-  border-color: var(--orange-web);
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+  transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
 
   &:hover:not(:disabled) {
-    background: #e8930f;
-    border-color: #e8930f;
+    border-color: var(--ink-400);
+    background: var(--paper);
   }
 
   &:disabled {
-    background: #ccc;
-    border-color: #ccc;
+    cursor: progress;
+  }
+
+  &__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    border-radius: var(--radius-lg);
+    background: var(--signal-50);
+    color: var(--signal-text);
+    font-size: 26px;
+  }
+
+  &__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+  }
+
+  &__title {
+    font-size: var(--text-lg);
+    font-weight: 650;
+  }
+
+  &__sub {
+    color: var(--ink-600);
+    font-size: var(--text-sm);
+  }
+
+  &__note {
+    color: var(--ink-500);
+    font-size: var(--text-xs);
+  }
+
+  // Once photos exist the zone steps back to a single row.
+  &.is-compact {
+    flex-direction: row;
+    padding: var(--space-4) var(--space-5);
+    text-align: left;
+
+    .drop__icon {
+      width: 44px;
+      height: 44px;
+      font-size: 20px;
+    }
+
+    .drop__title {
+      font-size: var(--text-base);
+    }
   }
 }
 
-.requirement-note {
-  text-align: center;
+// --- Thumbnails ---
+
+.photos-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-1) var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.photos-count {
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+}
+
+.thumbs {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.thumb {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+
+  &.is-primary {
+    border-color: var(--ink-900);
+    box-shadow: inset 0 0 0 1px var(--ink-900);
+  }
+
+  &__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 4 / 3;
+    background: var(--paper-2);
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__badge {
+    position: absolute;
+    top: var(--space-2);
+    left: var(--space-2);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    height: 24px;
+    padding: 0 var(--space-2);
+    border-radius: var(--radius-pill);
+    background: var(--ink-900);
+    color: var(--surface);
+    font-size: var(--text-xs);
+    font-weight: 650;
+
+    .anticon {
+      color: var(--signal-500);
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 2px;
+    padding: var(--space-1);
+    border-top: 1px solid var(--line);
+  }
+
+  &__btn {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: none;
+    color: var(--ink-600);
+    font-size: 17px;
+    cursor: pointer;
+    transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+
+    &:first-child {
+      margin-right: auto;
+    }
+
+    &:hover {
+      background: var(--paper-2);
+      color: var(--ink-900);
+    }
+
+    &.is-on {
+      color: var(--signal-text);
+    }
+
+    &--bad:hover {
+      background: var(--bad-wash);
+      color: var(--bad-text);
+    }
+  }
+}
+
+// --- Tips ---
+
+.tips {
+  margin-top: var(--space-8);
+
+  > .anticon {
+    align-self: flex-start;
+  }
 
   p {
-    color: #666;
-    font-size: 0.95rem;
+    margin: 0 0 var(--space-1);
+    color: var(--ink-900);
+    font-weight: 650;
+  }
+
+  ul {
     margin: 0;
+    padding-left: 1.1em;
+    list-style: disc;
   }
 }
 
-// Mobile responsiveness
-@media (max-width: 768px) {
-  .photo-upload-container {
-    padding: 1rem;
+@media (max-width: 639px) {
+  .drop {
+    padding: var(--space-8) var(--space-5);
   }
 
-  .page-title {
-    font-size: 2rem;
+  .thumbs {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
-  .page-header {
-    text-align: left;
-  }
-
-  .step-number {
-    width: 32px;
-    height: 32px;
-    font-size: 0.95rem;
-  }
-
-  .step-label {
-    font-size: 0.75rem;
-  }
-
-  .progress-line {
-    margin: 0 0.5rem;
-  }
-
-  .mock-upload-area {
-    padding: 2rem 1rem;
-  }
-
-  .upload-icon {
-    font-size: 2.5rem;
-  }
-
-  .upload-text h4 {
-    font-size: 1.2rem;
-  }
-
-  .photo-image {
-    height: 100px;
-  }
-}
-
-@media (max-width: 576px) {
-  .photo-upload-container {
-    padding: 0.75rem;
-  }
-
-  .step-label {
-    display: none;
-  }
-
-  .step-number {
-    width: 28px;
-    height: 28px;
-    font-size: 0.85rem;
-  }
-
-  .progress-line {
-    margin: 0 0.25rem;
-  }
-
-  .page-title {
-    font-size: 1.5rem;
-  }
-
-  .page-subtitle {
-    font-size: 0.9rem;
-  }
-
-  .page-header {
-    margin-bottom: 1rem;
-  }
-
-  .nav-buttons {
-    flex-direction: column-reverse;
-    gap: 0.75rem;
-  }
-
-  .nav-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .nav-spacer {
-    display: none;
+  .thumb__btn {
+    width: 42px;
+    height: 42px;
   }
 }

@@ -1,0 +1,251 @@
+// Shared frame for the five "report a problem" steps. Each step's stylesheet
+// `@use`s this file and includes only the mixins it renders, so the rules
+// compile into (and are scoped to) that step without paying for unused parts.
+//
+//   @use '../wizard';
+//   @include wizard.frame;     // progress header, content column, sticky action bar
+//   @include wizard.context;   // "the case so far" strip
+//   @include wizard.sections;  // stacked sections with a small heading block
+
+@mixin frame {
+  :host {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .wz {
+    --wz-w: 720px;
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+
+    &--wide {
+      --wz-w: 920px;
+    }
+  }
+
+  .wz-main,
+  .wz-bar__inner {
+    width: 100%;
+    max-width: calc(var(--wz-w) + 2 * var(--gutter));
+    margin-inline: auto;
+    box-sizing: border-box;
+  }
+
+  .wz-main {
+    flex: 1 0 auto;
+    padding: var(--space-6) var(--gutter) var(--space-12);
+  }
+
+  // Progress: "Pasul n din 5", then five bars (done = ink, current = signal).
+  .wz-count {
+    margin: 0 0 var(--space-2);
+    color: var(--ink-600);
+    font-size: var(--text-sm);
+    font-weight: 650;
+  }
+
+  .wz-count__now {
+    color: var(--ink-900);
+  }
+
+  .wz-steps {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    margin: 0 0 var(--space-6);
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-2);
+      color: var(--ink-500);
+      font-size: var(--text-xs);
+      font-weight: 600;
+
+      &::before {
+        content: '';
+        height: 4px;
+        border-radius: var(--radius-pill);
+        background: var(--line-strong);
+      }
+    }
+
+    .is-done {
+      color: var(--ink-700);
+
+      &::before { background: var(--ink-900); }
+    }
+
+    .is-current {
+      color: var(--ink-900);
+      font-weight: 700;
+
+      &::before { background: var(--signal-500); }
+    }
+
+    .anticon {
+      margin-right: 4px;
+      font-size: 11px;
+    }
+  }
+
+  .wz-head {
+    margin-bottom: var(--space-8);
+
+    h1 {
+      margin: 0;
+    }
+  }
+
+  .wz-lead {
+    margin: var(--space-2) 0 0;
+    color: var(--ink-600);
+    font-size: var(--text-lg);
+  }
+
+  // Sticky action bar: Back (outline) and the one signal button.
+  .wz-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 20;
+    border-top: 1px solid var(--line);
+    background: var(--surface);
+  }
+
+  .wz-bar__inner {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: var(--space-3) var(--gutter) max(var(--space-3), env(safe-area-inset-bottom));
+  }
+
+  .wz-bar__hint {
+    flex: 1;
+    margin: 0;
+    color: var(--ink-500);
+    font-size: var(--text-sm);
+    text-align: right;
+  }
+
+  .wz-bar__spacer {
+    flex: 1;
+  }
+
+  @media (max-width: 639px) {
+    // Bars only; the current step's name moves up into the count line.
+    .wz-steps__label {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+    }
+
+    .wz-head {
+      margin-bottom: var(--space-6);
+    }
+
+    .wz-lead {
+      font-size: var(--text-base);
+    }
+
+    .wz-bar__inner {
+      flex-wrap: wrap;
+      gap: var(--space-2);
+    }
+
+    .wz-bar__hint {
+      order: -1;
+      flex-basis: 100%;
+      font-size: var(--text-xs);
+      text-align: center;
+    }
+
+    .wz-bar__spacer {
+      display: none;
+    }
+
+    // Back collapses to its arrow so Continue keeps one full row; the label
+    // stays for screen readers.
+    .wz-bar__back.ant-btn {
+      flex: none;
+      width: 52px;
+      padding: 0;
+
+      > span:not(.anticon) {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+        white-space: nowrap;
+      }
+    }
+
+    .wz-bar__next {
+      flex: 1;
+      min-width: 0;
+    }
+  }
+
+  @media (min-width: 640px) {
+    .wz-count__now {
+      display: none;
+    }
+  }
+}
+
+@mixin context {
+  .wz-context {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2) var(--space-5);
+    width: fit-content;
+    max-width: 100%;
+    box-sizing: border-box;
+    margin: 0 0 var(--space-6);
+    padding: var(--space-3) var(--space-4);
+    border-radius: var(--radius-md);
+    background: var(--paper-2);
+    list-style: none;
+
+    li {
+      display: flex;
+      align-items: flex-start;
+      gap: var(--space-2);
+      min-width: 0;
+      color: var(--ink-700);
+      font-size: var(--text-sm);
+      font-weight: 600;
+    }
+
+    .anticon {
+      margin-top: 3px;
+      color: var(--ink-500);
+    }
+  }
+}
+
+@mixin sections {
+  .wz-section + .wz-section {
+    margin-top: var(--space-8);
+  }
+
+  .wz-section__head {
+    margin-bottom: var(--space-4);
+
+    h2 {
+      margin: 0;
+    }
+
+    p {
+      margin: var(--space-1) 0 0;
+      color: var(--ink-500);
+      font-size: var(--text-sm);
+    }
+  }
+}

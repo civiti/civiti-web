@@ -3,10 +3,8 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 
 import { CategoryInfo } from '../../../services/category.service';
 import { DEFAULT_CITY } from '../../../data/romanian-locations';
@@ -27,10 +25,8 @@ interface LocationData {
   imports: [
     CommonModule,
     RouterModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
-    NzTagModule,
     AuthorityPickerComponent,
   ],
   templateUrl: './authority-selection.component.html',

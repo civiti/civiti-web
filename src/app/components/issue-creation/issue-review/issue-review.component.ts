@@ -5,15 +5,9 @@ import { Store } from '@ngrx/store';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzResultModule } from 'ng-zorro-antd/result';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { AppState } from '../../../store/app.state';
@@ -48,15 +42,9 @@ const APP_NUDGE_KEY = 'app_nudge_post_submit';
   imports: [
     CommonModule,
     RouterModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
-    NzSpinModule,
-    NzTypographyModule,
-    NzTagModule,
-    NzResultModule,
-    NzGridModule,
-    NzBadgeModule
+    NzSpinModule
   ],
   templateUrl: './issue-review.component.html',
   styleUrls: ['./issue-review.component.scss']

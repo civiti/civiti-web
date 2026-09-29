@@ -6,17 +6,11 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 
 import { AppState } from '../../../store/app.state';
@@ -33,17 +27,11 @@ import { generateIssueTitle } from '../issue-title.util';
     CommonModule,
     FormsModule,
     RouterModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
-    NzGridModule,
-    NzSpinModule,
-    NzTypographyModule,
     NzAlertModule,
-    NzTagModule,
     NzModalModule,
     NzInputModule,
-    NzSelectModule,
     NzToolTipModule
   ],
   templateUrl: './issue-type-selection.component.html',
@@ -210,7 +198,7 @@ export class IssueTypeSelectionComponent implements OnInit {
     console.log('[TIP PROBLEMĂ] Schimbare locație solicitată');
 
     const modalRef = this.modalService.create({
-      nzTitle: 'Selectează Locația',
+      nzTitle: 'Selectează locația',
       nzContent: LocationPickerModalComponent,
       nzWidth: window.innerWidth < 576 ? '95vw' : 700,
       nzMaskClosable: false,

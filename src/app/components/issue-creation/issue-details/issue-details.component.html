@@ -1,152 +1,142 @@
-<div class="issue-details-container">
+<div class="wz">
+  <div class="wz-main">
 
-  <!-- Header -->
-  <div class="page-header">
-    <h1 class="page-title">Detalii problemă</h1>
-    <p class="page-subtitle">Descrie problema, soluția dorită și impactul asupra comunității</p>
-  </div>
+    <nav class="wz-progress" aria-label="Pașii raportării">
+      <p class="wz-count">Pasul 3 din 5<span class="wz-count__now"> · Detalii</span></p>
+      <ol class="wz-steps">
+        <li class="is-done"><span class="wz-steps__label"><span nz-icon nzType="check" nzTheme="outline"></span>Tip problemă<span class="c-sr-only"> (finalizat)</span></span></li>
+        <li class="is-done"><span class="wz-steps__label"><span nz-icon nzType="check" nzTheme="outline"></span>Fotografii<span class="c-sr-only"> (finalizat)</span></span></li>
+        <li class="is-current" aria-current="step"><span class="wz-steps__label">Detalii</span></li>
+        <li><span class="wz-steps__label">Autorități</span></li>
+        <li><span class="wz-steps__label">Verificare</span></li>
+      </ol>
+    </nav>
 
-  <!-- Progress Indicator -->
-  <div class="progress-indicator">
-    <div class="progress-step completed">
-      <div class="step-number">✓</div>
-      <div class="step-label">Tip problemă</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step completed">
-      <div class="step-number">✓</div>
-      <div class="step-label">Fotografii</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step active">
-      <div class="step-number">3</div>
-      <div class="step-label">Detalii</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step">
-      <div class="step-number">4</div>
-      <div class="step-label">Autorități</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step">
-      <div class="step-number">5</div>
-      <div class="step-label">Verificare</div>
-    </div>
-  </div>
+    <header class="wz-head">
+      <h1 class="c-h2">Detalii problemă</h1>
+      <p class="wz-lead">Descrie problema, soluția dorită și impactul asupra comunității</p>
+    </header>
 
-  <!-- Summary of Previous Steps -->
-  <div class="summary-section">
-    <nz-card nzTitle="Rezumat problemă" class="summary-card">
-      <div class="summary-content">
+    <!-- Summary of previous steps -->
+    <ul class="wz-context" aria-label="Rezumat problemă">
+      @if (selectedCategory) {
+        <li>
+          <span nz-icon [nzType]="selectedCategory.icon" nzTheme="outline"></span>
+          <span><span class="c-sr-only">Categorie: </span>{{ selectedCategory.name }}</span>
+        </li>
+      }
+      @if (uploadedPhotos.length > 0) {
+        <li>
+          <span nz-icon nzType="picture" nzTheme="outline"></span>
+          <span>{{ uploadedPhotos.length }} fotografii încărcate</span>
+        </li>
+      }
+      @if (currentLocation) {
+        <li>
+          <span nz-icon nzType="environment" nzTheme="outline"></span>
+          <span><span class="c-sr-only">Locație: </span>{{ currentLocation.address }}</span>
+        </li>
+      }
+    </ul>
 
-        @if (selectedCategory) {
-          <div class="summary-item">
-            <div class="summary-label">Categorie</div>
-            <div class="summary-value">
-              <span nz-icon [nzType]="selectedCategory.icon" nzTheme="outline" class="category-icon"></span>
-              {{ selectedCategory.name }}
-            </div>
-          </div>
-        }
+    <nz-spin [nzSpinning]="isEnhancingAI" nzTip="Se îmbunătățește textul...">
+      <form nz-form nzLayout="vertical" [formGroup]="detailsForm" class="details-form">
 
-        @if (uploadedPhotos.length > 0) {
-          <div class="summary-item">
-            <div class="summary-label">Fotografii</div>
-            <div class="summary-value">
-              <nz-tag nzColor="blue">{{ uploadedPhotos.length }} fotografii încărcate</nz-tag>
-            </div>
-          </div>
-        }
+        <!-- Description -->
+        <section class="c-card c-card--pad form-card" aria-labelledby="desc-title">
+          <h2 class="c-h3 form-card__title" id="desc-title">Descriere</h2>
 
-        @if (currentLocation) {
-          <div class="summary-item">
-            <div class="summary-label">Locație</div>
-            <div class="summary-value">{{ currentLocation.address }}</div>
-          </div>
-        }
-
-      </div>
-    </nz-card>
-  </div>
-
-  <!-- Details Form -->
-  <nz-spin [nzSpinning]="isEnhancingAI">
-    <div class="details-form-section">
-      <nz-card nzTitle="Detalii problemă" class="details-card">
-
-        <form nz-form [formGroup]="detailsForm">
-
-          <!-- Description -->
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzFor="description" nzRequired>
-              Descrierea problemei
-            </nz-form-label>
-            <nz-form-control [nzSpan]="24" nzErrorTip="Te rugăm să descrii problema (minim 10 caractere)">
+            <nz-form-label nzFor="description" nzRequired>Descrierea problemei</nz-form-label>
+            <nz-form-control nzErrorTip="Te rugăm să descrii problema (minim 10 caractere)">
               <textarea
                 nz-input
                 formControlName="description"
                 id="description"
-                rows="4"
+                rows="5"
+                [nzAutosize]="{ minRows: 5, maxRows: 14 }"
                 placeholder="Descrie în detaliu problema observată: ce vezi, unde se află exact, de cât timp există..."
-                maxlength="2000">
-              </textarea>
-              <div class="char-count">{{ detailsForm.get('description')?.value?.length || 0 }}/2000</div>
+                maxlength="2000"></textarea>
+              <div class="char-count" aria-live="polite">{{ detailsForm.get('description')?.value?.length || 0 }}/2000</div>
             </nz-form-control>
           </nz-form-item>
 
-          <!-- Desired Outcome -->
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzFor="desiredOutcome" nzRequired>
-              Rezultatul dorit
-            </nz-form-label>
-            <nz-form-control [nzSpan]="24" nzErrorTip="Te rugăm să descrii soluția dorită (minim 10 caractere)">
+            <nz-form-label nzFor="desiredOutcome" nzRequired>Rezultatul dorit</nz-form-label>
+            <nz-form-control nzErrorTip="Te rugăm să descrii soluția dorită (minim 10 caractere)">
               <textarea
                 nz-input
                 formControlName="desiredOutcome"
                 id="desiredOutcome"
                 rows="3"
+                [nzAutosize]="{ minRows: 3, maxRows: 10 }"
                 placeholder="Ce soluție propui? Ce acțiuni ar trebui să întreprindă autoritățile pentru a rezolva această problemă?"
-                maxlength="1000">
-              </textarea>
+                maxlength="1000"></textarea>
               <div class="char-count">{{ detailsForm.get('desiredOutcome')?.value?.length || 0 }}/1000</div>
             </nz-form-control>
           </nz-form-item>
 
-          <!-- Community Impact -->
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzFor="communityImpact" nzRequired>
-              Impactul asupra comunității
-            </nz-form-label>
-            <nz-form-control [nzSpan]="24" nzErrorTip="Te rugăm să descrii impactul asupra comunității (minim 10 caractere)">
+            <nz-form-label nzFor="communityImpact" nzRequired>Impactul asupra comunității</nz-form-label>
+            <nz-form-control nzErrorTip="Te rugăm să descrii impactul asupra comunității (minim 10 caractere)">
               <textarea
                 nz-input
                 formControlName="communityImpact"
                 id="communityImpact"
                 rows="3"
+                [nzAutosize]="{ minRows: 3, maxRows: 10 }"
                 placeholder="Cum afectează această problemă comunitatea? Câți oameni sunt afectați? Ce beneficii ar aduce rezolvarea ei?"
-                maxlength="1000">
-              </textarea>
+                maxlength="1000"></textarea>
               <div class="char-count">{{ detailsForm.get('communityImpact')?.value?.length || 0 }}/1000</div>
             </nz-form-control>
           </nz-form-item>
 
-          <!-- Urgency Level -->
+          <!-- AI enhancement -->
+          <div class="ai" [class.is-done]="isAIEnhanced">
+            <span class="ai__icon" aria-hidden="true">
+              <span nz-icon [nzType]="isAIEnhanced ? 'check' : 'robot'" nzTheme="outline"></span>
+            </span>
+            <div class="ai__text">
+              @if (isAIEnhanced) {
+                <p class="ai__title" role="status">Text îmbunătățit cu AI</p>
+              }
+              <p class="ai__help">Opțional: Lasă AI-ul să îmbunătățească textul introdus</p>
+            </div>
+            <button
+              nz-button
+              nzType="default"
+              type="button"
+              class="ai__btn"
+              [disabled]="!detailsForm.valid || isEnhancingAI || isAIEnhanced"
+              (click)="enhanceWithAI()">
+              <span nz-icon [nzType]="isEnhancingAI ? 'loading' : 'robot'" nzTheme="outline"></span>
+              <span>{{ isEnhancingAI ? 'Se îmbunătățește...' : 'Îmbunătățește cu AI' }}</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- Urgency + timing -->
+        <section class="c-card c-card--pad form-card" aria-labelledby="ctx-title">
+          <h2 class="c-h3 form-card__title" id="ctx-title">Urgență și moment</h2>
+
           <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzFor="urgency">Nivel de urgență</nz-form-label>
-            <nz-form-control [nzSpan]="24">
-              <nz-select formControlName="urgency" id="urgency" nzPlaceHolder="Cât de urgentă este această problemă?">
+            <nz-form-label id="urgency-label">Nivel de urgență</nz-form-label>
+            <nz-form-control>
+              <nz-radio-group formControlName="urgency" class="urgency" aria-labelledby="urgency-label">
                 @for (opt of urgencyOptions; track opt.value) {
-                  <nz-option [nzValue]="opt.value" [nzLabel]="opt.label + ' - ' + opt.description"></nz-option>
+                  <label nz-radio [nzValue]="opt.value" class="urgency__opt" [attr.data-level]="opt.value">
+                    <span class="urgency__label">{{ opt.label }}</span>
+                    <span class="urgency__desc">{{ opt.description }}</span>
+                  </label>
                 }
-              </nz-select>
+              </nz-radio-group>
             </nz-form-control>
           </nz-form-item>
 
-          <!-- When Did This Happen -->
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzFor="whenOccurred">Când ai observat problema?</nz-form-label>
-            <nz-form-control [nzSpan]="24">
-              <nz-select formControlName="whenOccurred" id="whenOccurred">
+          <nz-form-item class="when">
+            <nz-form-label nzFor="whenOccurred">Când ai observat problema?</nz-form-label>
+            <nz-form-control>
+              <nz-select formControlName="whenOccurred" nzId="whenOccurred">
                 <nz-option nzValue="now" nzLabel="Chiar acum"></nz-option>
                 <nz-option nzValue="today" nzLabel="Mai devreme astăzi"></nz-option>
                 <nz-option nzValue="yesterday" nzLabel="Ieri"></nz-option>
@@ -155,67 +145,35 @@
               </nz-select>
             </nz-form-control>
           </nz-form-item>
+        </section>
+      </form>
+    </nz-spin>
+  </div>
 
-          <!-- AI Enhancement Button -->
-          <div class="ai-section">
-            <div class="ai-button-wrapper">
-              <button
-                nz-button
-                nzType="default"
-                type="button"
-                [disabled]="!detailsForm.valid || isEnhancingAI || isAIEnhanced"
-                (click)="enhanceWithAI()"
-                class="enhance-btn">
-                @if (!isEnhancingAI) {
-                  <span nz-icon nzType="robot"></span>
-                }
-                @if (isEnhancingAI) {
-                  <span nz-icon nzType="loading"></span>
-                }
-                {{ isEnhancingAI ? 'Se îmbunătățește...' : 'Îmbunătățește cu AI' }}
-              </button>
-              <p class="ai-helper-text">Opțional: Lasă AI-ul să îmbunătățească textul introdus</p>
-            </div>
-            @if (isAIEnhanced) {
-              <div class="ai-success">
-                <span nz-icon nzType="check-circle" nzTheme="fill" class="ai-check"></span>
-                <span>Text îmbunătățit cu AI</span>
-              </div>
-            }
-          </div>
+  <!-- Action bar -->
+  <div class="wz-bar">
+    <div class="wz-bar__inner">
+      <button nz-button nzType="default" nzSize="large" class="wz-bar__back" routerLink="/create-issue/photo">
+        <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
+        <span>Înapoi</span>
+      </button>
 
-        </form>
+      @if (!detailsForm.valid) {
+        <p class="wz-bar__hint">Completează cele trei descrieri (minim 10 caractere fiecare)</p>
+      } @else {
+        <span class="wz-bar__spacer"></span>
+      }
 
-      </nz-card>
+      <button
+        nz-button
+        nzType="primary"
+        nzSize="large"
+        class="wz-bar__next"
+        [disabled]="!detailsForm.valid || isEnhancingAI"
+        (click)="continueToReview()">
+        <span>Selectează autorități</span>
+        <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
+      </button>
     </div>
-
-    <!-- Navigation -->
-    <div class="navigation-section">
-      <div class="nav-buttons">
-        <button
-          nz-button
-          nzType="default"
-          nzSize="large"
-          routerLink="/create-issue/photo"
-          class="nav-btn">
-          <span nz-icon nzType="arrow-left"></span>
-          Înapoi
-        </button>
-
-        <div class="nav-spacer"></div>
-
-        <button
-          nz-button
-          nzType="primary"
-          nzSize="large"
-          [disabled]="!detailsForm.valid || isEnhancingAI"
-          (click)="continueToReview()"
-          class="nav-btn continue-btn">
-          Selectează autorități
-          <span nz-icon nzType="arrow-right"></span>
-        </button>
-      </div>
-    </div>
-  </nz-spin>
-
+  </div>
 </div>
