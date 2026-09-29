@@ -11,21 +11,48 @@ import { isOwnerEditableStatus } from '../components/issue-creation/issue-field.
   pure: true
 })
 export class StatusTextPipe implements PipeTransform {
-  // Maps to backend IssueStatus enum values
+  // Maps to backend IssueStatus enum values. Sentence case: a surface that wants
+  // capitals sets text-transform, which screen readers do not spell out.
   private static readonly STATUS_MAP: Record<string, string> = {
-    'unspecified': 'NESPECIFICAT',
-    'draft': 'CIORNĂ',
-    'submitted': 'TRIMISĂ',
-    'underreview': 'ÎN REVIZUIRE',
-    'active': 'ACTIVĂ',
-    'resolved': 'REZOLVATĂ',
-    'rejected': 'RESPINSĂ',
-    'cancelled': 'ANULATĂ'
+    'unspecified': 'Nespecificată',
+    'draft': 'Ciornă',
+    'submitted': 'Trimisă',
+    'underreview': 'În evaluare',
+    'active': 'Activă',
+    'resolved': 'Rezolvată',
+    'rejected': 'Respinsă',
+    'cancelled': 'Anulată'
   };
 
   transform(status: string | null | undefined): string {
-    if (!status) return 'NECUNOSCUTĂ';
-    return StatusTextPipe.STATUS_MAP[status.toLowerCase()] || 'NECUNOSCUTĂ';
+    if (!status) return 'Necunoscută';
+    return StatusTextPipe.STATUS_MAP[status.toLowerCase()] || 'Necunoscută';
+  }
+}
+
+/** Visual tone of a status, for the `.c-status` pill: `[attr.data-tone]="s | statusTone"`. */
+export type StatusTone = 'active' | 'resolved' | 'pending' | 'rejected' | 'neutral';
+
+@Pipe({
+  name: 'statusTone',
+  standalone: true,
+  pure: true
+})
+export class StatusTonePipe implements PipeTransform {
+  transform(status: string | null | undefined): StatusTone {
+    switch ((status || '').toLowerCase()) {
+      case 'active':
+        return 'active';
+      case 'resolved':
+        return 'resolved';
+      case 'submitted':
+      case 'underreview':
+        return 'pending';
+      case 'rejected':
+        return 'rejected';
+      default:
+        return 'neutral';
+    }
   }
 }
 

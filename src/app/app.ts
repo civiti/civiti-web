@@ -22,6 +22,7 @@ interface RouteConfig {
   selector: 'app-root',
   imports: [RouterOutlet, HeaderComponent, FooterComponent],
   template: `
+    <a class="skip-link" href="#continut">Sari la conținut</a>
     @if (!routeConfig.hideHeader) {
       <app-header
         [title]="routeConfig.title"
@@ -29,7 +30,7 @@ interface RouteConfig {
         [backUrl]="routeConfig.backUrl"
         [subtitle]="routeConfig.subtitle" />
     }
-    <main>
+    <main id="continut" tabindex="-1">
       <router-outlet />
     </main>
     @if (routeConfig.showFooter) {

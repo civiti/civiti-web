@@ -12,7 +12,6 @@ export const routes: Routes = [
     loadComponent: () => import('./components/home/home.component').then(m => m.HomeComponent),
     data: {
       animation: 'HomePage',
-      hideHeader: true,
       showFooter: true,
       seo: {
         title: 'Sesizări către primărie, online și gratuit',
@@ -230,7 +229,6 @@ export const routes: Routes = [
     loadComponent: () => import('./components/legal/privacy-policy/privacy-policy.component').then(m => m.PrivacyPolicyComponent),
     data: {
       animation: 'PrivacyPage',
-      hideHeader: true,
       showFooter: true,
       seo: {
         title: 'Politica de Confidențialitate',
@@ -243,7 +241,6 @@ export const routes: Routes = [
     loadComponent: () => import('./components/legal/terms/terms.component').then(m => m.TermsComponent),
     data: {
       animation: 'TermsPage',
-      hideHeader: true,
       showFooter: true,
       seo: {
         title: 'Termeni și Condiții',

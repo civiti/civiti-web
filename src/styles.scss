@@ -1,75 +1,247 @@
-// Civica Theme Implementation
-// Based on Implementation.md and Colour-Scheme.md specifications
+// ==========================================================================
+// Civiti design system — global layer
+//
+// Everything a component can lean on lives here: fonts, tokens, base
+// typography, the `c-` primitives and the NG-ZORRO re-skin. Component SCSS
+// should only carry layout for its own template; if two screens need the same
+// visual, it belongs here. The full reference is docs/design/DESIGN.md.
+//
+// Layers, in order:
+//   1. Fonts           — self-hosted, latin + latin-ext (ș ț ă â î)
+//   2. Tokens          — colour, type, space, radius, elevation, motion
+//   3. Legacy aliases  — the pre-redesign token names, mapped onto the new ones
+//   4. Base            — html/body, headings, links, focus, selection
+//   5. Primitives      — c-container, c-btn, c-chip, c-status, c-card, …
+//   6. NG-ZORRO        — the component library, re-skinned to match
+//   7. Third party     — GLightbox
+// ==========================================================================
 
 @use 'tailwindcss';
-
-// Import GLightbox styles
 @use 'glightbox/dist/css/glightbox.min.css';
 
-// NG-ZORRO theme is loaded separately in angular.json
-// Custom overrides are applied below
+// --------------------------------------------------------------------------
+// 1. Fonts
+//
+// Self-hosted rather than pulled from Google Fonts: one fewer origin on the
+// critical path, no layout shift from a late stylesheet, and no visitor IP
+// handed to a third party before the consent banner has even rendered.
+// Both are variable fonts, so one file per subset covers every weight.
+// --------------------------------------------------------------------------
 
-// Define Civica CSS Variables (from Colour-Scheme.md)
+$latin: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+$latin-ext: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-latin.woff2') format('woff2');
+  unicode-range: $latin;
+}
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url('/fonts/bricolage-grotesque-latin-ext.woff2') format('woff2');
+  unicode-range: $latin-ext;
+}
+
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/public-sans-latin.woff2') format('woff2');
+  unicode-range: $latin;
+}
+
+@font-face {
+  font-family: 'Public Sans';
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/public-sans-latin-ext.woff2') format('woff2');
+  unicode-range: $latin-ext;
+}
+
+@font-face {
+  font-family: 'Public Sans';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/public-sans-italic-latin.woff2') format('woff2');
+  unicode-range: $latin;
+}
+
+@font-face {
+  font-family: 'Public Sans';
+  font-style: italic;
+  font-weight: 100 900;
+  font-display: swap;
+  src: url('/fonts/public-sans-italic-latin-ext.woff2') format('woff2');
+  unicode-range: $latin-ext;
+}
+
+// --------------------------------------------------------------------------
+// 2. Tokens
+// --------------------------------------------------------------------------
+
 :root {
-  /* Primary Colors - HEX */
+  /* Ink — the brand navy and its scale. Text, structure, dark surfaces.
+     On --surface: 900 is 15.97:1, 600 is 7.08:1, 500 is 5.64:1 (all AA body).
+     400 is 3.00:1 — placeholders, disabled text and large type only. */
+  --ink-950: #0A1428;
+  --ink-900: #14213D;
+  --ink-800: #22314F;
+  --ink-700: #36456A;
+  --ink-600: #4A587A;
+  --ink-500: #5B6785;
+  --ink-400: #8C95AB;
+  --ink-300: #B6BDCC;
+  --ink-200: #D5DAE3;
+  --ink-100: #E9ECF2;
+  --ink-50: #F3F5F8;
+
+  /* Paper — warm neutrals. The app sits on --paper; cards are --surface. */
+  --paper: #F6F4EF;
+  --paper-2: #EEEAE2;
+  --paper-3: #E4DFD4;
+  --surface: #FFFFFF;
+  --line: #E6E1D7;
+  --line-strong: #D5CEC0;
+
+  /* Signal — the brand orange. A FILL colour: under ink text it is 7.90:1.
+     Never set text in it on a light surface (2.02:1); use --signal-text. */
+  --signal-500: #FCA311;
+  --signal-600: #F29100;
+  --signal-700: #C97500;
+  --signal-text: #9E6200;
+  --signal-text-strong: #8F5900;
+  --signal-200: #FDD999;
+  --signal-100: #FEEBC8;
+  --signal-50: #FFF6E5;
+
+  /* Status. Each tone has text (AA on its wash and on white), wash and border. */
+  --ok-text: #15693F;
+  --ok-fill: #1E7A48;
+  --ok-wash: #E6F4EC;
+  --ok-line: #BFE3CD;
+  --bad-text: #B42318;
+  --bad-fill: #C4321F;
+  --bad-wash: #FDECEA;
+  --bad-line: #F6C9C4;
+  --info-text: #2446A8;
+  --info-wash: #E9EFFD;
+  --info-line: #C9D6F7;
+
+  /* Type */
+  --font-sans: 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Bricolage Grotesque', 'Public Sans', system-ui, sans-serif;
+  --font-mono: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --text-2xs: 0.6875rem;
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-md: 0.9375rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 1.875rem;
+  --text-4xl: 2.25rem;
+  --text-5xl: 3rem;
+  --text-6xl: 3.75rem;
+  --text-7xl: 4.5rem;
+
+  /* Fluid display sizes for page and hero titles */
+  --display-xl: clamp(2.5rem, 1.6rem + 3.6vw, 4.5rem);
+  --display-lg: clamp(2rem, 1.5rem + 2.2vw, 3.25rem);
+  --display-md: clamp(1.625rem, 1.3rem + 1.3vw, 2.25rem);
+
+  --tracking-tight: -0.02em;
+  --tracking-tighter: -0.028em;
+  --tracking-wide: 0.025em;
+  --tracking-wider: 0.05em;
+  --tracking-caps: 0.08em;
+
+  /* Space — a 4px grid */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.25rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+
+  /* Layout */
+  --container: 1200px;
+  --container-narrow: 760px;
+  --gutter: clamp(1rem, 0.5rem + 2.5vw, 2rem);
+  --header-h: 64px;
+
+  /* Radii */
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+  --radius-pill: 999px;
+
+  /* Elevation — hairlines do the structural work; shadows only for things
+     that float (menus, modals, the sticky header once it scrolls). */
+  --shadow-xs: 0 1px 2px rgba(20, 33, 61, 0.06);
+  --shadow-sm: 0 1px 3px rgba(20, 33, 61, 0.08), 0 1px 2px rgba(20, 33, 61, 0.04);
+  --shadow-md: 0 10px 24px -10px rgba(20, 33, 61, 0.22);
+  --shadow-lg: 0 24px 48px -16px rgba(20, 33, 61, 0.3);
+  --ring: 0 0 0 3px rgba(20, 33, 61, 0.14);
+
+  /* Motion */
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+  --dur-fast: 120ms;
+  --dur: 180ms;
+
+  // ------------------------------------------------------------------------
+  // 3. Legacy aliases
+  //
+  // Pre-redesign names, kept so every existing `var(--oxford-blue)` keeps
+  // resolving. They point at the new palette; new code uses the new names.
+  // ------------------------------------------------------------------------
   --black: #000000;
-  --oxford-blue: #14213D;
-  --orange-web: #FCA311;
-  --platinum: #E5E5E5;
+  --oxford-blue: var(--ink-900);
+  --orange-web: var(--signal-500);
+  --platinum: var(--line);
   --white: #FFFFFF;
 
-  /* Primary Colors - HSL */
-  --black-hsl: hsla(0, 0%, 0%, 1);
-  --oxford-blue-hsl: hsla(221, 51%, 16%, 1);
-  --orange-web-hsl: hsla(37, 98%, 53%, 1);
-  --platinum-hsl: hsla(0, 0%, 90%, 1);
-  --white-hsl: hsla(0, 0%, 100%, 1);
+  --color-primary: var(--ink-900);
+  --color-accent: var(--signal-500);
+  --color-background: var(--paper);
+  --color-surface: var(--surface);
+  --color-text: var(--ink-900);
+  --color-text-light: #FFFFFF;
+  --color-text-muted: var(--ink-500);
+  --color-success: #2F9E62;
+  --color-warning: var(--signal-500);
+  --color-error: var(--bad-text);
+  --color-info: var(--info-text);
+  --color-success-strong: var(--ok-fill);
+  --color-success-strong-hover: var(--ok-text);
+  --orange-web-dark: var(--signal-text);
+  --surface-muted: var(--paper);
 
-  /* Semantic Colors */
-  --color-primary: var(--oxford-blue);
-  --color-accent: var(--orange-web);
-  --color-background: var(--platinum);
-  --color-surface: var(--white);
-  --color-text: var(--oxford-blue);
-  --color-text-light: var(--white);
-  --color-text-muted: #666666;
-
-  /* State Colors */
-  --color-success: #28A745;
-  --color-warning: var(--orange-web);
-  --color-error: #DC3545;
-  --color-info: var(--oxford-blue);
-
-  /* Fill-safe success.
-     --color-success is 3.13:1 against white: fine as a border, an icon or large display
-     type, but below WCAG AA (4.5:1) for button-sized white label text sitting on it. This
-     is 5.14:1 with white on top. Use it whenever green is the *fill* behind text; keep
-     --color-success for accents. -hover is the pressed/hover step down from it. */
-  --color-success-strong: #1E7E34;
-  --color-success-strong-hover: #186429;
-
-  /* Text-safe accent.
-     --orange-web is 2.02:1 on white and 1.61:1 on --platinum: both fail WCAG AA
-     for text. This is 5.00:1 on white and 4.55:1 on --surface-muted. Use it for
-     orange *text* on a light surface; keep --orange-web for fills, borders,
-     large display type, and anything on --oxford-blue (7.90:1 there). */
-  --orange-web-dark: #9E6200;
-
-  /* Surfaces */
-  --surface-muted: #F4F4F4;
-
-  /* Opacity Variants */
   --oxford-blue-90: rgba(20, 33, 61, 0.9);
-  --oxford-blue-80: rgba(20, 33, 61, 0.8);
-  --orange-web-90: rgba(252, 163, 17, 0.9);
-  --orange-web-20: rgba(252, 163, 17, 0.2);
-
-  /* Ink on a light surface — all AA or better on --white */
   --oxford-blue-82: rgba(20, 33, 61, 0.82);
+  --oxford-blue-80: rgba(20, 33, 61, 0.8);
   --oxford-blue-68: rgba(20, 33, 61, 0.68);
   --oxford-blue-65: rgba(20, 33, 61, 0.65);
-
-  /* Ink on --oxford-blue — all AA or better */
   --white-82: rgba(255, 255, 255, 0.82);
   --white-78: rgba(255, 255, 255, 0.78);
   --white-55: rgba(255, 255, 255, 0.55);
@@ -78,371 +250,1394 @@
   --white-10: rgba(255, 255, 255, 0.1);
   --white-05: rgba(255, 255, 255, 0.05);
   --white-02: rgba(255, 255, 255, 0.02);
-
-  /* Accent washes — borders, glows and shadows, never text */
+  --orange-web-90: rgba(252, 163, 17, 0.9);
   --orange-web-60: rgba(252, 163, 17, 0.6);
   --orange-web-38: rgba(252, 163, 17, 0.38);
   --orange-web-35: rgba(252, 163, 17, 0.35);
   --orange-web-28: rgba(252, 163, 17, 0.28);
+  --orange-web-20: rgba(252, 163, 17, 0.2);
   --orange-web-10: rgba(252, 163, 17, 0.1);
   --orange-web-08: rgba(252, 163, 17, 0.08);
 
-  /* Radii */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 14px;
-  --radius-xl: 18px;
-
-  /* Elevation */
-  --shadow-card: 0 10px 28px rgba(20, 33, 61, 0.1);
-  --shadow-cta-navy: 0 10px 26px rgba(20, 33, 61, 0.25);
-  --shadow-cta-orange: 0 6px 20px var(--orange-web-28);
-  --shadow-cta-orange-hover: 0 10px 26px var(--orange-web-38);
-
-  /* Typography Scale (from Typography-Guide.md requirements) */
-  --font-primary: "Fira Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  --text-xs: 0.75rem;
-  --text-sm: 0.875rem;
-  --text-base: 1rem;
-  --text-lg: 1.125rem;
-  --text-xl: 1.25rem;
-  --text-2xl: 1.5rem;
-  --text-3xl: 1.875rem;
-  --text-4xl: 2.25rem;
-  --text-5xl: 3rem;
-
-  /* Letter Spacing */
-  --tracking-wide: 0.025em;
-  --tracking-wider: 0.05em;
-
-  /* Gradients */
-  --gradient-hero: linear-gradient(135deg, var(--oxford-blue) 0%, rgba(20, 33, 61, 0.8) 100%);
-  --gradient-cta: linear-gradient(135deg, #FCA311 0%, #FDB833 100%);
+  --font-primary: var(--font-sans);
+  --shadow-card: var(--shadow-md);
+  --shadow-cta-navy: var(--shadow-md);
+  --shadow-cta-orange: 0 6px 18px -6px rgba(242, 145, 0, 0.5);
+  --shadow-cta-orange-hover: 0 10px 22px -8px rgba(242, 145, 0, 0.55);
+  --gradient-hero: linear-gradient(135deg, var(--ink-900) 0%, var(--ink-800) 100%);
+  --gradient-cta: var(--signal-600);
 }
 
+// --------------------------------------------------------------------------
+// 4. Base
+// --------------------------------------------------------------------------
 
-// Set base styles for the application
 html {
-  // Set color scheme and base styles
   color-scheme: light;
-  background-color: var(--color-background);
-  color: var(--color-text);
-  font-family: var(--font-primary);
+  background-color: var(--paper);
+  color: var(--ink-900);
+  font-family: var(--font-sans);
+  -webkit-text-size-adjust: 100%;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: var(--font-primary);
-  background-color: var(--color-background);
-  color: var(--color-text);
+  min-height: 100%;
+  font-family: var(--font-sans);
+  font-size: var(--text-base);
+  line-height: 1.55;
+  background-color: var(--paper);
+  color: var(--ink-900);
 }
 
-// App loading fallback (shown before Angular bootstraps)
+h1, h2, h3, h4, h5, h6 {
+  color: var(--ink-900);
+  font-weight: 700;
+  line-height: 1.2;
+  text-wrap: balance;
+}
+
+p {
+  text-wrap: pretty;
+}
+
+::selection {
+  background: var(--signal-200);
+  color: var(--ink-950);
+}
+
+// One focus treatment everywhere: an ink ring with a paper gap, which reads on
+// every surface in the product (paper, white, and the navy bands).
+:where(a, button, input, select, textarea, summary, [tabindex]):focus-visible {
+  outline: 2px solid var(--ink-900);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms;
+    animation-iteration-count: 1;
+    transition-duration: 0.01ms;
+    scroll-behavior: auto;
+  }
+}
+
 .app-loading-fallback {
   padding: 20px;
   text-align: center;
 }
 
-// Ensure routed components fill remaining viewport space after the header
+// Routed components fill the space left between header and footer.
 router-outlet + * {
   flex: 1 0 auto;
 }
 
-// Issue-specific styling (from Implementation.md)
-.issue-card {
-  background-color: var(--white);
-  border: 1px solid var(--platinum);
-  transition: all 0.3s ease;
+// --------------------------------------------------------------------------
+// 5. Primitives
+// --------------------------------------------------------------------------
 
+// --- Layout ---------------------------------------------------------------
+
+.c-container {
+  width: 100%;
+  max-width: calc(var(--container) + 2 * var(--gutter));
+  margin-inline: auto;
+  padding-inline: var(--gutter);
+  box-sizing: border-box;
+}
+
+.c-container--narrow {
+  max-width: calc(var(--container-narrow) + 2 * var(--gutter));
+}
+
+.c-page {
+  padding-block: var(--space-8) var(--space-16);
+}
+
+// Page heading block: eyebrow, title, lead, and an optional actions slot that
+// sits to the right on wide screens.
+.c-page-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-4) var(--space-8);
+  margin-bottom: var(--space-8);
+
+  &__text {
+    flex: 1 1 420px;
+    min-width: 0;
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+  }
+}
+
+.c-stack > * + * {
+  margin-top: var(--space-6);
+}
+
+// --- Typography -----------------------------------------------------------
+
+.c-display {
+  font-family: var(--font-display);
+  font-size: var(--display-xl);
+  font-weight: 700;
+  line-height: 1.02;
+  letter-spacing: var(--tracking-tighter);
+  color: var(--ink-900);
+  margin: 0;
+}
+
+.c-h1 {
+  font-family: var(--font-display);
+  font-size: var(--display-lg);
+  font-weight: 700;
+  line-height: 1.06;
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink-900);
+  margin: 0;
+}
+
+.c-h2 {
+  font-family: var(--font-display);
+  font-size: var(--display-md);
+  font-weight: 700;
+  line-height: 1.12;
+  letter-spacing: var(--tracking-tight);
+  color: var(--ink-900);
+  margin: 0;
+}
+
+.c-h3 {
+  font-family: var(--font-sans);
+  font-size: var(--text-lg);
+  font-weight: 650;
+  line-height: 1.3;
+  color: var(--ink-900);
+  margin: 0;
+}
+
+.c-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0 0 var(--space-3);
+  font-family: var(--font-sans);
+  font-size: var(--text-xs);
+  font-weight: 650;
+  letter-spacing: var(--tracking-caps);
+  text-transform: uppercase;
+  color: var(--signal-text);
+
+  &--muted {
+    color: var(--ink-500);
+  }
+
+  &--on-dark {
+    color: var(--signal-500);
+  }
+}
+
+.c-lead {
+  font-size: var(--text-lg);
+  line-height: 1.6;
+  color: var(--ink-600);
+  margin: var(--space-3) 0 0;
+  max-width: 62ch;
+}
+
+.c-muted {
+  color: var(--ink-500);
+}
+
+.c-small {
+  font-size: var(--text-sm);
+}
+
+// Display numerals for counters and stats.
+.c-num {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tracking-tight);
+  line-height: 1;
+}
+
+.c-link {
+  color: var(--ink-900);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--signal-500);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 3px;
+  transition: color var(--dur) var(--ease), text-decoration-color var(--dur) var(--ease);
 
   &:hover {
-    box-shadow: 0 8px 24px rgba(20, 33, 61, 0.1);
-    transform: translateY(-2px);
+    color: var(--signal-text-strong);
+    text-decoration-color: currentColor;
   }
 }
 
-// Email counter styling (critical requirement)
-.email-counter {
-  .count {
-    color: var(--orange-web);
-    font-weight: 800;
-    font-size: var(--text-2xl);
+// Long-form content (guides, legal, about): readable measure and rhythm.
+.c-prose {
+  font-size: var(--text-lg);
+  line-height: 1.7;
+  color: var(--ink-800);
+  max-width: 68ch;
+
+  > * + * {
+    margin-top: 1em;
+  }
+
+  h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: var(--tracking-tight);
+    margin-top: 1.8em;
+  }
+
+  h2 {
+    font-size: var(--text-3xl);
+  }
+
+  h3 {
+    font-size: var(--text-xl);
+  }
+
+  a {
+    color: var(--ink-900);
+    text-decoration: underline;
+    text-decoration-color: var(--signal-500);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
+
+  strong {
+    color: var(--ink-900);
   }
 }
 
-// Email counter number for prominence (from Implementation.md)
-.email-counter-number {
-  font-size: var(--text-5xl);
-  font-weight: 800;
-  color: var(--orange-web);
+// --- Buttons ---------------------------------------------------------------
+//
+// One button, several tones. The mixins are shared with the NG-ZORRO re-skin
+// below, so `<button class="c-btn c-btn--signal">` and
+// `<button nz-button nzType="primary">` render identically.
+
+@mixin btn-base {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  height: 42px;
+  padding: 0 var(--space-5);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-sans);
+  font-size: var(--text-md);
+  font-weight: 650;
+  line-height: 1;
+  letter-spacing: 0;
+  text-transform: none;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: none;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease);
 }
 
-// Button styling for CTAs
-.btn-primary {
-  background-color: var(--orange-web);
-  color: var(--white);
-  border: none;
+@mixin btn-signal {
+  background: var(--signal-500);
+  border-color: var(--signal-500);
+  color: var(--ink-950);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--signal-600);
+    border-color: var(--signal-600);
+    color: var(--ink-950);
+  }
+
+  &:active {
+    background: var(--signal-700);
+    border-color: var(--signal-700);
+  }
+}
+
+@mixin btn-ink {
+  background: var(--ink-900);
+  border-color: var(--ink-900);
+  color: #FFFFFF;
+
+  &:hover,
+  &:focus-visible {
+    background: var(--ink-800);
+    border-color: var(--ink-800);
+    color: #FFFFFF;
+  }
+
+  &:active {
+    background: var(--ink-950);
+  }
+}
+
+@mixin btn-outline {
+  background: var(--surface);
+  border-color: var(--line-strong);
+  color: var(--ink-900);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--paper);
+    border-color: var(--ink-300);
+    color: var(--ink-900);
+  }
+
+  &:active {
+    background: var(--paper-2);
+  }
+}
+
+@mixin btn-ghost {
+  background: transparent;
+  border-color: transparent;
+  color: var(--ink-800);
+
+  &:hover,
+  &:focus-visible {
+    background: var(--paper-2);
+    color: var(--ink-900);
+  }
+}
+
+@mixin btn-disabled {
+  background: var(--paper-2);
+  border-color: var(--paper-2);
+  color: var(--ink-400);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.c-btn {
+  @include btn-base;
+  @include btn-outline;
+
+  &--signal { @include btn-signal; }
+  &--ink { @include btn-ink; }
+  &--outline { @include btn-outline; }
+  &--ghost { @include btn-ghost; }
+
+  &--on-dark {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.22);
+    color: #FFFFFF;
+
+    &:hover,
+    &:focus-visible {
+      background: rgba(255, 255, 255, 0.16);
+      border-color: rgba(255, 255, 255, 0.4);
+      color: #FFFFFF;
+    }
+  }
+
+  &--sm {
+    height: 34px;
+    padding: 0 var(--space-3);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+  }
+
+  &--lg {
+    height: 52px;
+    padding: 0 var(--space-6);
+    font-size: var(--text-base);
+    border-radius: var(--radius-lg);
+  }
+
+  &--block {
+    display: flex;
+    width: 100%;
+  }
+
+  &--icon {
+    width: 42px;
+    padding: 0;
+
+    &.c-btn--sm {
+      width: 34px;
+    }
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    @include btn-disabled;
+  }
+
+  .anticon {
+    font-size: 1.1em;
+  }
+}
+
+// --- Chips (filters, toggles) -------------------------------------------------
+
+.c-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  height: 36px;
+  padding: 0 var(--space-4);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink-700);
+  font-family: var(--font-sans);
+  font-size: var(--text-sm);
   font-weight: 600;
-  transition: all 0.3s ease;
-  text-transform: uppercase;
-  letter-spacing: var(--tracking-wide);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), border-color var(--dur) var(--ease), color var(--dur) var(--ease);
+
+  &:hover {
+    border-color: var(--ink-300);
+    color: var(--ink-900);
+  }
+
+  &.is-active,
+  &[aria-pressed='true'] {
+    background: var(--ink-900);
+    border-color: var(--ink-900);
+    color: #FFFFFF;
+  }
+
+  .anticon {
+    font-size: 15px;
+  }
 }
 
-.btn-primary:hover {
-  background: var(--gradient-cta);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(252, 163, 17, 0.3);
-}
-
-.btn-secondary {
-  background-color: var(--oxford-blue);
-  color: var(--white);
-  border: none;
-}
-
-.btn-secondary:hover {
-  background-color: var(--oxford-blue-90);
-}
-
-// Navigation styling
-.navbar {
-  background-color: var(--oxford-blue);
-  color: var(--white);
-}
-
-.nav-link {
-  color: var(--white);
-  opacity: 0.9;
-}
-
-.nav-link:hover,
-.nav-link.active {
-  opacity: 1;
-  color: var(--orange-web);
-}
-
-// Form styling
-.form-input {
-  background-color: var(--white);
-  border: 2px solid var(--platinum);
-  color: var(--oxford-blue);
-}
-
-.form-input:focus {
-  border-color: var(--orange-web);
-  outline: none;
-  box-shadow: 0 0 0 3px var(--orange-web-20);
-}
-
-.form-label {
-  color: var(--oxford-blue);
+// Small static label (category, sector, metadata).
+.c-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 var(--space-2);
+  border-radius: var(--radius-xs);
+  background: var(--paper-2);
+  color: var(--ink-700);
+  font-size: var(--text-xs);
   font-weight: 600;
+  line-height: 1;
+  white-space: nowrap;
+
+  &--urgent {
+    background: var(--bad-wash);
+    color: var(--bad-text);
+  }
+
+  &--signal {
+    background: var(--signal-50);
+    color: var(--signal-text-strong);
+  }
 }
 
-// Utility classes for Civica styling
-body .text-primary {
-  color: var(--oxford-blue);
+// --- Status pill -----------------------------------------------------------
+//
+// Driven by the `statusTone` pipe: <span class="c-status" [attr.data-tone]="s | statusTone">
+
+.c-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 24px;
+  padding: 0 10px 0 8px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink-700);
+  font-size: var(--text-xs);
+  font-weight: 650;
+  line-height: 1;
+  white-space: nowrap;
+
+  &::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--ink-400);
+    flex: none;
+  }
+
+  &[data-tone='active'] {
+    border-color: var(--signal-200);
+    background: var(--signal-50);
+    color: var(--signal-text-strong);
+
+    &::before { background: var(--signal-500); }
+  }
+
+  &[data-tone='resolved'] {
+    border-color: var(--ok-line);
+    background: var(--ok-wash);
+    color: var(--ok-text);
+
+    &::before { background: var(--ok-fill); }
+  }
+
+  &[data-tone='pending'] {
+    border-color: var(--info-line);
+    background: var(--info-wash);
+    color: var(--info-text);
+
+    &::before { background: var(--info-text); }
+  }
+
+  &[data-tone='rejected'] {
+    border-color: var(--bad-line);
+    background: var(--bad-wash);
+    color: var(--bad-text);
+
+    &::before { background: var(--bad-fill); }
+  }
+
+  // Over a photo: opaque surface so the label never depends on the image.
+  &--float {
+    box-shadow: var(--shadow-sm);
+  }
 }
 
-body .text-accent {
-  color: var(--orange-web);
+// --- Cards ------------------------------------------------------------------
+
+.c-card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+
+  &--pad {
+    padding: var(--space-6);
+  }
+
+  &--sunken {
+    background: var(--paper);
+  }
+
+  &--interactive {
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
+
+    &:hover {
+      border-color: var(--line-strong);
+      box-shadow: var(--shadow-md);
+    }
+  }
+
+  &--dark {
+    background: var(--ink-900);
+    border-color: var(--ink-900);
+    color: #FFFFFF;
+  }
 }
 
-body .bg-primary {
-  background-color: var(--oxford-blue);
+// Card title row: heading on the left, action on the right.
+.c-section-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+
+  h2, h3 {
+    margin: 0;
+  }
 }
 
-body .bg-accent {
-  background-color: var(--orange-web);
+.c-divider {
+  height: 1px;
+  border: 0;
+  margin: var(--space-6) 0;
+  background: var(--line);
 }
 
-body .bg-surface {
-  background-color: var(--white);
+// --- Stats ------------------------------------------------------------------
+
+.c-stat {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+
+  &__value {
+    font-family: var(--font-display);
+    font-size: var(--text-4xl);
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: var(--tracking-tight);
+    line-height: 1;
+    color: var(--ink-900);
+  }
+
+  &__label {
+    font-size: var(--text-sm);
+    font-weight: 500;
+    color: var(--ink-500);
+  }
 }
 
-body .bg-background {
-  background-color: var(--platinum);
+// Horizontal meter (progress toward a goal, share of a total).
+.c-meter {
+  height: 8px;
+  border-radius: var(--radius-pill);
+  background: var(--paper-3);
+  overflow: hidden;
+
+  &__fill {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--signal-500);
+  }
 }
 
-// Container for main content
-.container {
-  background-color: var(--white);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(20, 33, 61, 0.1);
+// --- Feedback -------------------------------------------------------------
+
+.c-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-16) var(--space-6);
+  text-align: center;
+  color: var(--ink-600);
+
+  &__icon {
+    display: grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: var(--space-2);
+    border-radius: var(--radius-lg);
+    background: var(--paper-2);
+    color: var(--ink-500);
+    font-size: 24px;
+  }
+
+  &__title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--ink-900);
+    margin: 0;
+  }
+
+  p {
+    max-width: 44ch;
+    margin: 0;
+  }
 }
 
-// Action required styling
-.action-required {
-  color: var(--orange-web);
-  font-weight: 600;
+.c-callout {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  color: var(--ink-700);
+  font-size: var(--text-sm);
+  line-height: 1.55;
+
+  .anticon {
+    margin-top: 3px;
+    color: var(--ink-500);
+  }
+
+  &--signal {
+    border-color: var(--signal-200);
+    background: var(--signal-50);
+
+    .anticon { color: var(--signal-text); }
+  }
+
+  &--ok {
+    border-color: var(--ok-line);
+    background: var(--ok-wash);
+    color: var(--ok-text);
+
+    .anticon { color: var(--ok-text); }
+  }
+
+  &--bad {
+    border-color: var(--bad-line);
+    background: var(--bad-wash);
+    color: var(--bad-text);
+
+    .anticon { color: var(--bad-text); }
+  }
 }
 
-// Official badge styling
-.official-badge {
-  background-color: var(--oxford-blue);
-  color: var(--white);
-  padding: 2px 8px;
-  border-radius: 4px;
-  font-size: 0.875em;
+@keyframes c-shimmer {
+  from { background-position: 200% 0; }
+  to { background-position: -200% 0; }
 }
 
-// Priority levels for issues
-.priority-urgent {
-  border-left: 4px solid var(--orange-web);
-  background-color: var(--orange-web-20);
+.c-skeleton {
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--paper-2) 25%, var(--paper) 50%, var(--paper-2) 75%);
+  background-size: 200% 100%;
+  animation: c-shimmer 1.4s linear infinite;
 }
 
-.priority-normal {
-  border-left: 4px solid var(--oxford-blue);
+// Visually hidden but announced.
+.c-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
-.priority-resolved {
-  border-left: 4px solid var(--color-success);
-  opacity: 0.7;
+// --------------------------------------------------------------------------
+// 6. NG-ZORRO re-skin
+//
+// theme.less sets the library's compile-time variables (primary colour,
+// heights, radius, font); these rules finish the job where variables cannot
+// reach. `body` prefixes give the specificity to win without !important.
+// --------------------------------------------------------------------------
+
+// --- Buttons ---
+
+body .ant-btn {
+  @include btn-base;
+  @include btn-outline;
+
+  > .anticon + span,
+  > span + .anticon {
+    margin-left: 0;
+  }
+
+  &.ant-btn-primary {
+    @include btn-signal;
+  }
+
+  &.ant-btn-dangerous:not(.ant-btn-primary) {
+    color: var(--bad-text);
+    border-color: var(--bad-line);
+
+    &:hover,
+    &:focus-visible {
+      background: var(--bad-wash);
+      border-color: var(--bad-text);
+      color: var(--bad-text);
+    }
+  }
+
+  &.ant-btn-primary.ant-btn-dangerous {
+    background: var(--bad-fill);
+    border-color: var(--bad-fill);
+    color: #FFFFFF;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--bad-text);
+      border-color: var(--bad-text);
+    }
+  }
+
+  &.ant-btn-text {
+    @include btn-ghost;
+  }
+
+  &.ant-btn-link {
+    background: transparent;
+    border-color: transparent;
+    color: var(--ink-900);
+    padding-inline: var(--space-2);
+    text-decoration: underline;
+    text-decoration-color: var(--signal-500);
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: var(--signal-text-strong);
+      background: transparent;
+    }
+  }
+
+  &.ant-btn-lg {
+    height: 52px;
+    padding: 0 var(--space-6);
+    font-size: var(--text-base);
+    border-radius: var(--radius-lg);
+  }
+
+  &.ant-btn-sm {
+    height: 34px;
+    padding: 0 var(--space-3);
+    font-size: var(--text-sm);
+    border-radius: var(--radius-sm);
+  }
+
+  &.ant-btn-icon-only {
+    width: 42px;
+    padding: 0;
+
+    &.ant-btn-sm { width: 34px; }
+    &.ant-btn-lg { width: 52px; }
+  }
+
+  &.ant-btn-circle {
+    border-radius: 50%;
+    padding: 0;
+    min-width: 42px;
+  }
+
+  &.ant-btn-block {
+    display: flex;
+    width: 100%;
+  }
+
+  &[disabled],
+  &[disabled]:hover {
+    @include btn-disabled;
+  }
+
+  // NG-ZORRO's click wave: a coloured halo that flashes after every click.
+  &::after {
+    display: none;
+  }
 }
 
-// There are deliberately no global `.hero` / `.hero-cta` rules. Both were left
-// over from a design that no longer exists, and HomeComponent was their only
-// remaining consumer — `.hero` silently gave `/` a navy panel it never asked
-// for. Style heroes from the component that owns them.
+body [ant-click-animating-without-extra-node='true']::after,
+body .ant-click-animating-node {
+  display: none;
+}
 
-// GLightbox custom styling to match Civica theme
-.glightbox-clean {
-  .gslide-title {
-    color: var(--oxford-blue);
-    font-family: var(--font-primary);
+// --- Inputs ---
+
+body {
+  .ant-input,
+  .ant-input-affix-wrapper,
+  .ant-input-number,
+  .ant-picker,
+  .ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    border-color: var(--line-strong);
+    border-radius: var(--radius-md);
+    background-color: var(--surface);
+    color: var(--ink-900);
+    box-shadow: none;
+    transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+  }
+
+  .ant-input:hover,
+  .ant-input-affix-wrapper:hover,
+  .ant-input-number:hover,
+  .ant-picker:hover,
+  .ant-select:not(.ant-select-disabled):hover .ant-select-selector {
+    border-color: var(--ink-300);
+  }
+
+  .ant-input:focus,
+  .ant-input-focused,
+  .ant-input-affix-wrapper-focused,
+  .ant-input-affix-wrapper:focus,
+  .ant-input-number-focused,
+  .ant-picker-focused,
+  .ant-select-focused:not(.ant-select-disabled).ant-select:not(.ant-select-customize-input) .ant-select-selector {
+    border-color: var(--ink-900);
+    box-shadow: var(--ring);
+  }
+
+  .ant-input-affix-wrapper > input.ant-input {
+    border-radius: 0;
+  }
+
+  .ant-input::placeholder,
+  .ant-select-selection-placeholder {
+    color: var(--ink-400);
+  }
+
+  .ant-input-prefix,
+  .ant-input-suffix {
+    color: var(--ink-500);
+  }
+
+  textarea.ant-input {
+    line-height: 1.6;
+    padding-block: 10px;
+  }
+
+  .ant-input-status-error:not(.ant-input-disabled),
+  .ant-form-item-has-error .ant-input,
+  .ant-form-item-has-error .ant-input-affix-wrapper,
+  .ant-form-item-has-error .ant-select:not(.ant-select-disabled) .ant-select-selector {
+    border-color: var(--bad-text);
+  }
+
+  .ant-form-item-explain-error {
+    color: var(--bad-text);
+    font-size: var(--text-sm);
+    margin-top: 4px;
+  }
+
+  .ant-input-disabled,
+  .ant-input[disabled],
+  .ant-select-disabled .ant-select-selector {
+    background-color: var(--paper);
+    color: var(--ink-500);
+  }
+
+  .ant-select-selection-item {
+    font-weight: 500;
+  }
+
+  .ant-select-arrow {
+    color: var(--ink-500);
+  }
+}
+
+// --- Select / dropdown panels (rendered in the CDK overlay) ---
+
+.ant-select-dropdown {
+  padding: 6px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--line);
+
+  .ant-select-item {
+    border-radius: var(--radius-sm);
+    padding: 8px 10px;
+    color: var(--ink-800);
+    font-size: var(--text-md);
+  }
+
+  .ant-select-item-option-active:not(.ant-select-item-option-disabled) {
+    background: var(--paper);
+  }
+
+  .ant-select-item-option-selected:not(.ant-select-item-option-disabled) {
+    background: var(--signal-50);
+    color: var(--ink-900);
+    font-weight: 650;
+  }
+}
+
+.ant-dropdown .ant-dropdown-menu,
+.ant-dropdown-menu {
+  padding: 6px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--line);
+
+  .ant-dropdown-menu-item {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--ink-800);
+    font-size: var(--text-md);
+    font-weight: 500;
+
+    &:hover {
+      background: var(--paper);
+      color: var(--ink-900);
+    }
+
+    .anticon {
+      font-size: 16px;
+      color: var(--ink-500);
+    }
+  }
+
+  .ant-dropdown-menu-item-divider {
+    margin: 6px 4px;
+    background: var(--line);
+  }
+}
+
+// --- Forms ---
+
+body .ant-form-item-label > label {
+  color: var(--ink-900);
+  font-size: var(--text-sm);
+  font-weight: 650;
+
+  &.ant-form-item-required:not(.ant-form-item-required-mark-optional)::before {
+    color: var(--signal-text);
+  }
+}
+
+body .ant-checkbox-inner,
+body .ant-radio-inner {
+  border-color: var(--line-strong);
+}
+
+body .ant-checkbox-wrapper,
+body .ant-radio-wrapper {
+  color: var(--ink-800);
+}
+
+// --- Modal ---
+
+.ant-modal-mask {
+  background-color: rgba(10, 20, 40, 0.55);
+  backdrop-filter: blur(2px);
+}
+
+.ant-modal {
+  .ant-modal-content {
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+
+  .ant-modal-header {
+    padding: var(--space-6) var(--space-6) var(--space-2);
+    border-bottom: 0;
+    background: var(--surface);
+
+    .ant-modal-title {
+      font-family: var(--font-display);
+      font-size: var(--text-2xl);
+      font-weight: 700;
+      letter-spacing: var(--tracking-tight);
+      color: var(--ink-900);
+    }
+  }
+
+  .ant-modal-body {
+    padding: var(--space-4) var(--space-6) var(--space-6);
+    color: var(--ink-700);
+    font-size: var(--text-base);
+    line-height: 1.6;
+  }
+
+  .ant-modal-footer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-2);
+    padding: var(--space-4) var(--space-6);
+    border-top: 1px solid var(--line);
+    background: var(--paper);
+
+    .ant-btn + .ant-btn {
+      margin-left: 0;
+    }
+  }
+
+  .ant-modal-close {
+    top: 14px;
+    right: 14px;
+    border-radius: var(--radius-sm);
+    color: var(--ink-500);
+
+    &:hover {
+      background: var(--paper-2);
+      color: var(--ink-900);
+    }
+  }
+
+  // Confirm dialogs (NzModalService.confirm / create with nzIconType)
+  .ant-modal-confirm-title {
+    font-family: var(--font-display);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    color: var(--ink-900);
+  }
+
+  .ant-modal-confirm-content {
+    color: var(--ink-600);
+  }
+}
+
+// --- Tabs ---
+
+body .ant-tabs {
+  color: var(--ink-600);
+
+  .ant-tabs-tab {
+    font-weight: 600;
+
+    &:hover {
+      color: var(--ink-900);
+    }
+  }
+
+  .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+    color: var(--ink-900);
+  }
+
+  .ant-tabs-ink-bar {
+    background: var(--signal-500);
+    height: 3px;
+  }
+
+  > .ant-tabs-nav::before {
+    border-bottom-color: var(--line);
+  }
+}
+
+// --- Pagination ---
+
+body .ant-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+
+  .ant-pagination-item,
+  .ant-pagination-prev .ant-pagination-item-link,
+  .ant-pagination-next .ant-pagination-item-link {
+    min-width: 40px;
+    height: 40px;
+    margin: 0;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    line-height: 38px;
+    font-weight: 600;
+
+    a {
+      color: var(--ink-800);
+    }
+
+    &:hover {
+      border-color: var(--ink-300);
+    }
+  }
+
+  .ant-pagination-prev,
+  .ant-pagination-next,
+  .ant-pagination-jump-prev,
+  .ant-pagination-jump-next {
+    min-width: 40px;
+    height: 40px;
+    margin: 0;
+    line-height: 40px;
+  }
+
+  .ant-pagination-item-active {
+    background: var(--ink-900);
+    border-color: var(--ink-900);
+
+    a,
+    &:hover a {
+      color: #FFFFFF;
+    }
+  }
+
+  .ant-pagination-disabled .ant-pagination-item-link {
+    background: var(--paper);
+    color: var(--ink-300);
+  }
+}
+
+// --- Tags ---
+
+body .ant-tag {
+  border-radius: var(--radius-pill);
+  font-size: var(--text-xs);
+  font-weight: 650;
+  line-height: 22px;
+  padding: 0 10px;
+}
+
+// --- Cards (legacy usage) ---
+
+body .ant-card {
+  border-color: var(--line);
+  border-radius: var(--radius-lg);
+
+  .ant-card-head {
+    border-bottom-color: var(--line);
+    color: var(--ink-900);
+
+    .ant-card-head-title {
+      font-weight: 650;
+    }
+  }
+}
+
+// --- Alerts ---
+
+body .ant-alert {
+  border-radius: var(--radius-md);
+  padding: 12px 16px;
+
+  &.ant-alert-info {
+    background: var(--info-wash);
+    border-color: var(--info-line);
+  }
+
+  &.ant-alert-success {
+    background: var(--ok-wash);
+    border-color: var(--ok-line);
+  }
+
+  &.ant-alert-warning {
+    background: var(--signal-50);
+    border-color: var(--signal-200);
+  }
+
+  &.ant-alert-error {
+    background: var(--bad-wash);
+    border-color: var(--bad-line);
+  }
+
+  .ant-alert-message {
+    color: var(--ink-900);
     font-weight: 600;
   }
 
+  .ant-alert-description {
+    color: var(--ink-700);
+  }
+}
+
+// --- Steps ---
+
+body .ant-steps {
+  .ant-steps-item-title {
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+
+  .ant-steps-item-process .ant-steps-item-icon {
+    background: var(--ink-900);
+    border-color: var(--ink-900);
+  }
+
+  .ant-steps-item-finish .ant-steps-item-icon {
+    background: var(--signal-50);
+    border-color: var(--signal-500);
+
+    > .ant-steps-icon {
+      color: var(--signal-text);
+    }
+  }
+}
+
+// --- Progress ---
+
+body .ant-progress-inner {
+  background: var(--paper-3);
+}
+
+body .ant-progress-bg {
+  background-color: var(--signal-500);
+}
+
+body .ant-progress-status-success .ant-progress-bg {
+  background-color: var(--ok-fill);
+}
+
+// --- Message / notification toasts ---
+
+.ant-message .ant-message-notice-content {
+  padding: 12px 18px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--line);
+  color: var(--ink-900);
+  font-weight: 500;
+
+  .ant-message-success .anticon { color: var(--ok-fill); }
+  .ant-message-error .anticon { color: var(--bad-text); }
+  .ant-message-warning .anticon { color: var(--signal-600); }
+  .ant-message-info .anticon { color: var(--info-text); }
+}
+
+.ant-notification .ant-notification-notice {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--line);
+}
+
+// --- Tooltip / popover ---
+
+.ant-tooltip .ant-tooltip-inner {
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  background: var(--ink-900);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  min-height: 0;
+}
+
+.ant-tooltip .ant-tooltip-arrow-content {
+  --antd-arrow-background-color: var(--ink-900);
+  background-color: var(--ink-900);
+}
+
+.ant-popover .ant-popover-inner {
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--line);
+}
+
+// --- Upload ---
+
+body .ant-upload.ant-upload-drag {
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--paper);
+
+  &:hover {
+    border-color: var(--ink-400);
+  }
+}
+
+// --- Empty / spin / divider / avatar ---
+
+body .ant-empty-description {
+  color: var(--ink-500);
+}
+
+body .ant-spin-dot-item {
+  background-color: var(--ink-900);
+}
+
+body .ant-divider {
+  border-top-color: var(--line);
+}
+
+body .ant-avatar {
+  background: var(--ink-100);
+  color: var(--ink-800);
+  font-weight: 650;
+}
+
+// --------------------------------------------------------------------------
+// 7. Third party
+// --------------------------------------------------------------------------
+
+.glightbox-clean {
+  .gslide-title {
+    color: var(--ink-900);
+    font-family: var(--font-sans);
+    font-weight: 650;
+  }
+
   .gslide-desc {
-    color: var(--oxford-blue);
-    font-family: var(--font-primary);
-    opacity: 0.8;
+    color: var(--ink-700);
+    font-family: var(--font-sans);
   }
 
   .gnext,
   .gprev,
   .gclose {
-    color: var(--oxford-blue);
-
-    &:hover {
-      color: var(--orange-web);
-    }
+    color: #FFFFFF;
   }
 
   .gslide-description {
-    background: var(--white);
-    border-top: 3px solid var(--orange-web);
-  }
-}
-
-// NG-ZORRO Global Overrides for Civica Theme
-body .ant-btn-primary {
-  background-color: var(--orange-web);
-  border-color: var(--orange-web);
-  text-transform: uppercase;
-  font-weight: 600;
-  letter-spacing: var(--tracking-wide);
-
-  &:hover,
-  &:focus {
-    background: var(--gradient-cta);
-    border-color: var(--orange-web);
-  }
-
-  &[disabled] {
-    background-color: var(--platinum);
-    border-color: var(--platinum);
-    color: var(--oxford-blue);
-    opacity: 0.6;
-  }
-}
-
-body .ant-btn-default {
-  color: var(--oxford-blue);
-  border-color: var(--platinum);
-
-  &:hover {
-    color: var(--orange-web);
-    border-color: var(--orange-web);
-  }
-}
-
-// NG-ZORRO Card styling
-body .ant-card {
-  border-color: var(--platinum);
-
-  .ant-card-head {
-    color: var(--oxford-blue);
-    border-bottom-color: var(--platinum);
-
-    .ant-card-head-title {
-      color: var(--oxford-blue);
-      font-weight: 600;
-    }
-  }
-
-  &:hover {
-    box-shadow: var(--card-hover-shadow);
-  }
-}
-
-// NG-ZORRO Form styling
-body .ant-form-item-label>label {
-  color: var(--oxford-blue);
-  font-weight: 600;
-
-  &.ant-form-item-required::before {
-    color: var(--orange-web);
-  }
-}
-
-// NG-ZORRO Tag styling (for email counter)
-body .ant-tag {
-  &.email-counter-tag {
-    background-color: var(--orange-web);
-    color: var(--white);
-    border: none;
-    font-weight: 800;
-    font-size: var(--text-xl);
-    padding: 4px 16px;
-    height: auto;
-  }
-}
-
-// NG-ZORRO Modal styling
-.ant-modal {
-  .ant-modal-header {
-    background-color: var(--white);
-    border-bottom-color: var(--platinum);
-
-    .ant-modal-title {
-      color: var(--oxford-blue);
-      font-weight: 600;
-      font-size: var(--text-xl);
-    }
-  }
-
-  .ant-modal-footer {
-    border-top-color: var(--platinum);
-  }
-}
-
-// NG-ZORRO Message styling
-.ant-message {
-  .ant-message-notice-content {
-    .ant-message-success {
-      .anticon {
-        color: var(--color-success);
-      }
-    }
-
-    .ant-message-error {
-      .anticon {
-        color: var(--color-error);
-      }
-    }
+    background: var(--surface);
+    border-top: 3px solid var(--signal-500);
   }
 }

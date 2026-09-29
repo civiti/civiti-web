@@ -3,108 +3,56 @@
   align-items: center;
 }
 
-.auth-buttons-row {
+.auth-row {
   display: flex;
-  gap: 0.5rem;
   align-items: center;
-}
+  gap: var(--space-2);
 
-// Auth buttons — dark-on-dark theme
-button.auth-button.ant-btn {
-  color: white;
-  background-color: transparent;
-  border-color: rgba(255, 255, 255, 0.3);
-  transition: all 0.3s ease;
-
-  i[nz-icon] {
-    color: currentColor;
-    margin-right: 0.25rem;
-  }
-
-  &:hover {
-    color: var(--oxford-blue);
-    background-color: white;
-    border-color: white;
-    transform: translateY(-1px);
-  }
-
-  &:focus-visible {
-    color: var(--oxford-blue);
-    background-color: white;
-    border-color: white;
-    transform: translateY(-1px);
-  }
-
-  // Navy on --orange-web is 7.90:1. White on it was 2.02:1 — an AA failure
-  // everywhere this control renders, and it is now the most prominent button
-  // above the fold on `/`. Hover keeps navy, on white: 12.68:1.
-  &.register-button {
-    background-color: var(--orange-web);
-    border-color: var(--orange-web);
-    color: var(--oxford-blue);
-
-    &:hover {
-      background-color: white;
-      color: var(--oxford-blue);
-      border-color: white;
-      transform: translateY(-1px);
-    }
-
-    &:focus-visible {
-      background-color: white;
-      color: var(--oxford-blue);
-      border-color: white;
-      transform: translateY(-1px);
-    }
+  .c-btn {
+    height: 40px;
+    padding-inline: var(--space-4);
   }
 }
 
-// User avatar dropdown
-.user-avatar-dropdown {
-  display: flex;
+.account-trigger {
+  display: inline-flex;
   align-items: center;
+  gap: var(--space-2);
+  height: 40px;
+  padding: 0 10px 0 4px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink-900);
+  font: 600 var(--text-sm) / 1 var(--font-sans);
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 24px;
-  transition: background-color 0.2s ease;
+  transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
 
-  &:hover {
-    background-color: rgba(255, 255, 255, 0.1);
-  }
-
-  .dropdown-arrow {
-    color: white;
-    font-size: 12px;
-    margin-left: 6px;
-  }
-
-  nz-avatar {
-    border: 2px solid rgba(255, 255, 255, 0.3);
-
-    &:hover {
-      border-color: rgba(255, 255, 255, 0.6);
-    }
+  &:hover,
+  &.ant-dropdown-open {
+    border-color: var(--ink-300);
+    background: var(--paper);
   }
 }
 
-// Mobile: icon-only auth buttons
-@media (max-width: 576px) {
-  .auth-btn-text {
+.account-name {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.account-caret {
+  font-size: 11px;
+  color: var(--ink-500);
+}
+
+@media (max-width: 1120px) {
+  .account-name {
     display: none;
   }
 
-  button.auth-button.ant-btn {
-    min-width: 40px;
-    min-height: 40px;
-    padding: 0;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 50%;
-
-    i[nz-icon] {
-      margin-right: 0;
-      font-size: 18px;
-    }
+  .auth-row .signin {
+    padding-inline: var(--space-3);
   }
 }

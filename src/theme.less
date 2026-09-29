@@ -1,92 +1,123 @@
-// Civica NG-ZORRO Theme Configuration
-// Based on Colour-Scheme.md specifications
+// NG-ZORRO compile-time theme.
+//
+// These variables are baked into the library's CSS at build time. They carry
+// the design system into every NG-ZORRO component we do not restyle by hand;
+// src/styles.scss finishes the job (buttons, modals, overlays). Values mirror
+// the tokens in styles.scss — LESS cannot read CSS custom properties, so the
+// hex values are repeated here and nowhere else. See docs/design/DESIGN.md.
 
-// Import NG-ZORRO default theme
 @import "ng-zorro-antd/ng-zorro-antd.less";
 
-// Civica Color Palette from Colour-Scheme.md
-@primary-color: #FCA311; // Orange Web - Primary actions, CTAs
-@info-color: #1890ff; // Ant Design blue - Information alerts (light, accessible)
-@success-color: #28A745; // Success states
-@warning-color: #FCA311; // Warning states (same as primary)
-@error-color: #DC3545; // Error states
+// Colour. Primary is ink, not orange: it drives focus borders, checked
+// checkboxes, active tabs, links and selected pagination, and orange fails
+// non-text contrast (2:1) in all of those roles. The orange call-to-action
+// look is applied to `.ant-btn-primary` in styles.scss.
+@primary-color: #14213D;
+@link-color: #14213D;
+@link-hover-color: #8F5900;
+@info-color: #2446A8;
+@success-color: #1E7A48;
+@warning-color: #C97500;
+@error-color: #B42318;
+@highlight-color: #B42318;
 
-// Typography from Typography-Guide.md
-@font-family: "Fira Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-@code-family: "Fira Code", "Consolas", "Monaco", monospace;
-
-// Base colors
-@body-background: #E5E5E5; // Platinum
-@component-background: #FFFFFF; // White
-@layout-body-background: #E5E5E5; // Platinum
-@layout-header-background: #14213D; // Oxford Blue
-
-// Text colors
-@heading-color: #14213D; // Oxford Blue
-@text-color: #14213D; // Oxford Blue
-@text-color-secondary: rgba(20, 33, 61, 0.8);
-@disabled-color: rgba(20, 33, 61, 0.4);
-
-// Border and shadow
-@border-color-base: #E5E5E5; // Platinum
-@border-color-split: #E5E5E5; // Platinum
-@border-radius-base: 8px;
-@box-shadow-base: 0 2px 8px rgba(20, 33, 61, 0.1);
-
-// Button specific
-@btn-primary-bg: #FCA311; // Orange Web
-@btn-primary-color: #FFFFFF;
-@btn-default-bg: #FFFFFF;
-@btn-default-color: #14213D;
-@btn-default-border: #E5E5E5;
-
-// Input specific
-@input-bg: #FFFFFF;
-@input-border-color: #E5E5E5;
-@input-hover-border-color: #14213D;
-@input-focus-border-color: #FCA311;
-@input-placeholder-color: rgba(20, 33, 61, 0.6);
-@input-disabled-bg: #F5F5F5;
-
-// Select specific
-@select-border-color: #E5E5E5;
-@select-item-selected-bg: #FCA311;
-@select-item-selected-color: #FFFFFF;
-@select-item-hover-bg: rgba(252, 163, 17, 0.1);
-
-// Card specific
-@card-shadow: 0 2px 8px rgba(20, 33, 61, 0.1);
-@card-hover-shadow: 0 8px 24px rgba(20, 33, 61, 0.15);
-@card-radius: 8px;
-
-// Modal specific
-@modal-header-bg: #FFFFFF;
-@modal-header-border-color-split: #E5E5E5;
-@modal-content-bg: #FFFFFF;
-@modal-footer-bg: #FFFFFF;
-@modal-footer-border-color-split: #E5E5E5;
-
-// Form specific
-@label-color: #14213D;
-@form-item-margin-bottom: 16px;
-@form-vertical-label-padding: 0 0 8px;
-
-// Typography scale from Typography-Guide.md
+// Type
+@font-family: "Public Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+@code-family: ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
 @font-size-base: 16px;
 @font-size-sm: 14px;
 @font-size-lg: 18px;
+@line-height-base: 1.55;
+@heading-color: #14213D;
+@text-color: #14213D;
+@text-color-secondary: #4A587A;
+@disabled-color: #8C95AB;
 @heading-1-size: 48px;
 @heading-2-size: 36px;
 @heading-3-size: 30px;
 @heading-4-size: 24px;
 @heading-5-size: 20px;
 
-// Line height
-@line-height-base: 1.5;
+// Surfaces
+@body-background: #F6F4EF;
+@component-background: #FFFFFF;
+@layout-body-background: #F6F4EF;
+@layout-header-background: #14213D;
+@background-color-light: #F6F4EF;
+@background-color-base: #EEEAE2;
+@item-hover-bg: #F6F4EF;
+@item-active-bg: #FFF6E5;
 
-// Animation
-@animation-duration-base: 0.3s;
-@animation-duration-fast: 0.2s;
+// Lines and shape
+@border-color-base: #D5CEC0;
+@border-color-split: #E6E1D7;
+@border-radius-base: 10px;
+@border-radius-sm: 8px;
+@outline-width: 3px;
+@outline-color: #14213D;
+@outline-fade: 86%;
+@box-shadow-base: 0 24px 48px -16px rgba(20, 33, 61, 0.3), 0 0 0 1px #E6E1D7;
+@shadow-1-down: 0 10px 24px -10px rgba(20, 33, 61, 0.22);
+@shadow-2: 0 24px 48px -16px rgba(20, 33, 61, 0.3);
+
+// Control heights — 42px default keeps a comfortable touch target and
+// matches .c-btn.
+@height-base: 42px;
+@height-lg: 52px;
+@height-sm: 34px;
+
+// Buttons (hover/active and the orange primary are finished in styles.scss)
+@btn-font-weight: 650;
+@btn-primary-bg: #FCA311;
+@btn-primary-color: #0A1428;
+@btn-default-bg: #FFFFFF;
+@btn-default-color: #14213D;
+@btn-default-border: #D5CEC0;
+@btn-shadow: none;
+@btn-primary-shadow: none;
+@btn-text-shadow: none;
+@btn-border-radius-base: 10px;
+@btn-border-radius-sm: 8px;
+
+// Inputs
+@input-bg: #FFFFFF;
+@input-border-color: #D5CEC0;
+@input-hover-border-color: #B6BDCC;
+@input-placeholder-color: #8C95AB;
+@input-disabled-bg: #F6F4EF;
+@input-padding-horizontal-base: 12px;
+
+// Select
+@select-border-color: #D5CEC0;
+@select-item-selected-bg: #FFF6E5;
+@select-item-selected-color: #14213D;
+@select-item-selected-font-weight: 650;
+@select-item-active-bg: #F6F4EF;
+
+// Card
+@card-shadow: none;
+@card-radius: 14px;
+@card-head-color: #14213D;
+
+// Modal
+@modal-header-bg: #FFFFFF;
+@modal-header-border-color-split: #E6E1D7;
+@modal-content-bg: #FFFFFF;
+@modal-footer-bg: #F6F4EF;
+@modal-footer-border-color-split: #E6E1D7;
+@modal-mask-bg: fade(#0A1428, 55%);
+
+// Tooltip
+@tooltip-bg: #14213D;
+
+// Form
+@label-color: #14213D;
+@form-item-margin-bottom: 20px;
+@form-vertical-label-padding: 0 0 6px;
+
+// Motion
+@animation-duration-base: 0.18s;
+@animation-duration-fast: 0.12s;
 
 // Z-index
 @zindex-modal: 1000;
