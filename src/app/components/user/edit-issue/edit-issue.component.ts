@@ -9,19 +9,11 @@ import { switchMap, catchError, toArray } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
@@ -54,6 +46,7 @@ import {
 } from '../../issue-creation/issue-field.constants';
 import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
 import * as IssueActions from '../../../store/issues/issue.actions';
+import { StatusTextPipe, StatusTonePipe } from '../../../pipes/status.pipe';
 
 /** A photo in the edit form — either loaded from the server or freshly uploaded. */
 interface EditPhoto {
@@ -73,22 +66,16 @@ interface EditPhoto {
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
     NzFormModule,
     NzInputModule,
     NzSelectModule,
-    NzCheckboxModule,
-    NzTagModule,
-    NzAlertModule,
-    NzEmptyModule,
-    NzDividerModule,
-    NzBadgeModule,
-    NzSpinModule,
     NzToolTipModule,
     NzModalModule,
     AuthorityPickerComponent,
+    StatusTextPipe,
+    StatusTonePipe,
   ],
   templateUrl: './edit-issue.component.html',
   styleUrls: ['./edit-issue.component.scss']
