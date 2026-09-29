@@ -236,14 +236,17 @@
           </section>
 
           <!-- Location -->
+          <!-- Coordinates when stored, else the address: an issue saved without coordinates
+               (0,0) must not send the reader to the middle of the ocean. -->
+          @let mapsUrl = issue.latitude | mapsSearchUrl: issue.longitude : issue.address;
           <section class="c-card panel o-map" aria-labelledby="map-title">
             <div class="panel-head">
               <h2 class="c-h3" id="map-title">Locație pe hartă</h2>
-              <a class="c-link c-small"
-                 [href]="'https://www.google.com/maps/search/?api=1&query=' + issue.latitude + ',' + issue.longitude"
-                 target="_blank" rel="noopener">
-                Deschide în Google Maps
-              </a>
+              @if (mapsUrl) {
+                <a class="c-link c-small" [href]="mapsUrl" target="_blank" rel="noopener">
+                  Deschide în Google Maps
+                </a>
+              }
             </div>
             <p class="map-address">
               <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>
@@ -260,7 +263,9 @@
                 <div class="map-state" role="status">
                   <span nz-icon nzType="environment" nzTheme="outline"></span>
                   <p class="map-state-title">Harta nu poate fi încărcată</p>
-                  <p>Folosește linkul „Deschide în Google Maps” pentru a vedea locul.</p>
+                  @if (mapsUrl) {
+                    <p>Folosește linkul „Deschide în Google Maps” pentru a vedea locul.</p>
+                  }
                 </div>
               }
               @if (isMapLoaded && !mapLoadError) {

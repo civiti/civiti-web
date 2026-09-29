@@ -130,6 +130,7 @@ export class ApprovalInterfaceComponent implements OnInit {
         next: (response) => {
           // Convert API response to component format
           this.pendingIssues = response.items;
+          this.clampPageIndex();
           console.log('[ADMIN] Loaded pending issues:', this.pendingIssues.length);
 
           // Reconcile selectedIssueIds with new data - remove stale IDs
@@ -255,11 +256,25 @@ export class ApprovalInterfaceComponent implements OnInit {
     }
   }
 
+  /**
+   * Keep the list on a page that still exists. The queue shrinks as reports are
+   * decided or reloaded; left alone, a moderator on the last page would be shown
+   * an empty slice (and no pager, once the queue fits on one page) while reports
+   * still wait on earlier pages.
+   */
+  private clampPageIndex(): void {
+    const lastPage = Math.max(1, Math.ceil(this.pendingIssues.length / this.pageSize));
+    if (this.pageIndex > lastPage) {
+      this.pageIndex = lastPage;
+    }
+  }
+
   private handleDecisionSuccess(decision: 'approve' | 'reject'): void {
     const processedIssueId = this.selectedIssue?.id;
 
     // Remove processed issue from pending list
     this.pendingIssues = this.pendingIssues.filter(issue => issue.id !== processedIssueId);
+    this.clampPageIndex();
 
     // Clear from bulk selection if it was selected
     if (processedIssueId && this.selectedIssueIds.has(processedIssueId)) {
@@ -367,6 +382,7 @@ export class ApprovalInterfaceComponent implements OnInit {
             .map(r => r.issueId));
 
           this.pendingIssues = this.pendingIssues.filter(issue => !approvedIds.has(issue.id));
+          this.clampPageIndex();
 
           // Update stats
           if (this.adminStats) {

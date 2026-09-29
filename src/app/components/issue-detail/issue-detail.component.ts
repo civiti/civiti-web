@@ -25,6 +25,7 @@ import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
 import { GoogleMapsConfigService } from '../../services/google-maps-config.service';
 import { StatusTextPipe, StatusTonePipe, IsActivePipe, IsResolvedPipe, IsTerminalStatePipe, IsOwnerEditablePipe } from '../../pipes/status.pipe';
 import { CategoryIconPipe, CategoryLabelPipe } from '../../pipes/category.pipe';
+import { MapsSearchUrlPipe } from '../../pipes/maps.pipe';
 import { IsUrgentPipe } from '../../pipes/urgency.pipe';
 import { DaysSincePipe, ResolutionSpanPipe } from '../../pipes/date.pipe';
 import { MainPhotoPipe, PhotosExceptPipe } from '../../pipes/photo.pipe';
@@ -52,6 +53,7 @@ import { SeoService, socialCardFromPhoto } from '../../services/seo.service';
         StatusTonePipe,
         CategoryLabelPipe,
         CategoryIconPipe,
+        MapsSearchUrlPipe,
         IsActivePipe,
         IsResolvedPipe,
         IsTerminalStatePipe,
