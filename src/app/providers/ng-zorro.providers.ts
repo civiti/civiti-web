@@ -104,7 +104,8 @@ import {
   WhatsAppOutline,
   ScheduleOutline,
   HourglassOutline,
-  CommentOutline
+  CommentOutline,
+  FileSearchOutline
 } from '@ant-design/icons-angular/icons';
 
 // The `theme` field was removed: it triggered NG-ZORRO's runtime CSS-variable
@@ -226,7 +227,8 @@ const icons: IconDefinition[] = [
   WhatsAppOutline,
   ScheduleOutline,
   HourglassOutline,
-  CommentOutline
+  CommentOutline,
+  FileSearchOutline
 ];
 
 export const ngZorroIcons = provideNzIcons(icons);

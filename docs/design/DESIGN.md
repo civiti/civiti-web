@@ -45,7 +45,9 @@ Principles:
 | `--info-*` | Pending review / informational |
 
 Rules: text on `--signal-500` is always ink (`--ink-950`/`--ink-900`, 7.9:1). Never orange text on
-white. Status is never conveyed by colour alone — pills always carry a label.
+white. Status is never conveyed by colour alone — pills always carry a label. White text on dark
+surfaces uses `var(--white)`; translucent whites for secondary text on ink are `--white-82`,
+`--white-78`, `--white-55`.
 
 Legacy names (`--oxford-blue`, `--orange-web`, `--platinum`, `--color-*`, `--oxford-blue-80`…)
 still resolve (they alias the new tokens) so un-migrated code keeps working. **New code uses the
@@ -128,6 +130,11 @@ tooltips. It is re-skinned globally, so:
   `.c-status`/`.c-tag` instead of `nz-tag`, `.c-empty` instead of `nz-empty`, CSS grid instead
   of `nz-row`/`nz-col`, `.c-page-head` instead of `nz-page-header`.
 - **Hydration rule:** an `nz-button` with an icon must wrap its text in `<span>`.
+- **Icons** are Ant Design outline icons. Register every icon you use in
+  `src/app/providers/ng-zorro.providers.ts`; an unregistered one is fetched at runtime and
+  renders blank during SSR.
+- `nz-pagination` inside SSR-rendered pages carries `ngSkipHydration` — it re-renders on the
+  client and would otherwise leave a duplicate pager behind.
 
 ## Patterns
 

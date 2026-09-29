@@ -1,5 +1,8 @@
 # Civica Typography Guide - Fira Sans
 
+> **Superseded.** The typography system is now defined in [DESIGN.md](DESIGN.md) (tokens in
+> `src/styles.scss`). This document is kept for history; the brand navy and orange carry over.
+
 ## 🔤 Typography Overview
 
 Fira Sans is our chosen typeface for Civica, designed by Mozilla specifically for screen readability. It provides excellent legibility, supports Romanian diacritics perfectly, and conveys approachability while maintaining professionalism.
