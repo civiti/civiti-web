@@ -1,8 +1,7 @@
-@use '../wizard';
-
-@include wizard.frame;
-@include wizard.context;
-@include wizard.sections;
+:host {
+  display: flex;
+  flex-direction: column;
+}
 
 // --- Drop zone ---
 

@@ -64,7 +64,7 @@ import { SeoService, socialCardFromPhoto } from '../../services/seo.service';
         CommentsComponent,
     ],
     templateUrl: './issue-detail.component.html',
-    styleUrl: './issue-detail.component.scss'
+    styleUrls: ['./issue-detail.component.scss', './issue-detail-actions.scss']
 })
 export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     private _route = inject(ActivatedRoute);
@@ -422,9 +422,8 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     /**
-     * Whether the owner-actions block has anything to show. Guards the wrapper so an owner
-     * viewing a Cancelled (or Draft) issue doesn't get an empty div, which would still claim
-     * a .space-y-6 gap above the card below it.
+     * Whether the owner-actions block has anything to show. Guards the card so an owner
+     * viewing a Cancelled (or Draft) issue doesn't get an empty "Problema ta" card.
      */
     hasOwnerActions(issue: IssueDetailResponse): boolean {
         if (!this.isOwner(issue)) {

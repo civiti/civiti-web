@@ -54,6 +54,7 @@ export class FormatDateTimePipe implements PipeTransform {
     if (diffMinutes < 1) return 'Chiar acum';
     if (diffMinutes < 60) return `Acum ${diffMinutes} min`;
     if (diffHours < 24) return `Acum ${diffHours}h`;
+    if (diffDays === 1) return 'Ieri';
     if (diffDays < 7) return `Acum ${diffDays} zile`;
 
     return date.toLocaleDateString('ro-RO', {

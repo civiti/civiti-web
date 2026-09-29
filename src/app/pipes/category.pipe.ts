@@ -21,6 +21,14 @@ export class CategoryColorPipe implements PipeTransform {
   }
 }
 
+/**
+ * Canonical PascalCase category value. Some endpoints return camelCase
+ * ('publicServices') where the category list uses 'PublicServices'.
+ */
+function canonicalCategory(category: string): string {
+  return category.charAt(0).toUpperCase() + category.slice(1);
+}
+
 /** Romanian label for a category value ('Infrastructure' → 'Infrastructură'). */
 @Pipe({
   name: 'categoryLabel',
@@ -31,7 +39,7 @@ export class CategoryLabelPipe implements PipeTransform {
   private readonly _categories = inject(CategoryService);
 
   transform(category: string | null | undefined): string {
-    return category ? this._categories.getCategoryLabel(category) : '';
+    return category ? this._categories.getCategoryLabel(canonicalCategory(category)) : '';
   }
 }
 
@@ -52,6 +60,6 @@ export class CategoryIconPipe implements PipeTransform {
   };
 
   transform(category: string | null | undefined): string {
-    return (category && CategoryIconPipe.ICONS[category]) || 'question-circle';
+    return (category && CategoryIconPipe.ICONS[canonicalCategory(category)]) || 'question-circle';
   }
 }

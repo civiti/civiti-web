@@ -1,18 +1,11 @@
-// Shared frame for the five "report a problem" steps. Each step's stylesheet
-// `@use`s this file and includes only the mixins it renders, so the rules
-// compile into (and are scoped to) that step without paying for unused parts.
-//
-//   @use '../wizard';
-//   @include wizard.frame;     // progress header, content column, sticky action bar
-//   @include wizard.context;   // "the case so far" strip
-//   @include wizard.sections;  // stacked sections with a small heading block
+// The report-a-problem wizard frame: progress header, content column, sticky
+// action bar (frame), the "case so far" strip (context) and stacked sections
+// (sections). Compiled once, globally, from src/styles.scss — every step
+// shares the same `.wz-*` markup, and inlining the mixins into five component
+// stylesheets both duplicated ~4 kB per step and pushed them over budget.
+// Each step's host only needs `:host { display: flex; flex-direction: column; }`.
 
 @mixin frame {
-  :host {
-    display: flex;
-    flex-direction: column;
-  }
-
   .wz {
     --wz-w: 720px;
     flex: 1 0 auto;

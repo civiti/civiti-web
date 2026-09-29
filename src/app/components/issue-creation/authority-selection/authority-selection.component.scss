@@ -1,4 +1,5 @@
-@use '../wizard';
+:host {
+  display: flex;
+  flex-direction: column;
+}
 
-@include wizard.frame;
-@include wizard.context;

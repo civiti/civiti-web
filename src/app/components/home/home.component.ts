@@ -26,7 +26,7 @@ import { GUIDE_ARTICLES } from '../../generated/guide-data';
   standalone: true,
   imports: [RouterLink, NzButtonModule, NzIconModule],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss',
+  styleUrls: ['./home.component.scss', './home-sections.scss'],
 })
 export class HomeComponent {
   private readonly _router = inject(Router);

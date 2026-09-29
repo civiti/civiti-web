@@ -13,11 +13,13 @@
 //   4. Base            — html/body, headings, links, focus, selection
 //   5. Primitives      — c-container, c-btn, c-chip, c-status, c-card, …
 //   6. NG-ZORRO        — the component library, re-skinned to match
-//   7. Third party     — GLightbox
+//   7. Patterns        — layouts shared by several screens (the report wizard)
+//   8. Third party     — GLightbox
 // ==========================================================================
 
 @use 'tailwindcss';
 @use 'glightbox/dist/css/glightbox.min.css';
+@use 'app/components/issue-creation/wizard';
 
 // --------------------------------------------------------------------------
 // 1. Fonts
@@ -523,6 +525,38 @@ router-outlet + * {
   strong {
     color: var(--ink-900);
   }
+
+  // Tailwind's preflight strips list markers; long-form text needs them back.
+  ul,
+  ol {
+    padding-left: 1.4em;
+  }
+
+  ul { list-style: disc; }
+  ol { list-style: decimal; }
+
+  li + li {
+    margin-top: 0.35em;
+  }
+
+  li::marker {
+    color: var(--signal-text);
+  }
+}
+
+// A plain bulleted list outside long-form text (hints, checklists in modals).
+.c-list {
+  margin: 0;
+  padding-left: 1.3em;
+  list-style: disc;
+
+  li + li {
+    margin-top: var(--space-1);
+  }
+
+  li::marker {
+    color: var(--ink-400);
+  }
 }
 
 // --- Buttons ---------------------------------------------------------------
@@ -954,7 +988,11 @@ router-outlet + * {
   font-size: var(--text-sm);
   line-height: 1.55;
 
+  // Pinned to the first line; centring drifts it into the middle of a
+  // multi-line message.
   .anticon {
+    align-self: flex-start;
+    flex: none;
     margin-top: 3px;
     color: var(--ink-500);
   }
@@ -1276,9 +1314,11 @@ body .ant-form-item-label > label {
   }
 }
 
+// The box's outline is the control itself, so it needs 3:1 against the
+// surface (WCAG 1.4.11); --line-strong is only 1.6:1 on white.
 body .ant-checkbox-inner,
 body .ant-radio-inner {
-  border-color: var(--line-strong);
+  border-color: var(--ink-400);
 }
 
 body .ant-checkbox-wrapper,
@@ -1615,7 +1655,16 @@ body .ant-avatar {
 }
 
 // --------------------------------------------------------------------------
-// 7. Third party
+// 7. Patterns shared by several screens
+// --------------------------------------------------------------------------
+
+// The report-a-problem wizard (/create-issue/*): see _wizard.scss.
+@include wizard.frame;
+@include wizard.context;
+@include wizard.sections;
+
+// --------------------------------------------------------------------------
+// 8. Third party
 // --------------------------------------------------------------------------
 
 .glightbox-clean {

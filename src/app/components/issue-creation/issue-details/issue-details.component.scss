@@ -1,7 +1,7 @@
-@use '../wizard';
-
-@include wizard.frame;
-@include wizard.context;
+:host {
+  display: flex;
+  flex-direction: column;
+}
 
 .form-card + .form-card {
   margin-top: var(--space-4);

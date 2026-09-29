@@ -1,6 +1,7 @@
-@use '../wizard';
-
-@include wizard.frame;
+:host {
+  display: flex;
+  flex-direction: column;
+}
 
 // Small square icon tile shared by recipients and success stats.
 @mixin tile($size) {

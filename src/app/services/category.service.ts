@@ -34,7 +34,7 @@ export class CategoryService {
     'Infrastructure': 'Infrastructură',
     'Environment': 'Mediu',
     'Transportation': 'Transport',
-    'PublicServices': 'Servicii Publice',
+    'PublicServices': 'Servicii publice',
     'Safety': 'Siguranță',
     'Other': 'Altele'
   };

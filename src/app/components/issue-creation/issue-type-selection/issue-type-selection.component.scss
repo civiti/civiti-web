@@ -1,7 +1,7 @@
-@use '../wizard';
-
-@include wizard.frame;
-@include wizard.sections;
+:host {
+  display: flex;
+  flex-direction: column;
+}
 
 .auth-alert {
   margin-bottom: var(--space-6);
