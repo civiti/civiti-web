@@ -21,6 +21,11 @@
 @use 'glightbox/dist/css/glightbox.min.css';
 @use 'app/components/issue-creation/wizard';
 
+// Tailwind v4 scans every non-ignored file for class names. The Markdown under docs/
+// holds old mock-up snippets whose nested utilities (space-y-1, hover:bg-orange-50)
+// the critical-CSS inliner rejects with "Empty sub-selector"; they are never used.
+@source not '../docs';
+
 // --------------------------------------------------------------------------
 // 1. Fonts
 //
