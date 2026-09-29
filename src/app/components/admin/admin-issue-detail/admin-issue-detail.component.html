@@ -279,10 +279,9 @@
             <h2 class="c-h3 card-title" id="history-title">Istoric acțiuni admin</h2>
             <ol class="history">
               @for (action of issue.adminActions; track action.id) {
-                @let meta = actionMeta[action.action];
                 <li class="history__item">
                   <div class="history__top">
-                    <span class="c-status" [attr.data-tone]="meta?.tone || 'neutral'">{{ meta?.label || (action.action | actionLabel) }}</span>
+                    <span class="c-status" [attr.data-tone]="action.action | actionTone">{{ action.action | actionLabel }}</span>
                     <time class="c-small c-muted" [attr.datetime]="action.createdAt">{{ action.createdAt | timeAgo }}</time>
                   </div>
                   <p class="history__who">{{ action.adminName || action.adminEmail }}</p>

@@ -15,7 +15,7 @@ import { ApiService } from '../../../services/api.service';
 import { CategoryLabelPipe } from '../../../pipes/category.pipe';
 import { StatusTextPipe, StatusTonePipe } from '../../../pipes/status.pipe';
 import { TimeAgoPipe } from '../../../pipes/date.pipe';
-import { ActionLabelPipe } from '../../../pipes/admin.pipe';
+import { ActionLabelPipe, ActionTonePipe } from '../../../pipes/admin.pipe';
 import {
   AdminIssueDetailResponse,
   IssueApprovedSnapshot,
@@ -46,7 +46,8 @@ interface DiffRow {
     StatusTextPipe,
     StatusTonePipe,
     TimeAgoPipe,
-    ActionLabelPipe
+    ActionLabelPipe,
+    ActionTonePipe
   ],
   templateUrl: './admin-issue-detail.component.html',
   styleUrls: ['./admin-issue-detail.component.scss']
@@ -144,17 +145,6 @@ export class AdminIssueDetailComponent implements OnInit {
   // Template lookups (declared after the static maps they reuse).
   readonly categoryLabels: Record<string, string> = AdminIssueDetailComponent.CATEGORY_LABELS;
   readonly urgencyLabels: Record<string, string> = AdminIssueDetailComponent.URGENCY_LABELS;
-
-  /**
-   * History pill per admin action: label + `.c-status` tone. Covers both spellings the API
-   * has used for "request changes" so neither renders as a raw key.
-   */
-  readonly actionMeta: Record<string, { label: string; tone: string }> = {
-    approve: { label: 'A aprobat', tone: 'resolved' },
-    reject: { label: 'A respins', tone: 'rejected' },
-    request_changes: { label: 'A solicitat modificări', tone: 'pending' },
-    requestchanges: { label: 'A solicitat modificări', tone: 'pending' }
-  };
 
   /**
    * Build the re-review diff from the approved snapshot. Branch on the snapshot's PRESENCE

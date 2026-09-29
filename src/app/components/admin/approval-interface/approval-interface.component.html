@@ -252,14 +252,17 @@
           </nz-form-item>
 
           <nz-form-item>
-            <nz-form-label nzFor="approval-notes">Notițe</nz-form-label>
-            <nz-form-control>
+            @let changesRequested = decision === 'request_changes';
+            <nz-form-label nzFor="approval-notes" [nzRequired]="changesRequested">
+              {{ changesRequested ? 'Modificări solicitate' : 'Notițe' }}
+            </nz-form-label>
+            <nz-form-control nzErrorTip="Descrie ce trebuie să modifice autorul">
               <textarea
                 nz-input
                 id="approval-notes"
                 formControlName="notes"
                 rows="4"
-                placeholder="Adaugă notițe sau feedback...">
+                [placeholder]="changesRequested ? 'Ce trebuie să completeze sau să corecteze autorul (vizibil pentru autor)...' : 'Adaugă notițe sau feedback...'">
               </textarea>
             </nz-form-control>
           </nz-form-item>

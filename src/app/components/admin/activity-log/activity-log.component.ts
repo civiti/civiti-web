@@ -16,7 +16,7 @@ import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { ApiService } from '../../../services/api.service';
 import { AdminActivityLogEntry, AdminActionType, PagedResult } from '../../../types/civica-api.types';
-import { ActionLabelPipe, TargetLabelPipe } from '../../../pipes/admin.pipe';
+import { ActionLabelPipe, ActionTonePipe, TargetLabelPipe } from '../../../pipes/admin.pipe';
 import { StatusTextPipe } from '../../../pipes/status.pipe';
 import { FormatDateTimePipe } from '../../../pipes/date.pipe';
 
@@ -33,6 +33,7 @@ import { FormatDateTimePipe } from '../../../pipes/date.pipe';
     NzIconModule,
     NzPaginationModule,
     ActionLabelPipe,
+    ActionTonePipe,
     TargetLabelPipe,
     StatusTextPipe,
     FormatDateTimePipe
@@ -65,17 +66,6 @@ export class ActivityLogComponent implements OnInit {
     { value: 'reject', label: 'Respingere' },
     { value: 'requestchanges', label: 'Cerere modificări' }
   ];
-
-  /**
-   * Pill per action: the filter's own noun + a `.c-status` tone (ok / bad / info). Both
-   * spellings of "request changes" are covered so neither renders as a raw key.
-   */
-  readonly actionMeta: Record<string, { label: string; tone: string }> = {
-    approve: { label: 'Aprobare', tone: 'resolved' },
-    reject: { label: 'Respingere', tone: 'rejected' },
-    requestchanges: { label: 'Cerere modificări', tone: 'pending' },
-    request_changes: { label: 'Cerere modificări', tone: 'pending' }
-  };
 
   ngOnInit(): void {
     // Set up the load pipeline with switchMap to cancel stale requests
@@ -141,58 +131,5 @@ export class ActivityLogComponent implements OnInit {
     this.dateRange = [];
     this.pageIndex = 1;
     this.loadActivities();
-  }
-
-  getActionLabel(action: AdminActionType): string {
-    const labels: Record<AdminActionType, string> = {
-      approve: 'A aprobat',
-      reject: 'A respins',
-      requestchanges: 'A cerut modificări pentru'
-    };
-    return labels[action] || action;
-  }
-
-  getActionColor(action: AdminActionType): string {
-    const colors: Record<AdminActionType, string> = {
-      approve: 'green',
-      reject: 'red',
-      requestchanges: 'orange'
-    };
-    return colors[action] || 'default';
-  }
-
-  getTimelineColor(action: AdminActionType): string {
-    const colors: Record<AdminActionType, string> = {
-      approve: 'green',
-      reject: 'red',
-      requestchanges: 'orange'
-    };
-    return colors[action] || 'gray';
-  }
-
-  formatDateTime(dateStr: string): string {
-    const date = new Date(dateStr);
-    const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
-    const diffMins = Math.floor(diffMs / 60000);
-    const diffHours = Math.floor(diffMins / 60);
-    const diffDays = Math.floor(diffHours / 24);
-
-    if (diffMins < 1) return 'Acum';
-    if (diffMins < 60) return `Acum ${diffMins} min`;
-    if (diffHours < 24) return `Acum ${diffHours} ore`;
-    if (diffDays < 7) return `Acum ${diffDays} zile`;
-
-    return date.toLocaleDateString('ro-RO', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
-  }
-
-  getTargetLabel(entry: AdminActivityLogEntry): string {
-    return entry.issueTitle || `Problemă #${entry.issueId.slice(0, 8)}`;
   }
 }

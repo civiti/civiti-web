@@ -25,6 +25,7 @@ import {
   AdminStatisticsResponse,
   ApproveIssueRequest,
   RejectIssueRequest,
+  RequestChangesRequest,
   BulkApproveRequest
 } from '../../../types/civica-api.types';
 
@@ -72,6 +73,8 @@ export class ApprovalInterfaceComponent implements OnInit {
   isApprovalModalVisible = false;
   selectedIssue: AdminIssueListItem | null = null;
   approvalForm!: FormGroup;
+  /** Mirrors the form's decision so the template can relabel the notes field. */
+  decision = '';
 
   // Bulk approval modal state
   isBulkApprovalModalVisible = false;
@@ -118,6 +121,17 @@ export class ApprovalInterfaceComponent implements OnInit {
       decision: ['', [Validators.required]],
       notes: ['']
     });
+
+    // Requesting changes sends the notes to the author as the list of changes, so they
+    // must say something; for approve/reject the notes stay optional.
+    this.approvalForm.get('decision')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(decision => {
+        this.decision = decision || '';
+        const notes = this.approvalForm.get('notes');
+        notes?.setValidators(decision === 'request_changes' ? [Validators.required, Validators.pattern(/\S/)] : []);
+        notes?.updateValueAndValidity();
+      });
   }
 
   private loadData(): void {
@@ -253,6 +267,29 @@ export class ApprovalInterfaceComponent implements OnInit {
             this.isProcessing = false;
           }
         });
+    } else if (formValue.decision === 'request_changes') {
+      const changes = (formValue.notes || '').trim();
+      const changesData: RequestChangesRequest = {
+        requestedChanges: changes,
+        adminNotes: changes
+      };
+
+      this.apiService.requestChanges(issueId, changesData)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (result) => {
+            console.log('[ADMIN] Changes requested successfully:', result);
+            this.message.success('Modificările au fost solicitate autorului');
+            this.handleDecisionSuccess('request_changes');
+          },
+          error: (error) => {
+            console.error('[ADMIN] Failed to request changes:', error);
+            this.message.error('Solicitarea modificărilor a eșuat. Încearcă din nou.');
+            this.isProcessing = false;
+          }
+        });
+    } else {
+      this.isProcessing = false;
     }
   }
 
@@ -269,7 +306,7 @@ export class ApprovalInterfaceComponent implements OnInit {
     }
   }
 
-  private handleDecisionSuccess(decision: 'approve' | 'reject'): void {
+  private handleDecisionSuccess(decision: 'approve' | 'reject' | 'request_changes'): void {
     const processedIssueId = this.selectedIssue?.id;
 
     // Remove processed issue from pending list
@@ -288,11 +325,10 @@ export class ApprovalInterfaceComponent implements OnInit {
     // Update stats
     if (this.adminStats) {
       this.adminStats.pendingReview--;
+      this.adminStats.reviewedToday++;
       if (decision === 'approve') {
-        this.adminStats.reviewedToday++;
         this.adminStats.approved++;
       } else if (decision === 'reject') {
-        this.adminStats.reviewedToday++;
         this.adminStats.rejected++;
       }
     }

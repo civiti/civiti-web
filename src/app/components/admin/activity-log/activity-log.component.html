@@ -58,13 +58,13 @@
     @if (activities.length > 0) {
       <ol class="log-list" [class.is-loading]="isLoading">
         @for (activity of activities; track activity.id) {
-          @let meta = actionMeta[activity.actionType];
-          <li class="entry" [attr.data-tone]="meta?.tone || 'neutral'">
+          @let tone = activity.actionType | actionTone;
+          <li class="entry" [attr.data-tone]="tone">
             <span class="entry__node" aria-hidden="true"></span>
 
             <div class="entry__body">
               <div class="entry__top">
-                <span class="c-status" [attr.data-tone]="meta?.tone || 'neutral'">{{ meta?.label || (activity.actionType | actionLabel) }}</span>
+                <span class="c-status" [attr.data-tone]="tone">{{ activity.actionType | actionLabel }}</span>
                 <a class="entry__issue" [routerLink]="['/admin/issue', activity.issueId]">{{ activity | targetLabel }}</a>
               </div>
 
