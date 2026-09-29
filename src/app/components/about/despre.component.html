@@ -1,101 +1,177 @@
-<article class="despre-page">
-  <div class="despre-container">
-    <nav class="breadcrumb" aria-label="Breadcrumb">
-      <a routerLink="/">Acasă</a>
-      <span class="breadcrumb-sep">/</span>
-      <span aria-current="page">Despre</span>
-    </nav>
+<article class="despre">
+  <!-- Hero: who we are on the left, the (upcoming) founder video on the right. -->
+  <header class="hero">
+    <div class="c-container hero-grid">
+      <div class="hero-copy">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <a routerLink="/">Acasă</a>
+          <span class="crumbs-sep" aria-hidden="true">/</span>
+          <span aria-current="page">Despre</span>
+        </nav>
 
-    <header class="despre-header">
-      <h1>Despre Civiti</h1>
-      <p class="despre-subtitle">
-        Platformă independentă de participare civică, construită pentru cetățenii din România care vor să acționeze, nu doar să se plângă.
-      </p>
-    </header>
-
-    <section class="video-section" aria-labelledby="video-heading">
-      <h2 id="video-heading" class="visually-hidden">Video introducere</h2>
-      <div class="video-placeholder">
-        <nz-icon nzType="play-circle" nzTheme="outline" class="video-icon"></nz-icon>
-        <p class="video-placeholder-title">Video în pregătire</p>
-        <p class="video-placeholder-sub">
-          Urmează un scurt video în care fondatorul povestește de ce a construit Civiti și cum o poți folosi.
+        <p class="c-eyebrow">Povestea platformei</p>
+        <h1 class="c-display">Despre Civiti</h1>
+        <p class="c-lead hero-lead">
+          Platformă independentă de participare civică, construită pentru cetățenii din România care vor să acționeze, nu doar să se plângă.
         </p>
+
+        <ul class="hero-tags" aria-label="Pe scurt">
+          <li class="c-tag">Independent</li>
+          <li class="c-tag">Open source</li>
+          <li class="c-tag">Fără apartenență politică</li>
+        </ul>
+      </div>
+
+      <section class="video" aria-labelledby="video-heading">
+        <h2 id="video-heading" class="c-sr-only">Video introducere</h2>
+        <div class="video-frame">
+          <span class="video-icon" aria-hidden="true">
+            <nz-icon nzType="play-circle" nzTheme="outline"></nz-icon>
+          </span>
+          <p class="video-title">Video în pregătire</p>
+          <p class="video-sub">
+            Urmează un scurt video în care fondatorul povestește de ce a construit Civiti și cum o poți folosi.
+          </p>
+        </div>
+      </section>
+    </div>
+  </header>
+
+  <!-- Story, then three figures that anchor it. -->
+  <section class="section" aria-labelledby="story-heading">
+    <div class="c-container story">
+      <div class="story-head">
+        <p class="c-eyebrow">De unde am pornit</p>
+        <h2 id="story-heading" class="c-h2">De ce Civiti</h2>
+      </div>
+      <div class="c-prose">
+        <p>
+          Civiti a pornit dintr-o frustrare simplă: în România, raportarea unei probleme locale — o groapă, un gunoi neridicat, un stâlp de iluminat stricat — înseamnă de obicei un drum la primărie, un formular nerezolvat sau un email trimis în gol. Autoritățile răspund mai des și mai rapid atunci când primesc presiune coordonată din partea mai multor cetățeni, nu mesaje izolate.
+        </p>
+        <p>
+          Civiti transformă reclamațiile individuale în campanii coordonate. Raportezi o problemă, alegi autoritățile responsabile, iar platforma te ajută să trimiți mesaje clare și eficiente — singur sau împreună cu alți cetățeni din zona ta.
+        </p>
+        <p>
+          Proiectul este independent, fără apartenență politică și construit de o persoană care crede că participarea civică nu ar trebui să fie un lux rezervat celor cu timp liber și conexiuni.
+        </p>
+      </div>
+    </div>
+
+    <div class="c-container">
+      <dl class="figures">
+        <div class="figure">
+          <dt class="c-stat__label">are autoritatea să răspundă unei petiții (OG 27/2002)</dt>
+          <dd class="c-stat__value">30 <span class="figure-unit">de zile</span></dd>
+        </div>
+        <div class="figure">
+          <dt class="c-stat__label">costă raportarea unei probleme și trimiterea sesizării</dt>
+          <dd class="c-stat__value">0 <span class="figure-unit">lei</span></dd>
+        </div>
+        <div class="figure">
+          <dt class="c-stat__label">componente cu cod public: platforma, aplicația mobilă și serverul</dt>
+          <dd class="c-stat__value">3</dd>
+        </div>
+      </dl>
+    </div>
+  </section>
+
+  <!-- Three ways to get involved, alternating copy and a small fact panel. -->
+  <div class="c-container features">
+    <section class="feature" aria-labelledby="app-heading">
+      <div class="feature-copy">
+        <span class="feature-icon" aria-hidden="true"><nz-icon nzType="mobile" nzTheme="outline"></nz-icon></span>
+        <h2 id="app-heading" class="c-h2">Civiti pe iPhone</h2>
+        <p>
+          Aplicația mobilă Civiti îți permite să raportezi o problemă direct de pe stradă, cu fotografie și locație GPS, în câteva secunde. Pentru moment, aplicația este disponibilă doar pe iOS; versiunea pentru Android va veni mai târziu.
+        </p>
+        <a
+          [href]="appStoreUrl"
+          target="_blank"
+          rel="noopener"
+          class="c-btn c-btn--ink c-btn--lg"
+          aria-label="Descarcă aplicația Civiti din App Store"
+        >
+          Descarcă din App Store →
+        </a>
+      </div>
+      <div class="feature-panel">
+        <p class="c-eyebrow c-eyebrow--muted">Disponibilitate</p>
+        <ul class="panel-list">
+          <li>
+            <span>iOS (iPhone)</span>
+            <span class="c-status" data-tone="resolved">Disponibilă</span>
+          </li>
+          <li>
+            <span>Android</span>
+            <span class="c-status">Mai târziu</span>
+          </li>
+        </ul>
       </div>
     </section>
 
-    <section class="despre-story" aria-labelledby="story-heading">
-      <h2 id="story-heading">De ce Civiti</h2>
-      <p>
-        Civiti a pornit dintr-o frustrare simplă: în România, raportarea unei probleme locale — o groapă, un gunoi neridicat, un stâlp de iluminat stricat — înseamnă de obicei un drum la primărie, un formular nerezolvat sau un email trimis în gol. Autoritățile răspund mai des și mai rapid atunci când primesc presiune coordonată din partea mai multor cetățeni, nu mesaje izolate.
-      </p>
-      <p>
-        Civiti transformă reclamațiile individuale în campanii coordonate. Raportezi o problemă, alegi autoritățile responsabile, iar platforma te ajută să trimiți mesaje clare și eficiente — singur sau împreună cu alți cetățeni din zona ta.
-      </p>
-      <p>
-        Proiectul este independent, fără apartenență politică și construit de o persoană care crede că participarea civică nu ar trebui să fie un lux rezervat celor cu timp liber și conexiuni.
-      </p>
+    <section class="feature feature--flip" aria-labelledby="opensource-heading">
+      <div class="feature-copy">
+        <span class="feature-icon" aria-hidden="true"><nz-icon nzType="github" nzTheme="outline"></nz-icon></span>
+        <h2 id="opensource-heading" class="c-h2">Cod deschis</h2>
+        <p>
+          Civiti este un proiect open source. Codul platformei, al aplicației mobile și al serverului este public pe GitHub, iar oricine poate să-l inspecteze, să raporteze probleme sau să contribuie.
+        </p>
+        <a [href]="githubUrl" target="_blank" rel="noopener" class="c-btn c-btn--lg">
+          Vezi proiectul pe GitHub →
+        </a>
+      </div>
+      <div class="feature-panel">
+        <p class="c-eyebrow c-eyebrow--muted">Public pe GitHub</p>
+        <ul class="panel-list panel-list--checks">
+          <li><nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></nz-icon><span>Platforma web</span></li>
+          <li><nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></nz-icon><span>Aplicația mobilă</span></li>
+          <li><nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></nz-icon><span>Serverul</span></li>
+        </ul>
+      </div>
     </section>
 
-    <section class="despre-app" aria-labelledby="app-heading">
-      <h2 id="app-heading">
-        <nz-icon nzType="mobile" nzTheme="outline"></nz-icon>
-        Civiti pe iPhone
-      </h2>
-      <p>
-        Aplicația mobilă Civiti îți permite să raportezi o problemă direct de pe stradă, cu fotografie și locație GPS, în câteva secunde. Pentru moment, aplicația este disponibilă doar pe iOS; versiunea pentru Android va veni mai târziu.
-      </p>
-      <a
-        [href]="appStoreUrl"
-        target="_blank"
-        rel="noopener"
-        class="app-store-cta"
-        aria-label="Descarcă aplicația Civiti din App Store"
-      >
-        Descarcă din App Store →
-      </a>
-    </section>
-
-    <section class="despre-opensource" aria-labelledby="opensource-heading">
-      <h2 id="opensource-heading">
-        <nz-icon nzType="github" nzTheme="outline"></nz-icon>
-        Cod deschis
-      </h2>
-      <p>
-        Civiti este un proiect open source. Codul platformei, al aplicației mobile și al serverului este public pe GitHub, iar oricine poate să-l inspecteze, să raporteze probleme sau să contribuie.
-      </p>
-      <a [href]="githubUrl" target="_blank" rel="noopener" class="inline-link">
-        Vezi proiectul pe GitHub →
-      </a>
-    </section>
-
-    <section class="despre-support" aria-labelledby="support-heading">
-      <h2 id="support-heading">
-        <nz-icon nzType="gift" nzTheme="outline"></nz-icon>
-        Susține proiectul
-      </h2>
-      <p>
-        Civiti este un proiect independent. Contribuțiile acoperă domeniul civiti.ro, serverele, contul Apple Developer și costurile API (Google Maps, Supabase). Platforma folosește modele AI pentru a ajuta cetățenii să-și formuleze mai clar problemele raportate, iar aceste servicii au cost per apel. Orice surplus intră în dezvoltarea platformei.
-      </p>
-      <a
-        [href]="revolutUrl"
-        target="_blank"
-        rel="noopener"
-        class="support-cta"
-        aria-label="Trimite o contribuție pe Revolut"
-      >
-        Trimite o contribuție pe Revolut →
-      </a>
-    </section>
-
-    <section class="despre-final-cta">
-      <h2>Ești gata să începi?</h2>
-      <p>
-        Alege orașul tău și vezi problemele raportate de alți cetățeni. Sau raportează tu una nouă.
-      </p>
-      <a routerLink="/" class="primary-cta">
-        Raportează o problemă →
-      </a>
+    <section class="feature" aria-labelledby="support-heading">
+      <div class="feature-copy">
+        <span class="feature-icon" aria-hidden="true"><nz-icon nzType="gift" nzTheme="outline"></nz-icon></span>
+        <h2 id="support-heading" class="c-h2">Susține proiectul</h2>
+        <p>
+          Civiti este un proiect independent. Contribuțiile acoperă domeniul civiti.ro, serverele, contul Apple Developer și costurile API (Google Maps, Supabase). Platforma folosește modele AI pentru a ajuta cetățenii să-și formuleze mai clar problemele raportate, iar aceste servicii au cost per apel. Orice surplus intră în dezvoltarea platformei.
+        </p>
+        <a
+          [href]="revolutUrl"
+          target="_blank"
+          rel="noopener"
+          class="c-btn c-btn--ink c-btn--lg"
+          aria-label="Trimite o contribuție pe Revolut"
+        >
+          Trimite o contribuție pe Revolut →
+        </a>
+      </div>
+      <div class="feature-panel">
+        <p class="c-eyebrow c-eyebrow--muted">Ce acoperă contribuțiile</p>
+        <ul class="panel-list panel-list--checks">
+          <li><nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></nz-icon><span>Domeniul civiti.ro</span></li>
+          <li><nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></nz-icon><span>Serverele</span></li>
+          <li><nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></nz-icon><span>Contul Apple Developer</span></li>
+          <li><nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></nz-icon><span>Costurile API (Google Maps, Supabase)</span></li>
+          <li><nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></nz-icon><span>Modelele AI, cu cost per apel</span></li>
+        </ul>
+      </div>
     </section>
   </div>
+
+  <!-- Closing CTA -->
+  <section class="c-container closing" aria-labelledby="closing-heading">
+    <div class="closing-panel">
+      <div>
+        <h2 id="closing-heading" class="c-h2">Ești gata să începi?</h2>
+        <p>
+          Alege orașul tău și vezi problemele raportate de alți cetățeni. Sau raportează tu una nouă.
+        </p>
+      </div>
+      <a routerLink="/" class="c-btn c-btn--signal c-btn--lg closing-cta">
+        Raportează o problemă →
+      </a>
+    </div>
+  </section>
 </article>

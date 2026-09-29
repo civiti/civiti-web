@@ -1,41 +1,36 @@
 <div class="home">
 
-  <!-- Hero: full-bleed navy band carrying its own brand bar. The route sets
-       hideHeader, so this bar is the only navigation above the fold. -->
-  <header class="hero">
-    <div class="wrap hero-bar">
-      <a class="brand" routerLink="/" aria-label="Civiti — pagina principală">
-        <img src="/images/logo/civiti-mark-light.svg" alt="" width="34" height="34" />
-        <span class="brand-name">Civiti</span>
-      </a>
-      <app-auth-buttons />
-    </div>
-
-    <div class="wrap hero-body">
+  <!-- Hero. The global header sits above it, so the hero is pure message:
+       the promise, the mechanism in one paragraph, and one way in. -->
+  <section class="hero">
+    <div class="c-container hero-grid">
       <div class="hero-copy">
-      <p class="eyebrow eyebrow-on-dark">Platformă civică pentru România</p>
+        <p class="c-eyebrow hero-eyebrow">
+          <span class="pulse" aria-hidden="true"></span>
+          Platformă civică pentru România
+        </p>
 
-      <h1 class="hero-title">Sesizări către primărie, online și gratuit</h1>
+        <h1 class="c-display hero-title">Sesizări către primărie, <span class="mark">online și gratuit</span></h1>
 
-      <p class="hero-lead">
-        Civiti este o platformă civică prin care cetățenii din România raportează problemele din
-        cartierul lor — gropi în asfalt, trotuare blocate, gunoi neridicat, iluminat public defect —
-        și trimit sesizarea, prin email, direct către autoritatea care răspunde de ele. O sesizare
-        singură se pierde ușor. Cincizeci de emailuri pe aceeași temă sunt greu de ignorat.
-      </p>
+        <p class="hero-lead">
+          Civiti este o platformă civică prin care cetățenii din România raportează problemele din
+          cartierul lor — gropi în asfalt, trotuare blocate, gunoi neridicat, iluminat public defect —
+          și trimit sesizarea, prin email, direct către autoritatea care răspunde de ele. O sesizare
+          singură se pierde ușor. Cincizeci de emailuri pe aceeași temă sunt greu de ignorat.
+        </p>
 
-      <div class="hero-actions">
-        <button nz-button nzSize="large" class="cta cta-accent" (click)="enterCity()">
-          <span>Vezi problemele din {{ defaultCity }}</span>
-          <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
-        </button>
-        <a routerLink="/despre" class="hero-link">De ce există Civiti →</a>
-      </div>
+        <div class="hero-actions">
+          <button nz-button nzSize="large" nzType="primary" (click)="enterCity()">
+            <span>Vezi problemele din {{ defaultCity }}</span>
+            <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
+          </button>
+          <a routerLink="/despre" class="c-link hero-link">De ce există Civiti →</a>
+        </div>
 
-      <p class="hero-note">
-        <span nz-icon nzType="info-circle" nzTheme="outline"></span>
-        <span>Nu ai nevoie de cont pentru a vedea sesizările. Momentan acoperim {{ defaultCity }}.</span>
-      </p>
+        <p class="hero-note">
+          <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+          <span>Nu ai nevoie de cont pentru a vedea sesizările. Momentan acoperim {{ defaultCity }}.</span>
+        </p>
       </div>
 
       <!-- A real anchor, not a click handler on the image: middle-click and
@@ -46,61 +41,76 @@
            The image is above the fold, so eager and prioritised, with intrinsic
            dimensions declared to keep it out of the CLS budget. -->
       <div class="hero-visual">
-        <a routerLink="/bucuresti" (click)="selectCity()">
+        <a routerLink="/bucuresti" (click)="selectCity()" class="shot">
           <img
             src="/images/screenshots/harta-bucuresti.webp"
             width="1120"
             height="840"
             fetchpriority="high"
             alt="Vezi harta sesizărilor din {{ defaultCity }}" />
+          <span class="shot-chip" aria-hidden="true">
+            <span nz-icon nzType="environment" nzTheme="outline"></span>
+            {{ defaultCity }}
+          </span>
         </a>
+        <div class="deadline-card" aria-hidden="true">
+          <span class="deadline-figure c-num">30</span>
+          <span class="deadline-text">de zile are autoritatea să îți răspundă</span>
+        </div>
       </div>
     </div>
-  </header>
-
-  <!-- How it works -->
-  <section class="wrap section">
-    <p class="eyebrow">Procesul</p>
-    <h2>Cum funcționează</h2>
-    <ol class="steps">
-      <li>
-        <span class="step-number">1</span>
-        <h3>Documentezi problema</h3>
-        <p>
-          Faci una-două fotografii, marchezi locația exactă pe hartă și descrii concret ce nu este
-          în regulă. Cu cât sesizarea e mai precisă, cu atât autoritatea are mai puține motive să o
-          claseze.
-        </p>
-      </li>
-      <li>
-        <span class="step-number">2</span>
-        <h3>Alegi autoritățile responsabile</h3>
-        <p>
-          Civiti îți propune instituțiile care au competență pe tipul acela de problemă și pe zona
-          respectivă, ca sesizarea să nu ajungă la ghișeul greșit și să se piardă în redirecționări.
-        </p>
-      </li>
-      <li>
-        <span class="step-number">3</span>
-        <h3>Trimiți emailul, iar problema rămâne publică</h3>
-        <p>
-          Platforma compune petiția în forma cerută de lege, tu o trimiți din contul tău, iar
-          sesizarea rămâne vizibilă pe site. Alți locuitori o pot vota și pot trimite la rândul lor
-          același email — presiunea colectivă este mecanismul care produce răspunsuri.
-        </p>
-      </li>
-    </ol>
   </section>
 
-  <!-- The law -->
-  <section class="wrap section law">
-    <div class="law-panel">
+  <!-- How it works -->
+  <section class="section">
+    <div class="c-container">
+      <div class="section-head">
+        <p class="c-eyebrow">Procesul</p>
+        <h2 class="c-h2">Cum funcționează</h2>
+      </div>
+      <ol class="steps">
+        <li class="step">
+          <span class="step-icon" aria-hidden="true"><span nz-icon nzType="camera" nzTheme="outline"></span></span>
+          <span class="step-number c-num" aria-hidden="true">01</span>
+          <h3>Documentezi problema</h3>
+          <p>
+            Faci una-două fotografii, marchezi locația exactă pe hartă și descrii concret ce nu este
+            în regulă. Cu cât sesizarea e mai precisă, cu atât autoritatea are mai puține motive să o
+            claseze.
+          </p>
+        </li>
+        <li class="step">
+          <span class="step-icon" aria-hidden="true"><span nz-icon nzType="bank" nzTheme="outline"></span></span>
+          <span class="step-number c-num" aria-hidden="true">02</span>
+          <h3>Alegi autoritățile responsabile</h3>
+          <p>
+            Civiti îți propune instituțiile care au competență pe tipul acela de problemă și pe zona
+            respectivă, ca sesizarea să nu ajungă la ghișeul greșit și să se piardă în redirecționări.
+          </p>
+        </li>
+        <li class="step">
+          <span class="step-icon" aria-hidden="true"><span nz-icon nzType="send" nzTheme="outline"></span></span>
+          <span class="step-number c-num" aria-hidden="true">03</span>
+          <h3>Trimiți emailul, iar problema rămâne publică</h3>
+          <p>
+            Platforma compune petiția în forma cerută de lege, tu o trimiți din contul tău, iar
+            sesizarea rămâne vizibilă pe site. Alți locuitori o pot vota și pot trimite la rândul lor
+            același email — presiunea colectivă este mecanismul care produce răspunsuri.
+          </p>
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- The law: a full-bleed ink band, the one dark moment on the page. -->
+  <section class="law">
+    <div class="c-container law-grid">
       <div class="law-stat">
-        <span class="law-stat-figure">30</span>
+        <span class="law-stat-figure c-num">30</span>
         <span class="law-stat-label">de zile — termenul legal de răspuns</span>
       </div>
       <div class="law-copy">
-        <h2>Autoritatea are 30 de zile să îți răspundă</h2>
+        <h2 class="c-h2">Autoritatea are 30 de zile să îți răspundă</h2>
         <p>
           Nu este o formulă de politețe, este o obligație legală. Conform articolului 8 din
           <strong>Ordonanța Guvernului nr. 27/2002</strong>, aprobată prin Legea 233/2002, instituția
@@ -119,67 +129,84 @@
     </div>
   </section>
 
-  <!-- Who is responsible -->
-  <section class="wrap section">
-    <p class="eyebrow">Competențe</p>
-    <h2>Cine răspunde de ce în {{ defaultCity }}</h2>
-    <p class="section-lead">
-      Cea mai frecventă cauză pentru care o sesizare rămâne fără efect este că a fost trimisă unei
-      instituții care nu are competență pe acel subiect. Împărțirea, pe scurt:
-    </p>
-    <ul class="responsibilities">
-      <li>
-        <strong>Primăria de sector</strong>
-        <span>— străzi secundare, trotuare, parcuri și spații verzi, iluminat stradal, salubritate, autorizații de construire.</span>
-      </li>
-      <li>
-        <strong>Primăria Municipiului București</strong>
-        <span>— bulevardele principale, transportul public de suprafață (STB), termoficarea (Termoenergetica).</span>
-      </li>
-      <li>
-        <strong>Administrația Străzilor</strong>
-        <span>— semafoare, marcaje rutiere și indicatoare pe drumurile municipale.</span>
-      </li>
-      <li>
-        <strong>Poliția Locală</strong>
-        <span>— parcări ilegale, comerț neautorizat, zgomot, curățenia spațiilor publice.</span>
-      </li>
-      <li>
-        <strong>ASPA</strong>
-        <span>— câinii fără stăpân și problemele legate de animale.</span>
-      </li>
-    </ul>
-    <p class="responsibilities-note">
-      Metroul nu intră în competența Primăriei: este administrat de Metrorex, în subordinea
-      Ministerului Transporturilor.
-    </p>
+  <!-- Who is responsible: a directory, not a paragraph. -->
+  <section class="section">
+    <div class="c-container directory">
+      <div class="directory-intro">
+        <p class="c-eyebrow">Competențe</p>
+        <h2 class="c-h2">Cine răspunde de ce în {{ defaultCity }}</h2>
+        <p class="section-lead">
+          Cea mai frecventă cauză pentru care o sesizare rămâne fără efect este că a fost trimisă unei
+          instituții care nu are competență pe acel subiect. Împărțirea, pe scurt:
+        </p>
+        <p class="responsibilities-note">
+          <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+          <span>
+            Metroul nu intră în competența Primăriei: este administrat de Metrorex, în subordinea
+            Ministerului Transporturilor.
+          </span>
+        </p>
+      </div>
+      <ul class="responsibilities">
+        <li>
+          <span class="resp-icon" aria-hidden="true"><span nz-icon nzType="home" nzTheme="outline"></span></span>
+          <strong>Primăria de sector</strong>
+          <span>— străzi secundare, trotuare, parcuri și spații verzi, iluminat stradal, salubritate, autorizații de construire.</span>
+        </li>
+        <li>
+          <span class="resp-icon" aria-hidden="true"><span nz-icon nzType="bank" nzTheme="outline"></span></span>
+          <strong>Primăria Municipiului București</strong>
+          <span>— bulevardele principale, transportul public de suprafață (STB), termoficarea (Termoenergetica).</span>
+        </li>
+        <li>
+          <span class="resp-icon" aria-hidden="true"><span nz-icon nzType="car" nzTheme="outline"></span></span>
+          <strong>Administrația Străzilor</strong>
+          <span>— semafoare, marcaje rutiere și indicatoare pe drumurile municipale.</span>
+        </li>
+        <li>
+          <span class="resp-icon" aria-hidden="true"><span nz-icon nzType="safety" nzTheme="outline"></span></span>
+          <strong>Poliția Locală</strong>
+          <span>— parcări ilegale, comerț neautorizat, zgomot, curățenia spațiilor publice.</span>
+        </li>
+        <li>
+          <span class="resp-icon" aria-hidden="true"><span nz-icon nzType="heart" nzTheme="outline"></span></span>
+          <strong>ASPA</strong>
+          <span>— câinii fără stăpân și problemele legate de animale.</span>
+        </li>
+      </ul>
+    </div>
   </section>
 
   <!-- Guides -->
-  <section class="resources">
-    <div class="wrap section">
-      <p class="eyebrow">Resurse</p>
-      <h2>Ghiduri practice</h2>
-      <p class="section-lead">
-        Poți folosi platforma fără să citești nimic în prealabil. Dar dacă vrei să înțelegi cum
-        funcționează mecanismul legal — sau vrei să scrii singur o petiție, în afara Civiti — ghidurile
-        de mai jos sunt gratuite și nu cer cont.
-      </p>
+  <section class="section resources">
+    <div class="c-container">
+      <div class="section-head">
+        <p class="c-eyebrow">Resurse</p>
+        <h2 class="c-h2">Ghiduri practice</h2>
+        <p class="section-lead">
+          Poți folosi platforma fără să citești nimic în prealabil. Dar dacă vrei să înțelegi cum
+          funcționează mecanismul legal — sau vrei să scrii singur o petiție, în afara Civiti — ghidurile
+          de mai jos sunt gratuite și nu cer cont.
+        </p>
+      </div>
       <ul class="guide-links">
         @for (guide of guides; track guide.slug) {
           <li>
-            <a [routerLink]="['/ghid', guide.slug]">
+            <a [routerLink]="['/ghid', guide.slug]" class="guide-card">
               @if (guide.image) {
-                <img
-                  [src]="guide.image"
-                  [width]="guide.imageWidth"
-                  [height]="guide.imageHeight"
-                  alt=""
-                  loading="lazy" />
+                <span class="guide-media">
+                  <img
+                    [src]="guide.image"
+                    [width]="guide.imageWidth"
+                    [height]="guide.imageHeight"
+                    alt=""
+                    loading="lazy" />
+                </span>
               }
               <span class="guide-body">
                 <span class="guide-title">{{ guide.title }}</span>
                 <span class="guide-desc">{{ guide.description }}</span>
+                <span class="guide-more" aria-hidden="true">Citește ghidul →</span>
               </span>
             </a>
           </li>
@@ -189,17 +216,23 @@
   </section>
 
   <!-- Closing CTA -->
-  <section class="wrap section closing">
-    <img src="/images/logo/civiti-mark.svg" alt="" width="48" height="48" class="closing-mark" />
-    <h2>Începe cu problema de la tine de pe stradă</h2>
-    <p>
-      Vezi ce au raportat deja ceilalți locuitori, votează sesizările care te afectează și pe ale
-      tale, sau adaugă una nouă.
-    </p>
-    <button nz-button nzSize="large" class="cta cta-navy" (click)="enterCity()">
-      <span nz-icon nzType="environment" nzTheme="outline"></span>
-      <span>Deschide harta sesizărilor din {{ defaultCity }}</span>
-    </button>
+  <section class="closing">
+    <div class="c-container">
+      <div class="closing-panel">
+        <img src="/images/logo/civiti-mark.svg" alt="" width="56" height="56" class="closing-mark" />
+        <div class="closing-copy">
+          <h2 class="c-h2">Începe cu problema de la tine de pe stradă</h2>
+          <p>
+            Vezi ce au raportat deja ceilalți locuitori, votează sesizările care te afectează și pe ale
+            tale, sau adaugă una nouă.
+          </p>
+        </div>
+        <button nz-button nzSize="large" class="closing-cta" (click)="enterCity()">
+          <span nz-icon nzType="environment" nzTheme="outline"></span>
+          <span>Deschide harta sesizărilor din {{ defaultCity }}</span>
+        </button>
+      </div>
+    </div>
   </section>
 
 </div>

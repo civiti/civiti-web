@@ -5,27 +5,17 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { switchMap, catchError, EMPTY } from 'rxjs';
 
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
-import { NzModalModule } from 'ng-zorro-antd/modal';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzRadioModule } from 'ng-zorro-antd/radio';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
 import { NzMessageService } from 'ng-zorro-antd/message';
 import { ApiService } from '../../../services/api.service';
-import { CategoryColorPipe } from '../../../pipes/category.pipe';
-import { UrgencyStatusPipe } from '../../../pipes/urgency.pipe';
-import { StatusTextPipe, StatusColorPipe } from '../../../pipes/status.pipe';
+import { CategoryLabelPipe } from '../../../pipes/category.pipe';
+import { StatusTextPipe, StatusTonePipe } from '../../../pipes/status.pipe';
 import { TimeAgoPipe } from '../../../pipes/date.pipe';
-import { ActionLabelPipe, ActionColorPipe, TimelineColorPipe } from '../../../pipes/admin.pipe';
+import { ActionLabelPipe } from '../../../pipes/admin.pipe';
 import {
   AdminIssueDetailResponse,
   IssueApprovedSnapshot,
@@ -47,28 +37,16 @@ interface DiffRow {
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
-    NzTagModule,
-    NzSpinModule,
-    NzGridModule,
-    NzDividerModule,
-    NzTimelineModule,
-    NzModalModule,
     NzFormModule,
     NzInputModule,
     NzRadioModule,
-    NzBadgeModule,
-    NzTabsModule,
-    CategoryColorPipe,
-    UrgencyStatusPipe,
+    CategoryLabelPipe,
     StatusTextPipe,
-    StatusColorPipe,
+    StatusTonePipe,
     TimeAgoPipe,
-    ActionLabelPipe,
-    ActionColorPipe,
-    TimelineColorPipe
+    ActionLabelPipe
   ],
   templateUrl: './admin-issue-detail.component.html',
   styleUrls: ['./admin-issue-detail.component.scss']
@@ -161,6 +139,21 @@ export class AdminIssueDetailComponent implements OnInit {
     medium: 'Medie',
     high: 'Ridicată',
     urgent: 'Urgentă',
+  };
+
+  // Template lookups (declared after the static maps they reuse).
+  readonly categoryLabels: Record<string, string> = AdminIssueDetailComponent.CATEGORY_LABELS;
+  readonly urgencyLabels: Record<string, string> = AdminIssueDetailComponent.URGENCY_LABELS;
+
+  /**
+   * History pill per admin action: label + `.c-status` tone. Covers both spellings the API
+   * has used for "request changes" so neither renders as a raw key.
+   */
+  readonly actionMeta: Record<string, { label: string; tone: string }> = {
+    approve: { label: 'A aprobat', tone: 'resolved' },
+    reject: { label: 'A respins', tone: 'rejected' },
+    request_changes: { label: 'A solicitat modificări', tone: 'pending' },
+    requestchanges: { label: 'A solicitat modificări', tone: 'pending' }
   };
 
   /**

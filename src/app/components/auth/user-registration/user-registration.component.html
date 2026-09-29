@@ -1,118 +1,122 @@
-<div class="registration-container">
+<app-auth-shell [wide]="true">
+  @if (!(emailConfirmationPending$ | async)) {
+    <a authTop routerLink="/auth/register" class="auth-back">
+      <span nz-icon nzType="arrow-left" nzTheme="outline" aria-hidden="true"></span>
+      <span>Înapoi</span>
+    </a>
+  }
 
   @if (emailConfirmationPending$ | async) {
-    <!-- Email Confirmation Pending View -->
-    <div class="confirmation-pending-container">
-      <nz-card [nzBordered]="false" class="confirmation-card">
-        <div class="confirmation-content">
-          <div class="confirmation-icon">
-            <span nz-icon nzType="mail" nzTheme="outline"></span>
-          </div>
-          <h1 class="confirmation-title">Verifică-ți email-ul</h1>
-          <p class="confirmation-message">
-            Am trimis un link de confirmare la adresa:
-          </p>
-          <p class="confirmation-email">{{ pendingEmail$ | async }}</p>
-          <p class="confirmation-instructions">
-            Accesează link-ul din email pentru a-ți activa contul.
-            După confirmare, te poți autentifica.
-          </p>
+    <!-- Email confirmation pending -->
+    <section class="auth-state confirm" aria-live="polite">
+      <span class="auth-icon auth-icon--ok" aria-hidden="true">
+        <span nz-icon nzType="mail" nzTheme="outline"></span>
+      </span>
+      <h1 class="auth-title">Verifică-ți emailul</h1>
+      <p class="auth-lead">Am trimis un link de confirmare la adresa:</p>
+      <p class="auth-email">{{ pendingEmail$ | async }}</p>
+      <p class="auth-lead">
+        Accesează linkul din email pentru a-ți activa contul. După confirmare, te poți autentifica.
+      </p>
 
-          <div class="confirmation-actions">
-            <button
-              nz-button
-              nzType="primary"
-              nzSize="large"
-              nzBlock
-              (click)="navigateToLogin()">
-              <span nz-icon nzType="login"></span>
-              Mergi la autentificare
-            </button>
-          </div>
+      <div class="auth-actions">
+        <button nz-button nzType="primary" nzSize="large" nzBlock type="button" (click)="navigateToLogin()">
+          <span nz-icon nzType="login" nzTheme="outline" aria-hidden="true"></span>
+          <span>Mergi la autentificare</span>
+        </button>
+      </div>
 
-          <div class="confirmation-help">
-            <p>Nu ai primit email-ul?</p>
-            <ul>
-              <li>Verifică folderul Spam sau Junk</li>
-              <li>Asigură-te că adresa de email este corectă</li>
-              <li>Încearcă să te <button type="button" class="link-button" (click)="retryRegistration()">înregistrezi din nou</button></li>
-            </ul>
-          </div>
-        </div>
-      </nz-card>
-    </div>
+      <div class="auth-help">
+        <p>Nu ai primit emailul?</p>
+        <ul>
+          <li>Verifică folderul Spam sau Junk</li>
+          <li>Asigură-te că adresa de email este corectă</li>
+          <li>
+            Încearcă să te
+            <button type="button" class="c-link auth-linkbtn" (click)="retryRegistration()">înregistrezi din nou</button>
+          </li>
+        </ul>
+      </div>
+    </section>
   } @else {
-    <!-- Registration Form View -->
-    <!-- Header -->
-    <div class="registration-header">
-      <button nz-button nzType="text" nzSize="large" routerLink="/auth/register" class="back-btn">
-        <span nz-icon nzType="arrow-left"></span>
-        Înapoi
-      </button>
-      <h1 class="page-title">Creează-ți contul</h1>
-      <p class="page-subtitle">Alătură-te comunității și începe să faci diferența</p>
-    </div>
+    <header class="auth-head">
+      <h1 class="auth-title">Creează-ți contul</h1>
+      <p class="auth-lead">Alătură-te comunității și începe să faci diferența.</p>
+    </header>
 
-    <!-- Registration Form -->
-    <div class="registration-form-container">
-      <nz-card [nzBordered]="false" class="registration-form-card">
-      
-      <!-- Progress Steps -->
-      <nz-steps [nzCurrent]="currentStep" nzSize="small" class="registration-steps">
-        <nz-step nzTitle="Cont" nzDescription="Informații de bază"></nz-step>
-        <nz-step nzTitle="Locație" nzDescription="Unde locuiești"></nz-step>
-        <nz-step nzTitle="Preferințe" nzDescription="Comunicare"></nz-step>
-      </nz-steps>
+    <!-- Progress: three short steps -->
+    <ol class="progress" aria-label="Pașii înregistrării">
+      <li [class.is-current]="currentStep === 0" [class.is-done]="currentStep > 0" [attr.aria-current]="currentStep === 0 ? 'step' : null">
+        <span class="progress-dot" aria-hidden="true">
+          @if (currentStep > 0) { <span nz-icon nzType="check" nzTheme="outline"></span> } @else { 1 }
+        </span>
+        <span class="progress-label">Cont</span>
+      </li>
+      <li [class.is-current]="currentStep === 1" [class.is-done]="currentStep > 1" [attr.aria-current]="currentStep === 1 ? 'step' : null">
+        <span class="progress-dot" aria-hidden="true">
+          @if (currentStep > 1) { <span nz-icon nzType="check" nzTheme="outline"></span> } @else { 2 }
+        </span>
+        <span class="progress-label">Locație</span>
+      </li>
+      <li [class.is-current]="currentStep === 2" [attr.aria-current]="currentStep === 2 ? 'step' : null">
+        <span class="progress-dot" aria-hidden="true">3</span>
+        <span class="progress-label">Preferințe</span>
+      </li>
+    </ol>
+    <p class="c-sr-only" aria-live="polite">Pasul {{ currentStep + 1 }} din 3</p>
 
-      <nz-spin [nzSpinning]="(isLoading$ | async) || false">
-        
-        <!-- Error Alert -->
-        @if (error$ | async; as error) {
-          <nz-alert
-            [nzMessage]="error"
-            nzType="error"
-            nzShowIcon
-            nzCloseable
-            (nzOnClose)="clearError()"
-            class="error-alert">
-          </nz-alert>
-        }
+    <nz-spin [nzSpinning]="(isLoading$ | async) || false">
+      @if (error$ | async; as error) {
+        <div class="c-callout c-callout--bad auth-alert" role="alert">
+          <span nz-icon nzType="exclamation-circle" nzTheme="outline" aria-hidden="true"></span>
+          <p>{{ error }}</p>
+          <button type="button" class="auth-alert__close" aria-label="Închide mesajul" (click)="clearError()">
+            <span nz-icon nzType="close" nzTheme="outline" aria-hidden="true"></span>
+          </button>
+        </div>
+      }
 
-        <form nz-form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
-          
-          <!-- Step 1: Account Information -->
-          @if (currentStep === 0) {
-          <div class="form-step">
-            <h3 class="step-title">Informații cont</h3>
-            
+      <form nz-form nzLayout="vertical" [formGroup]="registrationForm" (ngSubmit)="onSubmit()" class="auth-form">
+
+        <!-- Step 1: account -->
+        @if (currentStep === 0) {
+          <section class="c-card section" aria-labelledby="section-account">
+            <div class="section-head">
+              <h2 id="section-account" class="c-h3">Contul tău</h2>
+              <p class="auth-hint">La final îți trimitem un link de confirmare pe email.</p>
+            </div>
+
             <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzFor="displayName" nzRequired>Nume complet</nz-form-label>
-              <nz-form-control [nzSpan]="24" nzErrorTip="Te rugăm să introduci numele complet">
+              <nz-form-label nzFor="displayName" nzRequired>Nume complet</nz-form-label>
+              <nz-form-control
+                nzErrorTip="Te rugăm să introduci numele complet"
+                nzExtra="Petițiile fără datele de identificare ale petiționarului se clasează fără răspuns — de aceea îți cerem numele real.">
                 <input
                   nz-input
                   formControlName="displayName"
                   id="displayName"
-                  placeholder="Introdu numele complet"
+                  placeholder="Prenume și nume"
                   autocomplete="name">
               </nz-form-control>
             </nz-form-item>
 
             <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzFor="email" nzRequired>Adresă de email</nz-form-label>
-              <nz-form-control [nzSpan]="24" nzErrorTip="Te rugăm să introduci o adresă de email validă">
+              <nz-form-label nzFor="email" nzRequired>Adresă de email</nz-form-label>
+              <nz-form-control nzErrorTip="Te rugăm să introduci o adresă de email validă">
                 <input
                   nz-input
                   formControlName="email"
                   id="email"
                   type="email"
-                  placeholder="Introdu adresa de email"
+                  inputmode="email"
+                  placeholder="nume@exemplu.ro"
                   autocomplete="email">
               </nz-form-control>
             </nz-form-item>
 
             <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzFor="password" nzRequired>Parolă</nz-form-label>
-              <nz-form-control [nzSpan]="24" nzErrorTip="Parola trebuie să aibă cel puțin 6 caractere">
+              <nz-form-label nzFor="password" nzRequired>Parolă</nz-form-label>
+              <nz-form-control nzErrorTip="Parola trebuie să aibă cel puțin 6 caractere" nzExtra="Cel puțin 6 caractere.">
                 <nz-input-group [nzSuffix]="passwordSuffix">
                   <input
                     nz-input
@@ -123,25 +127,27 @@
                     autocomplete="new-password">
                 </nz-input-group>
                 <ng-template #passwordSuffix>
-                  <span 
-                    nz-icon 
-                    [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" 
-                    (click)="passwordVisible = !passwordVisible"
-                    class="password-toggle">
-                  </span>
+                  <button
+                    type="button"
+                    class="auth-eye"
+                    [attr.aria-label]="passwordVisible ? 'Ascunde parola' : 'Arată parola'"
+                    [attr.aria-pressed]="passwordVisible"
+                    (click)="passwordVisible = !passwordVisible">
+                    <span nz-icon [nzType]="passwordVisible ? 'eye-invisible' : 'eye'" nzTheme="outline" aria-hidden="true"></span>
+                  </button>
                 </ng-template>
               </nz-form-control>
             </nz-form-item>
 
             <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzFor="confirmPassword" nzRequired>Confirmă parola</nz-form-label>
-              <nz-form-control [nzSpan]="24" [nzErrorTip]="confirmPasswordErrorTip">
+              <nz-form-label nzFor="confirmPassword" nzRequired>Confirmă parola</nz-form-label>
+              <nz-form-control [nzErrorTip]="confirmPasswordErrorTip">
                 <input
                   nz-input
                   formControlName="confirmPassword"
                   id="confirmPassword"
                   type="password"
-                  placeholder="Confirmă parola"
+                  placeholder="Scrie parola încă o dată"
                   autocomplete="new-password">
                 <ng-template #confirmPasswordErrorTip>
                   @if (registrationForm.get('confirmPassword')?.hasError('required')) {
@@ -153,19 +159,21 @@
                 </ng-template>
               </nz-form-control>
             </nz-form-item>
-          </div>
-          }
+          </section>
+        }
 
-          <!-- Step 2: Location Information -->
-          @if (currentStep === 1) {
-          <div class="form-step">
-            <h3 class="step-title">Informații despre locație</h3>
-            <p class="step-description">Ajută-ne să te conectăm cu problemele din zona ta</p>
+        <!-- Step 2: location -->
+        @if (currentStep === 1) {
+          <section class="c-card section" aria-labelledby="section-location">
+            <div class="section-head">
+              <h2 id="section-location" class="c-h3">Unde locuiești</h2>
+              <p class="auth-hint">Ajută-ne să te conectăm cu problemele din zona ta.</p>
+            </div>
 
             <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzFor="county" nzRequired>Județ</nz-form-label>
-              <nz-form-control [nzSpan]="24" [nzErrorTip]="countyErrorTip">
-                <nz-select formControlName="county" id="county"
+              <nz-form-label nzFor="county" nzRequired>Județ</nz-form-label>
+              <nz-form-control [nzErrorTip]="countyErrorTip">
+                <nz-select formControlName="county" nzId="county"
                   nzPlaceHolder="Selectează județul"
                   nzShowSearch>
                   @for (county of counties; track county.code) {
@@ -183,9 +191,9 @@
             </nz-form-item>
 
             <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzFor="city" nzRequired>Oraș</nz-form-label>
-              <nz-form-control [nzSpan]="24" [nzErrorTip]="cityErrorTip">
-                <nz-select formControlName="city" id="city"
+              <nz-form-label nzFor="city" nzRequired>Oraș</nz-form-label>
+              <nz-form-control [nzErrorTip]="cityErrorTip">
+                <nz-select formControlName="city" nzId="city"
                   nzPlaceHolder="Selectează orașul"
                   nzShowSearch
                   [nzDisabled]="!registrationForm.get('county')?.value">
@@ -205,9 +213,9 @@
 
             @if (showDistricts) {
               <nz-form-item>
-                <nz-form-label [nzSpan]="24" nzFor="district" nzRequired>Sector</nz-form-label>
-                <nz-form-control [nzSpan]="24" [nzErrorTip]="districtErrorTip">
-                  <nz-select formControlName="district" id="district"
+                <nz-form-label nzFor="district" nzRequired>Sector</nz-form-label>
+                <nz-form-control [nzErrorTip]="districtErrorTip">
+                  <nz-select formControlName="district" nzId="district"
                     nzPlaceHolder="Selectează sectorul">
                     @for (district of districts; track $index) {
                       <nz-option
@@ -225,9 +233,9 @@
             }
 
             <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzFor="residenceType" nzRequired>Tip de rezidență</nz-form-label>
-              <nz-form-control [nzSpan]="24" [nzErrorTip]="residenceTypeErrorTip">
-                <nz-select formControlName="residenceType" id="residenceType"
+              <nz-form-label nzFor="residenceType" nzRequired>Tip de rezidență</nz-form-label>
+              <nz-form-control [nzErrorTip]="residenceTypeErrorTip">
+                <nz-select formControlName="residenceType" nzId="residenceType"
                   nzPlaceHolder="Selectează tipul de rezidență">
                   @for (type of residenceTypes; track type.value) {
                     <nz-option
@@ -242,127 +250,113 @@
                 </ng-template>
               </nz-form-control>
             </nz-form-item>
+          </section>
+        }
 
-          </div>
+        <!-- Step 3: notifications and consent -->
+        @if (currentStep === 2) {
+          <section class="c-card section" aria-labelledby="section-notifications">
+            <div class="section-head">
+              <h2 id="section-notifications" class="c-h3">Notificări</h2>
+              <p class="auth-hint">Alege cum dorești să fii informat.</p>
+            </div>
+
+            <div class="prefs">
+              <label nz-checkbox formControlName="issueUpdates" class="pref">
+                <span class="pref-title">Actualizări probleme</span>
+                <span class="pref-desc">Primește notificări când problemele raportate sunt actualizate</span>
+              </label>
+
+              <label nz-checkbox formControlName="communityNews" class="pref">
+                <span class="pref-title">Noutăți din comunitate</span>
+                <span class="pref-desc">Rămâi informat despre dezvoltările și îmbunătățirile din comunitate</span>
+              </label>
+
+              <label nz-checkbox formControlName="monthlyDigest" class="pref">
+                <span class="pref-title">Rezumat lunar</span>
+                <span class="pref-desc">Primește un rezumat lunar al activității comunității</span>
+              </label>
+
+              <label nz-checkbox formControlName="achievements" class="pref">
+                <span class="pref-title">Notificări realizări</span>
+                <span class="pref-desc">Primește notificări când câștigi insigne și atingi obiective</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="c-card section" aria-labelledby="section-consent">
+            <div class="section-head">
+              <h2 id="section-consent" class="c-h3">Acorduri</h2>
+              <p class="auth-hint">Ambele sunt necesare pentru a crea contul.</p>
+            </div>
+
+            <nz-form-item class="consent">
+              <nz-form-control>
+                <label nz-checkbox formControlName="agreeToTerms">
+                  Sunt de acord cu <a (click)="showTermsAndConditions(); $event.preventDefault()" href="#" class="c-link">Termenii și condițiile</a>
+                </label>
+              </nz-form-control>
+            </nz-form-item>
+
+            <nz-form-item class="consent">
+              <nz-form-control>
+                <label nz-checkbox formControlName="agreeToPrivacy">
+                  Sunt de acord cu <a (click)="showPrivacyPolicy(); $event.preventDefault()" href="#" class="c-link">Politica de confidențialitate</a>
+                </label>
+              </nz-form-control>
+            </nz-form-item>
+          </section>
+        }
+
+        <!-- Step navigation -->
+        <div class="nav">
+          @if (currentStep > 0) {
+            <button
+              nz-button
+              nzSize="large"
+              type="button"
+              (click)="previousStep()">
+              <span nz-icon nzType="arrow-left" nzTheme="outline" aria-hidden="true"></span>
+              <span>Înapoi</span>
+            </button>
           }
 
-          <!-- Step 3: Communication Preferences -->
+          @if (currentStep < 2) {
+            <button
+              nz-button
+              nzType="primary"
+              nzSize="large"
+              type="button"
+              class="nav-next"
+              (click)="nextStep()"
+              [disabled]="!isCurrentStepValid()">
+              <span>Următorul</span>
+              <span nz-icon nzType="arrow-right" nzTheme="outline" aria-hidden="true"></span>
+            </button>
+          }
+
           @if (currentStep === 2) {
-          <div class="form-step">
-            <h3 class="step-title">Preferințe de comunicare</h3>
-            <p class="step-description">Alege cum dorești să fii informat</p>
-            
-            <div class="preferences-group">
-              <label nz-checkbox formControlName="issueUpdates" class="preference-item">
-                <div class="preference-content">
-                  <div class="preference-title">Actualizări probleme</div>
-                  <div class="preference-description">Primește notificări când problemele raportate sunt actualizate</div>
-                </div>
-              </label>
-
-              <label nz-checkbox formControlName="communityNews" class="preference-item">
-                <div class="preference-content">
-                  <div class="preference-title">Noutăți din comunitate</div>
-                  <div class="preference-description">Rămâi informat despre dezvoltările și îmbunătățirile din comunitate</div>
-                </div>
-              </label>
-
-              <label nz-checkbox formControlName="monthlyDigest" class="preference-item">
-                <div class="preference-content">
-                  <div class="preference-title">Rezumat lunar</div>
-                  <div class="preference-description">Primește un rezumat lunar al activității comunității</div>
-                </div>
-              </label>
-
-              <label nz-checkbox formControlName="achievements" class="preference-item">
-                <div class="preference-content">
-                  <div class="preference-title">Notificări realizări</div>
-                  <div class="preference-description">Primește notificări când câștigi insigne și atingi obiective</div>
-                </div>
-              </label>
-            </div>
-
-            <!-- Terms and Privacy -->
-            <div class="terms-section">
-              <nz-form-item>
-                <nz-form-control [nzSpan]="24">
-                  <label nz-checkbox formControlName="agreeToTerms" class="terms-checkbox">
-                    Sunt de acord cu <a (click)="showTermsAndConditions(); $event.preventDefault()" href="#">Termenii și condițiile</a>
-                  </label>
-                </nz-form-control>
-              </nz-form-item>
-
-              <nz-form-item>
-                <nz-form-control [nzSpan]="24">
-                  <label nz-checkbox formControlName="agreeToPrivacy" class="terms-checkbox">
-                    Sunt de acord cu <a (click)="showPrivacyPolicy(); $event.preventDefault()" href="#">Politica de confidențialitate</a>
-                  </label>
-                </nz-form-control>
-              </nz-form-item>
-            </div>
-          </div>
+            <button
+              nz-button
+              nzType="primary"
+              nzSize="large"
+              type="submit"
+              class="nav-next"
+              [disabled]="!registrationForm.valid">
+              <span nz-icon nzType="user-add" nzTheme="outline" aria-hidden="true"></span>
+              <span>Creează cont</span>
+            </button>
           }
-
-          <!-- Navigation Buttons -->
-          <div class="form-navigation">
-            @if (currentStep > 0) {
-              <button
-                nz-button
-                nzType="default"
-                nzSize="large"
-                type="button"
-                (click)="previousStep()"
-                class="nav-btn">
-                <span nz-icon nzType="arrow-left"></span>
-                Înapoi
-              </button>
-            }
-
-            <div class="nav-spacer"></div>
-
-            @if (currentStep < 2) {
-              <button
-                nz-button
-                nzType="primary"
-                nzSize="large"
-                type="button"
-                (click)="nextStep()"
-                [disabled]="!isCurrentStepValid()"
-                class="nav-btn">
-                Următorul
-                <span nz-icon nzType="arrow-right"></span>
-              </button>
-            }
-
-            @if (currentStep === 2) {
-              <button
-                nz-button
-                nzType="primary"
-                nzSize="large"
-                type="submit"
-                [disabled]="!registrationForm.valid"
-                class="nav-btn submit-btn">
-                <span nz-icon nzType="user-add"></span>
-                Creează cont
-              </button>
-            }
-          </div>
-
-        </form>
-
-        <!-- Login Link -->
-        <div class="login-link">
-          <nz-divider nzText="sau" nzOrientation="center"></nz-divider>
-          <p>Ai deja un cont?
-            <a routerLink="/auth/login" class="login-link-text">Conectează-te</a>
-          </p>
         </div>
+      </form>
 
-      </nz-spin>
-    </nz-card>
-    </div>
+      <p class="auth-alt">
+        Ai deja un cont?
+        <a routerLink="/auth/login" class="c-link">Conectează-te</a>
+      </p>
+    </nz-spin>
   }
-</div>
+</app-auth-shell>
 
 <!-- Privacy Policy Modal Template -->
 <ng-template #privacyPolicyTemplate>
@@ -391,11 +385,10 @@
     <p>
       Problemele publicate pe platformă (descrieri, fotografii, locații generale) sunt vizibile public.
     </p>
-    <nz-alert
-      nzType="warning"
-      nzMessage="Utilizatorii sunt responsabili să nu publice date personale sensibile, date ale altor persoane fără consimțământ sau informații care pot încălca dreptul la viață privată."
-      nzShowIcon>
-    </nz-alert>
+    <div class="c-callout c-callout--signal">
+      <span nz-icon nzType="warning" nzTheme="outline" aria-hidden="true"></span>
+      <p>Utilizatorii sunt responsabili să nu publice date personale sensibile, date ale altor persoane fără consimțământ sau informații care pot încălca dreptul la viață privată.</p>
+    </div>
     <p>
       Administratorul își rezervă dreptul de a elimina conținutul care încalcă aceste reguli.
     </p>

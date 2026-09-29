@@ -1,15 +1,26 @@
 <footer class="site-footer">
-  <div class="footer-container">
+  <div class="c-container footer-top">
+    <div class="footer-intro">
+      <a routerLink="/" class="footer-brand" aria-label="Civiti — pagina principală">
+        <img src="/images/logo/civiti-mark-light.svg" alt="" width="36" height="36" />
+        <span>Civiti</span>
+      </a>
+      <p class="footer-mission">
+        Participare civică pentru România — sesizări publice, trimise direct autorităților
+        responsabile.
+      </p>
+    </div>
+
     <div class="footer-grid">
       <div class="footer-column">
-        <h3 class="footer-heading">Orașe</h3>
+        <h2 class="footer-heading">Orașe</h2>
         <ul class="footer-links">
           <li><a routerLink="/bucuresti">București</a></li>
         </ul>
       </div>
 
       <div class="footer-column">
-        <h3 class="footer-heading">Ghid Civic</h3>
+        <h2 class="footer-heading">Ghid civic</h2>
         <ul class="footer-links">
           @for (article of guideArticles; track article.slug) {
             <li><a [routerLink]="['/ghid', article.slug]">{{ article.title }}</a></li>
@@ -19,7 +30,7 @@
       </div>
 
       <div class="footer-column">
-        <h3 class="footer-heading">Proiect</h3>
+        <h2 class="footer-heading">Proiect</h2>
         <ul class="footer-links">
           <li><a routerLink="/despre">Despre Civiti</a></li>
           <li><a [href]="appStoreUrl" target="_blank" rel="noopener">Aplicația mobilă</a></li>
@@ -28,7 +39,7 @@
       </div>
 
       <div class="footer-column">
-        <h3 class="footer-heading">Legal</h3>
+        <h2 class="footer-heading">Legal</h2>
         <ul class="footer-links">
           <li><a routerLink="/privacy">Confidențialitate</a></li>
           <li><a routerLink="/terms">Termeni și Condiții</a></li>
@@ -48,9 +59,8 @@
   </div>
 
   <div class="footer-bottom">
-    <div class="footer-bottom-inner">
-      <span class="footer-brand">Civiti</span>
-      <span class="footer-copy">Participare Civică pentru România · {{ currentYear }}</span>
+    <div class="c-container footer-bottom-inner">
+      <span class="footer-copy">© {{ currentYear }} Civiti · Participare Civică pentru România</span>
       <!-- Author credit. rel="me" is the identity relation between a project
            and the personal site of the person behind it; deliberately not
            nofollow, since this is a genuine editorial link. -->

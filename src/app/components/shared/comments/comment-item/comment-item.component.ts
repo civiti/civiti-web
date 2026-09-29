@@ -1,11 +1,9 @@
 import { Component, input, output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { NzCommentModule } from 'ng-zorro-antd/comment';
 import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
 import { CommentNode } from '../../../../types/civica-api.types';
 import { CommentFormComponent } from '../comment-form/comment-form.component';
 
@@ -14,12 +12,10 @@ import { CommentFormComponent } from '../comment-form/comment-form.component';
   standalone: true,
   imports: [
     CommonModule,
-    NzCommentModule,
     NzAvatarModule,
     NzIconModule,
     NzToolTipModule,
     NzPopconfirmModule,
-    NzBadgeModule,
     CommentFormComponent
   ],
   templateUrl: './comment-item.component.html',

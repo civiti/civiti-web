@@ -1,77 +1,237 @@
-.navbar {
-  background-color: var(--oxford-blue);
-  color: white;
+:host {
+  display: block;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
 
-  // NG-ZORRO internal elements — need ::ng-deep to pierce encapsulation
-  ::ng-deep {
-    .ant-page-header-heading {
-      align-items: center;
+.site-header {
+  background: rgba(246, 244, 239, 0.88);
+  backdrop-filter: saturate(1.4) blur(12px);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+  border-bottom: 1px solid var(--line);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-8);
+  height: var(--header-h);
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex: none;
+  color: var(--ink-900);
+  text-decoration: none;
+
+  img {
+    display: block;
+  }
+}
+
+.brand-word {
+  font-family: var(--font-display);
+  font-size: 1.375rem;
+  font-weight: 750;
+  letter-spacing: var(--tracking-tight);
+}
+
+.primary-nav {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+
+  a {
+    position: relative;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    color: var(--ink-600);
+    font-size: var(--text-md);
+    font-weight: 600;
+    text-decoration: none;
+    transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+
+    &:hover {
+      color: var(--ink-900);
+      background: var(--paper-2);
     }
 
-    .ant-page-header-heading-title {
-      white-space: normal;
-      text-overflow: clip;
-      overflow: visible;
-    }
+    &.is-active {
+      color: var(--ink-900);
 
-    .ant-page-header-back-button {
-      color: white;
-
-      &:hover {
-        color: var(--orange-web);
+      &::after {
+        content: '';
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: -13px;
+        height: 3px;
+        border-radius: 3px 3px 0 0;
+        background: var(--signal-500);
       }
     }
   }
-
-  // Elements in our own template — no ::ng-deep needed
-  nz-page-header-title {
-    color: white;
-    font-weight: 600;
-  }
-
-  .header-title-text {
-    display: block;
-  }
-
-  .header-subtitle {
-    display: block;
-    font-size: 0.85rem;
-    font-weight: 400;
-    opacity: 0.85;
-    margin-top: 2px;
-  }
 }
 
-.header-nav {
+.actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: var(--space-3);
+  margin-left: auto;
 }
 
-.nav-link {
-  color: var(--white);
-  font-family: var(--font-primary);
-  font-weight: 500;
-  font-size: var(--text-sm);
-  text-decoration: none;
-  opacity: 0.9;
-  transition: opacity 0.2s, color 0.2s;
+.report {
+  height: 40px;
+  padding-inline: var(--space-4);
+}
 
-  &:hover {
-    opacity: 1;
-    color: var(--orange-web);
+.menu-toggle {
+  display: none;
+  font-size: 20px;
+}
+
+// --- Mobile disclosure panel ---
+
+.menu-panel {
+  border-top: 1px solid var(--line);
+  background: var(--paper);
+  box-shadow: var(--shadow-md);
+}
+
+.menu-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-block: var(--space-3) var(--space-5);
+
+  > a,
+  > button {
+    display: flex;
+    align-items: center;
+    gap: var(--space-3);
+    width: 100%;
+    padding: 12px var(--space-3);
+    border: 0;
+    border-radius: var(--radius-md);
+    background: none;
+    color: var(--ink-800);
+    font: 600 var(--text-base) / 1.3 var(--font-sans);
+    text-align: left;
+    text-decoration: none;
+    cursor: pointer;
+
+    .anticon {
+      font-size: 18px;
+      color: var(--ink-500);
+    }
+
+    &:hover,
+    &.is-active {
+      background: var(--paper-2);
+      color: var(--ink-900);
+    }
   }
 }
 
-// Responsive adjustments
-@media (max-width: 768px) {
-  .navbar {
-    ::ng-deep .ant-page-header-heading-title {
-      font-size: 16px;
-    }
+.menu-rule {
+  height: 1px;
+  margin: var(--space-2) 0;
+  border: 0;
+  background: var(--line);
+}
 
-    .header-subtitle {
-      font-size: 0.75rem;
-    }
+.menu-auth {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-3);
+  padding-top: var(--space-2);
+}
+
+// --- Context row (back + page title) ---
+
+.context {
+  border-top: 1px solid var(--line);
+  background: var(--surface);
+}
+
+.context-inner {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  min-height: 44px;
+  font-size: var(--text-sm);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: -8px;
+  padding: 6px 8px;
+  border: 0;
+  border-radius: var(--radius-sm);
+  background: none;
+  color: var(--ink-700);
+  font: 600 var(--text-sm) / 1 var(--font-sans);
+  cursor: pointer;
+
+  &:hover {
+    background: var(--paper-2);
+    color: var(--ink-900);
+  }
+}
+
+.context-sep {
+  width: 1px;
+  height: 16px;
+  background: var(--line-strong);
+}
+
+.context-title {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink-900);
+  font-weight: 650;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.context-sub {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--ink-500);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+@media (max-width: 959px) {
+  .primary-nav,
+  .account {
+    display: none;
+  }
+
+  .menu-toggle {
+    display: inline-flex;
+  }
+
+  .actions {
+    gap: var(--space-2);
+  }
+}
+
+@media (max-width: 420px) {
+  .bar {
+    gap: var(--space-3);
+  }
+
+  .report {
+    padding-inline: var(--space-3);
+  }
+
+  .context-sub {
+    display: none;
   }
 }

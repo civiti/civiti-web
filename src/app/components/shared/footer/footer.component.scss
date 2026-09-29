@@ -1,126 +1,117 @@
 .site-footer {
-  background: var(--oxford-blue);
+  background: var(--ink-950);
   color: var(--white);
 }
 
-.footer-container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem 1rem 1.5rem;
+.footer-top {
+  display: grid;
+  grid-template-columns: minmax(220px, 1fr) 2.4fr;
+  gap: var(--space-12);
+  padding-block: var(--space-16) var(--space-12);
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+    gap: var(--space-10);
+    padding-block: var(--space-12) var(--space-10);
+  }
+}
+
+.footer-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 750;
+  letter-spacing: var(--tracking-tight);
+  text-decoration: none;
+}
+
+.footer-mission {
+  max-width: 32ch;
+  margin: var(--space-4) 0 0;
+  color: var(--white-78);
+  font-size: var(--text-md);
+  line-height: 1.6;
 }
 
 .footer-grid {
-  display: flex;
-  gap: 3rem;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-8);
 
-  @media (max-width: 960px) {
-    flex-wrap: wrap;
-    gap: 2rem;
-  }
-
-  @media (max-width: 480px) {
-    gap: 1.5rem;
-  }
-}
-
-.footer-column {
-  flex: 1;
-  min-width: 0;
-
-  @media (max-width: 960px) {
-    flex-basis: calc(50% - 1rem);
-  }
-
-  @media (max-width: 480px) {
-    flex-basis: 100%;
+  @media (max-width: 720px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 .footer-heading {
-  font-family: var(--font-primary);
+  margin: 0 0 var(--space-4);
+  color: var(--signal-500);
+  font-family: var(--font-sans);
   font-size: var(--text-xs);
-  font-weight: 600;
-  color: var(--orange-web);
-  letter-spacing: var(--tracking-wider);
+  font-weight: 650;
+  letter-spacing: var(--tracking-caps);
   text-transform: uppercase;
-  margin: 0 0 0.5rem;
 }
 
 .footer-links {
-  list-style: none;
-  padding: 0;
-  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.375rem;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
 
   a {
-    font-family: var(--font-primary);
+    color: var(--white-82);
     font-size: var(--text-sm);
-    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.45;
     text-decoration: none;
-    transition: color 0.2s;
+    transition: color var(--dur) var(--ease);
 
     &:hover {
-      color: var(--orange-web);
+      color: var(--white);
+      text-decoration: underline;
+      text-decoration-color: var(--signal-500);
+      text-underline-offset: 3px;
     }
 
     &.view-all {
-      color: var(--orange-web);
-      font-weight: 500;
+      color: var(--signal-500);
+      font-weight: 600;
     }
   }
 }
 
 .footer-bottom {
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--white-10);
 }
 
 .footer-bottom-inner {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 1rem 1rem;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 0.5rem;
+  gap: var(--space-2) var(--space-5);
+  padding-block: var(--space-5);
 }
 
-.footer-brand {
-  font-family: var(--font-primary);
-  font-size: var(--text-sm);
-  font-weight: 700;
-  color: var(--white);
-}
-
-.footer-copy {
-  font-family: var(--font-primary);
-  font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.4);
-}
-
-// The lead-in stays as quiet as the copyright beside it; the name itself is
-// lifted to the same weight the other footer links carry, so it reads as a
-// link rather than as more small print. 10.6:1 on --oxford-blue.
+.footer-copy,
 .footer-author {
-  font-family: var(--font-primary);
+  color: var(--white-55);
   font-size: var(--text-xs);
-  color: rgba(255, 255, 255, 0.4);
+}
 
-  a {
-    color: var(--white-78);
-    text-decoration: none;
+// The name is lifted to link weight so it reads as a link, not small print.
+.footer-author a {
+  color: var(--white-82);
+  text-decoration: none;
 
-    &:hover {
-      color: var(--orange-web);
-      text-decoration: underline;
-      text-underline-offset: 2px;
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--orange-web);
-      outline-offset: 2px;
-    }
+  &:hover {
+    color: var(--white);
+    text-decoration: underline;
+    text-underline-offset: 2px;
   }
 }
 
@@ -128,22 +119,28 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.75rem;
-  height: 1.75rem;
-  color: rgba(255, 255, 255, 0.5);
-  transition: color 0.2s;
+  width: 2rem;
+  height: 2rem;
+  border-radius: var(--radius-sm);
+  color: var(--white-55);
   font-size: 1.125rem;
+  transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease);
 
-  &:hover,
-  &:focus-visible {
-    color: var(--orange-web);
+  &:hover {
+    color: var(--white);
+    background: var(--white-10);
   }
 }
 
+.site-footer a:focus-visible,
+.site-footer button:focus-visible {
+  outline: 2px solid var(--signal-500);
+  outline-offset: 2px;
+}
+
 /* Statlark analytics attribution badge — "mono" variant from
-   https://statlark.com/docs/badge, themed to sit as a quiet footer link.
-   The mono mascot is a single-colour silhouette (fill: currentColor), so it
-   inherits the tint below; no Slark brand colours are altered. */
+   https://statlark.com/docs/badge. The mascot is a single-colour silhouette
+   (fill: currentColor), so it inherits the tint; no Statlark colours change. */
 .footer-bottom-inner .slk-badge {
   margin-left: auto;
 }
@@ -153,16 +150,13 @@
   align-items: center;
   gap: 0.5em;
   padding: 0;
-  color: rgba(255, 255, 255, 0.7);
-  background: none;
   border: 0;
-  font-family: var(--font-primary);
+  background: none;
+  color: var(--white-78);
   font-size: var(--text-sm);
   line-height: 1;
   text-decoration: none;
   white-space: nowrap;
-  vertical-align: middle;
-  transition: color 0.2s;
 
   svg {
     width: 1.35em;
@@ -175,33 +169,27 @@
   }
 
   &:hover {
-    color: var(--orange-web);
+    color: var(--white);
     text-decoration: underline;
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--orange-web);
-    outline-offset: 2px;
   }
 }
 
-/* Statlark "Cookie settings" re-open control (wired by consent.js). Styled to
-   read as a quiet footer link, matching the sibling Legal links. consent.js
-   sets [hidden] where there is no consent choice to change (e.g. non-EU). */
+/* Statlark "Cookie settings" re-open control (wired by consent.js), styled as
+   a sibling of the Legal links. consent.js sets [hidden] where there is no
+   choice to change (e.g. outside the EU). */
 .slk-consent-reopen {
   display: inline-flex;
   align-items: center;
   gap: 0.4em;
   padding: 0;
-  background: none;
   border: 0;
-  font-family: var(--font-primary);
+  background: none;
+  color: var(--white-82);
+  font-family: var(--font-sans);
   font-size: var(--text-sm);
   line-height: inherit;
-  color: rgba(255, 255, 255, 0.8);
   text-align: left;
   cursor: pointer;
-  transition: color 0.2s;
 
   svg {
     width: 1.1em;
@@ -210,12 +198,7 @@
   }
 
   &:hover {
-    color: var(--orange-web);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--orange-web);
-    outline-offset: 2px;
+    color: var(--white);
   }
 
   // Class specificity beats the UA `[hidden]` rule, so restore it explicitly.

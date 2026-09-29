@@ -6,13 +6,13 @@ import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
+
+import { AuthShellComponent } from '../auth-shell/auth-shell.component';
 
 import { AppState } from '../../../store/app.state';
 import * as AuthActions from '../../../store/auth/auth.actions';
@@ -30,13 +30,12 @@ import {
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-    NzCardModule,
     NzButtonModule,
     NzFormModule,
     NzInputModule,
     NzIconModule,
-    NzAlertModule,
-    NzSpinModule
+    NzSpinModule,
+    AuthShellComponent
   ],
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss']

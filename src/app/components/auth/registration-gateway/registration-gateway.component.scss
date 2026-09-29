@@ -1,373 +1,135 @@
+// Layout, fields, divider and footer link come from the shared auth shell.
+
 :host {
-  display: flex;
-  flex-direction: column;
-}
-
-.registration-container {
-  flex: 1;
-  background: linear-gradient(135deg, var(--oxford-blue) 0%, #1a2b4f 100%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 2rem;
-  padding-top: 4rem;
-  position: relative;
-}
-
-// Back link - top left corner
-.back-link {
-  position: absolute;
-  top: 1.5rem;
-  left: 1.5rem;
-  color: rgba(255, 255, 255, 0.8);
-  font-weight: 500;
-  font-size: 0.95rem;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  transition: color 0.2s ease;
-
-  &:hover {
-    color: var(--white);
-  }
-
-  span[nz-icon] {
-    font-size: 1rem;
-  }
-}
-
-// Card wrapper
-.registration-card-wrapper {
-  width: 100%;
-  max-width: 480px;
-}
-
-// Main card
-.registration-card {
-  border-radius: 16px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.25);
-  background: var(--white);
-  border: none;
-
-  :deep(.ant-card-body) {
-    padding: 2.5rem;
-  }
-}
-
-// Card header with logo and title
-.card-header {
-  text-align: center;
-  margin-bottom: 2rem;
-}
-
-.logo {
   display: block;
-  height: 100px;
-  width: auto;
-  margin: 0 auto 1.25rem;
 }
 
-.page-title {
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--oxford-blue);
-  margin-bottom: 0.5rem;
-}
-
-.page-subtitle {
-  font-size: 0.95rem;
-  color: #666;
-  margin-bottom: 0;
-  line-height: 1.5;
-}
-
-// OAuth section
-.oauth-section {
-  margin-bottom: 0.5rem;
-}
-
-.google-oauth-btn {
-  background: #4285f4;
-  border-color: #4285f4;
-  color: var(--white);
-  font-weight: 600;
-  height: 52px;
-  font-size: 1rem;
-  border-radius: 10px;
-
-  &:hover {
-    background: #3367d6;
-    border-color: #3367d6;
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(66, 133, 244, 0.3);
-  }
-
-  span[nz-icon] {
-    font-size: 1.2rem;
-    margin-right: 0.5rem;
-  }
-}
-
-.oauth-benefits {
-  margin-top: 1rem;
+.perks {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-5);
+  margin: var(--space-3) 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--ink-600);
+  font-size: var(--text-sm);
 
-.benefit-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: #666;
-  font-size: 0.9rem;
-
-  .benefit-icon {
-    color: #28a745;
-    font-size: 1rem;
-  }
-}
-
-// Email section
-.email-section {
-  margin-bottom: 1.5rem;
-}
-
-.email-signup-btn {
-  height: 52px;
-  font-size: 1rem;
-  font-weight: 600;
-  border-radius: 10px;
-  border: 2px solid var(--orange-web);
-  color: var(--orange-web);
-
-  &:hover {
-    background: var(--orange-web);
-    color: var(--white);
-    border-color: var(--orange-web);
-    transform: translateY(-1px);
-    box-shadow: 0 6px 20px rgba(252, 163, 17, 0.3);
-  }
-
-  span[nz-icon] {
-    font-size: 1.2rem;
-    margin-right: 0.5rem;
-  }
-}
-
-.email-description {
-  text-align: center;
-  margin-top: 0.75rem;
-  color: #888;
-  font-size: 0.85rem;
-  margin-bottom: 0;
-}
-
-// Login section
-.login-section {
-  text-align: center;
-  padding-top: 1rem;
-  border-top: 1px solid #eee;
-
-  p {
-    margin: 0;
-    color: #666;
-    font-size: 0.95rem;
-  }
-}
-
-.login-link-text {
-  color: var(--orange-web);
-  font-weight: 600;
-  text-decoration: none;
-
-  &:hover {
-    text-decoration: underline;
-    color: #e8930f;
-  }
-}
-
-// Benefits section (below card)
-.benefits-section {
-  margin-top: 2.5rem;
-  text-align: center;
-
-  h3 {
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--white);
-    margin-bottom: 1.5rem;
-  }
-}
-
-.benefits-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
-}
-
-.benefit-card {
-  text-align: center;
-  padding: 1.25rem 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  transition: all 0.2s ease;
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-  }
-
-  h4 {
-    font-size: 0.95rem;
-    font-weight: 600;
-    color: var(--white);
-    margin-bottom: 0.5rem;
-  }
-
-  p {
-    color: rgba(255, 255, 255, 0.75);
-    line-height: 1.4;
-    margin: 0;
-    font-size: 0.8rem;
-  }
-}
-
-.benefit-icon-large {
-  margin-bottom: 0.75rem;
-
-  span[nz-icon] {
-    font-size: 1.75rem;
-    color: var(--orange-web);
-  }
-}
-
-// Privacy notice
-.privacy-notice {
-  margin-top: 2rem;
-  text-align: center;
-
-  p {
-    color: rgba(255, 255, 255, 0.7);
-    font-size: 0.85rem;
-    line-height: 1.5;
-    margin: 0;
+  li {
     display: inline-flex;
     align-items: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
-    justify-content: center;
+    gap: 6px;
   }
 
-  span[nz-icon] {
-    font-size: 1rem;
+  .anticon {
+    color: var(--ok-fill);
   }
 }
 
-.privacy-link {
-  color: rgba(255, 255, 255, 0.9);
-  text-decoration: underline;
-
-  &:hover {
-    color: var(--white);
-  }
+.email-hint {
+  text-align: center;
 }
 
-// Divider styling
-:deep(.ant-divider-inner-text) {
-  color: #999;
-  font-size: 0.85rem;
+// Why an account: one card, rows split by hairlines.
+.why {
+  margin-top: var(--space-10);
+  padding: var(--space-5) var(--space-5) var(--space-2);
 }
 
-// Mobile responsiveness
-@media (max-width: 768px) {
-  .registration-container {
-    padding: 1rem;
-    padding-top: 4rem;
-  }
+.why-title {
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-base);
+  font-weight: 700;
+}
 
-  .back-link {
-    top: 1rem;
-    left: 1rem;
-  }
+.why-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 
-  .registration-card {
-    :deep(.ant-card-body) {
-      padding: 1.5rem;
+  li {
+    display: flex;
+    gap: var(--space-3);
+    padding: var(--space-3) 0;
+
+    + li {
+      border-top: 1px solid var(--line);
     }
   }
 
-  .logo {
-    height: 84px;
-  }
-
-  .page-title {
-    font-size: 1.4rem;
-  }
-
-  .page-subtitle {
-    font-size: 0.9rem;
-  }
-
-  .benefits-grid {
-    grid-template-columns: 1fr;
-  }
-}
-
-@media (max-width: 480px) {
-  .google-oauth-btn,
-  .email-signup-btn {
-    height: 48px;
-    font-size: 0.95rem;
-  }
-}
-
-// Policy modal content styling
-.policy-content {
-  font-family: 'Fira Sans', sans-serif;
-  color: var(--oxford-blue);
-  line-height: 1.6;
-
   h3 {
-    color: var(--oxford-blue);
-    margin-top: 24px;
-    margin-bottom: 12px;
-    font-size: 1rem;
-    font-weight: 600;
+    margin: 0;
+    font-size: var(--text-md);
+    font-weight: 650;
   }
 
   p {
-    margin-bottom: 12px;
+    margin: 2px 0 0;
+    color: var(--ink-600);
+    font-size: var(--text-sm);
+    line-height: 1.45;
+  }
+}
+
+.why-icon {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: var(--paper-2);
+  color: var(--ink-700);
+  font-size: 17px;
+}
+
+.privacy {
+  display: flex;
+  gap: var(--space-2);
+  margin: var(--space-6) 0 0;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+
+  .anticon {
+    margin-top: 3px;
+  }
+}
+
+// Privacy policy, rendered inside the modal.
+.policy-content {
+  font-size: var(--text-md);
+
+  h3 {
+    margin: var(--space-6) 0 var(--space-2);
+    font-size: var(--text-base);
+    font-weight: 700;
+  }
+
+  p,
+  ul {
+    margin: 0 0 var(--space-3);
   }
 
   ul {
-    margin-left: 20px;
-    margin-top: 8px;
-    margin-bottom: 12px;
-
-    li {
-      margin-bottom: 4px;
-    }
+    padding-left: 1.25em;
   }
 
   a {
-    color: var(--orange-web);
+    color: var(--ink-900);
+    text-decoration-color: var(--signal-500);
+    text-underline-offset: 3px;
+  }
 
-    &:hover {
-      text-decoration: underline;
+  .c-callout {
+    margin-bottom: var(--space-3);
+
+    p {
+      margin: 0;
     }
   }
+}
 
-  nz-alert {
-    margin: 12px 0;
-  }
-
-  .policy-footer {
-    margin-top: 24px;
-    color: #666;
-    font-size: 12px;
-  }
+.policy-footer {
+  color: var(--ink-500);
+  font-size: var(--text-sm);
 }

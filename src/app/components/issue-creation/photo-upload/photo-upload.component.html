@@ -1,204 +1,166 @@
-<div class="photo-upload-container">
-  
-  <!-- Header -->
-  <div class="page-header">
-    <h1 class="page-title">Documentează problema</h1>
-    <p class="page-subtitle">Fă sau încarcă fotografii pentru a ajuta autoritățile să înțeleagă problema</p>
-  </div>
+<div class="wz">
+  <div class="wz-main">
 
-  <!-- Progress Indicator -->
-  <div class="progress-indicator">
-    <div class="progress-step completed">
-      <div class="step-number">✓</div>
-      <div class="step-label">Tip problemă</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step active">
-      <div class="step-number">2</div>
-      <div class="step-label">Fotografii</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step">
-      <div class="step-number">3</div>
-      <div class="step-label">Detalii</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step">
-      <div class="step-number">4</div>
-      <div class="step-label">Autorități</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step">
-      <div class="step-number">5</div>
-      <div class="step-label">Verificare</div>
-    </div>
-  </div>
+    <nav class="wz-progress" aria-label="Pașii raportării">
+      <p class="wz-count">Pasul 2 din 5<span class="wz-count__now"> · Fotografii</span></p>
+      <ol class="wz-steps">
+        <li class="is-done"><span class="wz-steps__label"><span nz-icon nzType="check" nzTheme="outline"></span>Tip problemă<span class="c-sr-only"> (finalizat)</span></span></li>
+        <li class="is-current" aria-current="step"><span class="wz-steps__label">Fotografii</span></li>
+        <li><span class="wz-steps__label">Detalii</span></li>
+        <li><span class="wz-steps__label">Autorități</span></li>
+        <li><span class="wz-steps__label">Verificare</span></li>
+      </ol>
+    </nav>
 
-  <!-- Selected Category Info -->
-  @if (selectedCategory) {
-    <div class="category-info">
-      <nz-card class="category-card">
-        <div class="category-summary">
-          <span class="category-icon" nz-icon [nzType]="selectedCategory.icon" nzTheme="outline"></span>
-          <div class="category-details">
-            <h3>{{ selectedCategory.name }}</h3>
-            <p>{{ selectedCategory.description }}</p>
-          </div>
-        </div>
-      </nz-card>
-    </div>
-  }
+    <header class="wz-head">
+      <h1 class="c-h2">Documentează problema</h1>
+      <p class="wz-lead">Fă sau încarcă fotografii pentru a ajuta autoritățile să înțeleagă problema</p>
+    </header>
 
-  <!-- Photo Upload Section -->
-  <div class="upload-section">
-    <nz-card nzTitle="Adaugă fotografii" class="upload-card">
+    @if (selectedCategory) {
+      <ul class="wz-context" aria-label="Sesizarea ta până acum">
+        <li>
+          <span nz-icon [nzType]="selectedCategory.icon" nzTheme="outline"></span>
+          <span>{{ selectedCategory.name }}</span>
+        </li>
+      </ul>
+    }
 
-      <!-- Upload Area -->
-      <nz-spin [nzSpinning]="isUploading">
-        <div class="upload-area">
-        
-        <!-- File Input (Mock Implementation) -->
-        <div class="mock-upload-area" (click)="triggerFileInput()">
-          <div class="upload-icon">
-            <span nz-icon nzType="camera" nzTheme="outline"></span>
-          </div>
-          <div class="upload-text">
-            <h4>Fă sau încarcă fotografii</h4>
-            <p>Fă clic pentru a deschide camera sau selectează din galerie</p>
-            <p class="upload-note">Maxim {{ maxPhotos }} fotografii, până la 10MB fiecare</p>
-          </div>
+    <section class="wz-section" aria-labelledby="add-title">
+      <h2 class="c-sr-only" id="add-title">Adaugă fotografii</h2>
+
+      <button
+        type="button"
+        class="drop"
+        [class.is-compact]="uploadedPhotos.length > 0"
+        [disabled]="isUploading"
+        [attr.aria-busy]="isUploading"
+        (click)="triggerFileInput()">
+        <span class="drop__icon" aria-hidden="true">
+          <span nz-icon [nzType]="isUploading ? 'loading' : 'camera'" nzTheme="outline"></span>
+        </span>
+        <span class="drop__text">
+          <span class="drop__title">{{ isUploading ? 'Se încarcă fotografiile...' : 'Fă sau încarcă fotografii' }}</span>
+          <span class="drop__sub">Fă clic pentru a deschide camera sau selectează din galerie</span>
+          <span class="drop__note">Maxim {{ maxPhotos }} fotografii, până la 10MB fiecare</span>
+        </span>
+      </button>
+
+      <input
+        #fileInput
+        type="file"
+        accept="image/*"
+        multiple
+        capture="environment"
+        class="c-sr-only"
+        tabindex="-1"
+        aria-hidden="true"
+        (change)="onFileSelected($event)">
+    </section>
+
+    @if (uploadedPhotos.length > 0) {
+      <section class="wz-section" aria-labelledby="photos-title">
+        <div class="photos-head">
+          <h2 class="c-h3" id="photos-title">Fotografii încărcate</h2>
+          <span class="photos-count">{{ uploadedPhotos.length }}/{{ maxPhotos }} fotografii încărcate</span>
         </div>
 
-        <input 
-          #fileInput 
-          type="file" 
-          accept="image/*" 
-          multiple 
-          capture="environment"
-          class="visually-hidden"
-          (change)="onFileSelected($event)">
+        <ul class="thumbs">
+          @for (photo of uploadedPhotos; track $index; let i = $index) {
+            <li class="thumb" [class.is-primary]="photo.isPrimary">
+              <!-- GLightbox anchor for photo preview -->
+              <a
+                [id]="'photo-gallery-' + i"
+                [href]="photo.url"
+                class="photo-gallery-item thumb__media"
+                [attr.data-glightbox]="'title: Fotografie ' + (i + 1)"
+                [attr.aria-label]="'Deschide fotografia ' + (i + 1)"
+                (click)="onGalleryItemClick($event, photo)">
+                <img
+                  [src]="photo.url"
+                  [alt]="'Fotografia ' + (i + 1)"
+                  loading="lazy"
+                  (error)="onImageError($event, photo)"
+                  (load)="onImageLoad($event, photo)">
+                @if (photo.isPrimary) {
+                  <span class="thumb__badge">
+                    <span nz-icon nzType="star" nzTheme="fill"></span>
+                    <span>Principală</span>
+                  </span>
+                }
+              </a>
 
-      </div>
-      </nz-spin>
-
-      <!-- Photo Preview Grid -->
-      @if (uploadedPhotos.length > 0) {
-        <div class="photo-grid">
-          <div class="photo-count">
-            <span>{{ uploadedPhotos.length }}/{{ maxPhotos }} fotografii încărcate</span>
-          </div>
-
-          <div nz-row [nzGutter]="[16, 16]">
-            @for (photo of uploadedPhotos; track $index; let i = $index) {
-              <div
-                nz-col
-                [nzSpan]="12"
-                [nzSm]="8"
-                [nzMd]="6"
-                class="photo-col">
-
-                <div class="photo-preview" [class.is-primary]="photo.isPrimary">
-                  <!-- Primary badge -->
-                  @if (photo.isPrimary) {
-                    <div class="primary-badge">
-                      <span nz-icon nzType="star" nzTheme="fill"></span>
-                      <span class="badge-text">Principală</span>
-                    </div>
-                  }
-
-                  <!-- GLightbox anchor for photo preview -->
-                  <a
-                    [id]="'photo-gallery-' + i"
-                    [href]="photo.url"
-                    class="photo-gallery-item"
-                    [attr.data-glightbox]="'title: Fotografie ' + (i + 1)"
-                    (click)="onGalleryItemClick($event, photo)">
-                    <img
-                      [src]="photo.url"
-                      [alt]="'Photo ' + (i + 1)"
-                      class="photo-image"
-                      loading="lazy"
-                      (error)="onImageError($event, photo)"
-                      (load)="onImageLoad($event, photo)">
-                  </a>
-
-                  <div class="photo-overlay">
-                    <div class="photo-actions">
-                      <!-- Set as primary button -->
-                      <button
-                        nz-button
-                        [nzType]="photo.isPrimary ? 'primary' : 'default'"
-                        nzSize="small"
-                        nzShape="circle"
-                        [nz-tooltip]="photo.isPrimary ? 'Imagine principală' : 'Setează ca principală'"
-                        (click)="setPrimaryPhoto(i); $event.stopPropagation()">
-                        <span nz-icon nzType="star" [nzTheme]="photo.isPrimary ? 'fill' : 'outline'"></span>
-                      </button>
-                      <button
-                        nz-button
-                        nzType="primary"
-                        nzSize="small"
-                        nzShape="circle"
-                        nz-tooltip="Vizualizează"
-                        (click)="viewPhoto(photo, i); $event.stopPropagation()">
-                        <span nz-icon nzType="eye"></span>
-                      </button>
-                      <button
-                        nz-button
-                        nzType="primary"
-                        nzDanger
-                        nzSize="small"
-                        nzShape="circle"
-                        nz-tooltip="Șterge"
-                        (click)="removePhoto(i); $event.stopPropagation()">
-                        <span nz-icon nzType="delete"></span>
-                      </button>
-                    </div>
-                  </div>
-
-                </div>
-
+              <div class="thumb__actions">
+                <button
+                  type="button"
+                  class="thumb__btn"
+                  [class.is-on]="photo.isPrimary"
+                  [attr.aria-pressed]="photo.isPrimary"
+                  [nz-tooltip]="photo.isPrimary ? 'Imagine principală' : 'Setează ca principală'"
+                  [attr.aria-label]="photo.isPrimary ? 'Imagine principală' : 'Setează ca principală'"
+                  (click)="setPrimaryPhoto(i); $event.stopPropagation()">
+                  <span nz-icon nzType="star" [nzTheme]="photo.isPrimary ? 'fill' : 'outline'"></span>
+                </button>
+                <button
+                  type="button"
+                  class="thumb__btn"
+                  nz-tooltip="Vizualizează"
+                  aria-label="Vizualizează"
+                  (click)="viewPhoto(photo, i); $event.stopPropagation()">
+                  <span nz-icon nzType="eye" nzTheme="outline"></span>
+                </button>
+                <button
+                  type="button"
+                  class="thumb__btn thumb__btn--bad"
+                  nz-tooltip="Șterge"
+                  aria-label="Șterge"
+                  (click)="removePhoto(i); $event.stopPropagation()">
+                  <span nz-icon nzType="delete" nzTheme="outline"></span>
+                </button>
               </div>
-            }
-          </div>
-        </div>
+            </li>
+          }
+        </ul>
+      </section>
+    }
+
+    <div class="c-callout tips">
+      <span nz-icon nzType="bulb" nzTheme="outline"></span>
+      <div>
+        <p class="tips__title">Sfaturi pentru fotografii utile</p>
+        <ul>
+          <li>O fotografie de ansamblu, în care se recunoaște locul.</li>
+          <li>Una de aproape, în care problema se vede clar.</li>
+          <li>Steaua marchează fotografia principală, afișată în lista de probleme.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action bar -->
+  <div class="wz-bar">
+    <div class="wz-bar__inner">
+      <button nz-button nzType="default" nzSize="large" class="wz-bar__back" routerLink="/create-issue">
+        <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
+        <span>Înapoi</span>
+      </button>
+
+      @if (uploadedPhotos.length === 0) {
+        <p class="wz-bar__hint">Este necesară cel puțin o fotografie pentru a continua</p>
+      } @else {
+        <span class="wz-bar__spacer"></span>
       }
 
-    </nz-card>
-  </div>
-
-  <!-- Navigation -->
-  <div class="navigation-section">
-    <div class="nav-buttons">
-      <button 
-        nz-button 
-        nzType="default" 
+      <button
+        nz-button
+        nzType="primary"
         nzSize="large"
-        routerLink="/create-issue"
-        class="nav-btn">
-        <span nz-icon nzType="arrow-left"></span>
-        Înapoi
-      </button>
-      
-      <div class="nav-spacer"></div>
-      
-      <button 
-        nz-button 
-        nzType="primary" 
-        nzSize="large"
+        class="wz-bar__next"
         [disabled]="uploadedPhotos.length === 0"
-        (click)="continueToDetails()"
-        class="nav-btn continue-btn">
-        Continuă cu detaliile
-        <span nz-icon nzType="arrow-right"></span>
+        (click)="continueToDetails()">
+        <span>Continuă cu detaliile</span>
+        <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
       </button>
     </div>
-    
-    @if (uploadedPhotos.length === 0) {
-      <div class="requirement-note">
-        <p>Este necesară cel puțin o fotografie pentru a continua</p>
-      </div>
-    }
   </div>
-
 </div>

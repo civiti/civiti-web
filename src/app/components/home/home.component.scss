@@ -1,583 +1,243 @@
-// The page paints its own white base. The global background is --platinum,
-// which is correct for the app shell but wrong behind a landing page whose
-// sections carry their own surfaces.
 :host {
   display: block;
-  flex: 1;
-  background-color: var(--white);
-}
-
-.home {
-  color: var(--oxford-blue);
-  font-family: "Fira Sans", sans-serif;
-}
-
-// Shared measure. Sections that need a full-bleed background wrap this instead
-// of constraining themselves, so the colour reaches the viewport edge.
-.wrap {
-  max-width: 1200px;
-  width: 100%;
-  margin: 0 auto;
-  padding-left: 1.5rem;
-  padding-right: 1.5rem;
-  box-sizing: border-box;
 }
 
 .section {
-  padding-top: 5rem;
-  padding-bottom: 4.5rem;
+  padding-block: clamp(3.5rem, 2rem + 5vw, 6.5rem);
+}
 
-  h2 {
-    font-size: 2rem;
-    font-weight: 700;
-    line-height: 1.25;
-    margin: 0 0 1rem;
-    text-wrap: balance;
-  }
-
-  h3 {
-    font-size: 1.1875rem;
-    font-weight: 600;
-    margin: 0 0 0.6rem;
-  }
+.section-head {
+  max-width: 720px;
+  margin-bottom: var(--space-10);
 }
 
 .section-lead {
-  line-height: 1.7;
-  margin: 0 0 2.25rem;
-  max-width: 68ch;
-  color: var(--oxford-blue-82);
+  margin: var(--space-4) 0 0;
+  color: var(--ink-600);
+  font-size: var(--text-lg);
+  line-height: 1.6;
 }
 
-// Section kickers. --orange-web is only 2.02:1 on white, so orange *text* on a
-// light surface uses --orange-web-dark (5.00:1); on navy the plain accent is
-// 7.90:1 and reads correctly.
-.eyebrow {
-  margin: 0 0 0.75rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--orange-web-dark);
-}
-
-.eyebrow-on-dark {
-  color: var(--orange-web);
-  margin-bottom: 1.25rem;
-}
-
-// ---------------------------------------------------------------- hero
+// --- Hero -----------------------------------------------------------------
 
 .hero {
-  background-color: var(--oxford-blue);
-  background-image: radial-gradient(
-    ellipse 900px 480px at 85% -10%,
-    var(--orange-web-10),
-    transparent 60%
-  );
-  color: var(--white);
+  position: relative;
+  overflow: hidden;
+  padding-block: clamp(2.5rem, 1rem + 5vw, 5.5rem) clamp(3rem, 1rem + 6vw, 6rem);
+  border-bottom: 1px solid var(--line);
+  // A faint street grid behind the copy: the product is about places.
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(to right, rgba(20, 33, 61, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(20, 33, 61, 0.045) 1px, transparent 1px);
+  background-size: 56px 56px;
+  background-position: center top;
 }
 
-.hero-bar {
-  display: flex;
-  flex-wrap: wrap;
+.hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 1fr);
   align-items: center;
-  justify-content: space-between;
-  gap: 0.75rem 1rem;
-  padding-top: 1.25rem;
-  padding-bottom: 1.25rem;
+  gap: clamp(2rem, 1rem + 4vw, 4.5rem);
 
-  // Keeps the auth control hard right once the bar wraps to two rows.
-  app-auth-buttons {
-    margin-left: auto;
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
   }
 }
 
-.brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.65rem;
-  text-decoration: none;
-
-  &:focus-visible {
-    outline: 2px solid var(--orange-web);
-    outline-offset: 4px;
-    border-radius: var(--radius-sm);
-  }
+.hero-eyebrow {
+  padding: 6px 12px 6px 10px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+  color: var(--ink-700);
+  letter-spacing: var(--tracking-wider);
 }
 
-.brand-name {
-  font-size: 1.25rem;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-  color: var(--white);
-}
-
-// Two columns: copy beside the product shot, wrapping to a single stack when
-// there is no room. Both floors are `min(100%, …)` rather than bare pixels — a
-// bare floor cannot shrink, which is what pushed the legal panel off narrow
-// screens.
-.hero-body {
-  padding-top: 3.5rem;
-  padding-bottom: 4.5rem;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 3.5rem;
-}
-
-.hero-copy {
-  flex: 1 1 480px;
-  min-width: min(100%, 320px);
-}
-
-.hero-visual {
-  flex: 1 1 380px;
-  min-width: min(100%, 300px);
-  max-width: 560px;
-
-  // Lift and brighten rather than a drop shadow — a shadow is invisible
-  // against --oxford-blue. Borrows the guide cards' hover language so the
-  // whole page reads one way.
-  a {
-    display: block;
-    border-radius: var(--radius-lg);
-    transition: transform 0.2s ease;
-
-    &:hover {
-      transform: translateY(-3px);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--orange-web);
-      outline-offset: 4px;
-    }
-
-    &:hover img {
-      border-color: var(--orange-web-60);
-    }
-  }
-
-  img {
-    display: block;
-    width: 100%;
-    height: auto;
-    border-radius: var(--radius-lg);
-    border: 1px solid var(--white-18);
-    transition: border-color 0.2s ease;
-  }
+.pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--signal-500);
+  box-shadow: 0 0 0 4px var(--signal-100);
 }
 
 .hero-title {
-  font-size: clamp(2.125rem, 4.2vw, 3.375rem);
-  font-weight: 700;
-  line-height: 1.12;
-  margin: 0 0 1.5rem;
-  text-wrap: balance;
-  color: var(--white);
+  margin-top: var(--space-5);
+}
+
+// Highlighter stroke under the promise — drawn, not a font colour, so the
+// words themselves stay ink and keep full contrast.
+.mark {
+  background: linear-gradient(transparent 66%, var(--signal-500) 66%, var(--signal-500) 90%, transparent 90%);
+  padding-inline: 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
 }
 
 .hero-lead {
-  font-size: 1.125rem;
-  line-height: 1.7;
-  margin: 0 0 2.25rem;
   max-width: 58ch;
-  color: var(--white-78);
+  margin: var(--space-6) 0 0;
+  color: var(--ink-600);
+  font-size: var(--text-lg);
+  line-height: 1.65;
 }
 
 .hero-actions {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: 1.5rem;
+  gap: var(--space-4) var(--space-6);
+  margin-top: var(--space-8);
 }
 
 .hero-link {
-  color: var(--orange-web);
-  font-weight: 500;
-  font-size: 1rem;
-  text-decoration: none;
-  border-bottom: 1px solid var(--orange-web-35);
-  padding-bottom: 2px;
-  transition: border-color 0.2s ease;
-
-  &:hover {
-    border-bottom-color: var(--orange-web);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--orange-web);
-    outline-offset: 3px;
-  }
+  font-size: var(--text-base);
 }
 
 .hero-note {
-  margin: 2rem 0 0;
-  font-size: 0.875rem;
-  color: var(--white-55);
   display: flex;
-  align-items: center;
-  gap: 0.45rem;
-}
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: var(--space-6) 0 0;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
 
-// ---------------------------------------------------------------- CTAs
-//
-// Targets the NG-ZORRO class alongside the local one so these win over the
-// `body .ant-btn-primary` theme overrides without reaching for !important.
-
-// Grows instead of overflowing. `.ant-btn` ships `height` and
-// `white-space: nowrap`, both of which have to be undone or a label that
-// wraps on a narrow screen spills straight out of the button.
-button.cta.ant-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  height: auto;
-  min-height: 52px;
-  max-width: 100%;
-  padding: 12px 26px;
-  box-sizing: border-box;
-  white-space: normal;
-  font-size: 1.0625rem;
-  font-weight: 600;
-  font-family: inherit;
-  text-transform: none;
-  letter-spacing: normal;
-  border: none;
-  border-radius: var(--radius-sm);
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
-
-  &:hover,
-  &:focus-visible {
-    transform: translateY(-2px);
-  }
-
-  [nz-icon] {
-    font-size: 1.0625rem;
+  .anticon {
+    margin-top: 3px;
   }
 }
 
-button.cta-accent.ant-btn {
-  background-color: var(--orange-web);
-  color: var(--oxford-blue);
-  text-align: left;
-  box-shadow: var(--shadow-cta-orange);
+.hero-visual {
+  position: relative;
+  padding: 0 0 var(--space-8) var(--space-8);
 
-  &:hover,
-  &:focus-visible {
-    background-color: var(--orange-web);
-    color: var(--oxford-blue);
-    box-shadow: var(--shadow-cta-orange-hover);
+  @media (max-width: 960px) {
+    padding: 0 0 var(--space-6);
   }
 }
 
-button.cta-navy.ant-btn {
-  background-color: var(--oxford-blue);
-  color: var(--white);
-
-  [nz-icon] {
-    color: var(--orange-web);
-  }
-
-  &:hover,
-  &:focus-visible {
-    background-color: var(--oxford-blue);
-    color: var(--white);
-    box-shadow: var(--shadow-cta-navy);
-  }
-}
-
-// ---------------------------------------------------------------- steps
-
-.steps {
-  list-style: none;
-  margin: 2.75rem 0 0;
-  padding: 0;
-  display: grid;
-  // `min(…, 100%)` floor: an auto-fit track cannot shrink below its minmax
-  // minimum, so a bare 280px floor overflows any container narrower than that.
-  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-  gap: 2.5rem;
-
-  li {
-    border-top: 3px solid var(--orange-web);
-    padding-top: 1.5rem;
-  }
-
-  p {
-    line-height: 1.7;
-    margin: 0;
-    color: var(--oxford-blue-82);
-  }
-}
-
-.step-number {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.5rem;
-  height: 2.5rem;
-  border-radius: 50%;
-  background-color: var(--orange-web);
-  color: var(--oxford-blue);
-  font-weight: 700;
-  font-size: 1.125rem;
-  margin-bottom: 1rem;
-}
-
-// ---------------------------------------------------------------- the law
-
-.law {
-  padding-top: 0;
-}
-
-.law-panel {
-  background-color: var(--oxford-blue);
-  background-image: radial-gradient(
-    ellipse 500px 300px at 0% 100%,
-    var(--orange-web-08),
-    transparent 60%
-  );
-  color: var(--white);
+.shot {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  border: 1px solid var(--line-strong);
   border-radius: var(--radius-xl);
-  // Fluid rather than a breakpoint: the panel tightens continuously as the
-  // viewport narrows, so there is no width at which it is still 3rem-padded
-  // and already too cramped.
-  padding: clamp(1.75rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 3rem);
-  display: flex;
-  flex-wrap: wrap;
-  gap: clamp(1.5rem, 4vw, 3rem);
-  align-items: center;
-
-  h2 {
-    font-size: 1.75rem;
-    color: var(--white);
-    margin-bottom: 1.25rem;
-  }
-
-  p {
-    line-height: 1.75;
-    margin: 0 0 1rem;
-    color: var(--white-82);
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
-
-  strong {
-    color: var(--white);
-  }
-}
-
-// `min(100%, …)` on every flex floor. A bare pixel minimum cannot shrink, and
-// the panel's own padding leaves less than 300px of content width below a
-// 396px viewport — which pushed the legal text out of the panel and scrolled
-// the whole page sideways on any 360-375px phone.
-.law-stat {
-  flex: 0 1 260px;
-  min-width: min(100%, 220px);
-}
-
-.law-stat-figure {
-  display: block;
-  font-size: clamp(4.5rem, 8vw, 7rem);
-  font-weight: 700;
-  line-height: 1;
-  color: var(--orange-web);
-}
-
-.law-stat-label {
-  display: block;
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--white-78);
-  margin-top: 0.5rem;
-}
-
-.law-copy {
-  flex: 1 1 480px;
-  min-width: min(100%, 300px);
-}
-
-// ---------------------------------------------------------------- lists
-
-.responsibilities {
-  list-style: none;
-  margin: 0 0 1.5rem;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
-  gap: 1rem;
-
-  li {
-    border: 1px solid var(--platinum);
-    border-radius: var(--radius-md);
-    padding: 1.375rem 1.5rem;
-    line-height: 1.65;
-    background-color: var(--white);
-    transition: border-color 0.2s ease;
-
-    &:hover {
-      border-color: var(--orange-web-60);
-    }
-  }
-
-  strong {
-    display: block;
-    margin-bottom: 0.35rem;
-    font-size: 1.0625rem;
-  }
-
-  span {
-    color: var(--oxford-blue-82);
-  }
-}
-
-.responsibilities-note {
-  line-height: 1.7;
-  margin: 0;
-  font-size: 0.9375rem;
-  color: var(--oxford-blue-65);
-  max-width: 68ch;
-}
-
-// ---------------------------------------------------------------- guides
-
-.resources {
-  background-color: var(--surface-muted);
-}
-
-.guide-links {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(min(250px, 100%), 1fr));
-  gap: 1.25rem;
-
-  a {
-    display: block;
-    height: 100%;
-    box-sizing: border-box;
-    background-color: var(--white);
-    border: 1px solid var(--platinum);
-    border-radius: var(--radius-md);
-    overflow: hidden;
-    color: inherit;
-    text-decoration: none;
-    transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-
-    &:hover {
-      border-color: var(--orange-web);
-      box-shadow: var(--shadow-card);
-      transform: translateY(-3px);
-    }
-
-    &:focus-visible {
-      outline: 2px solid var(--orange-web);
-      outline-offset: 2px;
-    }
-  }
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+  transition: box-shadow var(--dur) var(--ease), transform var(--dur) var(--ease);
 
   img {
     display: block;
     width: 100%;
     height: auto;
-    aspect-ratio: 5 / 3;
-    object-fit: cover;
-    border-bottom: 1px solid var(--platinum);
+  }
+
+  &:hover {
+    transform: translateY(-2px);
   }
 }
 
-.guide-body {
-  display: block;
-  padding: 1.125rem 1.25rem 1.25rem;
+.shot-chip {
+  position: absolute;
+  top: var(--space-4);
+  left: var(--space-4);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border-radius: var(--radius-pill);
+  background: var(--ink-900);
+  color: var(--white);
+  font-size: var(--text-sm);
+  font-weight: 650;
+  box-shadow: var(--shadow-md);
 }
 
-.guide-title {
-  display: block;
+.deadline-card {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 260px;
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg);
+
+  @media (max-width: 960px) {
+    left: var(--space-4);
+  }
+}
+
+.deadline-figure {
+  font-size: 2.75rem;
+  color: var(--ink-900);
+}
+
+.deadline-text {
+  color: var(--ink-600);
+  font-size: var(--text-sm);
   font-weight: 600;
-  font-size: 1rem;
-  line-height: 1.4;
-  margin-bottom: 0.45rem;
+  line-height: 1.35;
 }
 
-.guide-desc {
-  display: block;
-  font-size: 0.875rem;
-  line-height: 1.6;
-  color: var(--oxford-blue-68);
+// --- Steps ----------------------------------------------------------------
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-5);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: none;
+
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+  }
 }
 
-// ---------------------------------------------------------------- closing
+.step {
+  position: relative;
+  padding: var(--space-8) var(--space-6) var(--space-6);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
 
-.closing {
-  text-align: center;
-  padding-bottom: 5rem;
+  h3 {
+    margin: var(--space-5) 0 var(--space-3);
+    font-size: var(--text-xl);
+    font-weight: 700;
+    line-height: 1.25;
+  }
 
   p {
-    line-height: 1.7;
-    margin: 0 auto 2rem;
-    max-width: 56ch;
-    color: var(--oxford-blue-82);
+    margin: 0;
+    color: var(--ink-600);
+    line-height: 1.65;
   }
 }
 
-// Centred with auto margins, not by the section's `text-align`. Tailwind's
-// preflight sets `img { display: block }` globally, and a block-level image
-// ignores text-align — so this sat flush left while the heading and copy above
-// it were centred. The design has no preflight, which is why it looks right
-// there and wrong here.
-.closing-mark {
-  display: block;
-  margin: 0 auto 1.25rem;
+.step-icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: var(--signal-50);
+  color: var(--signal-text);
+  font-size: 22px;
+  box-shadow: inset 0 0 0 1px var(--signal-200);
 }
 
-// ---------------------------------------------------------------- responsive
-
-// The design is intrinsically responsive — flex-wrap, clamp() and min() rather
-// than breakpoints — so this is the only query, and it only tightens vertical
-// rhythm and the gutter. Nothing here overrides the fluid rules above.
-@media (max-width: 640px) {
-  .wrap {
-    padding-left: 1.25rem;
-    padding-right: 1.25rem;
-  }
-
-  .section {
-    padding-top: 3.5rem;
-    padding-bottom: 3rem;
-  }
-
-  .hero-body {
-    padding-top: 2.5rem;
-    padding-bottom: 3rem;
-  }
-
-  .hero-lead {
-    font-size: 1rem;
-  }
-
-  .section h2 {
-    font-size: 1.625rem;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  button.cta.ant-btn,
-  .guide-links a,
-  .responsibilities li,
-  .hero-visual a,
-  .hero-visual img,
-  .hero-link {
-    transition: none;
-  }
-
-  button.cta.ant-btn:hover,
-  button.cta.ant-btn:focus-visible,
-  .guide-links a:hover,
-  .hero-visual a:hover {
-    transform: none;
-  }
+.step-number {
+  position: absolute;
+  top: var(--space-6);
+  right: var(--space-6);
+  color: var(--ink-200);
+  font-size: var(--text-4xl);
 }

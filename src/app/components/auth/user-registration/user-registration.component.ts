@@ -7,19 +7,16 @@ import { Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
-import { NzStepsModule } from 'ng-zorro-antd/steps';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+
+import { AuthShellComponent } from '../auth-shell/auth-shell.component';
 
 import { AppState } from '../../../store/app.state';
 import * as AuthActions from '../../../store/auth/auth.actions';
@@ -67,19 +64,15 @@ interface RegistrationData {
     CommonModule,
     RouterModule,
     ReactiveFormsModule,
-    NzCardModule,
     NzButtonModule,
     NzFormModule,
     NzInputModule,
     NzCheckboxModule,
     NzSelectModule,
     NzIconModule,
-    NzAlertModule,
     NzSpinModule,
-    NzDividerModule,
-    NzTypographyModule,
-    NzStepsModule,
-    NzModalModule
+    NzModalModule,
+    AuthShellComponent
   ],
   templateUrl: './user-registration.component.html',
   styleUrls: ['./user-registration.component.scss']
@@ -304,7 +297,7 @@ export class UserRegistrationComponent implements OnInit {
 
   showPrivacyPolicy(): void {
     const modalRef = this.modal.create({
-      nzTitle: 'Politica de Confidențialitate',
+      nzTitle: 'Politica de confidențialitate',
       nzContent: this.privacyPolicyTemplate(),
       nzWidth: 700,
       nzCentered: true,
@@ -324,7 +317,7 @@ export class UserRegistrationComponent implements OnInit {
 
   showTermsAndConditions(): void {
     const modalRef = this.modal.create({
-      nzTitle: 'Termeni și Condiții',
+      nzTitle: 'Termeni și condiții',
       nzContent: this.termsTemplate(),
       nzWidth: 700,
       nzCentered: true,

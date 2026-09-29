@@ -1,39 +1,74 @@
-<div class="edit-issue-container">
-  <nz-spin [nzSpinning]="isLoading" nzTip="Se încarcă...">
+<div class="c-container c-container--narrow c-page edit" [attr.aria-busy]="isLoading || null">
 
-    <!-- Error State -->
-    @if (loadError) {
-      <nz-alert nzType="error" [nzMessage]="loadError" nzShowIcon class="mb-4"></nz-alert>
+  <div class="c-page-head">
+    <div class="c-page-head__text">
+      <p class="c-eyebrow">Problemele mele</p>
+      <h1 class="c-h1">Editează problema</h1>
+      <p class="c-lead">Modifică detaliile problemei și retrimite pentru aprobare</p>
+    </div>
+    @if (issue && !loadError) {
+      <div class="c-page-head__actions head-status">
+        <span class="c-muted c-small">Stare actuală</span>
+        <span class="c-status" [attr.data-tone]="issue.status | statusTone">{{ issue.status | statusText }}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Error State -->
+  @if (loadError) {
+    <div class="c-callout c-callout--bad load-error" role="alert">
+      <span nz-icon nzType="exclamation-circle" nzTheme="outline" aria-hidden="true"></span>
+      <div>
+        <p class="callout-title">{{ loadError }}</p>
+        <button nz-button nzSize="small" type="button" class="load-error__back" (click)="goBack()">
+          <span nz-icon nzType="arrow-left" nzTheme="outline" aria-hidden="true"></span>
+          <span>Înapoi la problemele mele</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- First load -->
+  @if (isLoading && !issue && !loadError) {
+    <div class="loading" aria-hidden="true">
+      <div class="c-skeleton sk-banner"></div>
+      <div class="c-skeleton sk-card"></div>
+      <div class="c-skeleton sk-card sk-card--short"></div>
+    </div>
+    <p class="c-sr-only" role="status">Se încarcă...</p>
+  }
+
+  <!-- Edit Form -->
+  @if (issue && !loadError) {
+    @if (statusBanner; as banner) {
+      <div
+        class="c-callout banner"
+        [class.c-callout--signal]="banner.type === 'warning'"
+        [class.banner--info]="banner.type === 'info'">
+        <span nz-icon [nzType]="banner.type === 'warning' ? 'exclamation-circle' : 'info-circle'" nzTheme="outline" aria-hidden="true"></span>
+        <div>
+          <p class="callout-title">{{ banner.message }}</p>
+          <p>{{ banner.description }}</p>
+        </div>
+      </div>
     }
 
-    <!-- Edit Form -->
-    @if (issue && !loadError) {
-      <nz-card class="edit-card">
-        <div class="edit-header">
-          <h2>Editează Problema</h2>
-          <p class="subtitle">Modifică detaliile problemei și retrimite pentru aprobare</p>
-        </div>
+    <form [formGroup]="editForm" (ngSubmit)="onSubmit()" class="form" [class.is-busy]="isLoading">
 
-        @if (statusBanner; as banner) {
-          <nz-alert
-            [nzType]="banner.type"
-            [nzMessage]="banner.message"
-            [nzDescription]="banner.description"
-            nzShowIcon
-            class="mb-4">
-          </nz-alert>
-        }
+      <!-- The problem -->
+      <section class="c-card section" aria-labelledby="sec-details">
+        <h2 id="sec-details" class="c-h3 section-title">Despre problemă</h2>
 
-        <form [formGroup]="editForm" (ngSubmit)="onSubmit()">
-          <!-- Title -->
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired nzFor="title">Titlu</nz-form-label>
-            <nz-form-control [nzSpan]="24" [nzErrorTip]="'Titlul este obligatoriu (maxim ' + TITLE_MAX + ' caractere)'">
-              <input nz-input id="title" formControlName="title" placeholder="Un titlu scurt și descriptiv" [attr.maxlength]="TITLE_MAX">
-              <div class="char-count">{{ editForm.get('title')?.value?.length || 0 }} / {{ TITLE_MAX }}</div>
-            </nz-form-control>
-          </nz-form-item>
+        <!-- Title -->
+        <nz-form-item>
+          <nz-form-label [nzSpan]="24" nzRequired nzFor="title">Titlu</nz-form-label>
+          <nz-form-control [nzSpan]="24" [nzErrorTip]="'Titlul este obligatoriu (maxim ' + TITLE_MAX + ' caractere)'">
+            <input nz-input id="title" formControlName="title" placeholder="Un titlu scurt și descriptiv" [attr.maxlength]="TITLE_MAX">
+            <div class="char-count">{{ editForm.get('title')?.value?.length || 0 }} / {{ TITLE_MAX }}</div>
+          </nz-form-control>
+        </nz-form-item>
 
+        <div class="field-row">
           <!-- Category -->
           <nz-form-item>
             <nz-form-label [nzSpan]="24" nzRequired nzFor="category">Categorie</nz-form-label>
@@ -43,54 +78,6 @@
                   <nz-option [nzValue]="cat.id" [nzLabel]="cat.name"></nz-option>
                 }
               </nz-select>
-            </nz-form-control>
-          </nz-form-item>
-
-          <!-- Description -->
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired nzFor="description">Descriere</nz-form-label>
-            <nz-form-control [nzSpan]="24" nzErrorTip="Descrierea trebuie să aibă cel puțin 10 caractere">
-              <textarea
-                nz-input
-                id="description"
-                formControlName="description"
-                placeholder="Descrie problema în detaliu..."
-                [nzAutosize]="{ minRows: 5, maxRows: 12 }"
-                [attr.maxlength]="DESCRIPTION_MAX">
-              </textarea>
-              <div class="char-count">{{ editForm.get('description')?.value?.length || 0 }} / {{ DESCRIPTION_MAX }}</div>
-            </nz-form-control>
-          </nz-form-item>
-
-          <!-- Desired outcome -->
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzFor="desiredOutcome">Rezultatul dorit</nz-form-label>
-            <nz-form-control [nzSpan]="24" nzErrorTip="Dacă îl completezi, folosește cel puțin 10 caractere">
-              <textarea
-                nz-input
-                id="desiredOutcome"
-                formControlName="desiredOutcome"
-                placeholder="Ce ți-ai dori să se întâmple?"
-                [nzAutosize]="{ minRows: 3, maxRows: 8 }"
-                [attr.maxlength]="TEXTAREA_MAX">
-              </textarea>
-              <div class="char-count">{{ editForm.get('desiredOutcome')?.value?.length || 0 }} / {{ TEXTAREA_MAX }}</div>
-            </nz-form-control>
-          </nz-form-item>
-
-          <!-- Community impact -->
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzFor="communityImpact">Impactul asupra comunității</nz-form-label>
-            <nz-form-control [nzSpan]="24" nzErrorTip="Dacă îl completezi, folosește cel puțin 10 caractere">
-              <textarea
-                nz-input
-                id="communityImpact"
-                formControlName="communityImpact"
-                placeholder="Cum afectează problema comunitatea?"
-                [nzAutosize]="{ minRows: 3, maxRows: 8 }"
-                [attr.maxlength]="TEXTAREA_MAX">
-              </textarea>
-              <div class="char-count">{{ editForm.get('communityImpact')?.value?.length || 0 }} / {{ TEXTAREA_MAX }}</div>
             </nz-form-control>
           </nz-form-item>
 
@@ -106,108 +93,163 @@
               </nz-select>
             </nz-form-control>
           </nz-form-item>
+        </div>
 
-          <!-- Location -->
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24">Locație</nz-form-label>
-            <nz-form-control [nzSpan]="24">
-              <div class="location-row">
-                <div class="readonly-field">
-                  <span nz-icon nzType="environment" nzTheme="outline"></span>
-                  <span>{{ location()?.address || 'Nicio locație selectată' }}</span>
+        <!-- Description -->
+        <nz-form-item>
+          <nz-form-label [nzSpan]="24" nzRequired nzFor="description">Descriere</nz-form-label>
+          <nz-form-control [nzSpan]="24" nzErrorTip="Descrierea trebuie să aibă cel puțin 10 caractere">
+            <textarea
+              nz-input
+              id="description"
+              formControlName="description"
+              placeholder="Descrie problema în detaliu..."
+              [nzAutosize]="{ minRows: 5, maxRows: 12 }"
+              [attr.maxlength]="DESCRIPTION_MAX">
+            </textarea>
+            <div class="char-count">{{ editForm.get('description')?.value?.length || 0 }} / {{ DESCRIPTION_MAX }}</div>
+          </nz-form-control>
+        </nz-form-item>
+      </section>
+
+      <!-- What the owner asks for -->
+      <section class="c-card section" aria-labelledby="sec-ask">
+        <h2 id="sec-ask" class="c-h3 section-title">Rezultat și impact</h2>
+        <p class="section-hint">Opționale. Ajută autoritatea să înțeleagă ce aștepți și pe cine afectează problema.</p>
+
+        <!-- Desired outcome -->
+        <nz-form-item>
+          <nz-form-label [nzSpan]="24" nzFor="desiredOutcome">Rezultatul dorit</nz-form-label>
+          <nz-form-control [nzSpan]="24" nzErrorTip="Dacă îl completezi, folosește cel puțin 10 caractere">
+            <textarea
+              nz-input
+              id="desiredOutcome"
+              formControlName="desiredOutcome"
+              placeholder="Ce ți-ai dori să se întâmple?"
+              [nzAutosize]="{ minRows: 3, maxRows: 8 }"
+              [attr.maxlength]="TEXTAREA_MAX">
+            </textarea>
+            <div class="char-count">{{ editForm.get('desiredOutcome')?.value?.length || 0 }} / {{ TEXTAREA_MAX }}</div>
+          </nz-form-control>
+        </nz-form-item>
+
+        <!-- Community impact -->
+        <nz-form-item>
+          <nz-form-label [nzSpan]="24" nzFor="communityImpact">Impactul asupra comunității</nz-form-label>
+          <nz-form-control [nzSpan]="24" nzErrorTip="Dacă îl completezi, folosește cel puțin 10 caractere">
+            <textarea
+              nz-input
+              id="communityImpact"
+              formControlName="communityImpact"
+              placeholder="Cum afectează problema comunitatea?"
+              [nzAutosize]="{ minRows: 3, maxRows: 8 }"
+              [attr.maxlength]="TEXTAREA_MAX">
+            </textarea>
+            <div class="char-count">{{ editForm.get('communityImpact')?.value?.length || 0 }} / {{ TEXTAREA_MAX }}</div>
+          </nz-form-control>
+        </nz-form-item>
+      </section>
+
+      <!-- Location -->
+      <section class="c-card section" aria-labelledby="sec-location">
+        <h2 id="sec-location" class="c-h3 section-title">Locație</h2>
+        <div class="location-row">
+          <div class="readonly-field">
+            <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>
+            <span>{{ location()?.address || 'Nicio locație selectată' }}</span>
+          </div>
+          <button nz-button nzType="default" type="button" (click)="changeLocation()">
+            <span nz-icon nzType="edit" nzTheme="outline" aria-hidden="true"></span><span>Schimbă locația</span>
+          </button>
+        </div>
+        @if (issueDistrict()) {
+          <p class="field-hint">Sector: {{ issueDistrict() }}</p>
+        }
+      </section>
+
+      <!-- Photos -->
+      <section class="c-card section" aria-labelledby="sec-photos">
+        <h2 id="sec-photos" class="c-h3 section-title">Fotografii</h2>
+        <p class="section-hint">Maxim {{ MAX_PHOTOS }} fotografii, fiecare sub 10MB. Prima fotografie este cea principală.</p>
+
+        <input
+          type="file"
+          id="edit-photo-input"
+          accept="image/*"
+          multiple
+          hidden
+          (change)="onFileSelected($event)">
+
+        <ul class="photo-grid">
+          @for (photo of photos(); track photo.id) {
+            <li class="photo-tile" [class.is-primary]="photo.isPrimary">
+              <img [src]="photo.url" alt="Fotografie problemă">
+              @if (photo.isUploading) {
+                <div class="photo-overlay" role="status">
+                  <span nz-icon nzType="loading" nzSpin aria-hidden="true"></span>
+                  <span class="c-sr-only">Se încarcă fotografia</span>
                 </div>
-                <button nz-button nzType="default" type="button" (click)="changeLocation()">
-                  <span nz-icon nzType="edit" nzTheme="outline"></span><span>Schimbă locația</span>
-                </button>
-              </div>
-              @if (issueDistrict()) {
-                <p class="field-hint">Sector: {{ issueDistrict() }}</p>
               }
-            </nz-form-control>
-          </nz-form-item>
-
-          <!-- Photos -->
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24">Fotografii</nz-form-label>
-            <nz-form-control [nzSpan]="24">
-              <input
-                type="file"
-                id="edit-photo-input"
-                accept="image/*"
-                multiple
-                hidden
-                (change)="onFileSelected($event)">
-
-              <div class="photo-grid">
-                @for (photo of photos(); track photo.id) {
-                  <div class="photo-tile" [class.is-primary]="photo.isPrimary">
-                    <img [src]="photo.url" alt="Fotografie problemă">
-                    @if (photo.isUploading) {
-                      <div class="photo-overlay">
-                        <span nz-icon nzType="loading" nzSpin></span>
-                      </div>
-                    }
-                    @if (photo.isPrimary) {
-                      <span class="primary-badge">Principală</span>
-                    }
-                    <div class="photo-actions">
-                      @if (!photo.isPrimary && !photo.isUploading) {
-                        <button
-                          nz-button nzType="text" nzSize="small" type="button"
-                          nz-tooltip nzTooltipTitle="Setează ca principală"
-                          (click)="setPrimaryPhoto(photo.id)">
-                          <span nz-icon nzType="star" nzTheme="outline"></span>
-                        </button>
-                      }
-                      <button
-                        nz-button nzType="text" nzDanger nzSize="small" type="button"
-                        nz-tooltip nzTooltipTitle="Șterge"
-                        (click)="removePhoto(photo.id)">
-                        <span nz-icon nzType="delete" nzTheme="outline"></span>
-                      </button>
-                    </div>
-                  </div>
-                }
-
-                @if (photos().length < MAX_PHOTOS) {
-                  <button type="button" class="photo-add" (click)="triggerFileInput()">
-                    <span nz-icon nzType="plus"></span>
-                    <span class="upload-text">Adaugă foto</span>
+              @if (photo.isPrimary) {
+                <span class="primary-badge">Principală</span>
+              }
+              <div class="photo-actions">
+                @if (!photo.isPrimary && !photo.isUploading) {
+                  <button
+                    nz-button nzType="text" nzSize="small" type="button"
+                    nz-tooltip nzTooltipTitle="Setează ca principală"
+                    aria-label="Setează ca principală"
+                    (click)="setPrimaryPhoto(photo.id)">
+                    <span nz-icon nzType="star" nzTheme="outline"></span>
                   </button>
                 }
+                <button
+                  nz-button nzType="text" nzDanger nzSize="small" type="button"
+                  nz-tooltip nzTooltipTitle="Șterge"
+                  aria-label="Șterge fotografia"
+                  (click)="removePhoto(photo.id)">
+                  <span nz-icon nzType="delete" nzTheme="outline"></span>
+                </button>
               </div>
-              <p class="photo-hint">Maxim {{ MAX_PHOTOS }} fotografii, fiecare sub 10MB. Prima fotografie este cea principală.</p>
-            </nz-form-control>
-          </nz-form-item>
+            </li>
+          }
 
-          <!-- Authorities -->
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24">Autorități destinatare</nz-form-label>
-            <nz-form-control [nzSpan]="24">
-              <app-authority-picker
-                [city]="issueCity()"
-                [district]="issueDistrict()"
-                [(selected)]="selectedAuthorities" />
-            </nz-form-control>
-          </nz-form-item>
+          @if (photos().length < MAX_PHOTOS) {
+            <li>
+              <button type="button" class="photo-add" (click)="triggerFileInput()">
+                <span nz-icon nzType="plus" aria-hidden="true"></span>
+                <span class="upload-text">Adaugă foto</span>
+              </button>
+            </li>
+          }
+        </ul>
+      </section>
 
-          <!-- Actions -->
-          <div class="form-actions">
-            <button nz-button nzType="default" type="button" (click)="goBack()" [disabled]="isSaving || isUploading()">
-              <span nz-icon nzType="arrow-left" nzTheme="outline"></span><span>Înapoi</span>
-            </button>
-            <button
-              nz-button
-              nzType="primary"
-              type="submit"
-              [nzLoading]="isSaving || isUploading()"
-              [disabled]="isSaving || isUploading()">
-              <span nz-icon nzType="check" nzTheme="outline"></span>
-              <span>{{ isUploading() ? 'Se încarcă fotografiile...' : 'Retrimite pentru aprobare' }}</span>
-            </button>
-          </div>
-        </form>
-      </nz-card>
-    }
-  </nz-spin>
+      <!-- Authorities: the picker brings its own cards, so no card around it -->
+      <section class="section section--bare" aria-labelledby="sec-authorities">
+        <h2 id="sec-authorities" class="c-h3 section-title">Autorități destinatare</h2>
+        <app-authority-picker
+          [city]="issueCity()"
+          [district]="issueDistrict()"
+          [(selected)]="selectedAuthorities" />
+      </section>
+
+      <!-- Sticky save bar -->
+      <div class="savebar">
+        <button nz-button nzType="default" type="button" class="savebar-back" (click)="goBack()" [disabled]="isSaving || isUploading()">
+          <span nz-icon nzType="arrow-left" nzTheme="outline" aria-hidden="true"></span><span class="savebar-back__label">Înapoi</span>
+        </button>
+        <button
+          nz-button
+          nzType="primary"
+          type="submit"
+          class="savebar-submit"
+          [nzLoading]="isSaving || isUploading()"
+          [disabled]="isSaving || isUploading()">
+          <span nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></span>
+          <span>{{ isUploading() ? 'Se încarcă fotografiile...' : 'Retrimite pentru aprobare' }}</span>
+        </button>
+      </div>
+    </form>
+  }
 </div>

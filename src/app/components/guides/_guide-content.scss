@@ -1,264 +1,150 @@
-// Shared styles for markdown-rendered guide content.
-// Mirrors patterns from _legal-shared.scss, reuses existing CSS variables.
+// Article body for the guides: HTML generated at build time from
+// src/content/guides/*.md (scripts/build-guides.js) and bound through
+// [innerHTML]. Those nodes carry no _ngcontent attribute, so every rule
+// below goes through ::ng-deep — anchored on .guide-content, which does, so
+// nothing leaks out of the article.
+//
+// The global .c-prose sets the base (size, measure, rhythm, display-face
+// headings, signal-underlined links); this file adds what markdown produces
+// on top of that: lists, the model-petition blockquote, tables.
 
-.guide-page {
-  flex: 1;
-  background: var(--white);
-  min-height: 100vh;
-  padding: 2rem 1rem;
-}
-
-.guide-container {
-  max-width: 720px;
-  margin: 0 auto;
-}
-
-.guide-header {
-  margin-bottom: 2rem;
-}
-
-.guide-breadcrumb {
-  display: flex;
-  align-items: center;
-  gap: 0.375rem;
-  margin-bottom: 1rem;
-  font-size: var(--text-sm);
-
-  a {
-    color: var(--orange-web);
-    text-decoration: none;
-    font-weight: 500;
-
-    &:hover {
-      text-decoration: underline;
-    }
-  }
-
-  .separator {
-    color: var(--color-text-muted);
-  }
-
-  .current {
-    color: var(--color-text-muted);
-  }
-}
-
-.guide-title {
-  font-family: var(--font-primary);
-  font-size: var(--text-3xl);
-  font-weight: 700;
-  color: var(--oxford-blue);
-  margin: 0 0 0.75rem;
-  line-height: 1.25;
-  letter-spacing: -0.01em;
-}
-
-.guide-description {
-  font-family: var(--font-primary);
-  font-size: var(--text-lg);
-  color: var(--color-text-muted);
-  line-height: 1.6;
-  margin: 0 0 1rem;
-}
-
-.guide-meta {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  font-size: var(--text-sm);
-  color: var(--color-text-muted);
-
-  .dot {
-    width: 4px;
-    height: 4px;
-    border-radius: 50%;
-    background: var(--platinum);
-  }
-}
-
-// Rendered markdown content
-.guide-content {
-  color: var(--oxford-blue);
-  line-height: 1.8;
-  font-size: var(--text-base);
-
+.guide-content ::ng-deep {
   h2 {
-    font-size: var(--text-xl);
-    font-weight: 700;
-    color: var(--oxford-blue);
-    margin: 2.5rem 0 0.75rem;
-    letter-spacing: -0.01em;
+    margin-top: 2em;
+    font-size: clamp(1.5rem, 1.25rem + 1vw, 1.875rem);
+    line-height: 1.15;
   }
 
   h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--oxford-blue);
-    margin: 2rem 0 0.5rem;
+    margin-top: 1.6em;
+    font-size: var(--text-xl);
+    line-height: 1.25;
   }
 
-  p {
-    margin: 0 0 1rem;
+  h2 + *,
+  h3 + * {
+    margin-top: 0.6em;
   }
 
-  ul, ol {
-    margin: 0 0 1rem;
-    padding-left: 1.5rem;
+  // Tailwind's preflight strips list markers; bring them back.
+  ul,
+  ol {
+    padding-left: 1.4em;
+  }
 
-    li {
-      margin-bottom: 0.375rem;
-      line-height: 1.7;
+  ul {
+    list-style: disc;
+  }
+
+  ol {
+    list-style: decimal;
+  }
+
+  li {
+    padding-left: 0.3em;
+
+    & + li {
+      margin-top: 0.55em;
     }
   }
 
-  strong {
-    font-weight: 600;
+  ul > li::marker {
+    color: var(--signal-600);
   }
 
-  a {
-    color: var(--orange-web);
-
-    &:hover {
-      text-decoration: underline;
-    }
+  ol > li::marker {
+    color: var(--signal-text);
+    font-family: var(--font-display);
+    font-weight: 700;
   }
 
+  a:hover {
+    color: var(--signal-text-strong);
+    text-decoration-color: currentColor;
+  }
+
+  em {
+    color: var(--ink-700);
+  }
+
+  // Used for the model petition: a sheet of paper you can copy from.
   blockquote {
-    margin: 1.5rem 0;
-    padding: 1.25rem 1.5rem;
-    border-left: 4px solid var(--orange-web);
-    background: var(--orange-web-20);
-    border-radius: 0 8px 8px 0;
+    margin: 1.75em 0 0;
+    padding: var(--space-6);
+    border: 1px solid var(--line);
+    border-left: 4px solid var(--signal-500);
+    border-radius: var(--radius-md);
+    background: var(--surface);
+    box-shadow: var(--shadow-xs);
+    color: var(--ink-800);
+    font-size: var(--text-base);
+    line-height: 1.65;
 
-    p {
-      margin-bottom: 0.5rem;
+    // NG-ZORRO's reset gives every <p> a bottom margin; inside the sheet the
+    // spacing is ours alone.
+    > * {
+      margin: 0;
+    }
 
-      &:last-child {
-        margin-bottom: 0;
-      }
+    > * + * {
+      margin-top: 0.75em;
+    }
+
+    + * {
+      margin-top: 1.75em;
     }
   }
 
   table {
     width: 100%;
-    border-collapse: collapse;
-    margin: 1rem 0;
+    margin-top: 1.5em;
+    border: 1px solid var(--line);
+    border-collapse: separate;
+    border-spacing: 0;
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    background: var(--surface);
+    font-size: var(--text-md);
+    line-height: 1.5;
+  }
+
+  th,
+  td {
+    padding: var(--space-3) var(--space-4);
+    text-align: left;
+    vertical-align: top;
+    overflow-wrap: anywhere;
+  }
+
+  th {
+    background: var(--paper-2);
+    color: var(--ink-900);
     font-size: var(--text-sm);
-
-    th, td {
-      padding: 0.5rem 0.75rem;
-      text-align: left;
-      border-bottom: 1px solid var(--platinum);
-    }
-
-    th {
-      font-weight: 600;
-      color: var(--oxford-blue);
-    }
-
-    td {
-      color: var(--color-text-muted);
-    }
-  }
-}
-
-// CTA box at the bottom of articles
-.guide-cta {
-  margin-top: 2.5rem;
-  padding: 2rem;
-  background: var(--oxford-blue);
-  border-radius: 12px;
-  text-align: center;
-
-  .cta-title {
-    font-family: var(--font-primary);
-    font-size: var(--text-xl);
-    font-weight: 700;
-    color: var(--white);
-    margin: 0 0 0.5rem;
+    font-weight: 650;
   }
 
-  .cta-text {
-    font-family: var(--font-primary);
-    font-size: var(--text-base);
-    color: rgba(255, 255, 255, 0.7);
-    margin: 0 0 1rem;
+  td {
+    border-top: 1px solid var(--line);
+    color: var(--ink-700);
   }
 
-  .cta-button {
-    display: inline-block;
-    padding: 0.625rem 1.5rem;
-    background: var(--orange-web);
-    color: var(--oxford-blue);
-    font-family: var(--font-primary);
-    font-size: var(--text-sm);
+  td:first-child {
+    color: var(--ink-900);
     font-weight: 600;
-    border-radius: 8px;
-    text-decoration: none;
-    transition: opacity 0.2s;
-
-    &:hover {
-      opacity: 0.9;
-    }
-  }
-}
-
-// Related articles at the bottom
-.guide-related {
-  margin-top: 2rem;
-  padding-top: 2rem;
-  border-top: 1px solid var(--platinum);
-
-  .related-heading {
-    font-family: var(--font-primary);
-    font-size: var(--text-lg);
-    font-weight: 600;
-    color: var(--oxford-blue);
-    margin: 0 0 1rem;
   }
 
-  .related-grid {
-    display: flex;
-    gap: 1rem;
-
-    @media (max-width: 480px) {
-      flex-direction: column;
-    }
+  hr {
+    height: 1px;
+    margin: 2.5em 0;
+    border: 0;
+    background: var(--line);
   }
 
-  .related-card {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.375rem;
-    padding: 1rem;
-    background: var(--platinum);
-    border-radius: 8px;
-    text-decoration: none;
-    transition: box-shadow 0.2s;
-
-    &:hover {
-      box-shadow: 0 2px 8px rgba(20, 33, 61, 0.1);
-    }
-
-    .related-category {
-      font-size: var(--text-xs);
-      font-weight: 600;
-      color: var(--color-text-muted);
-      text-transform: uppercase;
-      letter-spacing: var(--tracking-wider);
-    }
-
-    .related-title {
-      font-size: var(--text-base);
-      font-weight: 600;
-      color: var(--oxford-blue);
-      line-height: 1.4;
-    }
-
-    .related-meta {
-      font-size: var(--text-xs);
-      color: var(--color-text-muted);
-    }
+  code {
+    padding: 0.1em 0.35em;
+    border-radius: var(--radius-xs);
+    background: var(--paper-2);
+    font-family: var(--font-mono);
+    font-size: 0.9em;
   }
 }

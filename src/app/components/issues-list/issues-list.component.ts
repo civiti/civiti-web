@@ -3,16 +3,9 @@ import { Router, ActivatedRoute, RouterLink } from '@angular/router';
 import { CommonModule, isPlatformBrowser, Location } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { map, distinctUntilChanged, debounceTime } from 'rxjs/operators';
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzFormModule } from 'ng-zorro-antd/form';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzInputModule } from 'ng-zorro-antd/input';
-import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
 import { ReactiveFormsModule, FormsModule, FormControl } from '@angular/forms';
@@ -27,7 +20,8 @@ import { IssueItem, IssueCategory, CategoryResponse } from '../../types/civica-a
 import { CategoryService } from '../../services/category.service';
 import { BUCHAREST_DISTRICTS, DEFAULT_CITY } from '../../data/romanian-locations';
 import { BUCHAREST_LOCATION_BIAS } from '../../types/location.types';
-import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
+import { StatusTextPipe, StatusTonePipe } from '../../pipes/status.pipe';
+import { CategoryIconPipe, CategoryLabelPipe } from '../../pipes/category.pipe';
 import { IsUrgentPipe } from '../../pipes/urgency.pipe';
 import { DaysSincePipe } from '../../pipes/date.pipe';
 import { ViewSwitcherComponent, ViewMode } from '../shared/view-switcher/view-switcher.component';
@@ -41,20 +35,15 @@ import { IssuesMapComponent } from '../issues-map/issues-map.component';
     RouterLink,
     ReactiveFormsModule,
     FormsModule,
-    NzCardModule,
-    NzButtonModule,
     NzIconModule,
-    NzTagModule,
     NzSelectModule,
-    NzFormModule,
-    NzGridModule,
-    NzEmptyModule,
-    NzToolTipModule,
     NzModalModule,
     NzPaginationModule,
     NzInputModule,
     StatusTextPipe,
-    StatusColorPipe,
+    StatusTonePipe,
+    CategoryLabelPipe,
+    CategoryIconPipe,
     IsUrgentPipe,
     DaysSincePipe,
     ViewSwitcherComponent,
@@ -91,6 +80,9 @@ export class IssuesListComponent implements OnInit {
 
   sortBy = 'date';
   readonly PAGE_SIZE = 12;
+
+  /** Placeholder cards shown while a page of issues loads. */
+  readonly skeletons = [1, 2, 3, 4, 5, 6];
 
   // Filter state
   selectedDistrict: string | null = null;

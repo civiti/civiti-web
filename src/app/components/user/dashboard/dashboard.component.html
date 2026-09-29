@@ -1,300 +1,262 @@
-<nz-spin [nzSpinning]="(isLoading$ | async) || false">
-  <div class="dashboard-container">
-  
-  <!-- Gamification Progress Section -->
-  @if (levelProgress$ | async; as progress) {
-    <div class="gamification-section">
-      <nz-card nzTitle="Impactul tău civic" class="impact-card">
-        <div class="impact-overview">
-          <div class="level-info">
-            <div class="level-badge">
-              <span class="level-number">{{ userLevel$ | async }}</span>
-              <span class="level-label">Nivel</span>
-            </div>
-            <div class="level-title">
-              <h3>{{ (userLevel$ | async) | levelTitle }}</h3>
-              <p>{{ userPoints$ | async }} puncte de comunitate</p>
-            </div>
-          </div>
+<div class="c-container c-page dash">
 
-          <div class="progress-info">
-            <nz-progress
-              [nzPercent]="progress.percentage"
-              nzStrokeColor="#FCA311"
-              nzSize="small"
-              class="level-progress">
-            </nz-progress>
-            <p class="progress-text">
-              {{ progress.current }} / {{ progress.required }} puncte până la nivelul {{ (userLevel$ | async)! + 1 }}
-            </p>
-          </div>
-        </div>
-      </nz-card>
+  <!-- Greeting and the two ways out of the dashboard -->
+  <div class="c-page-head">
+    <div class="c-page-head__text">
+      <p class="c-eyebrow">Panoul meu</p>
+      <h1 class="c-h1">
+        @if (firstName$ | async; as name) { Bună, {{ name }} } @else { Bine ai revenit }
+      </h1>
+      <p class="c-lead">Urmărește problemele raportate, ce s-a schimbat la ele și impactul tău în comunitate.</p>
     </div>
-  }
+    <div class="c-page-head__actions">
+      <a nz-button nzType="primary" nzSize="large" routerLink="/create-issue">
+        <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
+        <span>Raportează o problemă</span>
+      </a>
+      <a nz-button nzSize="large" routerLink="/bucuresti">
+        <span>Vezi problemele din București</span>
+      </a>
+    </div>
+  </div>
 
-  <!-- Stats Grid -->
-  <div class="stats-grid">
+  <!-- Impact: level progress + the three counts that matter -->
+  <section class="impact" aria-labelledby="impact-title">
+    <h2 id="impact-title" class="c-eyebrow c-eyebrow--muted impact-title">Impactul tău civic</h2>
+
     @if (userStats$ | async; as stats) {
-      <div nz-row [nzGutter]="[16, 16]">
-
-        <div nz-col [nzSpan]="12" [nzSm]="6">
-          <nz-card class="stat-card">
-            <nz-statistic
-              [nzValue]="stats.issuesReported"
-              nzTitle="Probleme raportate"
-              [nzValueStyle]="{ color: '#FCA311' }">
-            </nz-statistic>
-          </nz-card>
+      <div class="impact-grid">
+        <div class="level c-card c-card--dark">
+          <div class="level-top">
+            <span class="level-badge">
+              <span class="level-badge__label">Nivel</span>
+              <span class="c-num level-badge__num">{{ userLevel$ | async }}</span>
+            </span>
+            <div class="level-name">
+              <p class="level-title">{{ (userLevel$ | async) | levelTitle }}</p>
+              <p class="level-points"><span class="c-num">{{ (userPoints$ | async) | number:'1.0-0':'ro' }}</span> puncte de comunitate</p>
+            </div>
+          </div>
+          @if (levelProgress$ | async; as progress) {
+            <div
+              class="c-meter level-meter"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="100"
+              [attr.aria-valuenow]="progress.percentage"
+              [attr.aria-label]="'Progres către nivelul ' + ((userLevel$ | async)! + 1)">
+              <div class="c-meter__fill" [style.width.%]="progress.percentage"></div>
+            </div>
+          }
+          @if (pointsToNextLevel$ | async; as toNext) {
+            <p class="level-next">Încă {{ toNext }} până la nivelul {{ (userLevel$ | async)! + 1 }}</p>
+          }
         </div>
 
-        <div nz-col [nzSpan]="12" [nzSm]="6">
-          <nz-card class="stat-card">
-            <nz-statistic
-              [nzValue]="stats.issuesResolved"
-              nzTitle="Probleme rezolvate"
-              [nzValueStyle]="{ color: '#28A745' }">
-            </nz-statistic>
-          </nz-card>
-        </div>
-
-        <div nz-col [nzSpan]="12" [nzSm]="6">
-          <nz-card class="stat-card">
-            <nz-statistic
-              [nzValue]="stats.communityVotes"
-              nzTitle="Voturi comunitate"
-              [nzValueStyle]="{ color: '#14213D' }">
-            </nz-statistic>
-          </nz-card>
-        </div>
-
+        <dl class="stats c-card">
+          <div class="c-stat">
+            <dt class="c-stat__label">Probleme raportate</dt>
+            <dd class="c-stat__value">{{ stats.issuesReported }}</dd>
+          </div>
+          <div class="c-stat">
+            <dt class="c-stat__label">Probleme rezolvate</dt>
+            <dd class="c-stat__value">{{ stats.issuesResolved }}</dd>
+          </div>
+          <div class="c-stat">
+            <dt class="c-stat__label">Voturi comunitate</dt>
+            <dd class="c-stat__value">{{ stats.communityVotes }}</dd>
+          </div>
+        </dl>
+      </div>
+    } @else if (isLoading$ | async) {
+      <div class="impact-grid" aria-hidden="true">
+        <div class="c-skeleton sk-level"></div>
+        <div class="c-skeleton sk-stats"></div>
       </div>
     }
-  </div>
+  </section>
 
-  <!-- Main Content Grid -->
-  <div class="main-content">
-    <div nz-row [nzGutter]="[24, 24]">
-      
-      <!-- Left Column -->
-      <div nz-col [nzSpan]="24" [nzLg]="16">
-        
-        <!-- Quick Actions -->
-        <nz-card nzTitle="Acțiuni rapide" class="quick-actions-card">
-          <div class="quick-actions">
-            
-            <div class="action-item primary" routerLink="/create-issue">
-              <div class="action-icon">
-                <span nz-icon nzType="plus-circle" nzTheme="outline"></span>
-              </div>
-              <div class="action-content">
-                <h4>Raportează problemă nouă</h4>
-                <p>Documentează o problemă din comunitatea ta</p>
-              </div>
-              <span nz-icon nzType="arrow-right" class="action-arrow"></span>
+  <div class="dash-grid">
+
+    <!-- Main column -->
+    <div class="dash-main">
+
+      <!-- My issues -->
+      <section class="c-card panel" aria-labelledby="mine-title">
+        <div class="c-section-head">
+          <h2 id="mine-title" class="c-h3">Problemele mele</h2>
+          <a class="c-link c-small" routerLink="/my-issues">Vezi toate</a>
+        </div>
+
+        @if (userIssuesSummary$ | async; as summary) {
+          @if (summary.total > 0) {
+            <ul class="tally" aria-label="Rezumat pe stări">
+              <li data-tone="active"><span class="tally-dot" aria-hidden="true"></span>Active <strong>{{ summary.active }}</strong></li>
+              <li data-tone="resolved"><span class="tally-dot" aria-hidden="true"></span>Rezolvate <strong>{{ summary.resolved }}</strong></li>
+              <li data-tone="rejected"><span class="tally-dot" aria-hidden="true"></span>Respinse <strong>{{ summary.rejected }}</strong></li>
+            </ul>
+          }
+        }
+
+        @if (recentUserIssues$ | async; as issues) {
+          @if (issues.length > 0) {
+            <ul class="rows">
+              @for (issue of issues; track issue.id) {
+                <li class="row">
+                  <img
+                    class="row-thumb"
+                    [src]="issue.mainPhotoUrl || '/images/placeholders/issue-placeholder.svg'"
+                    alt=""
+                    width="64"
+                    height="64"
+                    loading="lazy"
+                    (error)="onIssueImageError($event)">
+                  <div class="row-body">
+                    <h3 class="row-title">
+                      <a [routerLink]="['/issue', issue.id]">{{ issue.title }}</a>
+                    </h3>
+                    <div class="row-meta">
+                      <span class="c-status" [attr.data-tone]="issue.status | statusTone">{{ issue.status | statusText }}</span>
+                      <span class="row-stat" title="Emailuri trimise">
+                        <span nz-icon nzType="mail" nzTheme="outline" aria-hidden="true"></span>
+                        <span class="c-sr-only">Emailuri trimise:</span>
+                        <span>{{ issue.emailsSent }}</span>
+                      </span>
+                      @if (issue.status | isOwnerEditable) {
+                        <a class="c-btn c-btn--ghost c-btn--sm row-edit" [routerLink]="['/edit-issue', issue.id]">
+                          <span nz-icon nzType="edit" nzTheme="outline" aria-hidden="true"></span>
+                          <span>Editează</span>
+                        </a>
+                      }
+                    </div>
+                  </div>
+                </li>
+              }
+            </ul>
+          } @else if (userIssuesLoading$ | async) {
+            <div class="rows-skeleton" aria-hidden="true">
+              <div class="c-skeleton"></div>
+              <div class="c-skeleton"></div>
+              <div class="c-skeleton"></div>
             </div>
-
-            <div class="action-item" routerLink="/bucuresti">
-              <div class="action-icon">
-                <span nz-icon nzType="search" nzTheme="outline"></span>
-              </div>
-              <div class="action-content">
-                <h4>Răsfoiește probleme</h4>
-                <p>Explorează și susține problemele comunității</p>
-              </div>
-              <span nz-icon nzType="arrow-right" class="action-arrow"></span>
-            </div>
-
-            <div class="action-item" (click)="viewMyIssues()">
-              <div class="action-icon">
-                <span nz-icon nzType="file-text" nzTheme="outline"></span>
-              </div>
-              <div class="action-content">
-                <h4>Problemele mele</h4>
-                <p>Urmărește problemele raportate</p>
-              </div>
-              <span nz-icon nzType="arrow-right" class="action-arrow"></span>
-            </div>
-
-          </div>
-        </nz-card>
-
-        <!-- My Issues Preview -->
-        <nz-card class="my-issues-preview-card" [nzLoading]="(userIssuesLoading$ | async) || false">
-          <div class="card-header">
-            <h3>Problemele Mele</h3>
-            <a (click)="viewMyIssues()" class="see-all-link">
-              Vezi toate <i nz-icon nzType="arrow-right" nzTheme="outline"></i>
-            </a>
-          </div>
-
-          <!-- Summary Stats -->
-          @if (userIssuesSummary$ | async; as summary) {
-            <div class="issues-summary">
-              <div class="summary-stat">
-                <span class="stat-value active">{{ summary.active }}</span>
-                <span class="stat-label">Active</span>
-              </div>
-              <div class="summary-stat">
-                <span class="stat-value resolved">{{ summary.resolved }}</span>
-                <span class="stat-label">Rezolvate</span>
-              </div>
-              <div class="summary-stat">
-                <span class="stat-value rejected">{{ summary.rejected }}</span>
-                <span class="stat-label">Respinse</span>
-              </div>
+          } @else {
+            <div class="c-empty panel-empty">
+              <span class="c-empty__icon"><span nz-icon nzType="file-text" nzTheme="outline" aria-hidden="true"></span></span>
+              <p class="c-empty__title">Nu ai raportat încă probleme</p>
+              <p>O groapă, un trotuar blocat, un stâlp fără lumină: începe cu ce vezi zilnic.</p>
+              <a nz-button routerLink="/create-issue" class="panel-empty__cta">
+                <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
+                <span>Raportează prima problemă</span>
+              </a>
             </div>
           }
+        }
+      </section>
 
-          <!-- Recent Issues Mini-Cards -->
-          @if (recentUserIssues$ | async; as issues) {
-            <div class="recent-issues">
-              @for (issue of issues; track issue.id) {
-                <div class="mini-issue-card"
-                     (click)="viewIssueDetails(issue.id)">
-                  <div class="mini-issue-image">
-                    <img [src]="issue.mainPhotoUrl || '/images/placeholders/issue-placeholder.svg'"
-                         [alt]="issue.title"
-                         (error)="onIssueImageError($event)">
+      <!-- Recent activity -->
+      <section class="c-card panel" aria-labelledby="activity-title" [attr.aria-busy]="(activityLoading$ | async) || null">
+        <div class="c-section-head">
+          <h2 id="activity-title" class="c-h3">Activitate recentă</h2>
+        </div>
+
+        @if (recentActivity$ | async; as activities) {
+          @if (activities.length > 0) {
+            <ol class="timeline">
+              @for (item of activities; track item.id) {
+                <li class="event" [attr.data-type]="item.type">
+                  <span class="event-icon" aria-hidden="true">
+                    <span nz-icon [nzType]="item.type | activityIcon" nzTheme="outline"></span>
+                  </span>
+                  <div class="event-body">
+                    <p class="event-msg">{{ item.message }}</p>
+                    <a class="event-issue" [routerLink]="['/issue', item.issueId]">{{ item.issueTitle }}</a>
                   </div>
-                  <div class="mini-issue-info">
-                    <h5>{{ issue.title }}</h5>
-                    <div class="issue-meta">
-                      <nz-tag [nzColor]="issue.status | statusColor" nzMode="default">
-                        {{ issue.status | statusText }}
-                      </nz-tag>
-                      <span class="email-count">{{ issue.emailsSent }} contribuții</span>
-                    </div>
-                    @if (issue.status | isOwnerEditable) {
-                      <button nz-button nzType="link" nzSize="small" class="mini-edit-btn"
-                              (click)="$event.stopPropagation(); editIssue(issue.id)">
-                        <span nz-icon nzType="edit" nzTheme="outline"></span><span>Editează</span>
-                      </button>
+                  <time class="event-time" [attr.datetime]="item.createdAt" [title]="item.createdAt | date:'d MMM y, HH:mm':'':'ro'">{{ item.createdAt | timeAgo }}</time>
+                </li>
+              }
+            </ol>
+          } @else if (activityLoading$ | async) {
+            <div class="rows-skeleton" aria-hidden="true">
+              <div class="c-skeleton"></div>
+              <div class="c-skeleton"></div>
+            </div>
+          } @else {
+            <p class="panel-note">Nicio activitate recentă. Începe prin a raporta o problemă!</p>
+          }
+        }
+      </section>
+    </div>
+
+    <!-- Side column -->
+    <aside class="dash-side" aria-label="Insigne și realizări">
+
+      @if (badgeView$ | async; as badges) {
+        <section class="c-card panel" aria-labelledby="badges-title">
+          <div class="c-section-head">
+            <h2 id="badges-title" class="c-h3">Insignele tale</h2>
+            @if (badges.length > 0) {
+              <span class="c-muted c-small">{{ badges.length }}</span>
+            }
+          </div>
+          @if (badges.length > 0) {
+            <ul class="badges">
+              @for (b of badges; track $index) {
+                <li class="badge">
+                  <span class="badge-icon" aria-hidden="true">
+                    <span nz-icon [nzType]="b.icon" nzTheme="outline"></span>
+                  </span>
+                  <div class="badge-text">
+                    <p class="badge-name">{{ b.badge.nameRo }}</p>
+                    @if (b.badge.descriptionRo) {
+                      <p class="badge-desc">{{ b.badge.descriptionRo }}</p>
                     }
                   </div>
-                </div>
+                  <span class="c-tag" [class.c-tag--signal]="b.special">{{ b.badge.rarityRo || 'Comun' }}</span>
+                </li>
               }
-
-              @if (issues.length === 0) {
-                <div class="no-issues">
-                  <nz-empty nzNotFoundImage="simple"
-                            nzNotFoundContent="Nu ai raportat încă probleme">
-                  </nz-empty>
-                  <button nz-button nzType="primary" nzSize="small" routerLink="/create-issue" class="report-first-btn">
-                    <i nz-icon nzType="plus" nzTheme="outline"></i>
-                    Raportează prima problemă
-                  </button>
-                </div>
-              }
-            </div>
+            </ul>
+          } @else {
+            <p class="panel-note">Nicio insignă încă. Continuă să participi pentru a câștiga prima insignă!</p>
           }
-        </nz-card>
+        </section>
+      }
 
-        <!-- Recent Activity -->
-        <nz-card nzTitle="Activitate recentă" class="activity-card" [nzLoading]="(activityLoading$ | async) || false">
-          @if (recentActivity$ | async; as activities) {
-            @if (activities.length > 0) {
-              <nz-list
-                [nzDataSource]="activities"
-                [nzRenderItem]="activityItem">
-                <ng-template #activityItem let-item>
-                  <nz-list-item>
-                    <nz-list-item-meta
-                      [nzAvatar]="activityAvatar"
-                      [nzTitle]="item.message"
-                      [nzDescription]="item.issueTitle">
-                      <ng-template #activityAvatar>
-                        <nz-avatar [nzIcon]="item.type | activityIcon" [style.backgroundColor]="item.type | activityColor"></nz-avatar>
-                      </ng-template>
-                    </nz-list-item-meta>
-                    <div class="activity-time">{{ item.createdAt | date:'short' }}</div>
-                  </nz-list-item>
-                </ng-template>
-              </nz-list>
-            }
-
-            @if (activities.length === 0) {
-              <nz-empty
-                nzNotFoundImage="simple"
-                nzNotFoundContent="Nicio activitate recentă. Începe prin a raporta o problemă!">
-              </nz-empty>
-            }
-          }
-        </nz-card>
-
-      </div>
-
-      <!-- Right Column -->
-      <div nz-col [nzSpan]="24" [nzLg]="8">
-        
-        <!-- Earned Badges -->
-        @if (earnedBadges$ | async; as badges) {
-          <nz-card nzTitle="Insignele tale" class="badges-card">
-            @if (badges.length > 0) {
-              <div class="badges-grid">
-                @for (badge of badges; track $index) {
+      @if (incompleteAchievements$ | async; as achievements) {
+        <section class="c-card panel" aria-labelledby="goals-title">
+          <div class="c-section-head">
+            <h2 id="goals-title" class="c-h3">Realizări</h2>
+          </div>
+          @if (achievements.length > 0) {
+            <ul class="goals">
+              @for (achievement of achievements | slice:0:3; track $index) {
+                <li class="goal">
+                  <div class="goal-head">
+                    <p class="goal-title">{{ achievement.titleRo }}</p>
+                    <span class="goal-count c-num">{{ achievement.progress }}/{{ achievement.maxProgress }}</span>
+                  </div>
                   <div
-                    class="badge-item"
-                    [title]="badge.descriptionRo">
-                    <div class="badge-icon" [ngClass]="'rarity-' + (badge.rarity?.toLowerCase() || 'common')">
-                      <i nz-icon
-                         [nzType]="getBadgeIcon(badge.category, badge.rarity)"
-                         nzTheme="outline"
-                         class="badge-icon-svg">
-                      </i>
-                    </div>
-                    <div class="badge-info">
-                      <h5>{{ badge.nameRo }}</h5>
-                      <nz-tag [nzColor]="badge.rarity | badgeColor">{{ badge.rarityRo || 'Comun' }}</nz-tag>
-                    </div>
+                    class="c-meter"
+                    role="progressbar"
+                    aria-valuemin="0"
+                    aria-valuemax="100"
+                    [attr.aria-valuenow]="achievement.percentageComplete"
+                    [attr.aria-label]="achievement.titleRo">
+                    <div class="c-meter__fill" [style.width.%]="achievement.percentageComplete"></div>
                   </div>
-                }
-              </div>
-            } @else {
-              <nz-empty
-                nzNotFoundImage="simple"
-                nzNotFoundContent="Nicio insignă încă. Continuă să participi pentru a câștiga prima insignă!">
-              </nz-empty>
-            }
-          </nz-card>
-        }
-
-        <!-- Achievements Progress -->
-        @if (incompleteAchievements$ | async; as achievements) {
-          <nz-card nzTitle="Realizări" class="achievements-card">
-            @if (achievements.length > 0) {
-              <div class="achievements-list">
-                @for (achievement of achievements.slice(0, 3); track $index) {
-                  <div class="achievement-item">
-                    <div class="achievement-header">
-                      <h5>{{ achievement.titleRo }}</h5>
-                      <div class="achievement-progress">
-                        <nz-progress
-                          [nzPercent]="achievement.percentageComplete"
-                          nzStrokeColor="#FCA311"
-                          nzSize="small"
-                          [nzShowInfo]="false">
-                        </nz-progress>
-                        <span class="progress-text">{{ achievement.progress }}/{{ achievement.maxProgress }}</span>
-                      </div>
-                    </div>
-                    <p class="achievement-description">{{ achievement.descriptionRo }}</p>
-                  </div>
-                }
-              </div>
-            } @else {
-              <nz-empty
-                nzNotFoundImage="simple"
-                nzNotFoundContent="Toate realizările completate! Bună treabă!">
-              </nz-empty>
-            }
-          </nz-card>
-        }
-
-      </div>
-
-    </div>
+                  <p class="goal-desc">
+                    {{ achievement.descriptionRo }}
+                    @if (achievement.rewardPoints) {
+                      <span class="goal-reward">+{{ achievement.rewardPoints }} puncte</span>
+                    }
+                  </p>
+                </li>
+              }
+            </ul>
+          } @else {
+            <p class="panel-note">Toate realizările completate! Bună treabă!</p>
+          }
+        </section>
+      }
+    </aside>
   </div>
-
-  </div>
-</nz-spin>
+</div>

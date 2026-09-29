@@ -1,61 +1,87 @@
-<div class="guide-list-page">
-  <div class="guide-list-container">
-    <div class="page-header">
-      <h1 class="page-title">Ghid Civic</h1>
-      <p class="page-description">Informații practice despre drepturile tale civice, cum să interacționezi cu autoritățile locale și povești despre schimbările reale din comunitățile din România.</p>
-      <div class="category-filters">
-        @for (cat of categories; track cat.value) {
-          <button
-            class="filter-tab"
-            [class.active]="selectedCategory() === cat.value"
-            (click)="selectCategory(cat.value)">
-            {{ cat.label }}
-          </button>
-        }
-      </div>
+<div class="c-container c-page">
+  <header class="c-page-head">
+    <div class="c-page-head__text">
+      <p class="c-eyebrow">Resurse</p>
+      <h1 class="c-h1">Ghid civic</h1>
+      <p class="c-lead">Informații practice despre drepturile tale civice, cum să interacționezi cu autoritățile locale și povești despre schimbările reale din comunitățile din România.</p>
     </div>
+  </header>
 
-    @if (featuredArticle(); as featured) {
-      <a [routerLink]="['/ghid', featured.slug]" class="featured-article">
-        @if (featured.image) {
-          <img [src]="featured.image" [alt]="featured.title" class="featured-image">
-        } @else {
-          <div class="featured-image featured-image--placeholder"></div>
-        }
-        <div class="featured-content">
-          <span class="article-category">{{ categoryLabels[featured.category] ?? featured.category }}</span>
-          <h2 class="featured-title">{{ featured.title }}</h2>
-          <p class="featured-description">{{ featured.description }}</p>
-          <div class="article-meta">
-            <span>{{ featured.readingTime }}</span>
-            <span class="dot"></span>
-            <span>{{ featured.publishedAt }}</span>
-          </div>
-          <span class="read-link">Citește ghidul →</span>
-        </div>
-      </a>
+  <div class="filters" role="group" aria-label="Filtrează ghidurile după categorie">
+    @for (cat of categories; track cat.value) {
+      <button
+        type="button"
+        class="c-chip"
+        [attr.aria-pressed]="selectedCategory() === cat.value"
+        (click)="selectCategory(cat.value)">
+        {{ cat.label }}
+      </button>
     }
+  </div>
 
-    <div class="article-grid">
-      @for (article of regularArticles(); track article.slug) {
-        <a [routerLink]="['/ghid', article.slug]" class="article-card">
-          @if (article.image) {
-            <img [src]="article.image" [alt]="article.title" class="card-image">
-          } @else {
-            <div class="card-image card-image--placeholder"></div>
-          }
-          <div class="card-body">
-            <span class="article-category">{{ categoryLabels[article.category] ?? article.category }}</span>
-            <h3 class="card-title">{{ article.title }}</h3>
-            <p class="card-description">{{ article.description }}</p>
-            <div class="article-meta">
-              <span>{{ article.readingTime }}</span>
-              <span class="dot"></span>
-              <span>{{ article.publishedAt }}</span>
+  <!-- One grid for every guide. The featured guide takes the whole first row
+       and lays out side by side; on desktop its illustration lines up with the
+       first two cards underneath it. -->
+  <ul class="guide-grid">
+    @if (featuredArticle(); as featured) {
+      <li class="guide-grid__featured">
+        <a [routerLink]="['/ghid', featured.slug]" class="guide-card guide-card--featured">
+          <div class="guide-card__media">
+            @if (featured.image) {
+              <img
+                [src]="featured.image"
+                [attr.width]="featured.imageWidth"
+                [attr.height]="featured.imageHeight"
+                alt=""
+                fetchpriority="high" />
+            }
+          </div>
+          <div class="guide-card__body">
+            <div class="guide-card__top">
+              <span class="c-tag c-tag--signal">{{ categoryLabels[featured.category] ?? featured.category }}</span>
+              <span class="guide-card__flag">Recomandat</span>
             </div>
+            <h2 class="guide-card__title">{{ featured.title }}</h2>
+            <p class="guide-card__desc">{{ featured.description }}</p>
+            <p class="guide-card__meta">
+              <span>{{ featured.readingTime }}</span>
+              <span class="dot" aria-hidden="true"></span>
+              <time [attr.datetime]="featured.publishedAt">{{ featured.publishedAt | date: 'd MMMM y' : '' : 'ro' }}</time>
+            </p>
+            <span class="guide-card__more">Citește ghidul <span aria-hidden="true">→</span></span>
           </div>
         </a>
-      }
-    </div>
-  </div>
+      </li>
+    }
+
+    @for (article of regularArticles(); track article.slug) {
+      <li>
+        <a [routerLink]="['/ghid', article.slug]" class="guide-card">
+          <div class="guide-card__media">
+            @if (article.image) {
+              <img
+                [src]="article.image"
+                [attr.width]="article.imageWidth"
+                [attr.height]="article.imageHeight"
+                alt=""
+                loading="lazy" />
+            }
+          </div>
+          <div class="guide-card__body">
+            <div class="guide-card__top">
+              <span class="c-tag">{{ categoryLabels[article.category] ?? article.category }}</span>
+            </div>
+            <h2 class="guide-card__title">{{ article.title }}</h2>
+            <p class="guide-card__desc">{{ article.description }}</p>
+            <p class="guide-card__meta">
+              <span>{{ article.readingTime }}</span>
+              <span class="dot" aria-hidden="true"></span>
+              <time [attr.datetime]="article.publishedAt">{{ article.publishedAt | date: 'd MMMM y' : '' : 'ro' }}</time>
+            </p>
+            <span class="guide-card__more">Citește ghidul <span aria-hidden="true">→</span></span>
+          </div>
+        </a>
+      </li>
+    }
+  </ul>
 </div>

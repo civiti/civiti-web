@@ -1,150 +1,174 @@
-<div class="legal-page">
-  <div class="legal-container">
-    <div class="legal-header">
-      <div class="logo-section">
-        <h1 class="brand-name">Civiti</h1>
-      </div>
-      <h2 class="page-title">Politica de Confidențialitate</h2>
-      <p class="last-updated">Ultima actualizare: Iulie 2026</p>
-    </div>
+<div class="c-container c-page legal">
+  <header class="legal-head">
+    <p class="c-eyebrow">Document legal</p>
+    <h1 class="c-h1">Politica de confidențialitate</h1>
+    <p class="legal-updated">
+      <span nz-icon nzType="calendar" nzTheme="outline" aria-hidden="true"></span>
+      <span>Ultima actualizare: Iulie 2026</span>
+    </p>
+  </header>
 
-    <div class="legal-content">
-      <p>
-        Această politică descrie modul în care sunt colectate, utilizate și protejate datele cu caracter personal
-        ale utilizatorilor platformei <strong>Civiti</strong>, în conformitate cu Regulamentul (UE) 2016/679 (GDPR).
-      </p>
+  <!-- Table of contents: static links to the section headings below. The
+       click handler scrolls in place; a plain fragment link would be turned
+       into a router navigation that scrolls back to the top. -->
+  <nav class="legal-toc" aria-labelledby="toc-heading">
+    <p id="toc-heading" class="c-eyebrow c-eyebrow--muted">Cuprins</p>
+    <ol>
+      <li><a href="/privacy#cine-suntem" (click)="scrollToSection($event, 'cine-suntem')">Cine suntem</a></li>
+      <li><a href="/privacy#date-colectate" (click)="scrollToSection($event, 'date-colectate')">Ce date colectăm</a></li>
+      <li><a href="/privacy#continut-public" (click)="scrollToSection($event, 'continut-public')">Conținut public</a></li>
+      <li><a href="/privacy#scop" (click)="scrollToSection($event, 'scop')">Scopul prelucrării datelor</a></li>
+      <li><a href="/privacy#temei-legal" (click)="scrollToSection($event, 'temei-legal')">Temeiul legal</a></li>
+      <li><a href="/privacy#emailuri-autoritati" (click)="scrollToSection($event, 'emailuri-autoritati')">Trimiterea de emailuri către autorități</a></li>
+      <li><a href="/privacy#durata-stocarii" (click)="scrollToSection($event, 'durata-stocarii')">Durata stocării</a></li>
+      <li><a href="/privacy#drepturi" (click)="scrollToSection($event, 'drepturi')">Drepturile utilizatorilor</a></li>
+      <li><a href="/privacy#securitate" (click)="scrollToSection($event, 'securitate')">Securitatea datelor</a></li>
+      <li><a href="/privacy#cookie-uri" (click)="scrollToSection($event, 'cookie-uri')">Cookie-uri</a></li>
+      <li><a href="/privacy#fotografii" (click)="scrollToSection($event, 'fotografii')">Fotografii încărcate</a></li>
+      <li><a href="/privacy#modificari" (click)="scrollToSection($event, 'modificari')">Modificări</a></li>
+    </ol>
+  </nav>
 
-      <h3>1. Cine suntem</h3>
-      <p>
-        Platforma <strong>Civiti</strong> este o inițiativă civică independentă pentru îmbunătățirea comunităților locale.
-      </p>
-      <p>
-        Email de contact: <a href="mailto:contact&#64;civiti.ro">contact&#64;civiti.ro</a>
-      </p>
+  <article class="legal-doc">
+    <p class="legal-intro">
+      Această politică descrie modul în care sunt colectate, utilizate și protejate datele cu caracter personal
+      ale utilizatorilor platformei <strong>Civiti</strong>, în conformitate cu Regulamentul (UE) 2016/679 (GDPR).
+    </p>
 
-      <h3>2. Ce date colectăm</h3>
-      <p>Colectăm doar datele strict necesare funcționării platformei:</p>
-      <ul>
-        <li>Nume și adresă de email (la crearea contului sau la trimiterea de sesizări)</li>
-        <li>Locația de rezidență (județ, oraș, sector — pentru a afișa probleme relevante)</li>
-        <li>Conținut furnizat de utilizatori (descrieri de probleme, fotografii încărcate)</li>
-        <li>Adresa IP și date tehnice (pentru securitate și funcționare)</li>
-      </ul>
+    <h2 id="cine-suntem" tabindex="-1">1. Cine suntem</h2>
+    <p>
+      Platforma <strong>Civiti</strong> este o inițiativă civică independentă pentru îmbunătățirea comunităților locale.
+    </p>
+    <p>
+      Email de contact: <a href="mailto:contact&#64;civiti.ro">contact&#64;civiti.ro</a>
+    </p>
 
-      <h3>3. Conținut public</h3>
-      <p>
-        Problemele publicate pe platformă (descrieri, fotografii, locații generale) sunt vizibile public.
-      </p>
-      <div class="warning-box">
-        <span class="warning-icon">⚠</span>
-        <p>
-          Utilizatorii sunt responsabili să nu publice date personale sensibile, date ale altor persoane
-          fără consimțământ sau informații care pot încălca dreptul la viață privată.
-        </p>
-      </div>
-      <p>
-        Administratorul își rezervă dreptul de a elimina conținutul care încalcă aceste reguli.
-      </p>
+    <h2 id="date-colectate" tabindex="-1">2. Ce date colectăm</h2>
+    <p>Colectăm doar datele strict necesare funcționării platformei:</p>
+    <ul>
+      <li>Nume și adresă de email (la crearea contului sau la trimiterea de sesizări)</li>
+      <li>Locația de rezidență (județ, oraș, sector — pentru a afișa probleme relevante)</li>
+      <li>Conținut furnizat de utilizatori (descrieri de probleme, fotografii încărcate)</li>
+      <li>Adresa IP și date tehnice (pentru securitate și funcționare)</li>
+    </ul>
 
-      <h3>4. Scopul prelucrării datelor</h3>
-      <p>Datele sunt colectate și utilizate pentru:</p>
-      <ul>
-        <li>Crearea și administrarea conturilor de utilizator</li>
-        <li>Publicarea și gestionarea problemelor din comunitate</li>
-        <li>Facilitarea transmiterii de mesaje către autorități</li>
-        <li>Comunicarea cu utilizatorii</li>
-        <li>Îmbunătățirea platformei și securitatea acesteia</li>
-      </ul>
-
-      <h3>5. Temeiul legal</h3>
-      <p>Prelucrarea datelor se face în baza:</p>
-      <ul>
-        <li>Consimțământului utilizatorului</li>
-        <li>Interesului legitim al administratorului pentru funcționarea platformei</li>
-        <li>Obligațiilor legale aplicabile</li>
-      </ul>
-
-      <h3>6. Trimiterea de emailuri către autorități</h3>
+    <h2 id="continut-public" tabindex="-1">3. Conținut public</h2>
+    <p>
+      Problemele publicate pe platformă (descrieri, fotografii, locații generale) sunt vizibile public.
+    </p>
+    <div class="c-callout c-callout--signal legal-callout">
+      <span nz-icon nzType="warning" nzTheme="outline" aria-hidden="true"></span>
       <p>
-        Utilizatorii pot trimite emailuri către autorități folosind platforma sau propriul client de email.
-        Datele personale incluse în aceste mesaje sunt furnizate în mod voluntar de utilizator.
-      </p>
-      <p>
-        <em>Platforma nu este responsabilă pentru modul în care autoritățile prelucrează datele primite.</em>
-      </p>
-
-      <h3>7. Durata stocării</h3>
-      <p>Datele sunt păstrate:</p>
-      <ul>
-        <li>Pe durata existenței contului de utilizator</li>
-        <li>Sau până la solicitarea ștergerii acestora</li>
-        <li>Sau conform obligațiilor legale aplicabile</li>
-      </ul>
-
-      <h3>8. Drepturile utilizatorilor</h3>
-      <p>Conform GDPR, ai următoarele drepturi:</p>
-      <ul>
-        <li>Dreptul de acces la date</li>
-        <li>Dreptul de rectificare</li>
-        <li>Dreptul la ștergerea datelor („dreptul de a fi uitat")</li>
-        <li>Dreptul la restricționarea prelucrării</li>
-        <li>Dreptul de opoziție</li>
-        <li>Dreptul de a-ți retrage consimțământul</li>
-      </ul>
-      <p>
-        Solicitările pot fi trimise la: <a href="mailto:contact&#64;civiti.ro">contact&#64;civiti.ro</a>
-      </p>
-
-      <h3>9. Securitatea datelor</h3>
-      <p>
-        Aplicăm măsuri tehnice și organizatorice pentru protejarea datelor personale împotriva accesului
-        neautorizat, pierderii sau modificării acestora. Folosim criptare SSL/TLS pentru toate comunicațiile
-        și stocăm datele în servicii cloud securizate.
-      </p>
-
-      <h3>10. Cookie-uri</h3>
-      <p>
-        <strong>Cookie-uri esențiale.</strong> Platforma utilizează cookie-uri esențiale pentru
-        funcționare (autentificare, preferințe de sesiune). Acestea sunt necesare pentru ca platforma să
-        funcționeze și nu pot fi dezactivate.
-      </p>
-      <p>
-        <strong>Cookie-uri de analiză.</strong> Platforma folosește
-        <a href="https://statlark.com" target="_blank" rel="noopener noreferrer">Statlark</a> pentru
-        statistici agregate de trafic — câte persoane vizitează platforma și din ce surse. Statlark
-        setează două cookie-uri proprii (first-party): <strong>_slk_vid</strong>, care recunoaște un
-        browser care revine, și <strong>_slk_vds</strong>, care reține domeniul pentru care este setat
-        identificatorul. Pentru determinarea domeniului se scrie temporar și un cookie
-        <strong>_slk_p</strong>, șters imediat.
-      </p>
-      <p>
-        Acestea nu sunt cookie-uri de publicitate și nu urmăresc utilizatorii între site-uri.
-        Consimțământul este cerut înainte ca ele să fie setate: <strong>nu se stochează nimic până la
-        exprimarea alegerii</strong>, iar în cazul refuzului platforma folosește în continuare o
-        variantă anonimă, fără cookie-uri. Alegerea poate fi schimbată oricând din „Setări cookie-uri”,
-        în subsolul paginii. Detalii suplimentare sunt disponibile în
-        <a href="https://statlark.com/legal/privacy" target="_blank" rel="noopener noreferrer">politica
-        de confidențialitate Statlark</a>.
-      </p>
-
-      <h3>11. Fotografii încărcate</h3>
-      <p>
-        Pentru protejarea confidențialității, fotografiile încărcate sunt procesate automat pentru a elimina
-        metadatele EXIF (inclusiv locația GPS și informații despre dispozitiv) înainte de stocare.
-      </p>
-
-      <h3>12. Modificări</h3>
-      <p>
-        Ne rezervăm dreptul de a actualiza această politică. Versiunea actualizată va fi publicată pe platformă
-        și utilizatorii vor fi notificați prin email în cazul modificărilor semnificative.
+        Utilizatorii sunt responsabili să nu publice date personale sensibile, date ale altor persoane
+        fără consimțământ sau informații care pot încălca dreptul la viață privată.
       </p>
     </div>
+    <p>
+      Administratorul își rezervă dreptul de a elimina conținutul care încalcă aceste reguli.
+    </p>
 
-    <div class="legal-footer">
-      <p>
-        Pentru întrebări legate de confidențialitate: <a href="mailto:contact&#64;civiti.ro">contact&#64;civiti.ro</a>
-      </p>
-      <a routerLink="/" class="back-link">Înapoi la Civiti</a>
-    </div>
-  </div>
+    <h2 id="scop" tabindex="-1">4. Scopul prelucrării datelor</h2>
+    <p>Datele sunt colectate și utilizate pentru:</p>
+    <ul>
+      <li>Crearea și administrarea conturilor de utilizator</li>
+      <li>Publicarea și gestionarea problemelor din comunitate</li>
+      <li>Facilitarea transmiterii de mesaje către autorități</li>
+      <li>Comunicarea cu utilizatorii</li>
+      <li>Îmbunătățirea platformei și securitatea acesteia</li>
+    </ul>
+
+    <h2 id="temei-legal" tabindex="-1">5. Temeiul legal</h2>
+    <p>Prelucrarea datelor se face în baza:</p>
+    <ul>
+      <li>Consimțământului utilizatorului</li>
+      <li>Interesului legitim al administratorului pentru funcționarea platformei</li>
+      <li>Obligațiilor legale aplicabile</li>
+    </ul>
+
+    <h2 id="emailuri-autoritati" tabindex="-1">6. Trimiterea de emailuri către autorități</h2>
+    <p>
+      Utilizatorii pot trimite emailuri către autorități folosind platforma sau propriul client de email.
+      Datele personale incluse în aceste mesaje sunt furnizate în mod voluntar de utilizator.
+    </p>
+    <p>
+      <em>Platforma nu este responsabilă pentru modul în care autoritățile prelucrează datele primite.</em>
+    </p>
+
+    <h2 id="durata-stocarii" tabindex="-1">7. Durata stocării</h2>
+    <p>Datele sunt păstrate:</p>
+    <ul>
+      <li>Pe durata existenței contului de utilizator</li>
+      <li>Sau până la solicitarea ștergerii acestora</li>
+      <li>Sau conform obligațiilor legale aplicabile</li>
+    </ul>
+
+    <h2 id="drepturi" tabindex="-1">8. Drepturile utilizatorilor</h2>
+    <p>Conform GDPR, ai următoarele drepturi:</p>
+    <ul>
+      <li>Dreptul de acces la date</li>
+      <li>Dreptul de rectificare</li>
+      <li>Dreptul la ștergerea datelor („dreptul de a fi uitat")</li>
+      <li>Dreptul la restricționarea prelucrării</li>
+      <li>Dreptul de opoziție</li>
+      <li>Dreptul de a-ți retrage consimțământul</li>
+    </ul>
+    <p>
+      Solicitările pot fi trimise la: <a href="mailto:contact&#64;civiti.ro">contact&#64;civiti.ro</a>
+    </p>
+
+    <h2 id="securitate" tabindex="-1">9. Securitatea datelor</h2>
+    <p>
+      Aplicăm măsuri tehnice și organizatorice pentru protejarea datelor personale împotriva accesului
+      neautorizat, pierderii sau modificării acestora. Folosim criptare SSL/TLS pentru toate comunicațiile
+      și stocăm datele în servicii cloud securizate.
+    </p>
+
+    <h2 id="cookie-uri" tabindex="-1">10. Cookie-uri</h2>
+    <p>
+      <strong>Cookie-uri esențiale.</strong> Platforma utilizează cookie-uri esențiale pentru
+      funcționare (autentificare, preferințe de sesiune). Acestea sunt necesare pentru ca platforma să
+      funcționeze și nu pot fi dezactivate.
+    </p>
+    <p>
+      <strong>Cookie-uri de analiză.</strong> Platforma folosește
+      <a href="https://statlark.com" target="_blank" rel="noopener noreferrer">Statlark</a> pentru
+      statistici agregate de trafic — câte persoane vizitează platforma și din ce surse. Statlark
+      setează două cookie-uri proprii (first-party): <strong>_slk_vid</strong>, care recunoaște un
+      browser care revine, și <strong>_slk_vds</strong>, care reține domeniul pentru care este setat
+      identificatorul. Pentru determinarea domeniului se scrie temporar și un cookie
+      <strong>_slk_p</strong>, șters imediat.
+    </p>
+    <p>
+      Acestea nu sunt cookie-uri de publicitate și nu urmăresc utilizatorii între site-uri.
+      Consimțământul este cerut înainte ca ele să fie setate: <strong>nu se stochează nimic până la
+      exprimarea alegerii</strong>, iar în cazul refuzului platforma folosește în continuare o
+      variantă anonimă, fără cookie-uri. Alegerea poate fi schimbată oricând din „Setări cookie-uri”,
+      în subsolul paginii. Detalii suplimentare sunt disponibile în
+      <a href="https://statlark.com/legal/privacy" target="_blank" rel="noopener noreferrer">politica
+      de confidențialitate Statlark</a>.
+    </p>
+
+    <h2 id="fotografii" tabindex="-1">11. Fotografii încărcate</h2>
+    <p>
+      Pentru protejarea confidențialității, fotografiile încărcate sunt procesate automat pentru a elimina
+      metadatele EXIF (inclusiv locația GPS și informații despre dispozitiv) înainte de stocare.
+    </p>
+
+    <h2 id="modificari" tabindex="-1">12. Modificări</h2>
+    <p>
+      Ne rezervăm dreptul de a actualiza această politică. Versiunea actualizată va fi publicată pe platformă
+      și utilizatorii vor fi notificați prin email în cazul modificărilor semnificative.
+    </p>
+  </article>
+
+  <footer class="legal-foot">
+    <p>
+      <span nz-icon nzType="mail" nzTheme="outline" aria-hidden="true"></span>
+      <span>Pentru întrebări legate de confidențialitate: <a href="mailto:contact&#64;civiti.ro" class="c-link">contact&#64;civiti.ro</a></span>
+    </p>
+    <a routerLink="/" class="c-btn">
+      <span nz-icon nzType="arrow-left" nzTheme="outline" aria-hidden="true"></span>
+      <span>Înapoi la Civiti</span>
+    </a>
+  </footer>
 </div>

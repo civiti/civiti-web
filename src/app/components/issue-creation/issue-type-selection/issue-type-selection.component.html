@@ -1,230 +1,180 @@
-<div class="issue-type-container">
-  
-  <!-- Header -->
-  <div class="page-header">
-    <h1 class="page-title">Raportează o problemă din comunitate</h1>
-    <p class="page-subtitle">Alege categoria care descrie cel mai bine problema ta</p>
-  </div>
+<div class="wz wz--wide">
+  <div class="wz-main">
 
-  <!-- Progress Indicator -->
-  <div class="progress-indicator">
-    <div class="progress-step active">
-      <div class="step-number">1</div>
-      <div class="step-label">Tip problemă</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step">
-      <div class="step-number">2</div>
-      <div class="step-label">Fotografii</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step">
-      <div class="step-number">3</div>
-      <div class="step-label">Detalii</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step">
-      <div class="step-number">4</div>
-      <div class="step-label">Autorități</div>
-    </div>
-    <div class="progress-line"></div>
-    <div class="progress-step">
-      <div class="step-number">5</div>
-      <div class="step-label">Verificare</div>
-    </div>
-  </div>
+    <nav class="wz-progress" aria-label="Pașii raportării">
+      <p class="wz-count">Pasul 1 din 5<span class="wz-count__now"> · Tip problemă</span></p>
+      <ol class="wz-steps">
+        <li class="is-current" aria-current="step"><span class="wz-steps__label">Tip problemă</span></li>
+        <li><span class="wz-steps__label">Fotografii</span></li>
+        <li><span class="wz-steps__label">Detalii</span></li>
+        <li><span class="wz-steps__label">Autorități</span></li>
+        <li><span class="wz-steps__label">Verificare</span></li>
+      </ol>
+    </nav>
 
-  <!-- Authentication Check -->
-  @if (!(isAuthenticated$ | async)) {
-    <nz-alert
-      nzMessage="Autentificare necesară"
-      nzDescription="Te rugăm să te conectezi pentru a raporta probleme din comunitate"
-      nzType="warning"
-      nzShowIcon
-      nzCloseable
-      class="auth-alert">
-      <div class="auth-actions">
-        <button nz-button nzType="primary" routerLink="/auth/login">Conectare</button>
-        <button nz-button nzType="default" routerLink="/auth/register">Creează cont</button>
-      </div>
-    </nz-alert>
-  }
+    <header class="wz-head">
+      <h1 class="c-h2">Raportează o problemă din comunitate</h1>
+      <p class="wz-lead">Alege categoria care descrie cel mai bine problema ta</p>
+    </header>
 
-  <!-- Category Selection -->
-  <nz-spin [nzSpinning]="isLoading">
-    <div class="categories-container">
-    
-    <div class="categories-intro">
-      <h2>Ce tip de problemă raportezi?</h2>
-      <p>Selectează categoria care se potrivește cel mai bine cu preocuparea ta. Aceasta ne ajută să direcționăm raportul către autoritățile competente.</p>
-    </div>
-
-    <!-- Mobile dropdown (shown <576px) -->
-    <div class="categories-dropdown">
-      <nz-select
-        nzPlaceHolder="Selectează categoria"
-        [ngModel]="selectedCategory?.name"
-        (ngModelChange)="onMobileCategorySelect($event)"
-        nzSize="large">
-        @for (cat of categories; track cat.name) {
-          <nz-option [nzValue]="cat.name" [nzLabel]="cat.name" />
-        }
-      </nz-select>
-      @if (selectedCategory) {
-        <p class="category-description-mobile">
-          {{ selectedCategory.description }}
-        </p>
-      }
-    </div>
-
-    <!-- Desktop card grid (hidden <576px) -->
-    <div class="categories-grid">
-      <div nz-row [nzGutter]="[16, 16]">
-        
-        @for (category of categories; track category.id) {
-          <div
-            nz-col
-            [nzSpan]="24"
-            [nzMd]="12"
-            [nzLg]="8"
-            class="category-col">
-
-            <nz-card
-              class="category-card"
-              [class.selected]="selectedCategory?.id === category.id"
-              (click)="selectCategory(category)">
-
-              <div class="category-content">
-                <div class="category-icon">
-                  <span nz-icon [nzType]="category.icon" nzTheme="outline"></span>
-                </div>
-
-                <div class="category-info">
-                  <h3 class="category-title">{{ category.name }}</h3>
-                  <p class="category-description">{{ category.description }}</p>
-                </div>
-
-                <div class="category-examples">
-                  <div class="examples-label">Exemple:</div>
-                  <div class="examples-tags">
-                    @for (example of category.examples; track $index) {
-                      <nz-tag class="example-tag">
-                        {{ example }}
-                      </nz-tag>
-                    }
-                  </div>
-                </div>
-
-                @if (selectedCategory?.id === category.id) {
-                  <div class="selection-indicator">
-                    <span nz-icon nzType="check-circle" nzTheme="fill"></span>
-                    Selectat
-                  </div>
-                }
-
-              </div>
-            </nz-card>
-
-          </div>
-        }
-        
-      </div>
-    </div>
-
-    <!-- Current Location Display -->
-    <div class="location-info">
-      <nz-card class="location-card" [class.location-error]="locationError" [class.location-empty]="!currentLocation">
-        <div class="location-content">
-          <div class="location-icon-wrapper" [class.empty]="!currentLocation" [class.error]="locationError">
-            <span nz-icon nzType="environment" nzTheme="fill"></span>
-          </div>
-          <div class="location-details">
-            <div class="location-label">Locație</div>
-            @if (currentLocation) {
-              <div class="location-address">{{ currentLocation.address }}</div>
-            } @else {
-              <div class="location-address location-placeholder">Nicio locație selectată</div>
-            }
-            @if (currentLocation?.district) {
-              <div class="location-meta">
-                <nz-tag nzColor="processing">{{ currentLocation?.district }}</nz-tag>
-              </div>
-            }
-          </div>
-          <div class="location-action">
-            <button nz-button nzType="primary" (click)="changeLocation()">
-              <span nz-icon [nzType]="currentLocation ? 'edit' : 'plus'" nzTheme="outline"></span>
-              {{ currentLocation ? 'Modifică' : 'Selectează locația' }}
-            </button>
-          </div>
+    <!-- Authentication check -->
+    @if (!(isAuthenticated$ | async)) {
+      <nz-alert
+        nzType="warning"
+        nzShowIcon
+        nzCloseable
+        nzMessage="Autentificare necesară"
+        [nzDescription]="authDescription"
+        class="auth-alert">
+      </nz-alert>
+      <ng-template #authDescription>
+        <p class="auth-text">Te rugăm să te conectezi pentru a raporta probleme din comunitate</p>
+        <div class="auth-actions">
+          <button nz-button nzType="primary" routerLink="/auth/login">Conectare</button>
+          <button nz-button nzType="default" routerLink="/auth/register">Creează cont</button>
         </div>
-      </nz-card>
-      @if (locationError) {
-        <div class="location-error-message">
-          <span nz-icon nzType="exclamation-circle" nzTheme="fill"></span>
-          {{ locationError }}
-        </div>
-      }
-    </div>
-
-    <!-- Issue Title -->
-    @if (selectedCategory && currentLocation) {
-      <div class="title-section">
-        <nz-card class="title-card">
-          <div class="title-header">
-            <label class="title-label">Titlul sesizării</label>
-            <span class="title-hint">Generat automat — poți personaliza</span>
-          </div>
-          <nz-input-group [nzSuffix]="resetBtnTpl">
-            <input nz-input
-              [(ngModel)]="issueTitle"
-              (ngModelChange)="onTitleChange()"
-              placeholder="Titlul problemei..."
-              maxlength="150" />
-          </nz-input-group>
-          <ng-template #resetBtnTpl>
-            @if (isTitleCustomized) {
-              <span nz-icon nzType="undo" nz-tooltip nzTooltipTitle="Resetează titlul" class="reset-icon" (click)="resetTitle()"></span>
-            }
-          </ng-template>
-        </nz-card>
-      </div>
+      </ng-template>
     }
 
-    <!-- Navigation -->
-    <div class="navigation-section">
-      <div class="nav-buttons">
-        <button
-          nz-button
-          nzType="default"
-          nzSize="large"
-          routerLink="/dashboard"
-          class="nav-btn">
-          <span nz-icon nzType="arrow-left"></span>
-          Înapoi
-        </button>
+    <!-- Category -->
+    <section class="wz-section" aria-labelledby="cat-title">
+      <div class="wz-section__head">
+        <h2 class="c-h3" id="cat-title">Ce tip de problemă raportezi?</h2>
+        <p>Selectează categoria care se potrivește cel mai bine cu preocuparea ta. Aceasta ne ajută să direcționăm raportul către autoritățile competente.</p>
+      </div>
 
-        <div class="nav-spacer"></div>
+      @if (isLoading) {
+        <div class="cat-grid" aria-busy="true" aria-label="Se încarcă categoriile">
+          @for (n of [1, 2, 3, 4, 5, 6]; track n) {
+            <div class="cat-skeleton c-skeleton"></div>
+          }
+        </div>
+      } @else {
+        <div class="cat-grid">
+          @for (category of categories; track category.id) {
+            @let isSelected = selectedCategory?.id === category.id;
+            <button
+              type="button"
+              class="cat-card"
+              [class.is-selected]="isSelected"
+              [attr.aria-pressed]="isSelected"
+              (click)="selectCategory(category)">
+              <span class="cat-card__icon" aria-hidden="true">
+                <span nz-icon [nzType]="category.icon" nzTheme="outline"></span>
+              </span>
+              <span class="cat-card__body">
+                <span class="cat-card__name">{{ category.name }}</span>
+                <span class="cat-card__desc">{{ category.description }}</span>
+                @if (category.examples.length) {
+                  <span class="cat-card__examples">Ex.: @for (example of category.examples; track $index) {<span>{{ example }}</span>}</span>
+                }
+              </span>
+              @if (isSelected) {
+                <span class="cat-card__check">
+                  <span nz-icon nzType="check" nzTheme="outline" aria-hidden="true"></span>
+                  <span class="c-sr-only">Selectat</span>
+                </span>
+              }
+            </button>
+          }
+        </div>
+      }
+    </section>
 
-        <button
-          nz-button
-          nzType="primary"
-          nzSize="large"
-          [disabled]="!selectedCategory || !(isAuthenticated$ | async)"
-          (click)="continueToPhotos()"
-          class="nav-btn continue-btn">
-          Continuă cu fotografiile
-          <span nz-icon nzType="arrow-right"></span>
+    <!-- Location -->
+    <section class="wz-section" aria-labelledby="loc-title">
+      <div class="wz-section__head">
+        <h2 class="c-h3" id="loc-title">Locație</h2>
+      </div>
+
+      <div
+        class="loc-field"
+        [class.is-empty]="!currentLocation"
+        [class.is-error]="locationError">
+        <span class="loc-field__icon" aria-hidden="true">
+          <span nz-icon nzType="environment" nzTheme="outline"></span>
+        </span>
+        <div class="loc-field__body">
+          @if (currentLocation) {
+            <p class="loc-field__address">{{ currentLocation.address }}</p>
+            @if (currentLocation.district) {
+              <span class="c-tag">{{ currentLocation.district }}</span>
+            }
+          } @else {
+            <p class="loc-field__placeholder">Nicio locație selectată</p>
+          }
+        </div>
+        <button nz-button nzType="default" type="button" class="loc-field__btn" (click)="changeLocation()">
+          <span nz-icon [nzType]="currentLocation ? 'edit' : 'plus'" nzTheme="outline"></span>
+          <span>{{ currentLocation ? 'Modifică' : 'Selectează locația' }}</span>
         </button>
       </div>
 
-      @if (!selectedCategory) {
-        <div class="help-text">
-          <p>Te rugăm să selectezi o categorie pentru a continua</p>
-        </div>
+      @if (locationError) {
+        <p class="wz-error" role="alert">
+          <span nz-icon nzType="exclamation-circle" nzTheme="outline"></span>
+          <span>{{ locationError }}</span>
+        </p>
       }
-    </div>
+    </section>
 
+    <!-- Issue title -->
+    @if (selectedCategory && currentLocation) {
+      <section class="wz-section title-field">
+        <div class="title-field__head">
+          <label class="title-field__label" for="issue-title">Titlul sesizării</label>
+          <span class="title-field__hint">Generat automat — poți personaliza</span>
+        </div>
+        <nz-input-group nzSize="large" [nzSuffix]="resetBtnTpl">
+          <input
+            nz-input
+            id="issue-title"
+            [(ngModel)]="issueTitle"
+            (ngModelChange)="onTitleChange()"
+            placeholder="Titlul problemei..."
+            maxlength="150" />
+        </nz-input-group>
+        <ng-template #resetBtnTpl>
+          @if (isTitleCustomized) {
+            <button
+              type="button"
+              class="reset-btn"
+              nz-tooltip
+              nzTooltipTitle="Resetează titlul"
+              aria-label="Resetează titlul"
+              (click)="resetTitle()">
+              <span nz-icon nzType="undo" nzTheme="outline"></span>
+            </button>
+          }
+        </ng-template>
+      </section>
+    }
+  </div>
+
+  <!-- Action bar -->
+  <div class="wz-bar">
+    <div class="wz-bar__inner">
+      <button nz-button nzType="default" nzSize="large" class="wz-bar__back" routerLink="/dashboard">
+        <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
+        <span>Înapoi</span>
+      </button>
+
+      @if (!selectedCategory) {
+        <p class="wz-bar__hint">Te rugăm să selectezi o categorie pentru a continua</p>
+      } @else {
+        <span class="wz-bar__spacer"></span>
+      }
+
+      <button
+        nz-button
+        nzType="primary"
+        nzSize="large"
+        class="wz-bar__next"
+        [disabled]="!selectedCategory || !(isAuthenticated$ | async)"
+        (click)="continueToPhotos()">
+        <span>Continuă cu fotografiile</span>
+        <span nz-icon nzType="arrow-right" nzTheme="outline"></span>
+      </button>
     </div>
-  </nz-spin>
+  </div>
 </div>

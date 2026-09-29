@@ -1,4 +1,5 @@
 import { Component, signal, computed } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { RouterLink } from '@angular/router';
 import { GUIDE_ARTICLES, GuideArticle } from '../../../generated/guide-data';
 
@@ -10,7 +11,7 @@ interface CategoryFilter {
 @Component({
   selector: 'app-guide-list',
   standalone: true,
-  imports: [RouterLink],
+  imports: [RouterLink, DatePipe],
   templateUrl: './guide-list.component.html',
   styleUrl: './guide-list.component.scss',
 })

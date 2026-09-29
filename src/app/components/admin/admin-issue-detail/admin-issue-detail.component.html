@@ -1,383 +1,387 @@
-<div class="admin-container">
+<div class="c-container c-page">
 
   <!-- Loading State -->
   @if (isLoading) {
-    <div class="loading-state">
-      <nz-spin nzSimple [nzSize]="'large'"></nz-spin>
-      <p>Se incarca detaliile problemei...</p>
+    <div class="detail-grid" aria-busy="true" aria-label="Se încarcă detaliile problemei">
+      <div class="detail-main">
+        <div class="c-skeleton sk-title"></div>
+        <div class="c-skeleton sk-card"></div>
+        <div class="c-skeleton sk-card"></div>
+      </div>
+      <div class="detail-aside">
+        <div class="c-skeleton sk-panel"></div>
+      </div>
     </div>
   }
 
   <!-- Error State -->
   @if (error && !isLoading) {
-    <div class="error-state">
-      <span nz-icon nzType="close-circle" class="error-icon"></span>
-      <h3>Eroare la incarcarea problemei</h3>
+    <div class="c-empty">
+      <span class="c-empty__icon"><span nz-icon nzType="close-circle" nzTheme="outline"></span></span>
+      <h1 class="c-empty__title">Eroare la încărcarea problemei</h1>
       <p>{{ error }}</p>
-      <button nz-button nzType="primary" (click)="goBack()">
-        <span nz-icon nzType="arrow-left"></span>
-        Inapoi la aprobare
+      <button nz-button nzType="primary" class="error-back" (click)="goBack()">
+        <span nz-icon nzType="arrow-left" nzTheme="outline"></span>
+        <span>Înapoi la aprobare</span>
       </button>
     </div>
   }
 
   <!-- Issue Detail -->
   @if (issue && !isLoading) {
-    <!-- Actions Header -->
-    @if (issue.status === 'Submitted' || issue.status === 'UnderReview') {
-      <div class="detail-header">
-        <button nz-button nzType="primary" (click)="openDecisionModal()">
-          <span nz-icon nzType="audit"></span>
-          Revizuiește
-        </button>
+    @let reviewable = issue.status === 'Submitted' || issue.status === 'UnderReview';
+    @let decision = decisionForm.value.decision;
+
+    <header class="c-page-head detail-head">
+      <div class="c-page-head__text">
+        <p class="c-eyebrow">{{ isReReview ? 'Reevaluare' : 'Revizuire sesizare' }}</p>
+        <h1 class="c-h1 detail-title">{{ issue.title }}</h1>
+        <div class="detail-meta">
+          <span class="c-status" [attr.data-tone]="issue.status | statusTone">{{ issue.status | statusText }}</span>
+          <span class="c-tag">{{ categoryLabels[(issue.category | lowercase)] || (issue.category | categoryLabel) }}</span>
+          @let lvl = issue.urgency | lowercase;
+          <span class="c-tag" [class.c-tag--urgent]="lvl === 'urgent'" [class.c-tag--signal]="lvl === 'high'">
+            {{ lvl === 'urgent' ? 'Urgentă' : 'Urgență ' + ((urgencyLabels[lvl] || issue.urgency) | lowercase) }}
+          </span>
+          <span class="c-small c-muted">Trimisă {{ issue.createdAt | timeAgo | lowercase }}</span>
+        </div>
       </div>
-    }
+      @if (reviewable) {
+        <!-- Narrow screens: the decision panel sits below the content; this jumps to it. -->
+        <div class="c-page-head__actions detail-jump">
+          <button
+            type="button"
+            class="c-btn c-btn--ink"
+            (click)="decisionSlot.scrollIntoView({ behavior: 'smooth', block: 'start' }); decisionSlot.focus({ preventScroll: true })">
+            <span nz-icon nzType="audit" nzTheme="outline" aria-hidden="true"></span>
+            <span>Revizuiește</span>
+          </button>
+        </div>
+      }
+    </header>
 
-    <nz-row [nzGutter]="[24, 24]">
-      <!-- Left Column - Issue Content -->
-      <nz-col [nzXs]="24" [nzLg]="16">
-        <div class="column-stack">
+    <div class="detail-grid">
+      <!-- Left: the submission -->
+      <div class="detail-main">
 
-          <!-- Re-review diff (edit of already-approved content) -->
-          @if (isReReview) {
-            <nz-card class="detail-card rereview-card">
-              <div class="rereview-header">
-                <span nz-icon nzType="warning" nzTheme="fill" class="rereview-icon"></span>
-                <div class="rereview-copy">
-                  <h3>Reevaluare — editare a unei probleme deja aprobate</h3>
-                  <p>
-                    Voturile și email-urile afișate au fost strânse pentru conținutul aprobat anterior.
-                    @if (diffRows.length > 0) {
-                      Verifică modificările de mai jos înainte de a aproba.
-                    } @else {
-                      Această retrimitere nu conține modificări de câmp detectate.
-                    }
+        <!-- Re-review diff (edit of already-approved content) -->
+        @if (isReReview) {
+          <section class="c-card rr" aria-labelledby="rr-title">
+            <div class="rr__head">
+              <span nz-icon nzType="history" nzTheme="outline" class="rr__icon" aria-hidden="true"></span>
+              <div>
+                <h2 class="c-h3" id="rr-title">Reevaluare — editare a unei probleme deja aprobate</h2>
+                <p class="rr__lead">
+                  Voturile și email-urile afișate au fost strânse pentru conținutul aprobat anterior.
+                  @if (diffRows.length > 0) {
+                    Verifică modificările de mai jos înainte de a aproba.
+                  } @else {
+                    Această retrimitere nu conține modificări de câmp detectate.
+                  }
+                </p>
+                @if (issue.approvedSnapshot?.approvedAt) {
+                  <p class="rr__since">
+                    Versiunea aprobată: {{ issue.approvedSnapshot?.approvedAt | date:'d MMMM yyyy, HH:mm':'':'ro' }}
                   </p>
-                </div>
+                }
               </div>
+            </div>
 
-              @if (diffRows.length > 0) {
-                <div class="diff-list">
-                  @for (row of diffRows; track row.label) {
-                    <div class="diff-row">
-                      <div class="diff-field">{{ row.label }}</div>
-                      <div class="diff-values">
-                        <div class="diff-before">
-                          <span class="diff-tag diff-tag-before">Aprobat</span>
-                          <span class="diff-text">{{ row.before }}</span>
-                        </div>
-                        <div class="diff-after">
-                          <span class="diff-tag diff-tag-after">Nou</span>
-                          <span class="diff-text">{{ row.after }}</span>
-                        </div>
+            @if (diffRows.length > 0) {
+              <div class="diff">
+                @for (row of diffRows; track row.label) {
+                  <div class="diff__row">
+                    <h3 class="diff__field">{{ row.label }}</h3>
+                    <div class="diff__pair">
+                      <div class="diff__side diff__side--before">
+                        <span class="diff__tag"><span aria-hidden="true">−</span> Aprobat</span>
+                        <p class="diff__text">{{ row.before }}</p>
+                      </div>
+                      <div class="diff__side diff__side--after">
+                        <span class="diff__tag"><span aria-hidden="true">+</span> Nou</span>
+                        <p class="diff__text">{{ row.after }}</p>
                       </div>
                     </div>
-                  }
-                </div>
-              }
-            </nz-card>
-          }
-
-          <!-- Issue Header Card -->
-          <nz-card class="detail-card">
-            <div class="issue-title-section">
-              <h1>{{ issue.title }}</h1>
-              <div class="issue-meta">
-                <nz-tag [nzColor]="issue.status | statusColor">
-                  {{ issue.status | statusText }}
-                </nz-tag>
-                <nz-tag [nzColor]="issue.category | categoryColor">
-                  {{ issue.category | titlecase }}
-                </nz-tag>
-                <nz-badge
-                  [nzStatus]="issue.urgency | urgencyStatus"
-                  [nzText]="issue.urgency | titlecase">
-                </nz-badge>
+                  </div>
+                }
               </div>
+            }
+          </section>
+        }
+
+        <!-- Photos -->
+        @if (issue.photos && issue.photos.length > 0) {
+          <section class="c-card c-card--pad" aria-labelledby="photos-title">
+            <div class="c-section-head">
+              <h2 class="c-h3" id="photos-title">Fotografii</h2>
+              <span class="c-muted c-small">{{ issue.photos.length }}</span>
             </div>
-
-            <nz-divider></nz-divider>
-
-            <div class="issue-info-grid">
-              <div class="info-item">
-                <span class="info-label">Locatie</span>
-                <span class="info-value">
-                  <span nz-icon nzType="environment"></span>
-                  {{ issue.address }}
-                </span>
-              </div>
-              @if (issue.district) {
-                <div class="info-item">
-                  <span class="info-label">Sector/Judet</span>
-                  <span class="info-value">{{ issue.district }}</span>
-                </div>
-              }
-              <div class="info-item">
-                <span class="info-label">Data raportarii</span>
-                <span class="info-value">{{ issue.createdAt | date:'dd/MM/yyyy HH:mm' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Ultima actualizare</span>
-                <span class="info-value">{{ issue.updatedAt | date:'dd/MM/yyyy HH:mm' }}</span>
-              </div>
-              <div class="info-item">
-                <span class="info-label">Email-uri trimise</span>
-                <span class="info-value">{{ issue.emailsSent }}</span>
-              </div>
-            </div>
-          </nz-card>
-
-          <!-- Description Tabs -->
-          <nz-card class="detail-card">
-            <nz-tabset>
-              <nz-tab nzTitle="Descriere">
-                <div class="tab-content">
-                  <p class="description-text">{{ issue.description }}</p>
-                </div>
-              </nz-tab>
-              <nz-tab nzTitle="Rezultat Dorit">
-                <div class="tab-content">
-                  @if (issue.desiredOutcome) {
-                    <p class="description-text">{{ issue.desiredOutcome }}</p>
-                  } @else {
-                    <p class="empty-text">Nu a fost specificat un rezultat dorit.</p>
-                  }
-                </div>
-              </nz-tab>
-              <nz-tab nzTitle="Impact Comunitar">
-                <div class="tab-content">
-                  @if (issue.communityImpact) {
-                    <p class="description-text">{{ issue.communityImpact }}</p>
-                  } @else {
-                    <p class="empty-text">Nu a fost specificat impactul comunitar.</p>
-                  }
-                </div>
-              </nz-tab>
-            </nz-tabset>
-          </nz-card>
-
-          <!-- Photos -->
-          @if (issue.photos && issue.photos.length > 0) {
-            <nz-card class="detail-card" nzTitle="Fotografii">
-              <div class="photos-grid">
-                @for (photo of issue.photos; track photo.id) {
-                  <div class="photo-item" (click)="viewPhoto(photo.url)">
+            <ul class="photos" role="list">
+              @for (photo of issue.photos; track photo.id) {
+                <li>
+                  <button type="button" class="photo" (click)="viewPhoto(photo.url)">
                     <img [src]="photo.thumbnailUrl || photo.url"
                          [alt]="photo.description || 'Fotografie'"
                          loading="lazy">
                     @if (photo.isPrimary) {
-                      <span class="photo-badge">Principala</span>
+                      <span class="c-tag photo__badge">Principală</span>
                     }
-                  </div>
-                }
-              </div>
-            </nz-card>
+                    <span class="c-sr-only">(se deschide într-o filă nouă)</span>
+                  </button>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+
+        <!-- What the citizen wrote: all three fields, no tabs, so nothing is missed. -->
+        <section class="c-card c-card--pad copy" aria-label="Conținutul sesizării">
+          <h2 class="c-h3">Descriere</h2>
+          <p class="copy__text">{{ issue.description }}</p>
+
+          <h2 class="c-h3">Rezultat dorit</h2>
+          @if (issue.desiredOutcome) {
+            <p class="copy__text">{{ issue.desiredOutcome }}</p>
+          } @else {
+            <p class="copy__empty">Nu a fost specificat un rezultat dorit.</p>
           }
 
-          <!-- Authorities -->
-          @if (issue.authorities && issue.authorities.length > 0) {
-            <nz-card class="detail-card" nzTitle="Autoritati Responsabile">
-              @for (authority of issue.authorities; track authority.name; let last = $last) {
-                <div class="authority-row">
-                  <div class="authority-info">
-                    <span nz-icon [nzType]="authority.isPredefined ? 'bank' : 'user'"></span>
-                    <span class="authority-name">{{ authority.name }}</span>
-                  </div>
-                  <span class="authority-email">{{ authority.email }}</span>
-                </div>
-                @if (!last) {
-                  <nz-divider class="compact-divider"></nz-divider>
-                }
-              }
-            </nz-card>
+          <h2 class="c-h3">Impact comunitar</h2>
+          @if (issue.communityImpact) {
+            <p class="copy__text">{{ issue.communityImpact }}</p>
+          } @else {
+            <p class="copy__empty">Nu a fost specificat impactul comunitar.</p>
           }
-        </div>
-      </nz-col>
+        </section>
 
-      <!-- Right Column - Admin Info -->
-      <nz-col [nzXs]="24" [nzLg]="8">
-        <div class="column-stack">
-
-          <!-- User Profile Card -->
-          <nz-card class="detail-card" nzTitle="Informatii Utilizator">
-            <div class="user-info-list">
-              <div class="user-info-item">
-                <span class="info-label">Nume</span>
-                <span class="info-value">{{ issue.userName }}</span>
-              </div>
-              <nz-divider class="compact-divider"></nz-divider>
-              <div class="user-info-item">
-                <span class="info-label">Email</span>
-                <span class="info-value">{{ issue.userEmail }}</span>
-              </div>
-              @if (issue.userPhone) {
-                <nz-divider class="compact-divider"></nz-divider>
-                <div class="user-info-item">
-                  <span class="info-label">Telefon</span>
-                  <span class="info-value">{{ issue.userPhone }}</span>
-                </div>
-              }
-              <nz-divider class="compact-divider"></nz-divider>
-              <div class="user-info-item">
-                <span class="info-label">Probleme raportate</span>
-                <span class="info-value">{{ issue.userTotalIssues }}</span>
-              </div>
-              <nz-divider class="compact-divider"></nz-divider>
-              <div class="user-info-item">
-                <span class="info-label">Probleme rezolvate</span>
-                <span class="info-value">{{ issue.userResolvedIssues }}</span>
-              </div>
-              <nz-divider class="compact-divider"></nz-divider>
-              <div class="user-info-item">
-                <span class="info-label">Puncte</span>
-                <span class="info-value points-badge">{{ issue.userPoints }}</span>
-              </div>
+        <!-- Record facts -->
+        <section class="c-card c-card--pad" aria-labelledby="facts-title">
+          <h2 class="c-h3 card-title" id="facts-title">Detalii</h2>
+          <dl class="facts">
+            <div class="facts__item facts__item--wide">
+              <dt>Locație</dt>
+              <dd>
+                <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>
+                {{ issue.address }}
+              </dd>
             </div>
-          </nz-card>
+            @if (issue.district) {
+              <div class="facts__item">
+                <dt>Sector/Județ</dt>
+                <dd>{{ issue.district }}</dd>
+              </div>
+            }
+            <div class="facts__item">
+              <dt>Data raportării</dt>
+              <dd>{{ issue.createdAt | date:'dd/MM/yyyy HH:mm' }}</dd>
+            </div>
+            <div class="facts__item">
+              <dt>Ultima actualizare</dt>
+              <dd>{{ issue.updatedAt | date:'dd/MM/yyyy HH:mm' }}</dd>
+            </div>
+            <div class="facts__item">
+              <dt>Email-uri trimise</dt>
+              <dd>{{ issue.emailsSent }}</dd>
+            </div>
+            <div class="facts__item facts__item--wide">
+              <dt>ID problemă</dt>
+              <dd><code class="issue-id">{{ issue.id }}</code></dd>
+            </div>
+          </dl>
+        </section>
 
-          <!-- Admin Review Card -->
-          @if (issue.adminNotes || issue.rejectionReason || issue.reviewedAt) {
-            <nz-card class="detail-card" nzTitle="Detalii Revizuire">
+        <!-- Authorities -->
+        @if (issue.authorities && issue.authorities.length > 0) {
+          <section class="c-card c-card--pad" aria-labelledby="auth-title">
+            <h2 class="c-h3 card-title" id="auth-title">Autorități responsabile</h2>
+            <ul class="authorities" role="list">
+              @for (authority of issue.authorities; track authority.name) {
+                <li class="authority">
+                  <span nz-icon [nzType]="authority.isPredefined ? 'bank' : 'user'" nzTheme="outline" class="authority__icon" aria-hidden="true"></span>
+                  <span class="authority__name">
+                    {{ authority.name }}
+                    <span class="c-sr-only">{{ authority.isPredefined ? '(autoritate predefinită)' : '(adăugată de utilizator)' }}</span>
+                  </span>
+                  <span class="authority__email">{{ authority.email }}</span>
+                </li>
+              }
+            </ul>
+          </section>
+        }
+      </div>
+
+      <!-- Right: who sent it and what happened before, then the decision. The decision
+           panel is last in the column so it can stick without anything scrolling under it. -->
+      <aside class="detail-aside" aria-label="Context și decizie">
+
+        <!-- Submitter -->
+        <section class="c-card c-card--pad" aria-labelledby="user-title">
+          <h2 class="c-h3 card-title" id="user-title">Informații utilizator</h2>
+          <p class="person__name">{{ issue.userName }}</p>
+          <p class="person__line">
+            <span nz-icon nzType="mail" nzTheme="outline" aria-hidden="true"></span>
+            <span><span class="c-sr-only">Email: </span>{{ issue.userEmail }}</span>
+          </p>
+          @if (issue.userPhone) {
+            <p class="person__line">
+              <span nz-icon nzType="phone" nzTheme="outline" aria-hidden="true"></span>
+              <span><span class="c-sr-only">Telefon: </span>{{ issue.userPhone }}</span>
+            </p>
+          }
+          <dl class="facts tally">
+            <div>
+              <dt>Probleme raportate</dt>
+              <dd>{{ issue.userTotalIssues }}</dd>
+            </div>
+            <div>
+              <dt>Probleme rezolvate</dt>
+              <dd>{{ issue.userResolvedIssues }}</dd>
+            </div>
+            <div>
+              <dt>Puncte</dt>
+              <dd>{{ issue.userPoints }}</dd>
+            </div>
+          </dl>
+        </section>
+
+        <!-- Admin Review details (once reviewed) -->
+        @if (issue.adminNotes || issue.rejectionReason || issue.reviewedAt) {
+          <section class="c-card c-card--pad" aria-labelledby="review-title">
+            <h2 class="c-h3 card-title" id="review-title">Detalii revizuire</h2>
+            <dl class="rows">
               @if (issue.reviewedBy) {
-                <div class="review-item">
-                  <span class="info-label">Revizuit de</span>
-                  <span class="info-value">{{ issue.reviewedBy }}</span>
+                <div class="rows__item">
+                  <dt>Revizuit de</dt>
+                  <dd>{{ issue.reviewedBy }}</dd>
                 </div>
               }
               @if (issue.reviewedAt) {
-                <div class="review-item">
-                  <span class="info-label">Data revizuirii</span>
-                  <span class="info-value">{{ issue.reviewedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+                <div class="rows__item">
+                  <dt>Data revizuirii</dt>
+                  <dd>{{ issue.reviewedAt | date:'dd/MM/yyyy HH:mm' }}</dd>
                 </div>
               }
-              @if (issue.adminNotes) {
-                <div class="review-item">
-                  <span class="info-label">Notite admin</span>
-                  <p class="review-notes">{{ issue.adminNotes }}</p>
-                </div>
-              }
-              @if (issue.rejectionReason) {
-                <div class="review-item rejection">
-                  <span class="info-label">Motiv respingere</span>
-                  <p class="review-notes rejection-text">{{ issue.rejectionReason }}</p>
-                </div>
-              }
-            </nz-card>
-          }
+            </dl>
+            @if (issue.adminNotes) {
+              <p class="note-label">Notițe admin</p>
+              <p class="note">{{ issue.adminNotes }}</p>
+            }
+            @if (issue.rejectionReason) {
+              <p class="note-label">Motiv respingere</p>
+              <p class="note note--bad">{{ issue.rejectionReason }}</p>
+            }
+          </section>
+        }
 
-          <!-- Admin Actions Timeline -->
-          @if (issue.adminActions && issue.adminActions.length > 0) {
-            <nz-card class="detail-card" nzTitle="Istoric Actiuni Admin">
-              <nz-timeline>
-                @for (action of issue.adminActions; track action.id) {
-                  <nz-timeline-item [nzColor]="action.action | timelineColor">
-                    <div class="timeline-entry">
-                      <div class="timeline-header">
-                        <nz-tag [nzColor]="action.action | actionColor">
-                          {{ action.action | actionLabel }}
-                        </nz-tag>
-                        <span class="timeline-date">{{ action.createdAt | timeAgo }}</span>
-                      </div>
-                      <div class="timeline-admin">
-                        {{ action.adminName || action.adminEmail }}
-                      </div>
-                      @if (action.notes) {
-                        <p class="timeline-notes">{{ action.notes }}</p>
-                      }
-                    </div>
-                  </nz-timeline-item>
+        <!-- Admin Actions history -->
+        @if (issue.adminActions && issue.adminActions.length > 0) {
+          <section class="c-card c-card--pad" aria-labelledby="history-title">
+            <h2 class="c-h3 card-title" id="history-title">Istoric acțiuni admin</h2>
+            <ol class="history">
+              @for (action of issue.adminActions; track action.id) {
+                @let meta = actionMeta[action.action];
+                <li class="history__item">
+                  <div class="history__top">
+                    <span class="c-status" [attr.data-tone]="meta?.tone || 'neutral'">{{ meta?.label || (action.action | actionLabel) }}</span>
+                    <time class="c-small c-muted" [attr.datetime]="action.createdAt">{{ action.createdAt | timeAgo }}</time>
+                  </div>
+                  <p class="history__who">{{ action.adminName || action.adminEmail }}</p>
+                  @if (action.notes) {
+                    <p class="note">{{ action.notes }}</p>
+                  }
+                </li>
+              }
+            </ol>
+          </section>
+        }
+
+        <!-- Decision: the slot is always rendered so the header's jump button can reach it. -->
+        <div #decisionSlot class="decision-slot" tabindex="-1">
+        @if (reviewable) {
+          <section class="c-card c-card--pad decision" aria-labelledby="decision-title">
+            <h2 class="c-h3 card-title" id="decision-title">Decizie</h2>
+
+            <form nz-form nzLayout="vertical" [formGroup]="decisionForm" (ngSubmit)="submitDecision()">
+              <nz-form-item>
+                <nz-form-control nzErrorTip="Alege o decizie">
+                  <nz-radio-group
+                    formControlName="decision"
+                    class="choices"
+                    role="radiogroup"
+                    aria-labelledby="decision-title"
+                    aria-required="true">
+                    <label nz-radio nzValue="approve" class="choice" data-tone="ok">
+                      <span class="choice__body">
+                        <span class="choice__title">
+                          <span nz-icon nzType="check-circle" nzTheme="outline" class="choice__icon" aria-hidden="true"></span>
+                          Aprobă
+                        </span>
+                        <span class="choice__hint">Sesizarea devine activă și vizibilă public.</span>
+                      </span>
+                    </label>
+                    <label nz-radio nzValue="reject" class="choice" data-tone="bad">
+                      <span class="choice__body">
+                        <span class="choice__title">
+                          <span nz-icon nzType="close-circle" nzTheme="outline" class="choice__icon" aria-hidden="true"></span>
+                          Respinge
+                        </span>
+                        <span class="choice__hint">Autorul vede motivul respingerii.</span>
+                      </span>
+                    </label>
+                  </nz-radio-group>
+                </nz-form-control>
+              </nz-form-item>
+
+              @if (decision === 'reject') {
+                <nz-form-item>
+                  <nz-form-label nzRequired nzFor="reject-reason">Motiv respingere</nz-form-label>
+                  <nz-form-control nzErrorTip="Motivul respingerii este obligatoriu">
+                    <textarea
+                      nz-input
+                      id="reject-reason"
+                      formControlName="reason"
+                      rows="3"
+                      placeholder="Motivul respingerii (vizibil pentru utilizator)...">
+                    </textarea>
+                  </nz-form-control>
+                </nz-form-item>
+              }
+
+              <nz-form-item>
+                <nz-form-label nzFor="internal-notes">Notițe interne</nz-form-label>
+                <nz-form-control>
+                  <textarea
+                    nz-input
+                    id="internal-notes"
+                    formControlName="notes"
+                    rows="3"
+                    placeholder="Notițe interne (vizibile doar pentru admin)...">
+                  </textarea>
+                </nz-form-control>
+              </nz-form-item>
+
+              <button
+                nz-button
+                nzType="primary"
+                nzBlock
+                nzSize="large"
+                type="submit"
+                [nzDanger]="decision === 'reject'"
+                [disabled]="isProcessing"
+                [nzLoading]="isProcessing">
+                @switch (decision) {
+                  @case ('approve') { <span>Aprobă sesizarea</span> }
+                  @case ('reject') { <span>Respinge sesizarea</span> }
+                  @default { <span>Trimite decizia</span> }
                 }
-              </nz-timeline>
-            </nz-card>
-          }
-
-          <!-- Issue ID -->
-          <nz-card class="detail-card" nzSize="small">
-            <div class="user-info-item">
-              <span class="info-label">ID Problema</span>
-              <span class="info-value mono-text">{{ issue.id }}</span>
-            </div>
-          </nz-card>
+              </button>
+            </form>
+          </section>
+        }
         </div>
-      </nz-col>
-    </nz-row>
+      </aside>
+    </div>
   }
 
-  <!-- Decision Modal -->
-  <nz-modal
-    [(nzVisible)]="isDecisionModalVisible"
-    nzTitle="Revizuire sesizare"
-    [nzWidth]="600"
-    [nzFooter]="null"
-    [nzClosable]="!isProcessing"
-    [nzMaskClosable]="!isProcessing"
-    [nzKeyboard]="!isProcessing"
-    (nzOnCancel)="closeDecisionModal()"
-    nzClass="decision-modal">
-
-    <div *nzModalContent>
-      <nz-spin [nzSpinning]="isProcessing">
-        <form nz-form [formGroup]="decisionForm" (ngSubmit)="submitDecision()">
-
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24" nzRequired>Decizie</nz-form-label>
-            <nz-form-control [nzSpan]="24">
-              <nz-radio-group formControlName="decision">
-                <label nz-radio nzValue="approve">
-                  <span nz-icon nzType="check-circle" class="decision-icon-approve"></span>
-                  Aproba
-                </label>
-                <label nz-radio nzValue="reject">
-                  <span nz-icon nzType="close-circle" class="decision-icon-reject"></span>
-                  Respinge
-                </label>
-              </nz-radio-group>
-            </nz-form-control>
-          </nz-form-item>
-
-          @if (decisionForm.get('decision')?.value === 'reject') {
-            <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzRequired>Motiv respingere</nz-form-label>
-              <nz-form-control [nzSpan]="24" nzErrorTip="Motivul respingerii este obligatoriu">
-                <textarea
-                  nz-input
-                  formControlName="reason"
-                  rows="3"
-                  placeholder="Motivul respingerii (vizibil pentru utilizator)...">
-                </textarea>
-              </nz-form-control>
-            </nz-form-item>
-          }
-
-          <nz-form-item>
-            <nz-form-label [nzSpan]="24">Notițe interne</nz-form-label>
-            <nz-form-control [nzSpan]="24">
-              <textarea
-                nz-input
-                formControlName="notes"
-                rows="3"
-                placeholder="Notițe interne (vizibile doar pentru admin)...">
-              </textarea>
-            </nz-form-control>
-          </nz-form-item>
-
-          <div class="modal-actions">
-            <button nz-button nzType="default" type="button"
-                    [disabled]="isProcessing"
-                    (click)="closeDecisionModal()">
-              Anuleaza
-            </button>
-            <button nz-button nzType="primary" type="submit"
-                    [disabled]="isProcessing"
-                    [nzLoading]="isProcessing">
-              Trimite decizia
-            </button>
-          </div>
-
-        </form>
-      </nz-spin>
-    </div>
-
-  </nz-modal>
-
 </div>
+

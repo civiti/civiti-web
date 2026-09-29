@@ -1,53 +1,44 @@
-<nz-card class="comments-section">
-  <!-- Header -->
+<section class="c-card comments" aria-labelledby="comments-title">
   <div class="comments-header">
-    <div class="header-left">
-      <i nz-icon nzType="message" nzTheme="outline" class="header-icon"></i>
-      <h3 class="header-title">
-        Comentarii
-        @if (totalCount$ | async; as count) {
-          <span class="comment-count">({{ count }})</span>
-        }
-      </h3>
-    </div>
+    <h2 class="c-h3" id="comments-title">
+      Comentarii
+      @if (totalCount$ | async; as count) {
+        <span class="comment-count">{{ count }}</span>
+      }
+    </h2>
 
     @if (((totalCount$ | async) ?? 0) > 0) {
-      <div class="header-right">
-        <nz-select
-          [(ngModel)]="sortValue"
-          (ngModelChange)="onSortChange($event)"
-          nzSize="small"
-          class="comments-sort-select"
-        >
-          <nz-option nzValue="date-desc" nzLabel="Cele mai noi"></nz-option>
-          <nz-option nzValue="date-asc" nzLabel="Cele mai vechi"></nz-option>
-          <nz-option nzValue="helpful-desc" nzLabel="Cele mai utile"></nz-option>
-        </nz-select>
-      </div>
+      <nz-select
+        [(ngModel)]="sortValue"
+        (ngModelChange)="onSortChange($event)"
+        nzSize="small"
+        class="comments-sort"
+        aria-label="Sortează comentariile"
+      >
+        <nz-option nzValue="date-desc" nzLabel="Cele mai noi"></nz-option>
+        <nz-option nzValue="date-asc" nzLabel="Cele mai vechi"></nz-option>
+        <nz-option nzValue="helpful-desc" nzLabel="Cele mai utile"></nz-option>
+      </nz-select>
     }
   </div>
 
-  <!-- Loading State -->
   @if (loading$ | async) {
-    <div class="loading-state">
+    <div class="state" role="status">
       <nz-spin nzSimple></nz-spin>
       <p>Se încarcă comentariile...</p>
     </div>
   }
 
-  <!-- Error State -->
   @if (error$ | async; as error) {
-    <nz-alert
-      nzType="error"
-      [nzMessage]="error"
-      nzShowIcon
-      class="error-alert"
-    ></nz-alert>
+    <div class="c-callout c-callout--bad error" role="alert">
+      <span nz-icon nzType="close-circle" nzTheme="outline"></span>
+      <span>{{ error }}</span>
+    </div>
   }
 
-  <!-- New Comment Form (only for authenticated users on active issues, hidden while loading) -->
+  <!-- New comment (authenticated users on commentable issues, hidden while loading) -->
   @if ((isAuthenticated$ | async) && canComment && !(loading$ | async)) {
-    <div class="new-comment-section">
+    <div class="new-comment">
       <app-comment-form
         [submitting]="(submitting$ | async) ?? false"
         [resetKey]="(formResetCounter$ | async) ?? 0"
@@ -58,23 +49,20 @@
     </div>
   }
 
-  <!-- Login prompt for unauthenticated users (hidden while loading) -->
   @if (!(isAuthenticated$ | async) && canComment && !(loading$ | async)) {
-    <div class="login-prompt">
-      <i nz-icon nzType="lock" nzTheme="outline"></i>
+    <div class="c-callout prompt">
+      <span nz-icon nzType="lock" nzTheme="outline"></span>
       <span>Autentifică-te pentru a adăuga un comentariu.</span>
     </div>
   }
 
-  <!-- Status-specific message when comments are disabled -->
   @if (!canComment && issueStatus()) {
-    <div class="closed-message">
-      <i nz-icon nzType="info-circle" nzTheme="outline"></i>
+    <div class="c-callout prompt">
+      <span nz-icon nzType="info-circle" nzTheme="outline"></span>
       <span>{{ commentDisabledMessage }}</span>
     </div>
   }
 
-  <!-- Comments List -->
   @if (!(loading$ | async)) {
     <div class="comments-list">
       @if (commentTree$ | async; as tree) {
@@ -98,15 +86,12 @@
             ></app-comment-item>
           }
         } @else {
-          <nz-empty
-            nzNotFoundImage="simple"
-            [nzNotFoundContent]="emptyContent"
-          ></nz-empty>
-          <ng-template #emptyContent>
-            <span>Niciun comentariu încă. Fii primul care comentează!</span>
-          </ng-template>
+          <div class="empty">
+            <span nz-icon nzType="comment" nzTheme="outline" aria-hidden="true"></span>
+            <p>Niciun comentariu încă. Fii primul care comentează!</p>
+          </div>
         }
       }
     </div>
   }
-</nz-card>
+</section>

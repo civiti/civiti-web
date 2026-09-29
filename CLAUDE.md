@@ -25,7 +25,7 @@ npm run start:dev
 - **Frontend**: Angular 19, NgRx (store/effects), NG-ZORRO, Tailwind CSS, SCSS
 - **Authentication**: Supabase Auth (Google OAuth + email/password)
 - **State Management**: NgRx with effects for async operations
-- **Component Library**: NG-ZORRO Ant Design exclusively
+- **Component Library**: NG-ZORRO Ant Design for behaviour (modals, forms, selects, uploads, overlays), re-skinned globally; presentational pieces use the Civiti `c-` primitives
 
 ### Key Directories
 - `src/app/components/` - Feature components (auth/, user/, issue-creation/, admin/)
@@ -59,17 +59,27 @@ All backend calls go through `ApiService` (`src/app/services/api.service.ts`). T
 - Target NG-ZORRO classes alongside custom classes (e.g., `button.auth-button.ant-btn`)
 
 ### Design System
+The full reference is `docs/design/DESIGN.md`; tokens and the global `c-` primitives live in
+`src/styles.scss`, NG-ZORRO compile-time variables in `src/theme.less`.
 ```scss
-// Mandatory colors
---oxford-blue: #14213D;  // Headers, navigation
---orange-web: #FCA311;   // CTAs, urgency
---platinum: #E5E5E5;     // Backgrounds
---white: #FFFFFF;        // Cards
+// Core colours
+--ink-900: #14213D;      // Brand navy: text, headings, dark bands, ink buttons
+--signal-500: #FCA311;   // Brand orange: FILL only (CTA buttons, highlights); ink text on it
+--signal-text: #9E6200;  // Orange-ish TEXT on light surfaces (AA)
+--paper: #F6F4EF;        // App background
+--surface: #FFFFFF;      // Cards, inputs
+--line: #E6E1D7;         // Hairline borders
 
-// Typography
-font-family: "Fira Sans", sans-serif;
-// Weights: 400 (body), 500 (nav), 600 (headers), 700 (h1)
+// Typography (self-hosted in public/fonts — do not add Google Fonts links)
+--font-display: 'Bricolage Grotesque';  // Page/section titles, big numerals
+--font-sans: 'Public Sans';             // UI and body
 ```
+- Prefer the global primitives (`c-container`, `c-page-head`, `c-btn`, `c-status`, `c-tag`,
+  `c-chip`, `c-card`, `c-stat`, `c-empty`, …) over one-off component styles.
+- `nz-button nzType="primary"` renders as the orange signal button; default is outline.
+- Status pills: `<span class="c-status" [attr.data-tone]="status | statusTone">`.
+- Legacy token names (`--oxford-blue`, `--orange-web`, `--platinum`, …) still resolve as
+  aliases; new code uses the new names.
 
 ### Romanian Locale
 The app uses Romanian locale (`ro`). Component text should be in Romanian.
@@ -109,8 +119,8 @@ The app uses Romanian locale (`ro`). Component text should be in Romanian.
 
 Consult these docs for detailed specifications:
 - `docs/design/ux.md` - User journey specifications
-- `docs/design/Colour-Scheme.md` - Color palette
-- `docs/design/Typography-Guide.md` - Typography standards
+- `docs/design/DESIGN.md` - Design system: tokens, type, primitives, patterns (current)
+- `docs/design/Colour-Scheme.md`, `docs/design/Typography-Guide.md` - Superseded by DESIGN.md
 
 ## Environment Variables
 

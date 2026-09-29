@@ -1,487 +1,447 @@
 :host {
-  display: flex;
-  flex-direction: column;
+  display: block;
 }
 
-.dashboard-container {
-  flex: 1;
-  background: var(--platinum);
-  padding: 1.5rem;
+// Every list on this page is a layout list.
+ul,
+ol,
+dl,
+dd {
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
-.gamification-section {
-  margin-bottom: 2rem;
+.panel p,
+.level p {
+  margin: 0;
 }
 
-.impact-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(20, 33, 61, 0.1);
+// Title links in rows and the activity feed: ink, underlined in signal on hover.
+.row-title a,
+.event-issue {
+  color: var(--ink-900);
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--signal-500);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+  }
 }
 
-.impact-overview {
+@media (max-width: 640px) {
+  .dash .c-page-head__actions {
+    width: 100%;
+
+    > a {
+      flex: 1 1 auto;
+    }
+  }
+}
+
+// --- Impact: level tile + stats -----------------------------------------------
+
+.impact {
+  margin-bottom: var(--space-8);
+}
+
+.impact-title {
+  margin-bottom: var(--space-3);
+}
+
+.impact-grid {
+  display: grid;
+  gap: var(--space-4);
+
+  @media (min-width: 900px) {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.6fr);
+  }
+}
+
+.level {
+  display: grid;
+  gap: var(--space-4);
+  padding: var(--space-6);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: var(--text-sm);
+}
+
+.level-top {
   display: flex;
   align-items: center;
-  gap: 2rem;
-}
-
-.level-info {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
+  gap: var(--space-4);
 }
 
 .level-badge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  background: linear-gradient(135deg, var(--orange-web) 0%, #e8930f 100%);
-  color: var(--white);
-  padding: 1rem;
-  border-radius: 12px;
-  min-width: 80px;
-}
+  display: grid;
+  place-items: center;
+  align-content: center;
+  flex: none;
+  width: 68px;
+  height: 68px;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.08);
 
-.level-number {
-  font-size: 2rem;
-  font-weight: 800;
-}
+  &__label {
+    font-size: var(--text-2xs);
+    font-weight: 650;
+    letter-spacing: var(--tracking-caps);
+    text-transform: uppercase;
+  }
 
-.level-label {
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
+  &__num {
+    font-size: var(--text-3xl);
+    color: var(--signal-500);
+  }
 }
 
 .level-title {
-  h3 {
-    font-size: 1.5rem;
-    font-weight: 600;
-    margin: 0 0 0.25rem 0;
-    color: var(--oxford-blue);
+  font-family: var(--font-display);
+  font-size: var(--text-xl);
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--surface);
+}
+
+.level-points .c-num {
+  color: var(--surface);
+  font-size: var(--text-base);
+}
+
+.level-meter {
+  background: rgba(255, 255, 255, 0.14);
+}
+
+.level .level-next {
+  margin-top: calc(-1 * var(--space-2));
+}
+
+// Label on top, the number anchored to the bottom: reads as a KPI tile and
+// fills the height the level tile beside it sets.
+.stats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+
+  .c-stat {
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-6) var(--space-5);
+
+    + .c-stat {
+      border-left: 1px solid var(--line);
+    }
   }
 
-  p {
-    margin: 0;
-    color: rgba(20, 33, 61, 0.7);
-    font-size: 1rem;
-  }
-}
-
-.progress-info {
-  flex: 1;
-  margin-left: 1rem;
-}
-
-.level-progress {
-  margin-bottom: 0.5rem;
-}
-
-.progress-text {
-  margin: 0;
-  font-size: 0.9rem;
-  color: rgba(20, 33, 61, 0.7);
-}
-
-.stats-grid {
-  margin-bottom: 2rem;
-}
-
-.stat-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(20, 33, 61, 0.08);
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(20, 33, 61, 0.15);
-  }
-}
-
-.main-content {
-  margin-bottom: 2rem;
-}
-
-.quick-actions-card,
-.activity-card,
-.badges-card,
-.achievements-card {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(20, 33, 61, 0.1);
-  margin-bottom: 1.5rem;
-}
-
-.quick-actions {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.action-item {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  padding: 1.5rem;
-  border: 2px solid rgba(20, 33, 61, 0.1);
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  text-decoration: none;
-  color: inherit;
-
-  &:hover {
-    border-color: var(--orange-web);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(252, 163, 17, 0.15);
-    color: inherit;
-    text-decoration: none;
+  .c-stat__value {
+    font-size: var(--text-5xl);
   }
 
-  &.primary {
-    background: linear-gradient(135deg, var(--orange-web) 0%, #e8930f 100%);
-    border-color: var(--orange-web);
-    color: var(--white);
+  @media (max-width: 480px) {
+    .c-stat {
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-3);
+    }
 
-    &:hover {
-      color: var(--white);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px rgba(252, 163, 17, 0.3);
+    .c-stat__value {
+      font-size: var(--text-3xl);
+    }
+
+    .c-stat__label {
+      font-size: var(--text-xs);
     }
   }
 }
 
-.action-icon {
-  font-size: 2rem;
-  min-width: 48px;
-  text-align: center;
+.sk-level,
+.sk-stats {
+  height: 176px;
+  border-radius: var(--radius-lg);
 }
 
-.action-content {
-  flex: 1;
+// --- Two columns --------------------------------------------------------------
 
-  h4 {
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0 0 0.25rem 0;
-  }
+.dash-grid {
+  display: grid;
+  gap: var(--space-6);
 
-  p {
-    margin: 0;
-    opacity: 0.8;
-    font-size: 0.95rem;
+  @media (min-width: 1024px) {
+    grid-template-columns: minmax(0, 1fr) 360px;
+    align-items: start;
   }
 }
 
-.action-arrow {
-  font-size: 1.2rem;
-  opacity: 0.6;
+.dash-main,
+.dash-side {
+  display: grid;
+  gap: var(--space-6);
+  min-width: 0;
 }
 
-.activity-time {
-  color: rgba(20, 33, 61, 0.7);
-  font-size: 0.9rem;
+.panel {
+  padding: var(--space-6);
+
+  @media (max-width: 480px) {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  .c-section-head {
+    margin-bottom: var(--space-3);
+  }
 }
 
-.empty-activity {
-  text-align: center;
-  padding: 2rem;
+.panel-note {
+  color: var(--ink-500);
+  font-size: var(--text-sm);
 }
 
-.badges-grid {
+.panel-empty {
+  padding: var(--space-8) var(--space-2) var(--space-4);
+
+  &__cta {
+    margin-top: var(--space-3);
+  }
+}
+
+// --- My issues ------------------------------------------------------------------
+
+.tally {
   display: flex;
-  flex-direction: column;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-5);
+  margin-bottom: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--ink-600);
+
+  li {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+  }
+
+  strong {
+    color: var(--ink-900);
+  }
+
+  [data-tone='active'] .tally-dot { background: var(--signal-500); }
+  [data-tone='resolved'] .tally-dot { background: var(--ok-fill); }
+  [data-tone='rejected'] .tally-dot { background: var(--bad-fill); }
 }
 
-.badge-item {
+.tally-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.row {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: var(--space-4);
+  padding-top: var(--space-4);
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--line);
+
+  &:first-child {
+    margin-top: 0;
+  }
+}
+
+.row-thumb {
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper-2);
+  object-fit: cover;
+}
+
+.row-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  margin: 0 0 var(--space-2);
+  font-size: var(--text-md);
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.row-meta {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  gap: 1rem;
-  padding: 1rem;
-  background: var(--platinum);
-  border-radius: 8px;
-  transition: all 0.3s ease;
+  gap: var(--space-2) var(--space-4);
+}
 
-  &:hover {
-    background: rgba(20, 33, 61, 0.08);
-    transform: translateY(-1px);
+.row-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--ink-600);
+  font-size: var(--text-sm);
+}
+
+.row-edit {
+  margin-left: auto;
+
+  @media (max-width: 640px) {
+    height: 44px;
   }
+}
+
+.rows-skeleton {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+
+  .c-skeleton {
+    height: 64px;
+  }
+}
+
+// --- Activity timeline ----------------------------------------------------------
+
+.event {
+  position: relative;
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
+  gap: var(--space-3);
+  padding-block: var(--space-3);
+
+  // The thread that joins one event to the next.
+  &:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    left: 17px;
+    top: calc(var(--space-3) + 40px);
+    bottom: calc(4px - var(--space-3));
+    width: 2px;
+    background: var(--line);
+  }
+
+  @media (max-width: 480px) {
+    grid-template-columns: 36px minmax(0, 1fr);
+
+    .event-time {
+      grid-column: 2;
+      padding-top: 0;
+    }
+  }
+}
+
+.event-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border: 1px solid var(--ink-200);
+  border-radius: 50%;
+  background: var(--ink-50);
+  color: var(--ink-700);
+
+  [data-type='newSupporters'] & {
+    border-color: var(--signal-200);
+    background: var(--signal-50);
+    color: var(--signal-text);
+  }
+
+  [data-type='issueApproved'] &,
+  [data-type='issueResolved'] & {
+    border-color: var(--ok-line);
+    background: var(--ok-wash);
+    color: var(--ok-text);
+  }
+
+  [data-type='statusChange'] & {
+    border-color: var(--info-line);
+    background: var(--info-wash);
+    color: var(--info-text);
+  }
+}
+
+.event-body {
+  min-width: 0;
+}
+
+.event-msg,
+.badge-name,
+.goal-title {
+  font-weight: 650;
+  font-size: var(--text-md);
+  color: var(--ink-900);
+}
+
+.event-issue {
+  font-size: var(--text-sm);
+  color: var(--ink-600);
+}
+
+.event-time {
+  padding-top: 3px;
+  font-size: var(--text-xs);
+  color: var(--ink-500);
+  white-space: nowrap;
+}
+
+// --- Badges & achievements ------------------------------------------------------
+
+.badges,
+.goals {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.badge {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--space-3);
 }
 
 .badge-icon {
-  width: 40px;
-  height: 40px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-md);
+  background: var(--ink-900);
+  color: var(--signal-500);
+  font-size: 20px;
+}
+
+.badge-desc {
+  font-size: var(--text-sm);
+  color: var(--ink-500);
+}
+
+.goals {
+  gap: var(--space-5);
+}
+
+.goal-head {
   display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--white);
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-
-  // Badge icon SVG styling
-  i.badge-icon-svg {
-    font-size: 24px;
-  }
-
-  // Rarity-based icon colors
-  &.rarity-common i {
-    color: #8c8c8c;
-  }
-
-  &.rarity-uncommon i {
-    color: #1890ff;
-  }
-
-  &.rarity-rare i {
-    color: #faad14;
-  }
-
-  &.rarity-epic i {
-    color: #722ed1;
-  }
-
-  &.rarity-legendary i {
-    color: #f5222d;
-  }
-}
-
-.badge-info {
-  h5 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0 0 0.25rem 0;
-    color: var(--oxford-blue);
-  }
-}
-
-.achievements-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-
-.achievement-item {
-  padding: 1rem;
-  border-radius: 8px;
-  background: var(--platinum);
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: rgba(20, 33, 61, 0.08);
-    transform: translateY(-1px);
-  }
-}
-
-.achievement-header {
-  display: flex;
-  align-items: center;
+  align-items: baseline;
   justify-content: space-between;
-  gap: 1rem;
-
-  h5 {
-    flex: 1;
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0;
-    color: var(--oxford-blue);
-  }
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
 }
 
-.achievement-progress {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 120px;
-
-  :deep(.ant-progress) {
-    flex: 1;
-  }
-
-  .progress-text {
-    font-size: 0.85rem;
-    color: rgba(20, 33, 61, 0.7);
-    min-width: 30px;
-    text-align: right;
-  }
+.goal-count {
+  color: var(--ink-700);
 }
 
-.achievement-description {
-  font-size: 0.85rem;
-  color: rgba(20, 33, 61, 0.7);
-  margin: 0.5rem 0 0 0;
-  line-height: 1.4;
+.panel .goal-desc {
+  margin-top: var(--space-2);
+  font-size: var(--text-sm);
+  color: var(--ink-600);
 }
 
-// My Issues Preview Card
-.my-issues-preview-card {
-  border-radius: 12px;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 4px 12px rgba(20, 33, 61, 0.1);
-
-  .card-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 16px;
-
-    h3 {
-      font-size: 16px;
-      font-weight: 600;
-      color: var(--oxford-blue);
-      margin: 0;
-    }
-
-    .see-all-link {
-      color: var(--orange-web);
-      font-size: 14px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      transition: color 0.2s ease;
-
-      &:hover {
-        color: #e59400;
-      }
-    }
-  }
-
-  .issues-summary {
-    display: flex;
-    justify-content: space-around;
-    padding: 16px;
-    background: var(--platinum);
-    border-radius: 8px;
-    margin-bottom: 16px;
-
-    .summary-stat {
-      text-align: center;
-
-      .stat-value {
-        display: block;
-        font-size: 24px;
-        font-weight: 700;
-        line-height: 1.2;
-
-        &.active {
-          color: #1890ff;
-        }
-
-        &.resolved {
-          color: #52c41a;
-        }
-
-        &.rejected {
-          color: #ff4d4f;
-        }
-      }
-
-      .stat-label {
-        display: block;
-        font-size: 12px;
-        color: rgba(20, 33, 61, 0.7);
-        margin-top: 4px;
-      }
-    }
-  }
-
-  .recent-issues {
-    .mini-issue-card {
-      display: flex;
-      gap: 12px;
-      padding: 12px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: background 0.2s ease;
-      margin-bottom: 8px;
-
-      &:hover {
-        background: var(--platinum);
-      }
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-
-      .mini-issue-image {
-        width: 60px;
-        height: 60px;
-        border-radius: 8px;
-        overflow: hidden;
-        flex-shrink: 0;
-
-        img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-      }
-
-      .mini-issue-info {
-        flex: 1;
-        min-width: 0;
-
-        h5 {
-          font-size: 14px;
-          font-weight: 500;
-          color: var(--oxford-blue);
-          margin: 0 0 8px 0;
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-
-        .issue-meta {
-          display: flex;
-          align-items: center;
-          gap: 8px;
-
-          .email-count {
-            font-size: 12px;
-            color: rgba(20, 33, 61, 0.5);
-          }
-        }
-      }
-    }
-
-    .no-issues {
-      text-align: center;
-      padding: 16px 0;
-
-      .report-first-btn {
-        margin-top: 12px;
-        background: var(--orange-web);
-        border-color: var(--orange-web);
-
-        &:hover {
-          background: #e59400;
-          border-color: #e59400;
-        }
-      }
-    }
-  }
-}
-
-// Mobile responsiveness
-@media (max-width: 768px) {
-  .dashboard-container {
-    padding: 1rem;
-  }
-
-  .impact-overview {
-    flex-direction: column;
-    gap: 1rem;
-  }
-
-  .progress-info {
-    margin-left: 0;
-    width: 100%;
-  }
-
-  .action-item {
-    padding: 1rem;
-  }
-
-  .action-content h4 {
-    font-size: 1.1rem;
-  }
+.goal-reward {
+  margin-left: var(--space-1);
+  font-weight: 650;
+  color: var(--signal-text-strong);
+  white-space: nowrap;
 }

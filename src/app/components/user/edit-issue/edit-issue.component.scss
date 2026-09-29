@@ -1,320 +1,331 @@
-@use "sass:color";
-
-.edit-issue-container {
-  background: var(--platinum);
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 24px 16px;
+:host {
+  display: block;
 }
 
-.edit-card {
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(20, 33, 61, 0.08);
+.head-status {
+  align-items: center;
+  gap: var(--space-2);
 }
 
-.edit-header {
-  margin-bottom: 24px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--platinum);
+// --- Callouts ---------------------------------------------------------------------
 
-  h2 {
-    font-size: 24px;
-    font-weight: 600;
-    color: var(--oxford-blue);
-    margin: 0 0 8px 0;
-  }
+.callout-title {
+  margin: 0;
+  font-weight: 650;
+  color: var(--ink-900);
+}
 
-  .subtitle {
-    font-size: 14px;
-    color: var(--oxford-blue);
-    opacity: 0.75;
+.banner,
+.load-error {
+  margin-bottom: var(--space-6);
+
+  p {
     margin: 0;
   }
 }
 
-.mb-4 {
-  margin-bottom: 16px;
+.load-error .callout-title {
+  color: var(--bad-text);
+}
+
+.load-error__back {
+  margin-top: var(--space-3);
+}
+
+// Pending review: the informational tone (no global modifier for it yet).
+.banner--info {
+  border-color: var(--info-line);
+  background: var(--info-wash);
+
+  .anticon {
+    color: var(--info-text);
+  }
+}
+
+// --- Loading ----------------------------------------------------------------------
+
+.loading {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+}
+
+.sk-banner {
+  height: 72px;
+}
+
+.sk-card {
+  height: 320px;
+  border-radius: var(--radius-lg);
+
+  &--short {
+    height: 180px;
+  }
+}
+
+// --- Form sections ------------------------------------------------------------------
+
+.form {
+  display: grid;
+  // An explicit 0-minimum track: an implicit `auto` column grows to the widest
+  // child's min-content (the authority picker) and pushes the page sideways.
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--space-5);
+  transition: opacity var(--dur) var(--ease);
+
+  &.is-busy {
+    opacity: 0.6;
+    pointer-events: none;
+  }
+}
+
+.section {
+  padding: var(--space-6);
+
+  @media (max-width: 560px) {
+    padding: var(--space-5) var(--space-4);
+  }
+
+  // The authority picker is another component's markup; a long custom-authority
+  // tag in it does not wrap on phones. Scroll it here rather than the page.
+  &--bare {
+    padding: var(--space-3) 0 0;
+    overflow-x: auto;
+  }
+}
+
+.section-title {
+  margin-bottom: var(--space-4);
+}
+
+.section-hint {
+  margin: calc(-1 * var(--space-3)) 0 var(--space-4);
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+}
+
+nz-form-item {
+  margin-bottom: var(--space-5);
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+// `start`: a stretched nz-form-item (a wrapping flex row) would share the extra
+// height between label and control and push one select below the other.
+.field-row {
+  display: grid;
+  align-items: start;
+  gap: 0 var(--space-4);
+
+  @media (min-width: 560px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .full-width {
   width: 100%;
 }
 
-// Form styling
-nz-form-item {
-  margin-bottom: 24px;
-}
-
-nz-form-label {
-  font-weight: 500;
-  color: var(--oxford-blue);
-}
-
 .char-count {
+  margin-top: var(--space-1);
   text-align: right;
-  font-size: 12px;
-  color: var(--oxford-blue);
-  opacity: 0.6;
-  margin-top: 4px;
+  font-size: var(--text-xs);
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-500);
 }
 
-// Location
+// --- Location ---------------------------------------------------------------------
+
 .location-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
   flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-3);
 
-  .readonly-field {
-    flex: 1 1 auto;
-    min-width: 0;
-  }
-
-  button {
-    flex: 0 0 auto;
+  @media (max-width: 560px) {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 
 .readonly-field {
   display: flex;
+  flex: 1 1 260px;
   align-items: center;
-  gap: 8px;
-  padding: 12px 16px;
-  background-color: var(--platinum);
-  border-radius: 8px;
-  color: var(--oxford-blue);
+  gap: var(--space-2);
+  min-width: 0;
+  min-height: 42px;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  color: var(--ink-900);
 
-  span[nz-icon] {
-    font-size: 16px;
-    color: var(--orange-web);
+  .anticon {
+    flex: none;
+    color: var(--ink-500);
+  }
+
+  @media (max-width: 560px) {
+    flex-basis: auto;
   }
 }
 
 .field-hint {
-  font-size: 12px;
-  color: var(--oxford-blue);
-  opacity: 0.6;
-  margin-top: 8px;
-  margin-bottom: 8px;
+  margin: var(--space-2) 0 0;
+  font-size: var(--text-sm);
+  color: var(--ink-500);
 }
 
-// Photo grid
+// --- Photos -----------------------------------------------------------------------
+
 .photo-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (max-width: 420px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .photo-tile {
   position: relative;
-  aspect-ratio: 1 / 1;
-  border-radius: 8px;
+  aspect-ratio: 1;
   overflow: hidden;
-  border: 2px solid transparent;
-  background-color: rgba(229, 229, 229, 0.3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--paper-2);
 
   &.is-primary {
-    border-color: var(--orange-web);
+    outline: 2px solid var(--signal-500);
+    outline-offset: 2px;
   }
 
   img {
+    display: block;
     width: 100%;
     height: 100%;
     object-fit: cover;
-    display: block;
   }
+}
 
-  .photo-overlay {
-    position: absolute;
-    inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(20, 33, 61, 0.45);
-    color: var(--white);
-    font-size: 22px;
-  }
+.photo-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(10, 20, 40, 0.5);
+  color: var(--surface);
+  font-size: 22px;
+}
 
-  .primary-badge {
-    position: absolute;
-    top: 6px;
-    left: 6px;
-    background: var(--orange-web);
-    color: var(--white);
-    font-size: 10px;
-    font-weight: 600;
-    padding: 2px 6px;
-    border-radius: 4px;
-  }
+.primary-badge {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  padding: 3px var(--space-2);
+  border-radius: var(--radius-xs);
+  background: var(--signal-500);
+  color: var(--ink-950);
+  font-size: var(--text-2xs);
+  font-weight: 700;
+}
 
-  .photo-actions {
-    position: absolute;
-    bottom: 4px;
-    right: 4px;
-    display: flex;
-    gap: 2px;
-    background: rgba(255, 255, 255, 0.85);
-    border-radius: 6px;
+.photo-actions {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+
+  @media (max-width: 640px) {
+    button.ant-btn.ant-btn-sm.ant-btn-icon-only {
+      width: 40px;
+      height: 40px;
+    }
   }
 }
 
 .photo-add {
-  aspect-ratio: 1 / 1;
-  min-height: 110px;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  border: 1px dashed var(--platinum);
-  border-radius: 8px;
-  background-color: rgba(229, 229, 229, 0.3);
-  color: var(--oxford-blue);
+  gap: var(--space-1);
+  width: 100%;
+  aspect-ratio: 1;
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  color: var(--ink-700);
+  font: inherit;
   cursor: pointer;
-  transition: border-color 0.2s ease;
+  transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
 
   &:hover {
-    border-color: var(--orange-web);
+    border-color: var(--ink-400);
+    background: var(--paper-2);
   }
 
-  span[nz-icon] {
+  .anticon {
     font-size: 22px;
   }
 
   .upload-text {
-    font-size: 12px;
-  }
-}
-
-.photo-hint {
-  font-size: 12px;
-  color: var(--oxford-blue);
-  opacity: 0.6;
-  margin-top: 8px;
-  margin-bottom: 0;
-}
-
-// Authorities
-.selected-authorities {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-bottom: 12px;
-}
-
-.authority-search {
-  margin-bottom: 12px;
-}
-
-.authority-loading {
-  padding: 16px;
-  text-align: center;
-  color: var(--oxford-blue);
-  opacity: 0.7;
-}
-
-.authority-group {
-  margin-bottom: 16px;
-
-  .authority-group-title {
+    font-size: var(--text-sm);
     font-weight: 600;
-    color: var(--oxford-blue);
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
   }
 }
 
-.authority-item {
+// --- Sticky save bar ------------------------------------------------------------------
+
+.savebar {
+  position: sticky;
+  bottom: var(--space-4);
+  z-index: 5;
   display: flex;
-  align-items: baseline;
-  gap: 8px;
-  padding: 8px 4px;
-  width: 100%;
-  margin-left: 0;
-
-  .authority-name {
-    font-weight: 500;
-    color: var(--oxford-blue);
-  }
-
-  .authority-email {
-    font-size: 12px;
-    color: var(--oxford-blue);
-    opacity: 0.6;
-  }
-}
-
-.custom-authority {
-  margin-top: 12px;
-}
-
-.custom-email-form {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-
-  .custom-email-actions {
-    display: flex;
-    gap: 8px;
-  }
-}
-
-// Form actions
-.form-actions {
-  display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 16px;
-  margin-top: 32px;
-  padding-top: 24px;
-  border-top: 1px solid var(--platinum);
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-md);
 
-  button {
-    min-width: 140px;
-  }
+  @media (max-width: 560px) {
+    bottom: var(--space-2);
 
-  button[nzType="primary"] {
-    background-color: var(--orange-web);
-    border-color: var(--orange-web);
-
-    &:hover:not(:disabled) {
-      background-color: color.adjust(#FCA311, $lightness: -5%);
-      border-color: color.adjust(#FCA311, $lightness: -5%);
-    }
-
-    &:disabled {
-      opacity: 0.6;
+    .savebar-submit {
+      flex: 1 1 auto;
     }
   }
 }
 
-// Responsive
-@media (max-width: 576px) {
-  .edit-issue-container {
-    padding: 16px 12px;
+// Narrow phones: the back button keeps its accessible name but shows only the arrow,
+// so the submit label never has to wrap.
+@media (max-width: 420px) {
+  .savebar-back {
+    flex: none;
   }
 
-  .edit-header h2 {
-    font-size: 20px;
-  }
-
-  .location-row {
-    flex-direction: column;
-    align-items: stretch;
-
-    button {
-      width: 100%;
-    }
-  }
-
-  .form-actions {
-    flex-direction: column-reverse;
-    gap: 12px;
-
-    button {
-      width: 100%;
-    }
+  .savebar-back__label {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
   }
 }

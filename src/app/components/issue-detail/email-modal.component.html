@@ -1,139 +1,132 @@
-<div class="email-modal-container copy-workflow">
-  <!-- Authority Email Section - List all authorities -->
-  <nz-card class="mb-4 authority-card">
-    <div class="section-row">
-      <div class="section-label">
-        <span nz-icon nzType="bank" nzTheme="outline" class="text-oxford-blue mr-2"></span>
-        <strong class="text-oxford-blue">Către:</strong>
+<div class="email-modal">
+  <p class="intro">
+    Emailul pleacă din contul tău, ca petiție semnată de tine. Copiază cele trei părți de mai jos
+    în aplicația ta de email, apoi confirmă aici că l-ai trimis.
+  </p>
+
+  <ol class="steps">
+    <!-- 1. Recipients -->
+    <li class="step">
+      <div class="step-head">
+        <span class="step-num" aria-hidden="true">1</span>
+        <h3 class="step-title">Către</h3>
       </div>
-    </div>
-    <div class="authorities-list">
-      @for (authority of authorities; track authority.email; let i = $index) {
-      <div class="authority-item">
-        <div class="authority-info">
-          <div class="authority-name">{{ authority.name }}</div>
-          <div class="authority-email">{{ authority.email }}</div>
-        </div>
+      <ul class="authorities">
+        @for (authority of authorities; track authority.email; let i = $index) {
+          <li class="authority">
+            <div class="authority-info">
+              <span class="authority-name">{{ authority.name }}</span>
+              <span class="authority-email">{{ authority.email }}</span>
+            </div>
+            <button
+              nz-button
+              nzSize="small"
+              class="copy-button"
+              [class.is-copied]="emailCopyStates[i]"
+              (click)="copyAuthorityEmail(i)">
+              <span nz-icon [nzType]="emailCopyStates[i] ? 'check' : 'copy'" nzTheme="outline"></span>
+              <span>{{ emailCopyStates[i] ? 'Copiat!' : 'Copiază' }}</span>
+            </button>
+          </li>
+        }
+      </ul>
+    </li>
+
+    <!-- 2. Subject -->
+    <li class="step">
+      <div class="step-head">
+        <span class="step-num" aria-hidden="true">2</span>
+        <h3 class="step-title">Subiect</h3>
         <button
           nz-button
           nzSize="small"
-          [nzType]="emailCopyStates[i] ? 'primary' : 'default'"
-          (click)="copyAuthorityEmail(i)">
-          <span nz-icon [nzType]="emailCopyStates[i] ? 'check' : 'copy'" nzTheme="outline"></span>
-          {{ emailCopyStates[i] ? 'Copiat!' : 'Copiază' }}
+          class="copy-button step-action"
+          [class.is-copied]="copyStates.subject"
+          (click)="copySubject()">
+          <span nz-icon [nzType]="copyStates.subject ? 'check' : 'copy'" nzTheme="outline"></span>
+          <span>{{ copyStates.subject ? 'Copiat!' : 'Copiază' }}</span>
         </button>
       </div>
-      }
-    </div>
-  </nz-card>
+      <div class="subject">{{ emailTemplate?.subject }}</div>
+    </li>
 
-  <!-- Email Subject Section -->
-  <nz-card class="mb-4 subject-card">
-    <div class="section-row">
-      <div class="section-label">
-        <span nz-icon nzType="mail" nzTheme="outline" class="text-oxford-blue mr-2"></span>
-        <strong class="text-oxford-blue">Subiect:</strong>
-      </div>
-      <button
-        nz-button
-        [nzType]="copyStates.subject ? 'primary' : 'default'"
-        nzSize="small"
-        (click)="copySubject()">
-        <span nz-icon [nzType]="copyStates.subject ? 'check' : 'copy'" nzTheme="outline"></span>
-        {{ copyStates.subject ? 'Copiat!' : 'Copiază' }}
-      </button>
-    </div>
-    <div class="subject-display">
-      {{ emailTemplate?.subject }}
-    </div>
-  </nz-card>
-
-  <!-- Email Body Section -->
-  <nz-card class="mb-4 body-card">
-    <div class="section-row">
-      <div class="section-label">
-        <span nz-icon nzType="file-text" nzTheme="outline" class="text-oxford-blue mr-2"></span>
-        <strong class="text-oxford-blue">Mesaj:</strong>
+    <!-- 3. Body -->
+    <li class="step">
+      <div class="step-head">
+        <span class="step-num" aria-hidden="true">3</span>
+        <h3 class="step-title">Mesaj</h3>
         @if (aiGenerated) {
           <span class="ai-badge">
             <span nz-icon nzType="robot" nzTheme="outline"></span>
             <span>Îmbunătățit cu AI</span>
           </span>
         }
-      </div>
-      <div class="body-actions">
-        @if (canUseAI) {
+        <div class="step-action body-actions">
+          @if (canUseAI) {
+            <button
+              nz-button
+              nzSize="small"
+              nzType="text"
+              nz-popconfirm
+              nzPopconfirmTitle="Modificările tale vor fi înlocuite de textul regenerat. Continui?"
+              nzOkText="Da, regenerează"
+              nzCancelText="Renunță"
+              [nzCondition]="!userHasEdited"
+              (nzOnConfirm)="generateWithAI(true)"
+              [disabled]="isGenerating">
+              <span nz-icon [nzType]="isGenerating ? 'loading' : 'reload'" nzTheme="outline"></span>
+              <span>{{ isGenerating ? 'Se generează…' : 'Regenerează' }}</span>
+            </button>
+          }
           <button
             nz-button
             nzSize="small"
-            nz-popconfirm
-            nzPopconfirmTitle="Modificările tale vor fi înlocuite de textul regenerat. Continui?"
-            nzOkText="Da, regenerează"
-            nzCancelText="Renunță"
-            [nzCondition]="!userHasEdited"
-            (nzOnConfirm)="generateWithAI(true)"
-            [disabled]="isGenerating">
-            <span nz-icon [nzType]="isGenerating ? 'loading' : 'reload'" nzTheme="outline"></span>
-            <span>{{ isGenerating ? 'Se generează…' : 'Regenerează' }}</span>
+            class="copy-button"
+            [class.is-copied]="copyStates.body"
+            [disabled]="isGenerating || !bodyModel.trim()"
+            (click)="copyBody()">
+            <span nz-icon [nzType]="copyStates.body ? 'check' : 'copy'" nzTheme="outline"></span>
+            <span>{{ copyStates.body ? 'Copiat!' : 'Copiază' }}</span>
           </button>
-        }
-        <button
-          nz-button
-          nzSize="small"
-          [nzType]="copyStates.body ? 'primary' : 'default'"
-          [disabled]="isGenerating || !bodyModel.trim()"
-          (click)="copyBody()">
-          <span nz-icon [nzType]="copyStates.body ? 'check' : 'copy'" nzTheme="outline"></span>
-          <span>{{ copyStates.body ? 'Copiat!' : 'Copiază' }}</span>
-        </button>
+        </div>
       </div>
-    </div>
-    <div class="body-display">
       <nz-spin [nzSpinning]="isGenerating" nzTip="Se compune petiția…">
         <textarea
           nz-input
-          class="email-body-text-input"
+          class="body-input"
           [ngModel]="bodyModel"
           (ngModelChange)="onBodyChange($event)"
-          [nzAutosize]="{ minRows: 12, maxRows: 22 }"
+          [nzAutosize]="{ minRows: 10, maxRows: 20 }"
           aria-label="Corpul petiției (editabil)">
         </textarea>
       </nz-spin>
-    </div>
-    <p class="body-hint">
-      <span nz-icon nzType="edit" nzTheme="outline"></span>
-      Poți edita textul înainte de a-l copia.
-    </p>
-  </nz-card>
-
-  <!-- Collapsible Instructions -->
-  <nz-collapse class="instructions-collapse">
-    <nz-collapse-panel
-      [nzHeader]="instructionsHeader"
-      [nzActive]="true">
-      <p class="legal-note">
-        <span nz-icon nzType="warning" nzTheme="fill"></span>
-        Conform OG 27/2002, petiția trebuie să conțină datele tale de identificare.
+      <p class="body-hint">
+        <span nz-icon nzType="edit" nzTheme="outline"></span>
+        <span>Poți edita textul înainte de a-l copia.</span>
       </p>
+    </li>
+  </ol>
 
-      <ul class="hints-list">
-        <li>Trimite email-uri <strong>SEPARATE</strong> către fiecare autoritate</li>
-        <li>Descarcă și atașează fotografiile problemei</li>
-        <li>Înlocuiește textele marcate cu datele tale:
-          <ul class="placeholder-list">
-            <li><span class="placeholder-example">[NUMELE AUTORITĂȚII]</span> → numele autorității destinatare</li>
-            <li><span class="placeholder-example">[NUMELE TĂU COMPLET]</span> → numele tău complet</li>
-            <li><span class="placeholder-example">[ADRESA TA DE DOMICILIU]</span> → adresa completă (str., nr., bl., ap., oraș, județ)</li>
-            <li><span class="placeholder-example">[NUMĂRUL TĂU DE TELEFON]</span> → telefonul tău (recomandat)</li>
-          </ul>
-        </li>
-      </ul>
-    </nz-collapse-panel>
-  </nz-collapse>
-  <ng-template #instructionsHeader>
-    <span class="instructions-header">
+  <!-- Before sending -->
+  <section class="checklist" aria-labelledby="checklist-title">
+    <h3 class="checklist-title" id="checklist-title">
       <span nz-icon nzType="info-circle" nzTheme="outline"></span>
       Instrucțiuni importante
-    </span>
-  </ng-template>
+    </h3>
+    <p class="legal-note">
+      Conform OG 27/2002, petiția trebuie să conțină datele tale de identificare.
+    </p>
+    <ul class="hints">
+      <li>Trimite email-uri <strong>separate</strong> către fiecare autoritate</li>
+      <li>Descarcă și atașează fotografiile problemei</li>
+      <li>Înlocuiește textele marcate cu datele tale:
+        <ul class="placeholders">
+          <li><span class="placeholder">[NUMELE AUTORITĂȚII]</span> → numele autorității destinatare</li>
+          <li><span class="placeholder">[NUMELE TĂU COMPLET]</span> → numele tău complet</li>
+          <li><span class="placeholder">[ADRESA TA DE DOMICILIU]</span> → adresa completă (str., nr., bl., ap., oraș, județ)</li>
+          <li><span class="placeholder">[NUMĂRUL TĂU DE TELEFON]</span> → telefonul tău (recomandat)</li>
+        </ul>
+      </li>
+    </ul>
+  </section>
 </div>

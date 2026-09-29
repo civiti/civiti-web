@@ -1,342 +1,213 @@
-@use "sass:color";
-
-.email-modal-container.copy-workflow {
-  width: 100%;
-}
-
-// Section layout
-.section-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.section-label {
-  display: flex;
-  align-items: center;
-}
-
-// Authorities list container
-.authorities-list {
+.email-modal {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: var(--space-5);
 }
 
-// Individual authority item
-.authority-item {
+.intro {
+  margin: 0;
+  color: var(--ink-600);
+  font-size: var(--text-md);
+  line-height: 1.6;
+}
+
+.steps {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.step {
+  padding: var(--space-4);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+}
+
+.step-head {
+  display: flex;
+  flex-wrap: wrap;
   align-items: center;
-  padding: 12px;
-  background-color: var(--platinum);
-  border-radius: 6px;
-  border: 1px solid rgba(20, 33, 61, 0.1);
+  gap: var(--space-2) var(--space-3);
+  margin-bottom: var(--space-3);
+}
+
+.step-num {
+  display: grid;
+  flex: none;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--ink-900);
+  color: var(--white);
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: 700;
+}
+
+.step-title {
+  margin: 0;
+  color: var(--ink-900);
+  font-size: var(--text-md);
+  font-weight: 700;
+}
+
+.step-action {
+  margin-left: auto;
+}
+
+.body-actions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+button.copy-button.ant-btn.is-copied {
+  border-color: var(--ok-line);
+  background: var(--ok-wash);
+  color: var(--ok-text);
+}
+
+.authorities {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.authority {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-3) 0;
+
+  & + & {
+    border-top: 1px solid var(--line);
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  &:last-child {
+    padding-bottom: 0;
+  }
 }
 
 .authority-info {
-  flex: 1;
+  display: flex;
+  flex-direction: column;
   min-width: 0;
 }
 
 .authority-name {
-  font-weight: 600;
-  color: var(--oxford-blue);
-  font-size: 14px;
-  margin-bottom: 2px;
+  color: var(--ink-900);
+  font-size: var(--text-md);
+  font-weight: 650;
 }
 
 .authority-email {
-  font-family: monospace;
-  font-size: 13px;
-  color: var(--oxford-blue);
-  opacity: 0.75;
-  word-break: break-all;
+  overflow: hidden;
+  color: var(--ink-500);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-// Subject display
-.subject-display {
-  font-size: 14px;
-  color: var(--oxford-blue);
-  padding: 8px 12px;
-  background-color: var(--platinum);
-  border-radius: 4px;
+.subject {
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: var(--paper);
+  color: var(--ink-900);
+  font-size: var(--text-md);
+  font-weight: 600;
+  line-height: 1.5;
 }
 
-// Email body display (editable)
-.body-display {
-  border-radius: 4px;
-}
-
-.email-body-text-input.ant-input {
-  font-family: var(--font-primary);
-  font-size: 14px;
-  line-height: 1.6;
-  color: var(--oxford-blue);
-  background-color: var(--platinum);
-  padding: 16px;
-  width: 100%;
-  resize: vertical;
-}
-
-// Actions on the right of the body header
-.body-actions {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-// "Enhanced with AI" badge
 .ai-badge {
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  margin-left: 8px;
-  padding: 1px 8px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--orange-web);
-  background-color: rgba(252, 163, 17, 0.15);
-  border-radius: 10px;
-  line-height: 1.6;
-
-  .anticon {
-    font-size: 12px;
-  }
+  height: 22px;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  background: var(--signal-50);
+  color: var(--signal-text-strong);
+  font-size: var(--text-xs);
+  font-weight: 650;
 }
 
-// Editability hint under the body
+textarea.body-input.ant-input {
+  background: var(--paper);
+  font-size: var(--text-md);
+  line-height: 1.65;
+}
+
 .body-hint {
   display: flex;
   align-items: center;
   gap: 6px;
-  margin: 8px 0 0 0;
-  font-size: 12px;
-  color: var(--oxford-blue);
-  opacity: 0.7;
-
-  .anticon {
-    font-size: 12px;
-  }
+  margin: var(--space-2) 0 0;
+  color: var(--ink-500);
+  font-size: var(--text-xs);
 }
 
-// Hints list (consolidated at bottom)
-.hints-list {
-  list-style: disc;
-  margin: 8px 0 0 1rem;
-  padding: 0;
-
-  > li {
-    margin-bottom: 8px;
-    color: var(--oxford-blue);
-    font-size: 14px;
-  }
+.checklist {
+  padding: var(--space-4) var(--space-5);
+  border: 1px solid var(--signal-200);
+  border-radius: var(--radius-lg);
+  background: var(--signal-50);
+  color: var(--ink-800);
+  font-size: var(--text-sm);
+  line-height: 1.6;
 }
 
-// Collapsible instructions panel
-.instructions-collapse {
-  margin-top: 8px;
-}
-
-.instructions-header {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 12px;
-  font-weight: 500;
-  color: var(--oxford-blue);
-  line-height: 1;
-  vertical-align: middle;
-
-  .anticon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 13px;
-    color: var(--orange-web);
-    line-height: 1;
-    vertical-align: middle;
-  }
-}
-
-// Placeholder styling
-.placeholder-example {
-  background-color: rgba(252, 163, 17, 0.2);
-  color: var(--orange-web);
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 4px;
-  border: 1px dashed var(--orange-web);
-  font-family: monospace;
-  font-size: 13px;
-}
-
-// Placeholder legend
-.placeholder-legend {
-  margin-top: 8px;
-}
-
-.placeholder-list {
-  list-style: none;
-  margin: 8px 0 0 0;
-  padding: 0;
-
-  li {
-    margin-bottom: 4px;
-    font-size: 13px;
-    color: var(--oxford-blue);
-  }
-}
-
-// Legal note (compact warning)
-.legal-note {
+.checklist-title {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 0 0 12px 0;
-  padding: 6px 10px;
-  font-size: 12px;
-  color: var(--oxford-blue);
-  background-color: rgba(252, 163, 17, 0.15);
-  border-radius: 4px;
-  border-left: 3px solid var(--orange-web);
+  gap: var(--space-2);
+  margin: 0 0 var(--space-2);
+  color: var(--ink-900);
+  font-size: var(--text-md);
+  font-weight: 700;
 
   .anticon {
-    color: var(--orange-web);
-    font-size: 12px;
+    color: var(--signal-text);
   }
 }
 
-// NG-ZORRO overrides
-:host ::ng-deep {
-  // Card styling
-  .authority-card,
-  .subject-card,
-  .body-card {
-    .ant-card-body {
-      padding: 16px;
-    }
-  }
+.legal-note {
+  margin: 0 0 var(--space-2);
+  color: var(--signal-text-strong);
+  font-weight: 650;
+}
 
-  // Copy button styling - ensure consistent alignment
-  .ant-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+.hints {
+  margin: 0;
+  padding-left: 1.2em;
+  list-style: disc;
 
-    // Icon inside button
-    .anticon {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      line-height: 1;
-      vertical-align: middle;
-    }
-  }
-
-  // Alert styling
-  .ant-alert-info {
-    background-color: rgba(20, 33, 61, 0.05);
-    border-color: var(--oxford-blue);
-
-    .ant-alert-message {
-      color: var(--oxford-blue);
-      font-weight: 600;
-    }
-  }
-
-  .ant-alert-warning {
-    background-color: rgba(252, 163, 17, 0.1);
-    border-color: var(--orange-web);
-
-    .ant-alert-message {
-      color: var(--oxford-blue);
-    }
-
-    .ant-alert-description {
-      color: var(--oxford-blue);
-    }
-  }
-
-
-  // Collapsible instructions styling
-  .instructions-collapse.ant-collapse {
-    border: none;
-    background: transparent;
-
-    .ant-collapse-item {
-      border: 1px solid var(--orange-web);
-      border-radius: 4px;
-      overflow: hidden;
-
-      &.ant-collapse-item-active {
-        .ant-collapse-header {
-          border-radius: 0;
-        }
-      }
-    }
-
-    .ant-collapse-header {
-      display: flex;
-      align-items: center;
-      padding: 8px 12px;
-      font-size: 13px;
-      background-color: rgba(252, 163, 17, 0.1);
-      border: none;
-      border-radius: 0;
-      line-height: 1.4;
-
-      .ant-collapse-expand-icon {
-        display: flex;
-        align-items: center;
-      }
-    }
-
-    .ant-collapse-content {
-      background-color: rgba(252, 163, 17, 0.05);
-      border-top: 1px solid var(--orange-web);
-    }
-
-    .ant-collapse-content-box {
-      padding: 12px 16px;
-    }
-  }
-
-  // Button states
-  .ant-btn-primary {
-    background-color: var(--orange-web);
-    border-color: var(--orange-web);
-
-    &:hover,
-    &:focus {
-      background-color: color.adjust(#FCA311, $lightness: -10%);
-      border-color: color.adjust(#FCA311, $lightness: -10%);
-    }
+  li + li {
+    margin-top: 4px;
   }
 }
 
-// Civica color utilities
-.text-oxford-blue {
-  color: var(--oxford-blue);
+.placeholders {
+  margin: 6px 0 0;
+  padding-left: 1.1em;
+  list-style: circle;
 }
 
-.text-orange-web {
-  color: var(--orange-web);
-}
-
-// Responsive adjustments
-@media (max-width: 576px) {
-  .section-row {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 8px;
-  }
-
-  .email-body-text-input.ant-input {
-    font-size: 13px;
-    padding: 12px;
-  }
+.placeholder {
+  padding: 1px 6px;
+  border-radius: var(--radius-xs);
+  background: var(--surface);
+  color: var(--ink-900);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  box-shadow: inset 0 0 0 1px var(--signal-200);
 }

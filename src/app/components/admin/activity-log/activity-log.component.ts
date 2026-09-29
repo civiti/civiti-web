@@ -1,27 +1,23 @@
 import { Component, OnInit, DestroyRef, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { RouterModule } from '@angular/router';
 import { Subject, of } from 'rxjs';
 import { catchError, switchMap } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
-import { NzTimelineModule } from 'ng-zorro-antd/timeline';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzSelectModule } from 'ng-zorro-antd/select';
 import { NzDatePickerModule } from 'ng-zorro-antd/date-picker';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzPaginationModule } from 'ng-zorro-antd/pagination';
-import { NzAvatarModule } from 'ng-zorro-antd/avatar';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { ApiService } from '../../../services/api.service';
 import { AdminActivityLogEntry, AdminActionType, PagedResult } from '../../../types/civica-api.types';
-import { ActionLabelPipe, ActionColorPipe, TimelineColorPipe, TargetLabelPipe } from '../../../pipes/admin.pipe';
+import { ActionLabelPipe, TargetLabelPipe } from '../../../pipes/admin.pipe';
+import { StatusTextPipe } from '../../../pipes/status.pipe';
 import { FormatDateTimePipe } from '../../../pipes/date.pipe';
 
 @Component({
@@ -30,21 +26,15 @@ import { FormatDateTimePipe } from '../../../pipes/date.pipe';
   imports: [
     CommonModule,
     FormsModule,
-    NzCardModule,
-    NzTimelineModule,
-    NzTagModule,
+    RouterModule,
     NzSelectModule,
     NzDatePickerModule,
     NzButtonModule,
     NzIconModule,
-    NzSpinModule,
-    NzEmptyModule,
     NzPaginationModule,
-    NzAvatarModule,
     ActionLabelPipe,
-    ActionColorPipe,
-    TimelineColorPipe,
     TargetLabelPipe,
+    StatusTextPipe,
     FormatDateTimePipe
   ],
   templateUrl: './activity-log.component.html',
@@ -75,6 +65,17 @@ export class ActivityLogComponent implements OnInit {
     { value: 'reject', label: 'Respingere' },
     { value: 'requestchanges', label: 'Cerere modificări' }
   ];
+
+  /**
+   * Pill per action: the filter's own noun + a `.c-status` tone (ok / bad / info). Both
+   * spellings of "request changes" are covered so neither renders as a raw key.
+   */
+  readonly actionMeta: Record<string, { label: string; tone: string }> = {
+    approve: { label: 'Aprobare', tone: 'resolved' },
+    reject: { label: 'Respingere', tone: 'rejected' },
+    requestchanges: { label: 'Cerere modificări', tone: 'pending' },
+    request_changes: { label: 'Cerere modificări', tone: 'pending' }
+  };
 
   ngOnInit(): void {
     // Set up the load pipeline with switchMap to cancel stale requests

@@ -1,67 +1,67 @@
-<div class="location-picker-container">
-  <!-- MVP Info Message -->
-  <nz-alert
-    nzType="info"
-    nzMessage="Restricție MVP"
-    nzDescription="Pentru versiunea curentă, acceptăm doar adrese din București."
-    nzShowIcon
-    class="mvp-alert">
-  </nz-alert>
-
-  <!-- Address Search Section -->
-  <div class="address-section">
-    <nz-form-item>
-      <nz-form-label>Adresa</nz-form-label>
-      <nz-form-control>
-        <nz-input-group [nzPrefix]="searchIcon" [nzSuffix]="isSearching ? loadingIcon : emptyTemplate">
-          <input
-            nz-input
-            #addressInput
-            [formControl]="addressControl"
-            placeholder="Caută adresa ta din București..."
-            (blur)="onAddressInputBlur()"
-          />
-        </nz-input-group>
-        <ng-template #searchIcon>
-          <span nz-icon nzType="search" nzTheme="outline"></span>
-        </ng-template>
-        <ng-template #loadingIcon>
-          <span nz-icon nzType="loading" nzTheme="outline"></span>
-        </ng-template>
-        <ng-template #emptyTemplate></ng-template>
-
-        <!-- Autocomplete Suggestions Dropdown -->
-        @if (showSuggestions && suggestions.length) {
-          <div class="autocomplete-dropdown">
-            @for (suggestion of suggestions; track suggestion.place_id) {
-              <div
-                class="suggestion-item"
-                (mousedown)="onSuggestionSelected(suggestion)">
-                <span nz-icon nzType="environment" class="suggestion-icon"></span>
-                <span class="suggestion-text">{{ suggestion.description }}</span>
-              </div>
-            }
-          </div>
-        }
-      </nz-form-control>
-    </nz-form-item>
+<div class="lp">
+  <!-- MVP restriction -->
+  <div class="c-callout lp-note">
+    <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+    <p><strong>Restricție MVP.</strong> Pentru versiunea curentă, acceptăm doar adrese din București.</p>
   </div>
 
-  <!-- Map Section -->
-  <div class="map-section">
+  <!-- Address search -->
+  <div class="lp-address">
+    <label class="lp-label" for="lp-address-input">Adresa</label>
+    <nz-input-group nzSize="large" [nzPrefix]="searchIcon" [nzSuffix]="isSearching ? loadingIcon : emptyTemplate">
+      <input
+        nz-input
+        #addressInput
+        id="lp-address-input"
+        autocomplete="off"
+        role="combobox"
+        aria-autocomplete="list"
+        aria-controls="lp-suggestions"
+        [attr.aria-expanded]="showSuggestions && suggestions.length > 0"
+        [formControl]="addressControl"
+        placeholder="Caută adresa ta din București..."
+        (blur)="onAddressInputBlur()"
+      />
+    </nz-input-group>
+    <ng-template #searchIcon>
+      <span nz-icon nzType="search" nzTheme="outline"></span>
+    </ng-template>
+    <ng-template #loadingIcon>
+      <span nz-icon nzType="loading" nzTheme="outline"></span>
+    </ng-template>
+    <ng-template #emptyTemplate></ng-template>
+
+    <!-- Autocomplete suggestions -->
+    @if (showSuggestions && suggestions.length) {
+      <ul class="lp-suggestions" id="lp-suggestions" role="listbox" aria-label="Sugestii de adrese">
+        @for (suggestion of suggestions; track suggestion.place_id) {
+          <li
+            class="lp-suggestion"
+            role="option"
+            aria-selected="false"
+            (mousedown)="onSuggestionSelected(suggestion)">
+            <span nz-icon nzType="environment" nzTheme="outline"></span>
+            <span>{{ suggestion.description }}</span>
+          </li>
+        }
+      </ul>
+    }
+  </div>
+
+  <!-- Map -->
+  <div class="lp-map">
     @if (!isMapLoaded && !mapLoadError) {
-      <div class="map-loading">
+      <div class="lp-map__state">
         <nz-spin nzTip="Se încarcă harta..."></nz-spin>
       </div>
     }
 
     @if (mapLoadError) {
-      <nz-alert
-        nzType="error"
-        nzMessage="Eroare la încărcarea hărții"
-        nzDescription="Nu s-a putut încărca Google Maps. Vă rugăm să reîncercați."
-        nzShowIcon>
-      </nz-alert>
+      <div class="lp-map__state lp-map__state--error" role="alert">
+        <span class="lp-map__error-icon"><span nz-icon nzType="warning" nzTheme="outline"></span></span>
+        <p class="lp-map__error-title">Eroare la încărcarea hărții</p>
+        <p>Nu s-a putut încărca Google Maps. Vă rugăm să reîncercați.</p>
+      </div>
     }
 
     @if (isMapLoaded) {
@@ -86,61 +86,48 @@
     }
   </div>
 
-  <!-- Selected Location Display -->
-  @if (selectedLocation) {
-    <div class="selected-location">
-      <nz-card size="small" class="location-card" [class.invalid-location]="!isInAllowedArea()">
-        <div class="location-info">
-          <span nz-icon
-            [nzType]="isInAllowedArea() ? 'check-circle' : 'warning'"
-            nzTheme="fill"
-            [class.success-icon]="isInAllowedArea()"
-            [class.warning-icon]="!isInAllowedArea()">
-          </span>
-          <div class="location-text">
-            <strong>{{ selectedLocation.address }}</strong>
-            @if (selectedLocation.district) {
-              <nz-tag
-                class="district-tag"
-                [nzColor]="isInAllowedArea() ? 'green' : 'orange'">
-                {{ selectedLocation.district }}
-              </nz-tag>
-            }
-          </div>
-        </div>
-        <div class="coordinates">
-          <small>Coordonate: {{ selectedLocation.latitude.toFixed(6) }}, {{ selectedLocation.longitude.toFixed(6) }}</small>
-        </div>
-      </nz-card>
-
-      <!-- Location Restriction Warning -->
-      @if (getLocationRestrictionMessage()) {
-        <nz-alert
-          nzType="warning"
-          [nzMessage]="getLocationRestrictionMessage()"
-          nzShowIcon
-          class="restriction-alert">
-        </nz-alert>
-      }
-    </div>
-  }
-
-  <!-- Instruction Text -->
   @if (isMapLoaded) {
-    <p class="instruction-text">
-    <span nz-icon nzType="info-circle" nzTheme="outline"></span>
-    Poți da click pe hartă sau trage markerul pentru a ajusta locația exactă.
-  </p>
+    <p class="lp-hint">
+      <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+      <span>Poți da click pe hartă sau trage markerul pentru a ajusta locația exactă.</span>
+    </p>
   }
 
-  <!-- Action Buttons -->
-  <div class="action-buttons">
-    <button nz-button nzType="default" (click)="cancel()">
+  <!-- Selected location -->
+  @if (selectedLocation) {
+    <div class="lp-picked" [class.is-invalid]="!isInAllowedArea()" aria-live="polite">
+      <span class="lp-picked__icon" aria-hidden="true">
+        <span nz-icon [nzType]="isInAllowedArea() ? 'check' : 'warning'" nzTheme="outline"></span>
+      </span>
+      <div class="lp-picked__body">
+        <p class="lp-picked__address">{{ selectedLocation.address }}</p>
+        <div class="lp-picked__meta">
+          @if (selectedLocation.district) {
+            <span class="c-tag">{{ selectedLocation.district }}</span>
+          }
+          <span class="lp-picked__coords">Coordonate: {{ selectedLocation.latitude.toFixed(6) }}, {{ selectedLocation.longitude.toFixed(6) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Location restriction warning -->
+    @if (getLocationRestrictionMessage()) {
+      <div class="c-callout c-callout--bad lp-restriction" role="alert">
+        <span nz-icon nzType="warning" nzTheme="outline"></span>
+        <p>{{ getLocationRestrictionMessage() }}</p>
+      </div>
+    }
+  }
+
+  <!-- Actions (the modal is opened with nzFooter: null) -->
+  <div class="lp-actions">
+    <button nz-button nzType="default" type="button" (click)="cancel()">
       Anulează
     </button>
     <button
       nz-button
       nzType="primary"
+      type="button"
       [disabled]="!isLocationValid()"
       (click)="confirmLocation()">
       Confirmă locația

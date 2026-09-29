@@ -1,306 +1,285 @@
-<div class="admin-container">
+<div class="c-container c-page">
 
-  <!-- Stats Overview -->
-  @if (adminStats) {
-  <div class="stats-section">
-    <div nz-row [nzGutter]="[16, 16]">
-      
-      <div nz-col [nzSpan]="12" [nzMd]="6">
-        <nz-card class="stat-card">
-          <nz-statistic
-            [nzValue]="adminStats.pendingReview"
-            nzTitle="În așteptare"
-            [nzValueStyle]="{ color: '#FCA311' }">
-          </nz-statistic>
-        </nz-card>
-      </div>
-
-      <div nz-col [nzSpan]="12" [nzMd]="6">
-        <nz-card class="stat-card">
-          <nz-statistic
-            [nzValue]="adminStats.reviewedToday"
-            nzTitle="Aprobate azi"
-            [nzValueStyle]="{ color: '#28A745' }">
-          </nz-statistic>
-        </nz-card>
-      </div>
-
-      <div nz-col [nzSpan]="12" [nzMd]="6">
-        <nz-card class="stat-card">
-          <nz-statistic
-            [nzValue]="adminStats.approvalRate"
-            nzSuffix="%"
-            nzTitle="Rată aprobare"
-            [nzValueStyle]="{ color: '#14213D' }">
-          </nz-statistic>
-        </nz-card>
-      </div>
-
-      <div nz-col [nzSpan]="12" [nzMd]="6">
-        <nz-card class="stat-card">
-          <nz-statistic
-            [nzValue]="adminStats.averageReviewTimeHours"
-            nzSuffix="h"
-            nzTitle="Timp mediu revizuire"
-            [nzValueStyle]="{ color: '#6c757d' }">
-          </nz-statistic>
-        </nz-card>
-      </div>
-
+  <header class="c-page-head">
+    <div class="c-page-head__text">
+      <p class="c-eyebrow">Moderare</p>
+      <h1 class="c-h1">Probleme în așteptare</h1>
+      <p class="c-lead">Revizuiește și aprobă sesizările comunității.</p>
     </div>
-  </div>
+    <div class="c-page-head__actions">
+      <button nz-button (click)="refreshData()">
+        <span nz-icon nzType="reload" nzTheme="outline"></span>
+        <span>Reîmprospătare</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- Queue health, one compact strip -->
+  @if (adminStats) {
+    <dl class="stats c-card">
+      <div class="stats__item stats__item--pending">
+        <dt>În așteptare</dt>
+        <dd>{{ adminStats.pendingReview | number:'1.0-0':'ro' }}</dd>
+      </div>
+      <div class="stats__item">
+        <dt>Revizuite azi</dt>
+        <dd>{{ adminStats.reviewedToday | number:'1.0-0':'ro' }}</dd>
+      </div>
+      <div class="stats__item">
+        <dt>Rată de aprobare</dt>
+        <dd>{{ adminStats.approvalRate | number:'1.0-1':'ro' }}%</dd>
+      </div>
+      <div class="stats__item">
+        <dt>Timp mediu de revizuire</dt>
+        <dd>{{ adminStats.averageReviewTimeHours | number:'1.1-1':'ro' }} h</dd>
+      </div>
+    </dl>
   }
 
-  <!-- Issues Table -->
-  <div class="issues-section">
-    <nz-card nzTitle="Probleme în așteptare" [nzExtra]="issueActions" class="issues-card">
-      <ng-template #issueActions>
-        <div class="card-header-actions">
-          @if (pendingIssues.length > 0) {
-            <button
-              nz-button
-              nzType="primary"
-              nzSize="small"
-              [disabled]="selectedCount === 0"
-              (click)="openBulkApprovalModal()">
-              <span nz-icon nzType="check-circle"></span>
-              Aprobă selectate ({{ selectedCount }})
-            </button>
+  <section class="queue c-card" aria-labelledby="queue-title">
+    <h2 class="c-sr-only" id="queue-title">Coada de moderare</h2>
+
+    @if (pendingIssues.length > 0) {
+      <!-- Bulk-action bar: sticks under the header while the queue scrolls. -->
+      <div class="queue-bar" [class.is-active]="selectedCount > 0">
+        <label
+          nz-checkbox
+          class="queue-bar__all"
+          [nzChecked]="allSelected"
+          [nzIndeterminate]="selectedCount > 0 && selectedCount < pendingIssues.length"
+          (nzCheckedChange)="toggleSelectAll($event)">
+          <span>Selectează tot</span>
+        </label>
+
+        <p class="queue-bar__status" aria-live="polite">
+          @if (selectedCount > 0) {
+            Selectate: <strong>{{ selectedCount }}</strong> din {{ pendingIssues.length }}
+          } @else {
+            În coadă: <strong>{{ pendingIssues.length }}</strong>
           }
-          <button nz-button nzSize="small" (click)="refreshData()">
-            <span nz-icon nzType="reload"></span>
-            Reîmprospătare
-          </button>
+        </p>
+
+        <button
+          nz-button
+          nzType="primary"
+          class="queue-bar__approve"
+          [disabled]="selectedCount === 0"
+          (click)="openBulkApprovalModal()">
+          <span nz-icon nzType="check-circle" nzTheme="outline"></span>
+          <span>Aprobă selectate ({{ selectedCount }})</span>
+        </button>
+      </div>
+
+      <div class="queue-head" aria-hidden="true">
+        <span></span>
+        <span>Problemă</span>
+        <span>Categorie</span>
+        <span>Urgență</span>
+        <span>Poze</span>
+        <span>Trimisă</span>
+        <span></span>
+      </div>
+
+      <ul class="queue-list" role="list">
+        @for (issue of pendingIssues | slice:(pageIndex - 1) * pageSize:pageIndex * pageSize; track issue.id) {
+          @let selected = isIssueSelected(issue.id);
+          <li class="queue-row" [class.is-selected]="selected">
+            <label
+              nz-checkbox
+              class="queue-row__check"
+              [nzChecked]="selected"
+              (nzCheckedChange)="toggleIssueSelection(issue.id, $event)">
+              <span class="c-sr-only">Selectează: {{ issue.title }}</span>
+            </label>
+
+            <div class="queue-row__main">
+              <a class="queue-row__title" [routerLink]="['/admin/issue', issue.id]">{{ issue.title }}</a>
+              <p class="queue-row__sub">
+                @if (issue.isReReview) {
+                  <span
+                    class="c-status"
+                    data-tone="pending"
+                    nz-tooltip
+                    nzTooltipTitle="Editare a unei probleme deja aprobate — deschide detaliile pentru a vedea modificările">Reevaluare</span>
+                }
+                <span class="queue-row__meta">
+                  <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>
+                  <span>{{ issue.address | slice:0:80 }}</span>
+                </span>
+                <span class="queue-row__meta">
+                  <span nz-icon nzType="user" nzTheme="outline" aria-hidden="true"></span>
+                  <span><span class="c-sr-only">Trimisă de </span>{{ issue.userName }}</span>
+                </span>
+              </p>
+            </div>
+
+            <div class="queue-row__facts">
+              <span class="fact">
+                <span class="c-tag">{{ categoryLabels[(issue.category | lowercase)] || (issue.category | categoryLabel) }}</span>
+              </span>
+              <span class="fact">
+                @let lvl = issue.urgency | lowercase;
+                <span class="c-tag" [class.c-tag--urgent]="lvl === 'urgent'" [class.c-tag--signal]="lvl === 'high'">
+                  {{ lvl === 'urgent' ? 'Urgentă' : 'Urgență ' + ((urgencyLabels[lvl] || issue.urgency) | lowercase) }}
+                </span>
+              </span>
+              <span class="fact">
+                <span nz-icon nzType="picture" nzTheme="outline" aria-hidden="true"></span>
+                <span>{{ issue.photoCount }}<span class="c-sr-only"> fotografii</span></span>
+              </span>
+              <span class="fact">
+                <span nz-icon nzType="clock-circle" nzTheme="outline" aria-hidden="true"></span>
+                <time [attr.datetime]="issue.createdAt">{{ issue.createdAt | timeAgo }}</time>
+              </span>
+            </div>
+
+            <div class="queue-row__actions">
+              <button nz-button nzType="text" nzSize="small" (click)="viewIssueDetails(issue)">
+                <span nz-icon nzType="eye" nzTheme="outline"></span>
+                <span>Vezi</span>
+              </button>
+              <button nz-button nzSize="small" (click)="openApprovalModal(issue)">
+                <span nz-icon nzType="audit" nzTheme="outline"></span>
+                <span>Revizuiește</span>
+              </button>
+            </div>
+          </li>
+        }
+      </ul>
+
+      @if (pendingIssues.length > pageSize) {
+        <div class="queue-pager">
+          <nz-pagination
+            [(nzPageIndex)]="pageIndex"
+            [nzTotal]="pendingIssues.length"
+            [nzPageSize]="pageSize">
+          </nz-pagination>
         </div>
-      </ng-template>
-
-      <nz-table
-        #issuesTable
-        [nzData]="pendingIssues"
-        [nzLoading]="isLoading"
-        [nzPageSize]="10"
-        [nzShowPagination]="true"
-        [nzNoResult]="emptyState"
-        nzTableLayout="fixed">
-
-        <thead>
-          <tr>
-            <th nzWidth="50px">
-              <label
-                nz-checkbox
-                [nzChecked]="allSelected"
-                [nzIndeterminate]="selectedCount > 0 && selectedCount < pendingIssues.length"
-                (nzCheckedChange)="toggleSelectAll($event)">
-              </label>
-            </th>
-            <th nzWidth="50px">#</th>
-            <th nzWidth="200px">Problemă</th>
-            <th nzWidth="120px">Categorie</th>
-            <th nzWidth="100px">Urgență</th>
-            <th nzWidth="120px">Trimis</th>
-            <th nzWidth="80px">Poze</th>
-            <th nzWidth="150px">Acțiuni</th>
-          </tr>
-        </thead>
-
-        <tbody>
-          @for (issue of issuesTable.data; track issue.id; let i = $index) {
-            <tr>
-
-              <td>
-                <label
-                  nz-checkbox
-                  [nzChecked]="isIssueSelected(issue.id)"
-                  (nzCheckedChange)="toggleIssueSelection(issue.id, $event)">
-                </label>
-              </td>
-              <td>{{ i + 1 }}</td>
-
-              <td>
-                <div class="issue-title">
-                  {{ issue.title }}
-                  @if (issue.isReReview) {
-                    <nz-tag nzColor="gold" class="rereview-tag"
-                            nz-tooltip
-                            nzTooltipTitle="Editare a unei probleme deja aprobate — deschide detaliile pentru a vedea modificările">
-                      Reevaluare
-                    </nz-tag>
-                  }
-                </div>
-                <div class="issue-description">{{ issue.address | slice:0:80 }}</div>
-              </td>
-
-              <td>
-                <nz-tag [nzColor]="issue.category | categoryColor">
-                  {{ issue.category | titlecase }}
-                </nz-tag>
-              </td>
-
-              <td>
-                <nz-badge
-                  [nzStatus]="issue.urgency | urgencyStatus"
-                  [nzText]="issue.urgency | titlecase">
-                </nz-badge>
-              </td>
-
-              <td>
-                <div class="submission-time">
-                  {{ issue.createdAt | timeAgo }}
-                </div>
-              </td>
-
-              <td>
-                <nz-badge [nzCount]="issue.photoCount" nzShowZero>
-                  <span nz-icon nzType="picture"></span>
-                </nz-badge>
-              </td>
-
-              <td>
-                <div class="action-buttons">
-                  <button
-                    nz-button
-                    nzType="link"
-                    nzSize="small"
-                    (click)="viewIssueDetails(issue)">
-                    <span nz-icon nzType="eye"></span>
-                    Vezi
-                  </button>
-                  <button
-                    nz-button
-                    nzType="primary"
-                    nzSize="small"
-                    (click)="openApprovalModal(issue)">
-                    <span nz-icon nzType="check"></span>
-                    Revizuiește
-                  </button>
-                </div>
-              </td>
-
-            </tr>
-          }
-        </tbody>
-
-      </nz-table>
-
-      <ng-template #emptyState>
-        <div class="empty-state">
-          <div class="empty-icon">
-            <span nz-icon nzType="inbox"></span>
-          </div>
-          <h3>Nicio problemă în așteptare</h3>
-          <p>Toate sesizările comunității au fost revizuite.</p>
-        </div>
-      </ng-template>
-
-    </nz-card>
-  </div>
+      }
+    } @else if (isLoading) {
+      <ul class="queue-list" role="list" aria-busy="true" aria-label="Se încarcă sesizările">
+        @for (i of [1, 2, 3, 4]; track i) {
+          <li class="queue-row queue-row--skeleton">
+            <span></span>
+            <div class="queue-row__main">
+              <div class="c-skeleton sk-title"></div>
+              <div class="c-skeleton sk-sub"></div>
+            </div>
+          </li>
+        }
+      </ul>
+    } @else {
+      <div class="c-empty">
+        <span class="c-empty__icon"><span nz-icon nzType="inbox" nzTheme="outline"></span></span>
+        <p class="c-empty__title">Nicio problemă în așteptare</p>
+        <p>Toate sesizările comunității au fost revizuite.</p>
+      </div>
+    }
+  </section>
 
   <!-- Approval Modal -->
   <nz-modal
     [(nzVisible)]="isApprovalModalVisible"
     nzTitle="Revizuire sesizare"
-    [nzWidth]="800"
+    [nzWidth]="680"
     [nzFooter]="null"
     (nzOnCancel)="closeApprovalModal()"
     nzClass="approval-modal">
 
     <div *nzModalContent>
       <nz-spin [nzSpinning]="isProcessing || false">
-        <div class="modal-content">
 
-        <!-- Issue Details -->
         @if (selectedIssue) {
-          <div class="issue-details">
-
-            <div class="issue-header">
-              <h3>{{ selectedIssue.title }}</h3>
-              <div class="issue-meta">
-                <nz-tag [nzColor]="selectedIssue.category | categoryColor">
-                  {{ selectedIssue.category | titlecase }}
-                </nz-tag>
-                <nz-badge
-                  [nzStatus]="selectedIssue.urgency | urgencyStatus"
-                  [nzText]="selectedIssue.urgency | titlecase">
-                </nz-badge>
-                <span class="submission-time">
-                  Trimis {{ selectedIssue.createdAt | timeAgo }}
-                </span>
-              </div>
+          <div class="review">
+            <h3 class="c-h3 review__title">{{ selectedIssue.title }}</h3>
+            <div class="review__tags">
+              <span class="c-tag">{{ categoryLabels[(selectedIssue.category | lowercase)] || (selectedIssue.category | categoryLabel) }}</span>
+              @let slvl = selectedIssue.urgency | lowercase;
+              <span class="c-tag" [class.c-tag--urgent]="slvl === 'urgent'" [class.c-tag--signal]="slvl === 'high'">
+                {{ slvl === 'urgent' ? 'Urgentă' : 'Urgență ' + ((urgencyLabels[slvl] || selectedIssue.urgency) | lowercase) }}
+              </span>
+              @if (selectedIssue.isReReview) {
+                <span class="c-status" data-tone="pending">Reevaluare</span>
+              }
+              <span class="c-small c-muted">Trimis {{ selectedIssue.createdAt | timeAgo | lowercase }}</span>
             </div>
 
-            <div class="issue-location">
-              <h4>Locație</h4>
-              <p>{{ selectedIssue.address }}</p>
-            </div>
-
-            @if (selectedIssue.photoCount > 0) {
-              <div class="issue-photos">
-                <h4>Poze ({{ selectedIssue.photoCount }})</h4>
-                <p>Detaliile pozelor sunt disponibile în vizualizarea completă</p>
+            <dl class="review__facts">
+              <div>
+                <dt>Locație</dt>
+                <dd>{{ selectedIssue.address }}</dd>
               </div>
-            }
-
+              <div>
+                <dt>Trimisă de</dt>
+                <dd>{{ selectedIssue.userName }}</dd>
+              </div>
+              @if (selectedIssue.photoCount > 0) {
+                <div>
+                  <dt>Poze ({{ selectedIssue.photoCount }})</dt>
+                  <dd>Detaliile pozelor sunt disponibile în vizualizarea completă</dd>
+                </div>
+              }
+            </dl>
           </div>
         }
 
-        <!-- Approval Form -->
-        <div class="approval-form">
-          <form nz-form [formGroup]="approvalForm" (ngSubmit)="submitDecision()">
+        <form nz-form nzLayout="vertical" [formGroup]="approvalForm" (ngSubmit)="submitDecision()">
 
-            <nz-form-item>
-              <nz-form-label [nzSpan]="24" nzRequired>Decizie</nz-form-label>
-              <nz-form-control [nzSpan]="24">
-                <nz-radio-group formControlName="decision">
-                  <label nz-radio nzValue="approve">
-                    <span nz-icon nzType="check-circle" class="decision-icon-approve"></span>
-                    Aprobă
-                  </label>
-                  <label nz-radio nzValue="reject">
-                    <span nz-icon nzType="close-circle" class="decision-icon-reject"></span>
-                    Respinge
-                  </label>
-                  <label nz-radio nzValue="request_changes">
-                    <span nz-icon nzType="exclamation-circle" class="decision-icon-changes"></span>
-                    Solicită modificări
-                  </label>
-                </nz-radio-group>
-              </nz-form-control>
-            </nz-form-item>
+          <nz-form-item>
+            <nz-form-label nzRequired>Decizie</nz-form-label>
+            <nz-form-control>
+              <nz-radio-group formControlName="decision" class="choices">
+                <label nz-radio nzValue="approve" class="choice" data-tone="ok">
+                  <span>
+                    <span nz-icon nzType="check-circle" nzTheme="outline" class="choice__icon" aria-hidden="true"></span>
+                    <span>Aprobă</span>
+                  </span>
+                </label>
+                <label nz-radio nzValue="reject" class="choice" data-tone="bad">
+                  <span>
+                    <span nz-icon nzType="close-circle" nzTheme="outline" class="choice__icon" aria-hidden="true"></span>
+                    <span>Respinge</span>
+                  </span>
+                </label>
+                <label nz-radio nzValue="request_changes" class="choice" data-tone="info">
+                  <span>
+                    <span nz-icon nzType="exclamation-circle" nzTheme="outline" class="choice__icon" aria-hidden="true"></span>
+                    <span>Solicită modificări</span>
+                  </span>
+                </label>
+              </nz-radio-group>
+            </nz-form-control>
+          </nz-form-item>
 
-            <nz-form-item>
-              <nz-form-label [nzSpan]="24">Notițe</nz-form-label>
-              <nz-form-control [nzSpan]="24">
-                <textarea
-                  nz-input
-                  formControlName="notes"
-                  rows="4"
-                  placeholder="Adaugă notițe sau feedback...">
-                </textarea>
-              </nz-form-control>
-            </nz-form-item>
+          <nz-form-item>
+            <nz-form-label nzFor="approval-notes">Notițe</nz-form-label>
+            <nz-form-control>
+              <textarea
+                nz-input
+                id="approval-notes"
+                formControlName="notes"
+                rows="4"
+                placeholder="Adaugă notițe sau feedback...">
+              </textarea>
+            </nz-form-control>
+          </nz-form-item>
 
-            <nz-form-item class="form-actions">
-              <nz-form-control [nzSpan]="24">
-                <div class="action-buttons">
-                  <button nz-button nzType="default" type="button" (click)="closeApprovalModal()">
-                    Anulează
-                  </button>
-                  <button
-                    nz-button
-                    nzType="primary"
-                    type="submit"
-                    [disabled]="!approvalForm.valid"
-                    [nzLoading]="isProcessing">
-                    Trimite decizia
-                  </button>
-                </div>
-              </nz-form-control>
-            </nz-form-item>
+          <div class="modal-actions">
+            <button nz-button nzType="default" type="button" (click)="closeApprovalModal()">
+              Anulează
+            </button>
+            <button
+              nz-button
+              nzType="primary"
+              type="submit"
+              [disabled]="!approvalForm.valid"
+              [nzLoading]="isProcessing">
+              <span>Trimite decizia</span>
+            </button>
+          </div>
 
-          </form>
-        </div>
+        </form>
 
-        </div>
       </nz-spin>
     </div>
 
@@ -310,7 +289,7 @@
   <nz-modal
     [(nzVisible)]="isBulkApprovalModalVisible"
     nzTitle="Aprobare în masă"
-    [nzWidth]="500"
+    [nzWidth]="520"
     [nzOkText]="'Aprobă ' + selectedCount + ' probleme'"
     nzCancelText="Anulează"
     [nzOkLoading]="isProcessing"
@@ -318,18 +297,21 @@
     (nzOnCancel)="closeBulkApprovalModal()">
 
     <div *nzModalContent>
-      <div class="bulk-approval-content">
-        <p class="bulk-info">
-          <span nz-icon nzType="info-circle" nzTheme="outline"></span>
-          <span>Vei aproba <strong>{{ selectedCount }}</strong> probleme selectate.
-          Toate vor primi statusul "Activ" și vor fi vizibile public.</span>
+      <div class="c-callout bulk-info">
+        <span nz-icon nzType="info-circle" nzTheme="outline"></span>
+        <p>
+          Vei aproba <strong>{{ selectedCount }}</strong> probleme selectate.
+          Toate vor primi statusul „Activ” și vor fi vizibile public.
         </p>
+      </div>
 
-        <nz-form-item>
-          <nz-form-label>Notițe (opțional)</nz-form-label>
+      <div nz-form nzLayout="vertical">
+        <nz-form-item class="bulk-notes">
+          <nz-form-label nzFor="bulk-notes">Notițe (opțional)</nz-form-label>
           <nz-form-control>
             <textarea
               nz-input
+              id="bulk-notes"
               [(ngModel)]="bulkApprovalNotes"
               rows="3"
               placeholder="Adaugă notițe pentru toate problemele aprobate...">

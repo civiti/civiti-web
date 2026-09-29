@@ -7,19 +7,29 @@ import * as AuthActions from '../../../store/auth/auth.actions';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { CommonModule } from '@angular/common';
 import { DEFAULT_CITY } from '../../../data/romanian-locations';
+import { AuthShellComponent } from '../auth-shell/auth-shell.component';
 
 @Component({
   selector: 'app-oauth-callback',
   standalone: true,
-  imports: [CommonModule, NzSpinModule],
+  imports: [CommonModule, NzSpinModule, AuthShellComponent],
+  // On failure the component routes to /auth/login, which shows the error, so
+  // this screen only ever needs its in-progress state.
   template: `
-    <div class="flex items-center justify-center flex-1 bg-gray-50">
-      <div class="text-center">
-        <nz-spin nzSize="large" nzTip="Se procesează autentificarea..."></nz-spin>
-      </div>
-    </div>
+    <app-auth-shell>
+      <section class="auth-state" role="status" aria-live="polite">
+        <span class="auth-icon" aria-hidden="true">
+          <nz-spin nzSimple></nz-spin>
+        </span>
+        <h1 class="auth-title">Se procesează autentificarea...</h1>
+        <p class="auth-lead">Îți pregătim contul. Te redirecționăm imediat.</p>
+      </section>
+    </app-auth-shell>
   `,
-  styles: [`:host { display: flex; flex-direction: column; flex: 1; }`]
+  styles: [`
+    :host { display: block; }
+    .auth-icon { background: var(--surface); border-color: var(--line); }
+  `]
 })
 export class OauthCallbackComponent implements OnInit {
   constructor(
@@ -136,7 +146,7 @@ export class OauthCallbackComponent implements OnInit {
 
   private handleAuthFailure(): void {
     this.store.dispatch(AuthActions.loginWithGoogleFailure({
-      error: 'Authentication failed. Please try again.'
+      error: 'Autentificarea a eșuat. Te rugăm să încerci din nou.'
     }));
     this.router.navigate(['/auth/login']);
   }

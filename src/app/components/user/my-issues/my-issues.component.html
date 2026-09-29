@@ -1,165 +1,212 @@
-<nz-spin [nzSpinning]="(isLoading$ | async) || false">
-  <div class="my-issues-container">
-    <!-- Filter Bar with Inline Counts -->
-    @if (summary$ | async; as summary) {
-      <div class="filter-bar">
-        <nz-segmented
-          [nzOptions]="getFilterOptions(summary)"
-          [(ngModel)]="selectedFilter"
-          (ngModelChange)="onFilterChange($event)">
-        </nz-segmented>
-      </div>
-    }
+<div class="c-container c-page mine">
 
-    <!-- Issues Grid -->
-    @if ((issues$ | async); as issues) {
-      @if (issues.length > 0) {
-        <nz-row [nzGutter]="[16, 16]">
-          @for (issue of issues; track issue.id) {
-            <nz-col [nzXs]="24" [nzMd]="12" [nzLg]="8">
-            <nz-card class="issue-card" [class.cancelled]="(issue.status | isCancelled)" [nzCover]="coverTemplate">
-              <!-- Card Cover -->
-              <ng-template #coverTemplate>
-                <div class="issue-cover">
-                  <img
-                    [src]="issue.mainPhotoUrl || '/images/placeholders/issue-placeholder.svg'"
-                    [alt]="issue.title"
-                    class="issue-image"
-                    (error)="onImageError($event)">
-                  <div class="status-badge">
-                    <nz-tag [nzColor]="issue.status | statusColor">
-                      {{ issue.status | statusText }}
-                    </nz-tag>
-                  </div>
-                </div>
-              </ng-template>
-
-              <!-- Card Content -->
-              <div class="issue-content">
-                <h4 class="issue-title">{{ issue.title }}</h4>
-                <p class="issue-description">{{ issue.description }}</p>
-
-                <div class="issue-meta">
-                  @if (issue.address || issue.city) {
-                    <span class="meta-item">
-                      <i nz-icon nzType="environment" nzTheme="outline"></i>
-                      {{ issue.address || issue.city }}
-                    </span>
-                  }
-                  <span class="meta-item">
-                    <i nz-icon nzType="mail" nzTheme="outline"></i>
-                    {{ issue.emailsSent }} contribuții
-                  </span>
-                  <span class="meta-item">
-                    <i nz-icon nzType="clock-circle" nzTheme="outline"></i>
-                    {{ issue.createdAt | daysSince }} zile
-                  </span>
-                </div>
-
-                <!-- Actions -->
-                <div class="issue-actions">
-                  <button nz-button nzType="default" nzSize="small"
-                          (click)="viewIssueDetails(issue.id)">
-                    <i nz-icon nzType="eye" nzTheme="outline"></i> Vezi
-                  </button>
-
-                  <!-- Edit button for owner-editable issues (rejected, active, pending review) -->
-                  @if ((issue.status | isOwnerEditable)) {
-                    <button
-                            nz-button [nzType]="(issue.status | isRejected) ? 'primary' : 'default'" nzSize="small"
-                            (click)="editIssue(issue)">
-                      <span nz-icon nzType="edit" nzTheme="outline"></span><span> Editează</span>
-                    </button>
-                  }
-
-                  <!-- Mark as solved for active issues -->
-                  @if ((issue.status | isActive)) {
-                    <button
-                            nz-button nzType="primary" nzSize="small"
-                            nz-tooltip nzTooltipTitle="Marchează problema ca rezolvată"
-                            (click)="markAsSolved(issue)">
-                      <i nz-icon nzType="check-circle" nzTheme="outline"></i> Rezolvă
-                    </button>
-                  }
-
-                  <!-- Reopen for resolved issues (back to Active, no admin re-review) -->
-                  @if ((issue.status | isResolved)) {
-                    <button
-                            nz-button nzType="default" nzSize="small"
-                            nz-tooltip nzTooltipTitle="Redeschide problema"
-                            (click)="reopenIssue(issue)">
-                      <span nz-icon nzType="reload" nzTheme="outline"></span><span> Redeschide</span>
-                    </button>
-                  }
-
-                  <!-- Cancel for active issues -->
-                  @if ((issue.status | isActive)) {
-                    <button
-                            nz-button nzType="text" nzDanger nzSize="small"
-                            nz-tooltip nzTooltipTitle="Anulează problema"
-                            (click)="cancelIssue(issue)">
-                      <i nz-icon nzType="close-circle" nzTheme="outline"></i> Anulează
-                    </button>
-                  }
-                </div>
-              </div>
-            </nz-card>
-          </nz-col>
-          }
-        </nz-row>
-      }
-    }
-
-    <!-- Error State -->
-    @if (!(isLoading$ | async) && (error$ | async); as error) {
-      <div class="error-state">
-        <nz-alert
-          nzType="error"
-          nzMessage="Eroare la încărcarea problemelor"
-          [nzDescription]="error"
-          nzShowIcon>
-        </nz-alert>
-        <button nz-button nzType="primary" (click)="retryLoad()" class="retry-button">
-          <i nz-icon nzType="reload" nzTheme="outline"></i>
-          Încearcă din nou
+  <div class="c-page-head">
+    <div class="c-page-head__text">
+      <p class="c-eyebrow">Contul meu</p>
+      <h1 class="c-h1">Problemele mele</h1>
+      <p class="c-lead">Tot ce ai raportat, cu starea la zi. De aici le editezi, le marchezi ca rezolvate sau le anulezi.</p>
+    </div>
+    @if ((summary$ | async)?.total) {
+      <div class="c-page-head__actions">
+        <button nz-button nzType="primary" nzSize="large" (click)="navigateToCreateIssue()">
+          <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
+          <span>Raportează o problemă</span>
         </button>
       </div>
     }
+  </div>
 
-    <!-- Empty State -->
-    @if (!(isLoading$ | async) && !(error$ | async) && ((issues$ | async)?.length || 0) === 0) {
-      <div class="empty-state">
-        <nz-empty
-          nzNotFoundImage="simple"
-          [nzNotFoundContent]="emptyContent"
-          [nzNotFoundFooter]="emptyFooter">
-        </nz-empty>
-        <ng-template #emptyContent>
-          @if (selectedFilter === 'all') {
-            <span>Nu ai raportat încă nicio problemă</span>
-          }
-          @if (selectedFilter === 'active') {
-            <span>Nu ai probleme active</span>
-          }
-          @if (selectedFilter === 'resolved') {
-            <span>Nu ai probleme rezolvate</span>
-          }
-          @if (selectedFilter === 'rejected') {
-            <span>Nu ai probleme respinse</span>
-          }
-          @if (selectedFilter === 'cancelled') {
-            <span>Nu ai probleme anulate</span>
-          }
-        </ng-template>
-        <ng-template #emptyFooter>
-          @if (selectedFilter === 'all') {
-            <button nz-button nzType="primary" (click)="navigateToCreateIssue()">
-              <i nz-icon nzType="plus" nzTheme="outline"></i>
-              Raportează prima problemă
-            </button>
-          }
-        </ng-template>
+  <!-- Status filters with inline counts -->
+  @if ((summary$ | async)?.total) {
+    @if (filterChips$ | async; as chips) {
+      <div class="filters" role="group" aria-label="Filtrează după stare">
+        @for (chip of chips; track chip.value) {
+          <button
+            type="button"
+            class="c-chip"
+            [attr.data-tone]="chip.tone"
+            [attr.aria-pressed]="selectedFilter === chip.value"
+            (click)="onFilterChange(chip.value)">
+            @if (chip.tone) {
+              <span class="chip-dot" aria-hidden="true"></span>
+            }
+            <span>{{ chip.label }}</span>
+            <span class="chip-count">{{ chip.count }}</span>
+          </button>
+        }
       </div>
     }
-  </div>
-</nz-spin>
+  }
+
+  <!-- Error State -->
+  @if (!(isLoading$ | async) && (error$ | async); as error) {
+    <div class="c-callout c-callout--bad error" role="alert">
+      <span nz-icon nzType="exclamation-circle" nzTheme="outline" aria-hidden="true"></span>
+      <div class="error-body">
+        <p class="error-title">Eroare la încărcarea problemelor</p>
+        <p>{{ error }}</p>
+        <button nz-button nzSize="small" (click)="retryLoad()" class="retry-button">
+          <span nz-icon nzType="reload" nzTheme="outline" aria-hidden="true"></span>
+          <span>Încearcă din nou</span>
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Issues -->
+  @if (issues$ | async; as issues) {
+    @if (issues.length > 0) {
+      <ul class="list c-card" [attr.aria-busy]="(isLoading$ | async) || null">
+        @for (issue of issues; track issue.id) {
+          <li class="item" [class.is-cancelled]="issue.status | isCancelled">
+            <img
+              class="item-photo"
+              [src]="issue.mainPhotoUrl || '/images/placeholders/issue-placeholder.svg'"
+              alt=""
+              width="160"
+              height="120"
+              loading="lazy"
+              (error)="onImageError($event)">
+
+            <div class="item-head">
+              <div class="item-top">
+                <span class="c-status" [attr.data-tone]="issue.status | statusTone">{{ issue.status | statusText }}</span>
+                @if (issue.address || issue.city) {
+                  <span class="item-place">
+                    <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>
+                    <span>{{ issue.address || issue.city }}</span>
+                  </span>
+                }
+              </div>
+              <h2 class="item-title">
+                <a [routerLink]="['/issue', issue.id]">{{ issue.title }}</a>
+              </h2>
+            </div>
+
+            <p class="item-desc">{{ issue.description }}</p>
+
+            <dl class="item-stats">
+              <div>
+                <dt>emailuri</dt>
+                <dd class="c-num">{{ issue.emailsSent }}</dd>
+              </div>
+              <div>
+                <dt>voturi</dt>
+                <dd class="c-num">{{ issue.communityVotes }}</dd>
+              </div>
+              <div>
+                <dt>zile</dt>
+                <dd class="c-num">{{ issue.createdAt | daysSince }}</dd>
+              </div>
+            </dl>
+
+            <div class="item-actions">
+              <button nz-button nzSize="small" (click)="viewIssueDetails(issue.id)">
+                <span nz-icon nzType="eye" nzTheme="outline" aria-hidden="true"></span>
+                <span>Vezi</span>
+              </button>
+
+              <!-- Edit button for owner-editable issues (rejected, active, pending review) -->
+              @if ((issue.status | isOwnerEditable)) {
+                <button
+                  nz-button
+                  nzSize="small"
+                  [class.btn-strong]="issue.status | isRejected"
+                  (click)="editIssue(issue)">
+                  <span nz-icon nzType="edit" nzTheme="outline" aria-hidden="true"></span>
+                  <span>Editează</span>
+                </button>
+              }
+
+              <!-- Mark as solved for active issues -->
+              @if ((issue.status | isActive)) {
+                <button
+                  nz-button
+                  nzSize="small"
+                  nz-tooltip
+                  nzTooltipTitle="Marchează problema ca rezolvată"
+                  (click)="markAsSolved(issue)">
+                  <span nz-icon nzType="check-circle" nzTheme="outline" aria-hidden="true"></span>
+                  <span>Rezolvă</span>
+                </button>
+              }
+
+              <!-- Reopen for resolved issues (back to Active, no admin re-review) -->
+              @if ((issue.status | isResolved)) {
+                <button
+                  nz-button
+                  nzSize="small"
+                  nz-tooltip
+                  nzTooltipTitle="Redeschide problema"
+                  (click)="reopenIssue(issue)">
+                  <span nz-icon nzType="reload" nzTheme="outline" aria-hidden="true"></span>
+                  <span>Redeschide</span>
+                </button>
+              }
+
+              <!-- Cancel for active issues -->
+              @if ((issue.status | isActive)) {
+                <button
+                  nz-button
+                  nzType="text"
+                  nzDanger
+                  nzSize="small"
+                  class="item-cancel"
+                  nz-tooltip
+                  nzTooltipTitle="Anulează problema"
+                  (click)="cancelIssue(issue)">
+                  <span nz-icon nzType="close-circle" nzTheme="outline" aria-hidden="true"></span>
+                  <span>Anulează</span>
+                </button>
+              }
+            </div>
+          </li>
+        }
+      </ul>
+    } @else if (isLoading$ | async) {
+      <div class="list c-card" aria-hidden="true">
+        @for (n of [1, 2, 3]; track n) {
+          <div class="item item--skeleton">
+            <div class="c-skeleton item-photo"></div>
+            <div class="item-head">
+              <div class="c-skeleton sk-line sk-line--short"></div>
+              <div class="c-skeleton sk-line"></div>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
+
+  <!-- Empty State -->
+  @if (!(isLoading$ | async) && !(error$ | async) && ((issues$ | async)?.length || 0) === 0) {
+    <div class="c-card">
+      <div class="c-empty">
+        <span class="c-empty__icon">
+          <span nz-icon [nzType]="selectedFilter === 'all' ? 'file-add' : 'filter'" nzTheme="outline" aria-hidden="true"></span>
+        </span>
+        <p class="c-empty__title">
+          @switch (selectedFilter) {
+            @case ('active') { Nu ai probleme active }
+            @case ('resolved') { Nu ai probleme rezolvate }
+            @case ('rejected') { Nu ai probleme respinse }
+            @case ('cancelled') { Nu ai probleme anulate }
+            @default { Nu ai raportat încă nicio problemă }
+          }
+        </p>
+        @if (selectedFilter === 'all') {
+          <p>Fotografiezi problema, marchezi locul pe hartă și alegi autoritatea căreia îi scrii.</p>
+          <button nz-button nzType="primary" nzSize="large" class="empty-cta" (click)="navigateToCreateIssue()">
+            <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
+            <span>Raportează prima problemă</span>
+          </button>
+        } @else {
+          <p>Nicio problemă de-a ta nu are această stare acum.</p>
+          <button nz-button class="empty-cta" (click)="onFilterChange('all')">
+            <span>Arată toate problemele</span>
+          </button>
+        }
+      </div>
+    </div>
+  }
+</div>

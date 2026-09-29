@@ -7,22 +7,12 @@ import { distinctUntilChanged, map } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzProgressModule } from 'ng-zorro-antd/progress';
-import { NzStatisticModule } from 'ng-zorro-antd/statistic';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzAvatarModule } from 'ng-zorro-antd/avatar';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzListModule } from 'ng-zorro-antd/list';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { StatusTextPipe, StatusColorPipe, IsOwnerEditablePipe } from '../../../pipes/status.pipe';
-import { ActivityIconPipe, ActivityColorPipe } from '../../../pipes/activity.pipe';
-import { LevelTitlePipe, BadgeColorPipe } from '../../../pipes/dashboard.pipe';
+import { StatusTextPipe, StatusTonePipe, IsOwnerEditablePipe } from '../../../pipes/status.pipe';
+import { ActivityIconPipe } from '../../../pipes/activity.pipe';
+import { LevelTitlePipe } from '../../../pipes/dashboard.pipe';
+import { TimeAgoPipe } from '../../../pipes/date.pipe';
 import { AppState } from '../../../store/app.state';
 import * as UserActions from '../../../store/user/user.actions';
 import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
@@ -53,8 +43,16 @@ import {
   selectUserStats,
   selectNextLevelProgress,
   selectIncompleteAchievements,
-  selectUserLoading
+  selectUserLoading,
+  selectGamificationData
 } from '../../../store/user/user.selectors';
+
+/** Romanian count agreement: "1 punct", "19 puncte", "20 de puncte", "101 puncte". */
+function roCount(n: number, one: string, many: string): string {
+  if (n === 1) return `${n} ${one}`;
+  const lastTwo = n % 100;
+  return n >= 20 && (lastTwo === 0 || lastTwo >= 20) ? `${n} de ${many}` : `${n} ${many}`;
+}
 
 @Component({
   selector: 'app-dashboard',
@@ -62,26 +60,14 @@ import {
   imports: [
     CommonModule,
     RouterModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
-    NzProgressModule,
-    NzStatisticModule,
-    NzGridModule,
-    NzAvatarModule,
-    NzTagModule,
-    NzListModule,
-    NzBadgeModule,
-    NzSpinModule,
-    NzTypographyModule,
-    NzEmptyModule,
     StatusTextPipe,
-    StatusColorPipe,
+    StatusTonePipe,
     IsOwnerEditablePipe,
     ActivityIconPipe,
-    ActivityColorPipe,
     LevelTitlePipe,
-    BadgeColorPipe
+    TimeAgoPipe
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
@@ -100,6 +86,27 @@ export class DashboardComponent implements OnInit {
   earnedBadges$ = this.store.select(selectUserBadges);
   incompleteAchievements$ = this.store.select(selectIncompleteAchievements);
   isLoading$ = this.store.select(selectUserLoading);
+
+  // Presentation helpers
+  /** First word of the display name, for the greeting; null when it would be an email. */
+  firstName$ = this.user$.pipe(
+    map(user => {
+      const first = user?.displayName?.trim().split(/\s+/)[0];
+      return first && !first.includes('@') ? first : null;
+    })
+  );
+  /** "260 de puncte" still needed for the next level. */
+  pointsToNextLevel$ = this.store.select(selectGamificationData).pipe(
+    map(g => g ? roCount(g.pointsToNextLevel ?? Math.max(0, g.nextLevelPoints - g.points), 'punct', 'puncte') : null)
+  );
+  /** Earned badges with their icon resolved once, instead of a method call per change detection. */
+  badgeView$ = this.earnedBadges$.pipe(
+    map(badges => badges.map(badge => ({
+      badge,
+      icon: this.getBadgeIcon(badge.category, badge.rarity),
+      special: ['epic', 'legendary'].includes(badge.rarity?.toLowerCase() ?? '')
+    })))
+  );
 
   // User Issues Observables
   userIssuesSummary$ = this.store.select(UserIssuesSelectors.selectUserIssuesSummary);

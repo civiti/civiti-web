@@ -7,7 +7,6 @@ import { AppState } from '../../store/app.state';
 import * as LocationActions from '../../store/location/location.actions';
 import { DEFAULT_CITY } from '../../data/romanian-locations';
 import { GUIDE_ARTICLES } from '../../generated/guide-data';
-import { AuthButtonsComponent } from '../shared/auth-buttons/auth-buttons.component';
 
 /**
  * The homepage.
@@ -25,9 +24,9 @@ import { AuthButtonsComponent } from '../shared/auth-buttons/auth-buttons.compon
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterLink, NzButtonModule, NzIconModule, AuthButtonsComponent],
+  imports: [RouterLink, NzButtonModule, NzIconModule],
   templateUrl: './home.component.html',
-  styleUrl: './home.component.scss',
+  styleUrls: ['./home.component.scss', './home-sections.scss'],
 })
 export class HomeComponent {
   private readonly _router = inject(Router);

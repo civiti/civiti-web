@@ -1,212 +1,198 @@
-.location-picker-container {
-  padding: 0;
+.lp {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+
+  p {
+    margin: 0;
+  }
 }
 
-.mvp-alert {
-  margin-bottom: 1rem;
-  border-radius: 8px;
-}
+// --- Address search ---
 
-.address-section {
-  margin-bottom: 1rem;
+.lp-address {
   position: relative;
 }
 
-.autocomplete-dropdown {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: var(--white, #ffffff);
-  border: 1px solid var(--platinum, #e5e5e5);
-  border-radius: 4px;
-  box-shadow: 0 4px 12px rgba(20, 33, 61, 0.1);
-  z-index: 1000;
-  max-height: 200px;
-  overflow-y: auto;
+.lp-label {
+  display: block;
+  margin-bottom: var(--space-2);
+  color: var(--ink-900);
+  font-size: var(--text-sm);
+  font-weight: 650;
 }
 
-.suggestion-item {
-  padding: 12px 16px;
-  cursor: pointer;
+.lp-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  left: 0;
+  z-index: 1000;
+  max-height: 240px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--line);
+  list-style: none;
+}
+
+.lp-suggestion {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
-  color: var(--oxford-blue, #14213d);
-  transition: background-color 0.2s ease;
+  gap: var(--space-2);
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  color: var(--ink-800);
+  font-size: var(--text-md);
+  line-height: 1.4;
+  cursor: pointer;
 
   &:hover {
-    background-color: rgba(252, 163, 17, 0.1);
+    background: var(--paper);
+    color: var(--ink-900);
   }
 
-  .suggestion-icon {
-    color: var(--orange-web, #fca311);
-    flex-shrink: 0;
-    margin-top: 2px;
-  }
-
-  .suggestion-text {
-    flex: 1;
-    line-height: 1.4;
+  .anticon {
+    flex: none;
+    margin-top: 3px;
+    color: var(--ink-500);
   }
 }
 
-.map-section {
-  border-radius: 8px;
-  overflow: hidden;
-  margin-bottom: 1rem;
-  position: relative;
-  border: 1px solid var(--platinum, #e5e5e5);
+// --- Map ---
 
-  .map-loading {
-    height: 350px;
+.lp-map {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--paper-2);
+
+  &__state {
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: var(--platinum, #e5e5e5);
+    gap: var(--space-2);
+    height: 350px;
+    padding: var(--space-6);
+    color: var(--ink-600);
+    font-size: var(--text-sm);
+    text-align: center;
+  }
+
+  &__error-icon {
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border-radius: var(--radius-md);
+    background: var(--bad-wash);
+    color: var(--bad-text);
+    font-size: 20px;
+  }
+
+  &__error-title {
+    color: var(--ink-900);
+    font-size: var(--text-base);
+    font-weight: 650;
   }
 }
 
-.selected-location {
-  margin-bottom: 1rem;
+.lp-hint {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  color: var(--ink-600);
+  font-size: var(--text-sm);
 
-  .location-card {
-    border-radius: 8px;
-    border-color: var(--orange-web, #fca311);
-    background: rgba(252, 163, 17, 0.05);
+  .anticon {
+    margin-top: 3px;
+  }
+}
+
+// --- Picked location ---
+
+.lp-picked {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--ok-line);
+  border-radius: var(--radius-md);
+  background: var(--ok-wash);
+
+  &__icon {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--ok-fill);
+    color: var(--surface);
+    font-size: 14px;
   }
 
-  .location-info {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-  }
+  &.is-invalid {
+    border-color: var(--signal-200);
+    background: var(--signal-50);
 
-  .success-icon {
-    color: #52c41a;
-    font-size: 20px;
-    margin-top: 2px;
-    flex-shrink: 0;
-  }
-
-  .warning-icon {
-    color: #faad14;
-    font-size: 20px;
-    margin-top: 2px;
-    flex-shrink: 0;
-  }
-
-  .location-card.invalid-location {
-    border-color: #faad14;
-    background: rgba(250, 173, 20, 0.05);
-  }
-
-  .restriction-alert {
-    margin-top: 12px;
-    border-radius: 8px;
-  }
-
-  .location-text {
-    flex: 1;
-
-    strong {
-      display: block;
-      color: var(--oxford-blue, #14213d);
-      margin-bottom: 8px;
-      line-height: 1.4;
+    .lp-picked__icon {
+      background: var(--signal-500);
+      color: var(--ink-950);
     }
   }
 
-  .district-tag {
-    font-weight: 600;
+  &__body {
+    flex: 1;
+    min-width: 0;
   }
 
-  .coordinates {
-    margin-top: 8px;
-    padding-left: 32px;
-    color: var(--oxford-blue, #14213d);
-    opacity: 0.6;
+  &__address {
+    color: var(--ink-900);
+    font-weight: 650;
+    line-height: 1.4;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin-top: var(--space-2);
+  }
+
+  &__coords {
+    color: var(--ink-600);
+    font-family: var(--font-mono);
+    font-size: var(--text-xs);
   }
 }
 
-.instruction-text {
-  color: var(--oxford-blue, #14213d);
-  opacity: 0.75;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 0 1rem 0;
-}
+// --- Actions: drawn like the global modal footer (the modal has none) ---
 
-.action-buttons {
+.lp-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 12px;
-  padding-top: 1rem;
-  border-top: 1px solid var(--platinum, #e5e5e5);
-
-  button[nztype="primary"] {
-    background: var(--orange-web, #fca311);
-    border-color: var(--orange-web, #fca311);
-
-    &:hover:not(:disabled) {
-      background: #e8930f;
-      border-color: #e8930f;
-    }
-
-    &:disabled {
-      background: #ccc;
-      border-color: #ccc;
-    }
-  }
+  gap: var(--space-2);
+  margin: var(--space-2) calc(-1 * var(--space-6)) calc(-1 * var(--space-6));
+  padding: var(--space-4) var(--space-6);
+  border-top: 1px solid var(--line);
+  background: var(--paper);
 }
 
-// Form styling
-:host ::ng-deep {
-  .ant-input-group-wrapper {
-    width: 100%;
-  }
-
-  .ant-form-item {
-    margin-bottom: 0;
-  }
-
-  .ant-form-item-label > label {
-    color: var(--oxford-blue, #14213d);
-    font-weight: 600;
-  }
-
-  .ant-input {
-    &:focus,
-    &:hover {
-      border-color: var(--orange-web, #fca311);
-    }
-  }
-
-  .ant-input-affix-wrapper {
-    &:focus,
-    &:hover,
-    &.ant-input-affix-wrapper-focused {
-      border-color: var(--orange-web, #fca311);
-      box-shadow: 0 0 0 2px rgba(252, 163, 17, 0.2);
-    }
-  }
-}
-
-// Responsive
 @media (max-width: 576px) {
-  .map-section {
-    google-map {
-      height: 280px;
-    }
-
-    .map-loading {
-      height: 280px;
-    }
+  .lp-map__state {
+    height: 280px;
   }
 
-  .action-buttons {
+  .lp-map google-map {
+    height: 280px;
+  }
+
+  .lp-actions {
     flex-direction: column-reverse;
 
     button {

@@ -18,12 +18,11 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { IssueCategory, IssueItem } from '../../types/civica-api.types';
 import { MapIssueFilters, MapIssuesService, PlottableIssue } from '../../services/map-issues.service';
 import { googleMapsConfig } from '../../../environments/google-maps-config';
-import { StatusTextPipe, StatusColorPipe } from '../../pipes/status.pipe';
+import { StatusTextPipe, StatusTonePipe } from '../../pipes/status.pipe';
 import { IsUrgentPipe } from '../../pipes/urgency.pipe';
 import { DaysSincePipe } from '../../pipes/date.pipe';
 
@@ -164,10 +163,9 @@ interface MarkerEntry {
   imports: [
     NzButtonModule,
     NzIconModule,
-    NzTagModule,
     NzSpinModule,
     StatusTextPipe,
-    StatusColorPipe,
+    StatusTonePipe,
     IsUrgentPipe,
     DaysSincePipe
   ],

@@ -6,16 +6,11 @@ import { Observable } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzSpaceModule } from 'ng-zorro-antd/space';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
+
+import { AuthShellComponent } from '../auth-shell/auth-shell.component';
 
 import { AppState } from '../../../store/app.state';
 import * as AuthActions from '../../../store/auth/auth.actions';
@@ -31,16 +26,10 @@ import {
   imports: [
     CommonModule,
     RouterModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
-    NzDividerModule,
-    NzSpaceModule,
-    NzTypographyModule,
-    NzGridModule,
-    NzAlertModule,
-    NzSpinModule,
-    NzModalModule
+    NzModalModule,
+    AuthShellComponent
   ],
   templateUrl: './registration-gateway.component.html',
   styleUrls: ['./registration-gateway.component.scss']
@@ -92,7 +81,7 @@ export class RegistrationGatewayComponent implements OnInit {
 
   showPrivacyPolicy(): void {
     const modalRef = this.modal.create({
-      nzTitle: 'Politica de Confidențialitate',
+      nzTitle: 'Politica de confidențialitate',
       nzContent: this.privacyPolicyTemplate(),
       nzWidth: 700,
       nzCentered: true,

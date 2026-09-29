@@ -5,15 +5,13 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, FormsModule } 
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzFormModule } from 'ng-zorro-antd/form';
 import { NzInputModule } from 'ng-zorro-antd/input';
 import { NzSelectModule } from 'ng-zorro-antd/select';
+import { NzRadioModule } from 'ng-zorro-antd/radio';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzMessageService } from 'ng-zorro-antd/message';
 
 import { EnhanceTextRequest, URGENCY_OPTIONS } from '../../../types/civica-api.types';
@@ -45,15 +43,13 @@ interface PhotoData {
     RouterModule,
     ReactiveFormsModule,
     FormsModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
     NzFormModule,
     NzInputModule,
     NzSelectModule,
-    NzSpinModule,
-    NzTypographyModule,
-    NzTagModule
+    NzRadioModule,
+    NzSpinModule
   ],
   templateUrl: './issue-details.component.html',
   styleUrls: ['./issue-details.component.scss']

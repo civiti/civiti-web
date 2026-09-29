@@ -19,10 +19,11 @@
         <button
           nz-button
           nzSize="small"
+          nzType="text"
           (click)="onCancel()"
           [disabled]="submitting()"
         >
-          Anulează
+          <span>Anulează</span>
         </button>
       }
       <button
@@ -34,7 +35,7 @@
         (click)="onSubmit()"
       >
         @if (!submitting()) {
-          <i nz-icon nzType="send" nzTheme="outline"></i>
+          <span nz-icon nzType="send" nzTheme="outline"></span>
         }
         <span>{{ submitLabel() }}</span>
       </button>

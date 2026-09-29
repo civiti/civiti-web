@@ -3,22 +3,14 @@ import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
 
 // NG-ZORRO imports
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzTagModule } from 'ng-zorro-antd/tag';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
-import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzStatisticModule } from 'ng-zorro-antd/statistic';
-import { NzSegmentedModule } from 'ng-zorro-antd/segmented';
 import { NzModalModule, NzModalService } from 'ng-zorro-antd/modal';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
 
 import { AppState } from '../../../store/app.state';
 import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
@@ -27,8 +19,16 @@ import { UserIssuesStatusFilter } from '../../../store/user-issues/user-issues.s
 import {
   IssueItem
 } from '../../../types/civica-api.types';
-import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsResolvedPipe, IsCancelledPipe, IsRejectedPipe, IsOwnerEditablePipe } from '../../../pipes/status.pipe';
+import { StatusTextPipe, StatusTonePipe, StatusTone, IsActivePipe, IsResolvedPipe, IsCancelledPipe, IsRejectedPipe, IsOwnerEditablePipe } from '../../../pipes/status.pipe';
 import { DaysSincePipe } from '../../../pipes/date.pipe';
+
+/** One status filter chip: label and count kept apart so the count can be styled. */
+interface FilterChip {
+  value: UserIssuesStatusFilter;
+  label: string;
+  count: number;
+  tone: StatusTone | null;
+}
 
 @Component({
   selector: 'app-my-issues',
@@ -36,21 +36,12 @@ import { DaysSincePipe } from '../../../pipes/date.pipe';
   imports: [
     CommonModule,
     RouterModule,
-    FormsModule,
-    NzCardModule,
     NzButtonModule,
     NzIconModule,
-    NzTagModule,
-    NzGridModule,
-    NzEmptyModule,
-    NzSpinModule,
-    NzStatisticModule,
-    NzSegmentedModule,
     NzModalModule,
     NzToolTipModule,
-    NzAlertModule,
     StatusTextPipe,
-    StatusColorPipe,
+    StatusTonePipe,
     IsActivePipe,
     IsResolvedPipe,
     IsCancelledPipe,
@@ -75,6 +66,7 @@ export class MyIssuesComponent implements OnInit {
   summary$: Observable<{ active: number; resolved: number; rejected: number; cancelled: number; total: number }>;
 
   // Filter options will be computed dynamically based on summary counts
+  filterChips$: Observable<FilterChip[]>;
 
   selectedFilter: UserIssuesStatusFilter = 'all';
 
@@ -84,6 +76,15 @@ export class MyIssuesComponent implements OnInit {
     this.error$ = this.store.select(UserIssuesSelectors.selectUserIssuesError);
     this.statusFilter$ = this.store.select(UserIssuesSelectors.selectStatusFilter);
     this.summary$ = this.store.select(UserIssuesSelectors.selectUserIssuesSummary);
+    this.filterChips$ = this.summary$.pipe(
+      map((summary): FilterChip[] => [
+        { value: 'all', label: 'Toate', count: summary.total, tone: null },
+        { value: 'active', label: 'Active', count: summary.active, tone: 'active' },
+        { value: 'resolved', label: 'Rezolvate', count: summary.resolved, tone: 'resolved' },
+        { value: 'rejected', label: 'Respinse', count: summary.rejected, tone: 'rejected' },
+        { value: 'cancelled', label: 'Anulate', count: summary.cancelled, tone: 'neutral' }
+      ])
+    );
   }
 
   ngOnInit(): void {

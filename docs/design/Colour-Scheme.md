@@ -1,5 +1,8 @@
 # Civica Color Scheme Documentation
 
+> **Superseded.** The colour system is now defined in [DESIGN.md](DESIGN.md) (tokens in
+> `src/styles.scss`). This document is kept for history; the brand navy and orange carry over.
+
 ## 🎨 Color Palette Overview
 
 Our color scheme balances authority and trust with urgent civic action. The palette uses a professional blue-orange combination that's both colorblind-friendly and conveys the seriousness of community issues.
