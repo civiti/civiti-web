@@ -1,275 +1,240 @@
-<div class="flex-1 bg-background">
-  <div class="container mx-auto p-4 max-w-6xl">
-    <!-- Issues Control Panel -->
-    <div class="issues-control-panel">
-      <!-- Header Row: Title + view switcher -->
-      <div class="control-panel-header">
-        <div class="header-info">
-          <h1 class="sr-only">Probleme Active</h1>
-          <h2 class="text-oxford-blue font-semibold text-lg">
-            {{ (totalIssues$ | async) || 0 }} probleme documentate
-          </h2>
+<div class="hub">
+  <!-- Page head: where you are, how much there is, and the two things you can do. -->
+  <section class="hub-head">
+    <div class="c-container head-row">
+      <div class="head-text">
+        <p class="c-eyebrow">
+          <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>
+          {{ currentCity() }}
+        </p>
+        <h1 class="c-h1">Probleme civice în {{ currentCity() }}</h1>
+        <p class="head-count">
+          <strong>{{ (totalIssues$ | async) || 0 }} probleme documentate</strong>
           @if (paginationInfo$ | async; as pagination) {
-            <p class="text-oxford-blue opacity-75 text-sm">
+            <span class="head-range">
               @if (isMapView()) {
-                <span>Toate cele {{ pagination.totalCount }} pe hartă</span>
+                Toate cele {{ pagination.totalCount }} pe hartă
               } @else if (pagination.totalCount > 0) {
-                <span>
-                  Se afișează {{ pagination.startItem }}-{{ pagination.endItem }} din {{ pagination.totalCount }}
-                </span>
+                Se afișează {{ pagination.startItem }}-{{ pagination.endItem }} din {{ pagination.totalCount }}
               } @else {
-                <span>
-                  Alege o problemă și ajută la rezolvarea ei
-                </span>
+                Alege o problemă și ajută la rezolvarea ei
               }
-            </p>
+            </span>
           }
-        </div>
-
-        <!-- Not [(mode)]: the change must also write the URL, so it is handled. -->
-        <app-view-switcher [mode]="viewMode()" (modeChange)="onViewModeChange($event)" />
+        </p>
       </div>
-
-      <!-- Filters Row -->
-      <div class="control-panel-filters">
-        <div class="filters-grid">
-          <!-- Address Search -->
-          <div class="filter-item filter-address">
-            <div class="address-search-wrapper">
-              <nz-input-group [nzPrefix]="searchIcon" [nzSuffix]="suffixIcon" nzSize="default">
-                <input
-                  nz-input
-                  [formControl]="addressSearchControl"
-                  placeholder="Caută după adresă..."
-                  (blur)="onAddressInputBlur()"
-                  (keydown.enter)="onAddressSearch()"
-                />
-              </nz-input-group>
-              <ng-template #searchIcon>
-                <span nz-icon nzType="environment"></span>
-              </ng-template>
-              <ng-template #suffixIcon>
-                  @if (addressSearchControl.value) {
-                  <span
-                    nz-icon
-                    nzType="close-circle"
-                    nzTheme="fill"
-                    class="ant-select-clear"
-                    (click)="clearAddressFilter()">
-                  </span>
-                }
-              </ng-template>
-
-              <!-- Autocomplete dropdown -->
-              @if (showSuggestions && suggestions.length) {
-                <div class="autocomplete-dropdown">
-                  @for (s of suggestions; track s.place_id) {
-                    <div
-                         class="suggestion-item"
-                         (mousedown)="onAddressSuggestionSelected(s)">
-                      <span nz-icon nzType="environment"></span>
-                      {{ s.description }}
-                    </div>
-                  }
-                </div>
-              }
-            </div>
-          </div>
-
-          <!-- Sector Filter -->
-          <div class="filter-item filter-sector">
-            <nz-select
-              [(ngModel)]="selectedDistrict"
-              (ngModelChange)="onDistrictChange()"
-              nzPlaceHolder="Sector"
-              nzAllowClear
-              nzSize="default"
-              class="w-full">
-              @for (d of districts; track $index) {
-                <nz-option [nzValue]="d" [nzLabel]="d"></nz-option>
-              }
-            </nz-select>
-          </div>
-
-          <!-- Category Filter -->
-          <div class="filter-item filter-category">
-            <nz-select
-              [(ngModel)]="selectedCategory"
-              (ngModelChange)="onCategoryChange()"
-              nzPlaceHolder="Categorie"
-              nzAllowClear
-              nzSize="default"
-              class="w-full">
-              @for (c of categories; track c.value) {
-                <nz-option [nzValue]="c.value" [nzLabel]="c.label"></nz-option>
-              }
-            </nz-select>
-          </div>
-
-          <!-- Status Filter -->
-          <div class="filter-item filter-status">
-            <nz-select
-              [(ngModel)]="selectedStatus"
-              (ngModelChange)="onStatusChange()"
-              nzPlaceHolder="Status"
-              nzSize="default"
-              class="w-full">
-              @for (s of statusOptions; track s.value) {
-                <nz-option [nzValue]="s.value" [nzLabel]="s.label"></nz-option>
-              }
-            </nz-select>
-          </div>
-
-          <!-- Sort -->
-          <div class="filter-item filter-sort">
-            <nz-select
-              [(ngModel)]="sortBy"
-              (ngModelChange)="onSortChange()"
-              nzSize="default"
-              class="w-full">
-              <nz-option nzValue="date" nzLabel="Cele mai noi"></nz-option>
-              <nz-option nzValue="emails" nzLabel="Contribuții"></nz-option>
-              <nz-option nzValue="votes" nzLabel="Cele mai votate"></nz-option>
-              <nz-option nzValue="urgency" nzLabel="Urgență"></nz-option>
-            </nz-select>
-          </div>
-
-          <!-- Clear Filters -->
-          @if (hasActiveFilters()) {
-          <div class="filter-item filter-clear">
-            <button nz-button nzType="text" (click)="clearFilters()">
-              <span nz-icon nzType="close-circle"></span>
-              <span>Șterge filtrele</span>
-            </button>
-          </div>
-          }
-        </div>
+      <div class="head-actions">
+        <button type="button" class="c-btn c-btn--signal" (click)="promptToCreateIssue()">
+          <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
+          <span>Raportează o problemă</span>
+        </button>
       </div>
     </div>
+  </section>
 
-    <!-- Loading State — the map renders its own -->
+  <!-- Toolbar: search + selects on the first row, status and category as
+       one-tap chips on the second. Sticky on wide screens so filtering stays
+       in reach while scanning a long page of cards. -->
+  <section class="toolbar" aria-label="Filtre">
+    <div class="c-container">
+      <div class="toolbar-row">
+        <div class="address-search">
+          <nz-input-group [nzPrefix]="searchIcon" [nzSuffix]="suffixIcon">
+            <input
+              nz-input
+              [formControl]="addressSearchControl"
+              placeholder="Caută după adresă..."
+              aria-label="Caută după adresă"
+              (blur)="onAddressInputBlur()"
+              (keydown.enter)="onAddressSearch()"
+            />
+          </nz-input-group>
+          <ng-template #searchIcon>
+            <span nz-icon nzType="search" nzTheme="outline"></span>
+          </ng-template>
+          <ng-template #suffixIcon>
+            @if (addressSearchControl.value) {
+              <button type="button" class="clear-address" aria-label="Șterge adresa" (click)="clearAddressFilter()">
+                <span nz-icon nzType="close-circle" nzTheme="fill"></span>
+              </button>
+            }
+          </ng-template>
+
+          @if (showSuggestions && suggestions.length) {
+            <ul class="suggestions" role="listbox">
+              @for (s of suggestions; track s.place_id) {
+                <li role="option" (mousedown)="onAddressSuggestionSelected(s)">
+                  <span nz-icon nzType="environment" nzTheme="outline"></span>
+                  <span>{{ s.description }}</span>
+                </li>
+              }
+            </ul>
+          }
+        </div>
+
+        <nz-select
+          class="select-sector"
+          [(ngModel)]="selectedDistrict"
+          (ngModelChange)="onDistrictChange()"
+          nzPlaceHolder="Toate sectoarele"
+          nzAllowClear
+          aria-label="Sector">
+          @for (d of districts; track $index) {
+            <nz-option [nzValue]="d" [nzLabel]="d"></nz-option>
+          }
+        </nz-select>
+
+        <nz-select
+          class="select-sort"
+          [(ngModel)]="sortBy"
+          (ngModelChange)="onSortChange()"
+          aria-label="Sortează">
+          <nz-option nzValue="date" nzLabel="Cele mai noi"></nz-option>
+          <nz-option nzValue="emails" nzLabel="Cele mai multe emailuri"></nz-option>
+          <nz-option nzValue="votes" nzLabel="Cele mai votate"></nz-option>
+          <nz-option nzValue="urgency" nzLabel="Urgență"></nz-option>
+        </nz-select>
+
+        <!-- Not [(mode)]: the change must also write the URL, so it is handled. -->
+        <app-view-switcher class="switcher" [mode]="viewMode()" (modeChange)="onViewModeChange($event)" />
+      </div>
+
+      <div class="toolbar-row toolbar-chips">
+        <div class="segment" role="group" aria-label="Status">
+          @for (s of statusOptions; track s.value) {
+            <button
+              type="button"
+              class="segment-option"
+              [class.is-active]="selectedStatus === s.value"
+              [attr.aria-pressed]="selectedStatus === s.value"
+              (click)="selectedStatus = s.value; onStatusChange()">
+              {{ s.label }}
+            </button>
+          }
+        </div>
+
+        <div class="chips" role="group" aria-label="Categorie">
+          <button
+            type="button"
+            class="c-chip"
+            [attr.aria-pressed]="!selectedCategory"
+            (click)="selectedCategory = null; onCategoryChange()">
+            Toate categoriile
+          </button>
+          @for (c of categories; track c.value) {
+            <button
+              type="button"
+              class="c-chip"
+              [attr.aria-pressed]="selectedCategory === c.value"
+              (click)="selectedCategory = $any(c.value); onCategoryChange()">
+              <span nz-icon [nzType]="c.value | categoryIcon" nzTheme="outline" aria-hidden="true"></span>
+              <span>{{ c.label }}</span>
+            </button>
+          }
+        </div>
+
+        @if (hasActiveFilters()) {
+          <button type="button" class="c-btn c-btn--ghost c-btn--sm clear-filters" (click)="clearFilters()">
+            <span nz-icon nzType="close" nzTheme="outline" aria-hidden="true"></span>
+            <span>Șterge filtrele</span>
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <div class="c-container results">
+    <!-- Loading: skeleton cards in the shape of the real ones. The map renders its own. -->
     @if (!isMapView() && (isLoading$ | async)) {
-      <div class="text-center py-12">
-        <i nz-icon nzType="loading" nzTheme="outline" nzSpin class="text-oxford-blue text-4xl mb-4"></i>
-        <p class="text-oxford-blue">Se încarcă problemele...</p>
+      <div class="grid" aria-busy="true" aria-label="Se încarcă problemele...">
+        @for (n of skeletons; track n) {
+          <div class="c-card skeleton-card" aria-hidden="true">
+            <div class="c-skeleton skeleton-media"></div>
+            <div class="skeleton-body">
+              <div class="c-skeleton skeleton-line skeleton-line--short"></div>
+              <div class="c-skeleton skeleton-line"></div>
+              <div class="c-skeleton skeleton-line skeleton-line--mid"></div>
+            </div>
+          </div>
+        }
       </div>
     }
 
-    <!-- Issues Grid -->
     @if (!isMapView() && !(isLoading$ | async)) {
-      <nz-row [nzGutter]="[16, 16]">
+      <div class="grid">
         @for (issue of issues$ | async; track issue.id) {
-          <nz-col [nzXs]="24" [nzMd]="12" [nzLg]="8">
-        <nz-card class="issue-card cursor-pointer"
-                 (click)="viewIssueDetails(issue.id)"
-                 [nzCover]="coverTemplate">
-          <nz-card-meta
-            [nzTitle]="titleTemplate"
-            [nzDescription]="descriptionTemplate">
-          </nz-card-meta>
-
-          <!--
-            The title is a real <h2><a routerLink>, not an anonymous div behind a
-            (click) handler. routerLink emits a genuine href into the
-            server-rendered HTML, which is the only way Googlebot can discover an
-            issue page — it does not click. Before this, /issue/:id pages existed
-            solely as sitemap entries with no inbound link anywhere on the site.
-
-            Anchoring the title rather than the whole card is deliberate: the
-            anchor text becomes the issue title ("Blocul V6, Calea 13
-            Septembrie"), which is where all the long-tail keyword signal lives.
-            The card keeps its own (click) so the whole surface stays clickable.
-          -->
-          <ng-template #titleTemplate>
-            <h2 class="issue-card-title line-clamp-2">
-              <!--
-                stopPropagation matters for modified clicks. On a plain click the
-                bubbled card handler is harmless (the router ignores a repeat
-                navigation to the same URL), but on Ctrl/Cmd/middle-click the
-                browser opens the issue in a new tab AND the card handler
-                navigates the current tab away. The action button below stops
-                propagation for the same reason.
-              -->
-              <a [routerLink]="['/issue', issue.id]"
-                 (click)="$event.stopPropagation()">{{ issue.title }}</a>
-            </h2>
-          </ng-template>
-          
-          <!-- Cover Template -->
-          <ng-template #coverTemplate>
-            <div class="relative h-48 bg-platinum overflow-hidden">
-              <img 
-                [src]="getIssueImage(issue)" 
+          <article class="issue-card c-card c-card--interactive" (click)="viewIssueDetails(issue.id)">
+            <div class="issue-media">
+              <img
+                [src]="getIssueImage(issue)"
                 [alt]="issue.title"
-                class="w-full h-full object-cover"
+                loading="lazy"
                 (error)="onImageError($event)"
               >
-              <!-- Status Badge -->
-              <div class="absolute top-3 left-3">
-                <nz-tag [nzColor]="issue.status | statusColor">
+              <div class="issue-badges">
+                <span class="c-status c-status--float" [attr.data-tone]="issue.status | statusTone">
                   {{ issue.status | statusText }}
-                </nz-tag>
+                </span>
+                @if (issue.urgency | isUrgent) {
+                  <span class="c-tag c-tag--urgent urgent-tag">
+                    <span nz-icon nzType="fire" nzTheme="outline" aria-hidden="true"></span>
+                    Urgent
+                  </span>
+                }
               </div>
-              <!-- Urgency Badge -->
-              @if (issue.urgency | isUrgent) {
-              <div class="absolute top-3 right-3">
-                <nz-tag nzColor="error" class="font-bold">
-                  URGENT
-                </nz-tag>
-              </div>
+            </div>
+
+            <div class="issue-body">
+              <p class="issue-kicker">
+                <span nz-icon [nzType]="issue.category | categoryIcon" nzTheme="outline" aria-hidden="true"></span>
+                <span>{{ issue.category | categoryLabel }}</span>
+                @if (issue.district) {
+                  <span class="kicker-sep" aria-hidden="true">·</span>
+                  <span>{{ issue.district }}</span>
+                }
+              </p>
+
+              <!--
+                The title is a real <h2><a routerLink>, not an anonymous div behind a
+                (click) handler. routerLink emits a genuine href into the
+                server-rendered HTML, which is the only way Googlebot can discover an
+                issue page — it does not click. The anchor text is the issue title,
+                where all the long-tail keyword signal lives. The card keeps its own
+                (click) so the whole surface stays clickable.
+
+                stopPropagation matters for modified clicks: on Ctrl/Cmd/middle-click
+                the browser opens the issue in a new tab, and without it the card
+                handler would also navigate the current tab away.
+              -->
+              <h2 class="issue-title">
+                <a [routerLink]="['/issue', issue.id]" (click)="$event.stopPropagation()">{{ issue.title }}</a>
+              </h2>
+
+              @if (issue.address) {
+                <p class="issue-address">
+                  <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>
+                  <span>{{ issue.address }}</span>
+                </p>
               }
+
+              <dl class="issue-stats">
+                <div class="stat stat--emails">
+                  <dt>emailuri</dt>
+                  <dd class="c-num">{{ issue.emailsSent }}</dd>
+                </div>
+                <div class="stat">
+                  <dt>voturi</dt>
+                  <dd class="c-num">{{ issue.communityVotes }}</dd>
+                </div>
+                <div class="stat">
+                  <dt>zile</dt>
+                  <dd class="c-num">{{ issue.createdAt | daysSince }}</dd>
+                </div>
+              </dl>
             </div>
-          </ng-template>
-          
-          <!-- Description Template -->
-          <ng-template #descriptionTemplate>
-            <p class="text-oxford-blue opacity-75 text-sm mb-3 line-clamp-3">
-              {{ issue.description }}
-            </p>
-
-            <!-- Location -->
-            <div class="flex items-center text-oxford-blue opacity-60 text-xs mb-4">
-              <i nz-icon nzType="environment" nzTheme="outline" class="text-base mr-1"></i>
-              <span class="truncate">{{ issue.address }}</span>
-            </div>
-
-            <!-- Stats Row -->
-            <div class="stats-grid">
-              <!-- Emails -->
-              <div class="stat-item" nz-tooltip nzTooltipTitle="Emailuri trimise">
-                <i nz-icon nzType="mail" nzTheme="outline"></i>
-                <span class="stat-value">{{ issue.emailsSent }}</span>
-              </div>
-
-              <!-- Votes -->
-              <div class="stat-item" nz-tooltip nzTooltipTitle="Voturi comunitate">
-                <i nz-icon nzType="like" nzTheme="outline"></i>
-                <span class="stat-value">{{ issue.communityVotes }}</span>
-              </div>
-
-              <!-- Days Since -->
-              <div class="stat-item" nz-tooltip nzTooltipTitle="Zile de la raportare">
-                <i nz-icon nzType="calendar" nzTheme="outline"></i>
-                <span class="stat-value">{{ issue.createdAt | daysSince }}</span>
-              </div>
-            </div>
-
-            <!-- Action Button -->
-            <button
-              nz-button
-              nzType="primary"
-              nzBlock
-              class="mt-4"
-              (click)="viewIssueDetails(issue.id); $event.stopPropagation()"
-            >
-              <i nz-icon nzType="eye" nzTheme="outline" class="mr-2"></i>
-              <span>Vezi Detalii</span>
-            </button>
-          </ng-template>
-        </nz-card>
-          </nz-col>
+          </article>
         }
-      </nz-row>
+      </div>
     }
 
     <!--
@@ -299,62 +264,40 @@
       }
     }
 
-    <!-- Empty State -->
+    <!-- Empty -->
     @if (!isMapView() && !(isLoading$ | async) && ((issues$ | async)?.length || 0) === 0) {
-      <div>
-        <nz-empty
-          nzNotFoundContent="Nu au fost găsite probleme"
-          [nzNotFoundFooter]="emptyFooter">
-        </nz-empty>
-        <ng-template #emptyFooter>
-          <p class="text-oxford-blue opacity-75">
-            Încearcă să schimbi criteriile de sortare sau revino mai târziu.
-          </p>
-        </ng-template>
+      <div class="c-card c-empty">
+        <span class="c-empty__icon"><span nz-icon nzType="file-search" nzTheme="outline"></span></span>
+        <p class="c-empty__title">Nu au fost găsite probleme</p>
+        <p>Încearcă să schimbi criteriile de sortare sau revino mai târziu.</p>
+        <div class="empty-actions">
+          @if (hasActiveFilters()) {
+            <button type="button" class="c-btn" (click)="clearFilters()">
+              <span>Șterge filtrele</span>
+            </button>
+          }
+          <button type="button" class="c-btn c-btn--signal" (click)="promptToCreateIssue()">
+            <span nz-icon nzType="plus" nzTheme="outline" aria-hidden="true"></span>
+            <span>Raportează o problemă</span>
+          </button>
+        </div>
       </div>
     }
 
-    <!-- Pagination Section — hidden in map view, which already shows every match -->
+    <!-- Pagination — hidden in map view, which already shows every match -->
     @if (!isMapView() && !(isLoading$ | async) && (paginationInfo$ | async); as pagination) {
-      <div class="pagination-container mt-8 mb-20">
-        @if (pagination.totalPages > 1) {
-          <div class="bg-white rounded-lg shadow-sm border border-platinum p-4">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-          <!-- Pagination Component -->
+      @if (pagination.totalPages > 1) {
+        <nav class="pager" aria-label="Paginare">
           <nz-pagination
-            class="pagination-control"
+            ngSkipHydration
             [nzPageIndex]="pagination.currentPage"
             [nzTotal]="pagination.totalCount"
             [nzPageSize]="pagination.pageSize"
             (nzPageIndexChange)="onPageChange($event)">
           </nz-pagination>
-
-          <!-- Total pages info -->
-          <p class="text-oxford-blue opacity-60 text-sm">
-            Pagina {{ pagination.currentPage }} din {{ pagination.totalPages }}
-          </p>
-        </div>
-          </div>
-        }
-      </div>
+          <p class="pager-info">Pagina {{ pagination.currentPage }} din {{ pagination.totalPages }}</p>
+        </nav>
+      }
     }
-
-    <!-- Create Issue Button - requires authentication -->
-    <div class="sticky bottom-6 flex justify-end pointer-events-none pr-4 sm:pr-6">
-      <div class="pointer-events-auto">
-      <button 
-        nz-button 
-        nzType="primary" 
-        nzShape="circle"
-        nzSize="large"
-        nz-tooltip
-nzTooltipTitle="Raportează o problemă nouă"
-        class="shadow-lg create-issue-fab"
-        (click)="promptToCreateIssue()"
-      >
-        <i nz-icon nzType="plus" nzTheme="outline" class="text-2xl"></i>
-      </button>
-      </div>
-    </div>
   </div>
 </div>

@@ -1,30 +1,32 @@
 .solve-modal {
-  color: var(--oxford-blue);
+  color: var(--ink-900);
 }
 
 .solve-question {
-  margin-bottom: 1.25rem;
-  font-size: 1rem;
+  margin-bottom: var(--space-5);
+  font-size: var(--text-base);
+  line-height: 1.6;
 }
 
 // Separated from the question by a rule rather than a heading weight: the picker is optional,
 // and a second bold heading would read as a second thing being asked.
 .solve-proof {
-  padding-top: 1rem;
-  border-top: 1px solid var(--platinum);
+  padding-top: var(--space-4);
+  border-top: 1px solid var(--line);
 }
 
 .solve-proof-title {
-  margin-bottom: 0.25rem;
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: var(--oxford-blue);
+  margin: 0 0 var(--space-1);
+  color: var(--ink-900);
+  font-size: var(--text-md);
+  font-weight: 650;
 }
 
 .solve-proof-hint {
-  margin-bottom: 0.75rem;
-  font-size: var(--text-xs);
-  color: var(--oxford-blue-68);
+  margin: 0 0 var(--space-3);
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  line-height: 1.55;
 }
 
 // Fixed three-up so the tiles do not resize as photos are added, and so the row always shows
@@ -32,13 +34,13 @@
 .proof-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 0.75rem;
+  gap: var(--space-3);
 }
 
 .proof-tile {
   position: relative;
   overflow: hidden;
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-md);
   aspect-ratio: 4 / 3;
 
   img {
@@ -60,13 +62,13 @@
 
 .proof-tile-remove {
   position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
+  top: var(--space-1);
+  right: var(--space-1);
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 1.5rem;
-  height: 1.5rem;
+  width: 28px;
+  height: 28px;
   padding: 0;
   border: none;
   border-radius: 50%;
@@ -75,7 +77,7 @@
   cursor: pointer;
 
   &:hover:not(:disabled) {
-    background-color: var(--oxford-blue);
+    background-color: var(--bad-fill);
   }
 
   &:disabled {
@@ -91,18 +93,20 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 0.25rem;
+  gap: var(--space-1);
   aspect-ratio: 4 / 3;
-  border: 1px dashed var(--platinum);
-  border-radius: var(--radius-sm);
-  background-color: transparent;
-  font-size: var(--text-xs);
-  color: var(--oxford-blue-68);
+  border: 1.5px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--paper);
+  color: var(--ink-600);
+  font-size: var(--text-sm);
+  font-weight: 600;
   cursor: pointer;
+  transition: border-color var(--dur) var(--ease), color var(--dur) var(--ease);
 
   &:hover:not(:disabled) {
-    border-color: var(--orange-web);
-    color: var(--orange-web);
+    border-color: var(--ink-400);
+    color: var(--ink-900);
   }
 
   &:disabled {
@@ -112,9 +116,9 @@
 }
 
 .solve-proof-empty {
-  margin-top: 0.75rem;
-  font-size: var(--text-xs);
-  color: var(--oxford-blue-68);
+  margin: var(--space-3) 0 0;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
 }
 
 .proof-input {
@@ -123,5 +127,5 @@
 
 nz-alert {
   display: block;
-  margin-top: 1rem;
+  margin-top: var(--space-4);
 }

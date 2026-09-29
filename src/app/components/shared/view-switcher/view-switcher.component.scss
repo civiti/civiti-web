@@ -6,21 +6,18 @@ $track-inset: 4px;
   display: block;
 }
 
-// Segmented control track.
-// It sits inside the white .issues-control-panel, so the track is --platinum
-// (an inset "well") and the active thumb is --oxford-blue with white text —
-// the same language as .official-badge / .btn-secondary. --orange-web is kept
-// for CTAs and urgency, and would also fail contrast under white text.
+// Segmented control track: a white field with a hairline, matching the inputs
+// beside it in the issues toolbar; the active thumb is ink with white text.
 .view-switcher {
   position: relative;
   display: inline-grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 0; // Load-bearing: the thumb math assumes two flush, equal halves
   padding: $track-inset;
-  border: 1px solid var(--platinum);
-  border-radius: 10px;
-  background: var(--platinum);
-  font-family: var(--font-primary);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  font-family: var(--font-sans);
 }
 
 // Absolutely positioned, so it is not a grid item and never sizes the tracks.
@@ -31,8 +28,7 @@ $track-inset: 4px;
   left: $track-inset;
   width: calc(50% - #{$track-inset});
   border-radius: 7px;
-  background: var(--oxford-blue);
-  box-shadow: 0 1px 3px rgba(20, 33, 61, 0.24);
+  background: var(--ink-900);
   pointer-events: none;
   // transform only — animating left/width would force layout every frame
   transition: transform 0.2s ease;
@@ -49,8 +45,8 @@ $track-inset: 4px;
   align-items: center;
   justify-content: center;
   gap: 0.375rem;
-  min-height: 44px; // Comfortable touch target
-  padding: 0 1rem;
+  min-height: 32px;
+  padding: 0 0.875rem;
   border: none;
   border-radius: 7px;
   background: transparent;
@@ -58,9 +54,7 @@ $track-inset: 4px;
   font-family: inherit;
   font-size: var(--text-sm);
   font-weight: 600;
-  letter-spacing: var(--tracking-wide);
-  color: var(--oxford-blue);
-  opacity: 0.7;
+  color: var(--ink-600);
   transition: color 0.2s ease, opacity 0.2s ease;
 
   span[nz-icon] {
@@ -69,27 +63,30 @@ $track-inset: 4px;
   }
 
   &:hover {
-    opacity: 1;
+    color: var(--ink-900);
   }
 
   &.is-active {
     color: var(--white);
-    opacity: 1;
     cursor: default;
   }
 
   &:focus-visible {
-    outline: 2px solid var(--oxford-blue);
+    outline: 2px solid var(--ink-900);
     outline-offset: 2px;
     // The white spacer fills the outline offset, so the ring keeps >= 3:1
-    // (WCAG 1.4.11) even where it overlaps the --oxford-blue thumb next to it.
+    // (WCAG 1.4.11) even where it overlaps the ink thumb next to it.
     box-shadow: 0 0 0 2px var(--white);
-    opacity: 1;
   }
 }
 
-// Full width on mobile: two equal halves the thumb still tracks exactly.
-@media (max-width: 768px) {
+// Full width on mobile: two equal halves the thumb still tracks exactly. The
+// taller options restore a 44px touch target where fingers are the pointer.
+@media (max-width: 959px) {
+  .view-switcher-option {
+    min-height: 40px;
+  }
+
   .view-switcher {
     display: grid;
     width: 100%;

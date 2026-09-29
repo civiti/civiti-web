@@ -148,7 +148,7 @@
   padding: 7px 12px;
   border-radius: var(--radius-pill);
   background: var(--ink-900);
-  color: #FFFFFF;
+  color: var(--white);
   font-size: var(--text-sm);
   font-weight: 650;
   box-shadow: var(--shadow-md);
@@ -277,7 +277,7 @@
 
 .law-stat-label {
   max-width: 18ch;
-  color: #FFFFFF;
+  color: var(--white);
   font-size: var(--text-lg);
   font-weight: 600;
   line-height: 1.35;
@@ -286,7 +286,7 @@
 .law-copy {
   h2 {
     margin-bottom: var(--space-6);
-    color: #FFFFFF;
+    color: var(--white);
   }
 
   p {
@@ -297,7 +297,7 @@
   }
 
   strong {
-    color: #FFFFFF;
+    color: var(--white);
     font-weight: 650;
   }
 }
@@ -512,7 +512,7 @@
 button.closing-cta.ant-btn {
   background: var(--ink-900);
   border-color: var(--ink-900);
-  color: #FFFFFF;
+  color: var(--white);
   white-space: normal;
   text-align: left;
   height: auto;
@@ -523,6 +523,6 @@ button.closing-cta.ant-btn {
   &:focus-visible {
     background: var(--ink-800);
     border-color: var(--ink-800);
-    color: #FFFFFF;
+    color: var(--white);
   }
 }

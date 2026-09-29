@@ -3,19 +3,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzButtonModule } from 'ng-zorro-antd/button';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { NzTagModule } from 'ng-zorro-antd/tag';
 import { NzModalModule, NzModalRef, NzModalService } from 'ng-zorro-antd/modal';
 import { NzMessageService } from 'ng-zorro-antd/message';
-import { NzTabsModule } from 'ng-zorro-antd/tabs';
-import { NzCollapseModule } from 'ng-zorro-antd/collapse';
-import { NzSpaceModule } from 'ng-zorro-antd/space';
-import { NzBadgeModule } from 'ng-zorro-antd/badge';
-import { NzGridModule } from 'ng-zorro-antd/grid';
-import { NzDividerModule } from 'ng-zorro-antd/divider';
-import { NzTypographyModule } from 'ng-zorro-antd/typography';
 import { NzToolTipModule } from 'ng-zorro-antd/tooltip';
 import { NzProgressModule } from 'ng-zorro-antd/progress';
 import { Store } from '@ngrx/store';
@@ -32,7 +23,8 @@ import { isOwnerEditableStatus } from '../issue-creation/issue-field.constants';
 import { EmailModalComponent } from './email-modal.component';
 import { GoogleMap, MapMarker, MapInfoWindow } from '@angular/google-maps';
 import { GoogleMapsConfigService } from '../../services/google-maps-config.service';
-import { StatusTextPipe, StatusColorPipe, IsActivePipe, IsResolvedPipe, IsTerminalStatePipe, IsOwnerEditablePipe } from '../../pipes/status.pipe';
+import { StatusTextPipe, StatusTonePipe, IsActivePipe, IsResolvedPipe, IsTerminalStatePipe, IsOwnerEditablePipe } from '../../pipes/status.pipe';
+import { CategoryIconPipe, CategoryLabelPipe } from '../../pipes/category.pipe';
 import { IsUrgentPipe } from '../../pipes/urgency.pipe';
 import { DaysSincePipe, ResolutionSpanPipe } from '../../pipes/date.pipe';
 import { MainPhotoPipe, PhotosExceptPipe } from '../../pipes/photo.pipe';
@@ -48,25 +40,18 @@ import { SeoService, socialCardFromPhoto } from '../../services/seo.service';
     standalone: true,
     imports: [
         CommonModule,
-        NzCardModule,
         NzButtonModule,
         NzIconModule,
-        NzTagModule,
         NzModalModule,
-        NzTabsModule,
-        NzCollapseModule,
-        NzSpaceModule,
-        NzBadgeModule,
-        NzGridModule,
-        NzDividerModule,
-        NzTypographyModule,
         NzToolTipModule,
         NzProgressModule,
         GoogleMap,
         MapMarker,
         MapInfoWindow,
         StatusTextPipe,
-        StatusColorPipe,
+        StatusTonePipe,
+        CategoryLabelPipe,
+        CategoryIconPipe,
         IsActivePipe,
         IsResolvedPipe,
         IsTerminalStatePipe,
@@ -371,7 +356,7 @@ export class IssueDetailComponent implements OnInit, OnDestroy, AfterViewInit {
         if (!issue.authorities || issue.authorities.length === 0) return;
 
         const modalRef: any = this._modal.create({
-            nzTitle: 'Trimite Mail',
+            nzTitle: 'Trimite email autorităților',
             nzContent: EmailModalComponent,
             nzData: { issue, authorities: issue.authorities },
             nzWidth: 700,

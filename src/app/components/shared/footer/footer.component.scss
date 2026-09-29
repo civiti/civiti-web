@@ -1,6 +1,6 @@
 .site-footer {
   background: var(--ink-950);
-  color: #FFFFFF;
+  color: var(--white);
 }
 
 .footer-top {
@@ -20,7 +20,7 @@
   display: inline-flex;
   align-items: center;
   gap: 10px;
-  color: #FFFFFF;
+  color: var(--white);
   font-family: var(--font-display);
   font-size: 1.5rem;
   font-weight: 750;
@@ -72,7 +72,7 @@
     transition: color var(--dur) var(--ease);
 
     &:hover {
-      color: #FFFFFF;
+      color: var(--white);
       text-decoration: underline;
       text-decoration-color: var(--signal-500);
       text-underline-offset: 3px;
@@ -109,7 +109,7 @@
   text-decoration: none;
 
   &:hover {
-    color: #FFFFFF;
+    color: var(--white);
     text-decoration: underline;
     text-underline-offset: 2px;
   }
@@ -127,7 +127,7 @@
   transition: color var(--dur) var(--ease), background-color var(--dur) var(--ease);
 
   &:hover {
-    color: #FFFFFF;
+    color: var(--white);
     background: var(--white-10);
   }
 }
@@ -169,7 +169,7 @@
   }
 
   &:hover {
-    color: #FFFFFF;
+    color: var(--white);
     text-decoration: underline;
   }
 }
@@ -198,7 +198,7 @@
   }
 
   &:hover {
-    color: #FFFFFF;
+    color: var(--white);
   }
 
   // Class specificity beats the UA `[hidden]` rule, so restore it explicitly.

@@ -4,12 +4,9 @@ import { Store } from '@ngrx/store';
 import { Observable, combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { NzCardModule } from 'ng-zorro-antd/card';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { NzSpinModule } from 'ng-zorro-antd/spin';
-import { NzEmptyModule } from 'ng-zorro-antd/empty';
 import { NzSelectModule } from 'ng-zorro-antd/select';
-import { NzAlertModule } from 'ng-zorro-antd/alert';
 import { FormsModule } from '@angular/forms';
 import { AppState } from '../../../store/app.state';
 import * as CommentsActions from '../../../store/comments/comments.actions';
@@ -25,12 +22,9 @@ import { CommentItemComponent } from './comment-item/comment-item.component';
   imports: [
     CommonModule,
     FormsModule,
-    NzCardModule,
     NzIconModule,
     NzSpinModule,
-    NzEmptyModule,
     NzSelectModule,
-    NzAlertModule,
     CommentFormComponent,
     CommentItemComponent
   ],

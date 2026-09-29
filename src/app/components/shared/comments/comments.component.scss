@@ -1,101 +1,69 @@
-.comments-section {
-  margin-top: 1.5rem;
+.comments {
+  padding: var(--space-6);
 
-  ::ng-deep .ant-card-body {
-    padding: 1rem 1.5rem;
+  @media (max-width: 640px) {
+    padding: var(--space-5);
   }
 }
 
 .comments-header {
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  margin-bottom: 1rem;
-  padding-bottom: 0.75rem;
-  border-bottom: 1px solid var(--platinum);
-
-  .header-left {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-
-    .header-icon {
-      font-size: 1.25rem;
-      color: var(--oxford-blue);
-    }
-
-    .header-title {
-      margin: 0;
-      font-size: 1.125rem;
-      font-weight: 600;
-      color: var(--oxford-blue);
-
-      .comment-count {
-        font-weight: 400;
-        opacity: 0.7;
-      }
-    }
-  }
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
-.comments-sort-select {
-  width: 160px;
+.comment-count {
+  margin-left: 4px;
+  color: var(--ink-400);
+  font-weight: 600;
 }
 
-.loading-state {
+.comments-sort {
+  width: 150px;
+}
+
+.state {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
-  padding: 2rem;
-  color: var(--oxford-blue);
-  opacity: 0.7;
+  gap: var(--space-2);
+  padding: var(--space-8) 0;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
 
   p {
-    margin-top: 0.75rem;
-    margin-bottom: 0;
+    margin: 0;
   }
 }
 
-.error-alert {
-  margin-bottom: 1rem;
+.error,
+.prompt {
+  margin-bottom: var(--space-4);
 }
 
-.new-comment-section {
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--platinum);
+.new-comment {
+  margin-bottom: var(--space-5);
 }
 
-.login-prompt,
-.closed-message {
+.empty {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 0.5rem;
-  padding: 0.75rem 1rem;
-  margin-bottom: 1rem;
-  background-color: var(--platinum);
-  border-radius: 8px;
-  color: var(--oxford-blue);
-  opacity: 0.8;
-  font-size: 0.875rem;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-4);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  text-align: center;
 
-  i {
-    font-size: 1rem;
-  }
-}
-
-.comments-list {
-  min-height: 100px;
-}
-
-::ng-deep {
-  .ant-empty {
-    padding: 2rem 0;
+  .anticon {
+    font-size: 24px;
   }
 
-  .ant-empty-description {
-    color: var(--oxford-blue);
-    opacity: 0.7;
+  p {
+    margin: 0;
   }
 }

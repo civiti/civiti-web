@@ -71,9 +71,9 @@
     <article class="issues-map__card" aria-live="polite">
       <header class="issues-map__card-head">
         <div class="issues-map__card-tags">
-          <nz-tag [nzColor]="issue.status | statusColor">{{ issue.status | statusText }}</nz-tag>
+          <span class="c-status" [attr.data-tone]="issue.status | statusTone">{{ issue.status | statusText }}</span>
           @if (issue.urgency | isUrgent) {
-            <nz-tag nzColor="error">URGENT</nz-tag>
+            <span class="c-tag c-tag--urgent">Urgent</span>
           }
         </div>
 

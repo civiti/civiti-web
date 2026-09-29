@@ -1,437 +1,433 @@
-// Issues Control Panel - unified header + filters
-.issues-control-panel {
-  background: white;
-  border-radius: 8px;
-  border: 1px solid var(--platinum);
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-  margin-bottom: 1.5rem;
-
-  .control-panel-header {
-    padding: 1rem 1.25rem;
-
-    .header-info {
-      h2 {
-        margin: 0 0 0.25rem 0;
-      }
-
-      p {
-        margin: 0;
-      }
-    }
-  }
-
-  .control-panel-filters {
-    padding: 0.75rem 1.25rem 1rem;
-    border-top: 1px solid var(--platinum);
-    background: rgba(0, 0, 0, 0.01);
-  }
+:host {
+  display: block;
 }
 
-.address-search-wrapper {
-  position: relative;
-
-  // Ensure input and icons are vertically aligned
-  .ant-input-group {
-    display: flex;
-    align-items: center;
-  }
-
-  .ant-input-prefix,
-  .ant-input-suffix {
-    display: flex;
-    align-items: center;
-  }
-
-  // Match NG-ZORRO select clear button styling
-  .ant-select-clear {
-    cursor: pointer;
-    opacity: 0;
-    transition: color 0.2s ease, opacity 0.2s ease;
-    color: rgba(0, 0, 0, 0.25);
-
-    &:hover {
-      color: rgba(0, 0, 0, 0.45);
-    }
-  }
-
-  // Show clear button on hover over the input group
-  &:hover .ant-select-clear,
-  .ant-select-clear:focus {
-    opacity: 1;
-  }
-
-  .autocomplete-dropdown {
-    position: absolute;
-    top: 100%;
-    left: 0;
-    right: 0;
-    background: white;
-    border: 1px solid #d9d9d9;
-    border-radius: 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-    z-index: 1000;
-    max-height: 200px;
-    overflow-y: auto;
-
-    .suggestion-item {
-      padding: 8px 12px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: var(--oxford-blue);
-
-      &:hover {
-        background: rgba(252, 163, 17, 0.1);
-      }
-    }
-  }
+.hub {
+  padding-bottom: var(--space-16);
 }
 
-// Filters grid layout
-.filters-grid {
+// --- Head ---
+
+.hub-head {
+  padding-block: var(--space-10) var(--space-6);
+}
+
+.head-row {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-5) var(--space-8);
+}
+
+.head-text {
+  flex: 1 1 480px;
+  min-width: 0;
+}
+
+.head-count {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1) var(--space-3);
+  margin: var(--space-3) 0 0;
+  color: var(--ink-600);
+  font-size: var(--text-base);
+
+  strong {
+    color: var(--ink-900);
+    font-weight: 650;
+  }
+}
+
+.head-range {
+  color: var(--ink-500);
+}
+
+// Below 960px the header's own "Raportează" sits a thumb's reach away.
+.head-actions {
+  @media (max-width: 959px) {
+    display: none;
+  }
+}
+
+// --- Toolbar ---
+
+.toolbar {
+  position: sticky;
+  top: var(--header-h);
+  z-index: 20;
+  padding-block: var(--space-3);
+  border-block: 1px solid var(--line);
+  background: rgba(246, 244, 239, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+
+  @media (max-width: 959px) {
+    position: static;
+    backdrop-filter: none;
+  }
+}
+
+.toolbar-row {
+  display: flex;
   align-items: center;
+  gap: var(--space-3);
 
-  .filter-item {
-    flex-shrink: 0;
+  & + & {
+    margin-top: var(--space-3);
   }
 
-  .filter-address {
-    flex: 1;
-    min-width: 200px;
-    max-width: 300px;
+  @media (max-width: 959px) {
+    flex-wrap: wrap;
   }
+}
 
-  // All dropdown filters get consistent min-width for stable sizing
-  .filter-sector {
-    min-width: 110px;
+.address-search {
+  position: relative;
+  flex: 1 1 280px;
+  min-width: 0;
+
+  @media (max-width: 959px) {
+    flex-basis: 100%;
   }
+}
 
-  .filter-category {
-    min-width: 140px;
+.clear-address {
+  display: inline-flex;
+  padding: 2px;
+  border: 0;
+  background: none;
+  color: var(--ink-400);
+  cursor: pointer;
+
+  &:hover {
+    color: var(--ink-700);
   }
+}
 
-  .filter-status {
-    min-width: 150px;
-  }
+.suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 30;
+  max-height: 280px;
+  margin: 0;
+  padding: 6px;
+  overflow-y: auto;
+  list-style: none;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-lg), 0 0 0 1px var(--line);
 
-  .filter-sort {
-    min-width: 160px;
-  }
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--space-2);
+    padding: 9px 10px;
+    border-radius: var(--radius-sm);
+    color: var(--ink-800);
+    font-size: var(--text-md);
+    cursor: pointer;
 
-  .filter-clear {
-    margin-left: auto;
-
-    button {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.25rem;
-      color: var(--oxford-blue);
-      opacity: 0.7;
-
-      &:hover {
-        opacity: 1;
-        color: var(--orange-web);
-      }
+    &:hover {
+      background: var(--paper);
     }
-  }
 
-  @media (max-width: 768px) {
-    .filter-address {
-      flex-basis: 100%;
-      max-width: none;
-    }
-
-    .filter-item:not(.filter-address):not(.filter-clear) {
-      flex: 1;
-      min-width: 120px;
-    }
-
-    .filter-clear {
-      flex-basis: 100%;
-      margin-left: 0;
+    .anticon {
+      margin-top: 3px;
+      color: var(--ink-500);
     }
   }
 }
 
-// The card title is an <h2><a> now; strip the heading and link defaults so it
-// renders exactly as the previous ant-design meta title did.
-.issue-card-title {
-  margin: 0;
-  font: inherit;
-  font-weight: 600;
+.select-sector {
+  width: 190px;
+}
 
-  // NG-ZORRO gives .ant-card-meta-title `white-space: nowrap` plus an ellipsis, and that
-  // nowrap is inherited by this heading — so the title could never wrap, however much room
-  // the card had. Resetting it here is what lets .line-clamp-2 above do anything at all.
-  //
-  // Two lines rather than one because these titles are addresses ("Blocul V6, Calea 13
-  // Septembrie"): the part that gets cut is the part that says which place it is, so a
-  // one-line title reads as a generic street name on exactly the issues with the most
-  // specific locations.
-  white-space: normal;
+.select-sort {
+  width: 220px;
+}
 
-  // Both lines are reserved whether or not the title uses them, so the description, the
-  // location row and the stats grid stay level across the three cards in a grid row. Without
-  // it, one two-line title in a row would shunt its own card's content down alone.
-  // 2 lines x the 1.4 line-height set below.
-  min-height: 2.8em;
-  line-height: 1.4;
-
-  // A single unbroken token — a long street name, a pasted URL — would otherwise render as
-  // one overflowing line that the clamp cannot catch, and push past the card edge.
-  overflow-wrap: anywhere;
-
-  a {
-    color: inherit;
-    text-decoration: none;
+@media (max-width: 959px) {
+  .select-sector,
+  .select-sort {
+    flex: 1 1 160px;
+    width: auto;
   }
+}
+
+.switcher {
+  flex: none;
+
+  @media (max-width: 959px) {
+    flex-basis: 100%;
+  }
+}
+
+// Chips wrap on wide screens; on narrow ones the row scrolls sideways instead
+// of stacking into a wall of pills.
+.toolbar-chips {
+  flex-wrap: wrap;
+  row-gap: var(--space-2);
+
+  @media (max-width: 959px) {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
+  }
+}
+
+.segment {
+  display: inline-flex;
+  flex: none;
+  padding: 3px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-pill);
+  background: var(--surface);
+}
+
+.segment-option {
+  height: 30px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--ink-600);
+  font: 600 var(--text-sm) / 1 var(--font-sans);
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background-color var(--dur) var(--ease), color var(--dur) var(--ease);
+
+  &:hover {
+    color: var(--ink-900);
+  }
+
+  &.is-active {
+    background: var(--ink-900);
+    color: var(--white);
+  }
+}
+
+.chips {
+  display: flex;
+  flex: 0 1 auto;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  padding-left: var(--space-3);
+  border-left: 1px solid var(--line-strong);
+
+  .c-chip {
+    height: 34px;
+    padding-inline: 12px;
+  }
+
+  @media (max-width: 959px) {
+    flex: none;
+    flex-wrap: nowrap;
+  }
+}
+
+.clear-filters {
+  flex: none;
+  margin-left: auto;
+}
+
+// --- Results ---
+
+.results {
+  padding-top: var(--space-6);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+  gap: var(--space-5);
 }
 
 .issue-card {
-  position: relative;
-  border: 1px solid var(--platinum);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  cursor: pointer;
 
-  // Use pseudo-element for hover shadow to prevent flickering
-  &::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    box-shadow: 0 12px 32px rgba(20, 33, 61, 0.15);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none; // Don't interfere with hover detection
-    z-index: -1;
-  }
-
-  &:hover::after {
-    opacity: 1;
-  }
-
-  // Prevent hover conflicts with buttons
-  button {
-    position: relative;
-    transition: all 0.2s ease;
-    margin: 4px 0;
-
-    &:hover {
-      transform: translateY(-1px);
-      box-shadow: 0 4px 12px rgba(252, 163, 17, 0.3);
-    }
+  &:hover .issue-title a {
+    text-decoration-color: var(--signal-500);
   }
 }
 
-.line-clamp-2 {
+.issue-media {
+  position: relative;
+  aspect-ratio: 16 / 10;
   overflow: hidden;
+  background: var(--paper-2);
+
+  img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.issue-badges {
+  position: absolute;
+  top: var(--space-3);
+  left: var(--space-3);
+  right: var(--space-3);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-2);
+}
+
+.urgent-tag {
+  box-shadow: var(--shadow-sm);
+}
+
+.issue-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-5) var(--space-5);
+}
+
+.issue-kicker {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0;
+  color: var(--signal-text);
+  font-size: var(--text-xs);
+  font-weight: 650;
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+.kicker-sep {
+  color: var(--ink-300);
+}
+
+.issue-title {
   display: -webkit-box;
+  margin: var(--space-2) 0 0;
+  overflow: hidden;
+  font-size: var(--text-lg);
+  font-weight: 700;
+  line-height: 1.3;
+  -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
   line-clamp: 2;
-  -webkit-box-orient: vertical;
+
+  a {
+    color: var(--ink-900);
+    text-decoration: underline;
+    text-decoration-color: transparent;
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+    transition: text-decoration-color var(--dur) var(--ease);
+  }
 }
 
-.line-clamp-3 {
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  -webkit-box-orient: vertical;
+.issue-address {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: var(--space-2) 0 0;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+
+  span:last-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
-// Stats grid for issue cards
-.stats-grid {
+.issue-stats {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 1rem;
-  border-top: 1px solid var(--platinum);
-  padding-top: 0.75rem;
-  margin-bottom: 0.5rem;
+  margin: auto 0 0;
+  padding-top: var(--space-4);
 
-  .stat-item {
+  .stat {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.375rem;
+    flex-direction: column-reverse;
+    gap: 4px;
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--line);
+  }
 
-    i {
-      font-size: 1.25rem;
-      color: var(--orange-web);
-    }
+  dt {
+    color: var(--ink-500);
+    font-size: var(--text-xs);
+    font-weight: 500;
+  }
 
-    .stat-value {
-      font-size: 1rem;
-      font-weight: 600;
-      color: var(--oxford-blue);
-    }
+  dd {
+    margin: 0;
+    color: var(--ink-900);
+    font-size: var(--text-xl);
+  }
+
+  // Emails are the mechanism; they get the signal.
+  .stat--emails {
+    border-top-color: var(--signal-500);
+    border-top-width: 2px;
+    padding-top: calc(var(--space-3) - 1px);
   }
 }
 
-// Priority urgent styling with proper specificity
-.priority-urgent,
-nz-tag.priority-urgent,
-.ant-tag.priority-urgent {
-  background-color: var(--orange-web);
-  color: white;
-  font-weight: 700;
-  animation: pulse 2s infinite;
-  border-color: var(--orange-web);
+// --- Skeletons ---
+
+.skeleton-card {
+  overflow: hidden;
 }
 
-@keyframes pulse {
-
-  0%,
-  100% {
-    opacity: 1;
-  }
-
-  50% {
-    opacity: 0.7;
-  }
+.skeleton-media {
+  aspect-ratio: 16 / 10;
+  border-radius: 0;
 }
 
-.animate-spin {
-  animation: spin 2s linear infinite;
+.skeleton-body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-5);
 }
 
-@keyframes spin {
-  from {
-    transform: rotate(0deg);
-  }
+.skeleton-line {
+  height: 14px;
 
-  to {
-    transform: rotate(360deg);
-  }
+  &--short { width: 40%; }
+  &--mid { width: 70%; }
 }
 
-.bg-background {
-  background-color: var(--color-background);
+// --- Empty / pager ---
+
+.empty-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
 }
 
-.text-oxford-blue {
-  color: var(--oxford-blue);
+.pager {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: var(--space-10);
 }
 
-.text-orange-web {
-  color: var(--orange-web);
-}
-
-.border-platinum {
-  border-color: var(--platinum);
-}
-
-.official-badge {
-  background-color: var(--oxford-blue);
-  color: var(--white);
-}
-
-
-.container {
-  max-width: 1200px;
-}
-
-// Create issue FAB styling
-.create-issue-fab {
-  background: linear-gradient(135deg, var(--orange-web) 0%, #FDB833 100%);
-  border: none;
-  transition: all 0.3s ease;
-  
-  &:hover {
-    transform: translateY(-3px) scale(1.05);
-    box-shadow: 0 8px 25px rgba(252, 163, 17, 0.4);
-  }
-  
-  &:active {
-    transform: translateY(-1px) scale(1.02);
-  }
-}
-
-@media (max-width: 768px) {
-  .grid {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-  }
-
-  .container {
-    padding: 1rem;
-  }
-}
-
-// Pagination styling
-.pagination-control {
-  ::ng-deep {
-    .ant-pagination-item {
-      border-color: var(--platinum);
-
-      &:hover {
-        border-color: var(--orange-web);
-
-        a {
-          color: var(--orange-web);
-        }
-      }
-
-      a {
-        color: var(--oxford-blue);
-      }
-    }
-
-    .ant-pagination-item-active {
-      background-color: var(--orange-web);
-      border-color: var(--orange-web);
-
-      a {
-        color: var(--white);
-      }
-
-      &:hover {
-        border-color: var(--orange-web);
-
-        a {
-          color: var(--white);
-        }
-      }
-    }
-
-    .ant-pagination-prev,
-    .ant-pagination-next {
-      .ant-pagination-item-link {
-        border-color: var(--platinum);
-        color: var(--oxford-blue);
-
-        &:hover {
-          border-color: var(--orange-web);
-          color: var(--orange-web);
-        }
-      }
-    }
-
-    .ant-pagination-disabled {
-      .ant-pagination-item-link {
-        color: var(--platinum);
-        border-color: var(--platinum);
-      }
-    }
-
-    .ant-pagination-jump-prev,
-    .ant-pagination-jump-next {
-      .ant-pagination-item-link-icon {
-        color: var(--orange-web);
-      }
-    }
-
-    .ant-pagination-options-quick-jumper {
-      input {
-        border-color: var(--platinum);
-        color: var(--oxford-blue);
-
-        &:hover,
-        &:focus {
-          border-color: var(--orange-web);
-        }
-      }
-    }
-  }
+.pager-info {
+  margin: 0;
+  color: var(--ink-500);
+  font-size: var(--text-sm);
 }
