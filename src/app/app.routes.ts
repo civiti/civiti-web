@@ -174,7 +174,7 @@ export const routes: Routes = [
         loadComponent: () => import('./components/guides/guide-list/guide-list.component').then(m => m.GuideListComponent),
         data: {
           animation: 'GuideListPage',
-          headerTitle: 'Ghid Civic',
+          headerTitle: 'Ghid civic',
           showFooter: true,
           seo: {
             title: 'Ghid Civic',
@@ -187,9 +187,7 @@ export const routes: Routes = [
         loadComponent: () => import('./components/guides/guide-detail/guide-detail.component').then(m => m.GuideDetailComponent),
         data: {
           animation: 'GuideDetailPage',
-          headerTitle: 'Ghid Civic',
-          showBackButton: true,
-          backUrl: '/ghid',
+          headerTitle: 'Ghid civic',
           showFooter: true,
         }
       }
@@ -214,8 +212,6 @@ export const routes: Routes = [
     data: {
       animation: 'DesprePage',
       headerTitle: 'Despre Civiti',
-      showBackButton: true,
-      backUrl: '/',
       showFooter: true,
       seo: {
         title: 'Despre Civiti — Povestea platformei',
