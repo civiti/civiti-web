@@ -18,10 +18,9 @@ import {
   CreateIssueRequest,
   UrgencyLevel,
   IssueCategory,
-  IssueAuthorityInput,
-  URGENCY_LEVELS,
-  URGENCY_COLORS
+  IssueAuthorityInput
 } from '../../../types/civica-api.types';
+import { UrgencyLabelPipe, UrgencyTonePipe } from '../../../pipes/urgency.pipe';
 import { generateIssueTitle } from '../issue-title.util';
 import { clearIssueCreationSession } from '../issue-session.util';
 import { APP_STORE_URL } from '../../../constants/urls';
@@ -44,7 +43,9 @@ const APP_NUDGE_KEY = 'app_nudge_post_submit';
     RouterModule,
     NzButtonModule,
     NzIconModule,
-    NzSpinModule
+    NzSpinModule,
+    UrgencyLabelPipe,
+    UrgencyTonePipe
   ],
   templateUrl: './issue-review.component.html',
   styleUrls: ['./issue-review.component.scss']
@@ -115,10 +116,6 @@ export class IssueReviewComponent implements OnInit {
     }
   }
 
-  getUrgencyStatus(urgency: string): 'default' | 'processing' | 'success' | 'error' | 'warning' {
-    return (URGENCY_COLORS[urgency as UrgencyLevel] || 'default') as 'default' | 'processing' | 'success' | 'error' | 'warning';
-  }
-
   getWhenLabel(when: string): string {
     const labels: { [key: string]: string } = {
       'now': 'Chiar acum',
@@ -128,11 +125,6 @@ export class IssueReviewComponent implements OnInit {
       'longer': 'Acum mai mult de o săptămână'
     };
     return labels[when] || when;
-  }
-
-
-  getUrgencyLabel(urgency: string): string {
-    return URGENCY_LEVELS[urgency as UrgencyLevel] || urgency;
   }
 
   viewPhoto(photoUrl: string): void {

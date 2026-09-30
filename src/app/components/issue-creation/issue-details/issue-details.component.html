@@ -28,7 +28,7 @@
       @if (uploadedPhotos.length > 0) {
         <li>
           <span nz-icon nzType="picture" nzTheme="outline"></span>
-          <span>{{ uploadedPhotos.length }} fotografii încărcate</span>
+          <span>{{ uploadedPhotos.length | roPlural:'fotografie încărcată':'fotografii încărcate' }}</span>
         </li>
       }
       @if (currentLocation) {
@@ -122,11 +122,11 @@
           <nz-form-item>
             <nz-form-label id="urgency-label">Nivel de urgență</nz-form-label>
             <nz-form-control>
-              <nz-radio-group formControlName="urgency" class="urgency" aria-labelledby="urgency-label">
+              <nz-radio-group formControlName="urgency" class="c-radio-cards urgency" aria-labelledby="urgency-label">
                 @for (opt of urgencyOptions; track opt.value) {
-                  <label nz-radio [nzValue]="opt.value" class="urgency__opt" [attr.data-level]="opt.value">
-                    <span class="urgency__label">{{ opt.label }}</span>
-                    <span class="urgency__desc">{{ opt.description }}</span>
+                  <label nz-radio [nzValue]="opt.value" class="c-radio-card">
+                    <span class="c-radio-card__title">{{ opt.label }}</span>
+                    <span class="c-radio-card__hint">{{ opt.description }}</span>
                   </label>
                 }
               </nz-radio-group>

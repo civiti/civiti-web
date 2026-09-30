@@ -114,7 +114,9 @@
                 "output": "/assets/"
               }
             ],
-            "styles": ["src/theme.less", "src/styles.scss"]
+            "styles": ["src/theme.less", "src/styles.scss"],
+            "karmaConfig": "karma.conf.js",
+            "aot": true
           }
         }
       }

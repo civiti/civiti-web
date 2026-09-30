@@ -21,6 +21,11 @@
 @use 'glightbox/dist/css/glightbox.min.css';
 @use 'app/components/issue-creation/wizard';
 
+// Tailwind v4 scans every non-ignored file for class names. The Markdown under docs/
+// holds old mock-up snippets whose nested utilities (space-y-1, hover:bg-orange-50)
+// the critical-CSS inliner rejects with "Empty sub-selector"; they are never used.
+@source not '../docs';
+
 // --------------------------------------------------------------------------
 // 1. Fonts
 //
@@ -188,6 +193,10 @@ $latin-ext: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0
   --container-narrow: 760px;
   --gutter: clamp(1rem, 0.5rem + 2.5vw, 2rem);
   --header-h: 64px;
+  --back-row-h: 44px;
+  /* Where sticky content starts on a route with a back row (showBackButton):
+     the header bar, the back row and their two 1px hairlines. */
+  --sticky-top: calc(var(--header-h) + var(--back-row-h) + 2px);
 
   /* Radii */
   --radius-xs: 6px;
@@ -490,6 +499,40 @@ router-outlet + * {
 }
 
 // Long-form content (guides, legal, about): readable measure and rhythm.
+// Breadcrumb trail above a page title.
+//   <nav class="c-breadcrumb" aria-label="Breadcrumb">
+//     <a routerLink="/ghid">Ghid civic</a><span class="c-breadcrumb__sep" aria-hidden="true">/</span>
+//     <span aria-current="page">Titlu</span>
+//   </nav>
+.c-breadcrumb {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--ink-500);
+  font-size: var(--text-sm);
+  font-weight: 600;
+
+  // The padding grows the tap target; the negative margin keeps it off the layout.
+  a {
+    margin-block: calc(-1 * var(--space-3));
+    padding-block: var(--space-3);
+    color: var(--ink-900);
+    text-decoration: underline;
+    text-decoration-color: var(--signal-500);
+    text-decoration-thickness: 2px;
+    text-underline-offset: 3px;
+
+    &:hover {
+      color: var(--signal-text-strong);
+    }
+  }
+
+  &__sep {
+    color: var(--ink-300);
+  }
+}
+
 .c-prose {
   font-size: var(--text-lg);
   line-height: 1.7;
@@ -774,14 +817,24 @@ router-outlet + * {
   line-height: 1;
   white-space: nowrap;
 
-  &--urgent {
+  // Tone by modifier, or by data-tone when a pipe picks it:
+  // <span class="c-tag" [attr.data-tone]="issue.urgency | urgencyTone">
+  &--urgent,
+  &[data-tone='urgent'] {
     background: var(--bad-wash);
     color: var(--bad-text);
   }
 
-  &--signal {
+  &--signal,
+  &[data-tone='signal'] {
     background: var(--signal-50);
     color: var(--signal-text-strong);
+  }
+
+  &--info,
+  &[data-tone='info'] {
+    background: var(--info-wash);
+    color: var(--info-text);
   }
 }
 
@@ -902,6 +955,116 @@ router-outlet + * {
   background: var(--line);
 }
 
+// A guide teaser (home, /ghid, related guides): image, then title and blurb.
+//   <a class="c-guide-card"><span class="c-guide-card__media"><img></span>
+//     <span class="c-guide-card__body">__top? __title __desc __meta? __more?</span></a>
+// --compact tightens it for the two-up "related" grid.
+.c-guide-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  color: inherit;
+  text-decoration: none;
+  transition: border-color var(--dur) var(--ease), box-shadow var(--dur) var(--ease);
+
+  &:hover {
+    border-color: var(--line-strong);
+    box-shadow: var(--shadow-md);
+
+    .c-guide-card__more {
+      color: var(--ink-900);
+    }
+  }
+
+  &__media {
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-bottom: 1px solid var(--line);
+    background: var(--paper-2);
+
+    img {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+  }
+
+  &__body {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    gap: var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-6);
+  }
+
+  &__top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-3);
+  }
+
+  &__title {
+    margin: 0;
+    color: var(--ink-900);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  &__desc {
+    flex: 1;
+    margin: 0;
+    color: var(--ink-600);
+    font-size: var(--text-sm);
+    line-height: 1.55;
+  }
+
+  &__meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-2);
+    margin: 0;
+    color: var(--ink-500);
+    font-size: var(--text-xs);
+    font-weight: 500;
+  }
+
+  &__dot {
+    width: 3px;
+    height: 3px;
+    border-radius: 50%;
+    background: var(--ink-300);
+  }
+
+  &__more {
+    color: var(--signal-text);
+    font-size: var(--text-sm);
+    font-weight: 650;
+  }
+
+  &--compact {
+    .c-guide-card__body {
+      align-items: flex-start;
+      gap: var(--space-2);
+      padding: var(--space-4) var(--space-5) var(--space-5);
+    }
+
+    .c-guide-card__title {
+      flex: 1;
+      font-size: var(--text-base);
+      line-height: 1.35;
+    }
+  }
+}
+
 // --- Stats ------------------------------------------------------------------
 
 .c-stat {
@@ -937,6 +1100,134 @@ router-outlet + * {
     height: 100%;
     border-radius: inherit;
     background: var(--signal-500);
+  }
+}
+
+// --- Data lists -------------------------------------------------------------
+
+// Key/value rows: label left, value right, a hairline between rows.
+//   <dl class="c-kv"><div class="c-kv__row"><dt>Status</dt><dd>Activă</dd></div></dl>
+// --num sets the values as display numerals; __row--stacked puts a value too
+// long to share the row (an ID, an address) under its label.
+.c-kv {
+  --kv-pad: var(--space-2);
+
+  margin: 0;
+  font-size: var(--text-sm);
+
+  &__row {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding-block: var(--kv-pad);
+
+    & + & {
+      border-top: 1px solid var(--line);
+    }
+
+    &:first-child {
+      padding-top: 0;
+    }
+
+    &:last-child {
+      padding-bottom: 0;
+    }
+
+    &--stacked {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 2px;
+
+      dd {
+        text-align: left;
+      }
+    }
+  }
+
+  dt {
+    color: var(--ink-500);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ink-900);
+    font-weight: 600;
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+
+  &--num {
+    --kv-pad: var(--space-3);
+
+    font-size: var(--text-base);
+
+    dt {
+      color: var(--ink-600);
+    }
+
+    dd {
+      font-family: var(--font-display);
+      font-size: var(--text-xl);
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+  }
+}
+
+// Horizontal bars: one ink series, largest first, the value at the bar's tip.
+//   <ul class="c-bars" role="list"><li class="c-bars__row">
+//     <span class="c-bars__label">Mediu</span>
+//     <span class="c-bars__plot"><span class="c-bars__fill" [style.--pct]="pct"></span>
+//       <span class="c-bars__value">12</span></span></li></ul>
+// --pct is 0–100 of the largest value.
+.c-bars {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  &__row {
+    display: grid;
+    grid-template-columns: 8.5rem minmax(0, 1fr);
+    align-items: center;
+    gap: var(--space-3);
+    font-size: var(--text-sm);
+
+    @media (max-width: 420px) {
+      grid-template-columns: 6.5rem minmax(0, 1fr);
+    }
+  }
+
+  &__label {
+    color: var(--ink-700);
+    font-weight: 550;
+    overflow-wrap: anywhere;
+  }
+
+  &__plot {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+    min-width: 0;
+  }
+
+  // The bar may use the plot minus room for its value label.
+  &__fill {
+    flex: none;
+    width: calc((100% - 3.5rem) * var(--pct, 0) / 100);
+    min-width: 2px;
+    height: 12px;
+    border-radius: 0 var(--radius-xs) var(--radius-xs) 0;
+    background: var(--ink-700);
+  }
+
+  &__value {
+    color: var(--ink-900);
+    font-weight: 650;
+    font-variant-numeric: tabular-nums;
   }
 }
 
@@ -1002,6 +1293,13 @@ router-outlet + * {
     background: var(--signal-50);
 
     .anticon { color: var(--signal-text); }
+  }
+
+  &--info {
+    border-color: var(--info-line);
+    background: var(--info-wash);
+
+    .anticon { color: var(--info-text); }
   }
 
   &--ok {
@@ -1324,6 +1622,78 @@ body .ant-radio-inner {
 body .ant-checkbox-wrapper,
 body .ant-radio-wrapper {
   color: var(--ink-800);
+}
+
+// Radio cards: an nz-radio-group whose options are bordered cards.
+//   <nz-radio-group class="c-radio-cards">
+//     <label nz-radio nzValue="approve" class="c-radio-card" data-tone="ok">
+//       <span class="c-radio-card__title">Aprobă</span>
+//       <span class="c-radio-card__hint">Sesizarea devine publică.</span></label>
+// The checked card takes an ink outline, or its data-tone (ok, bad, info) as
+// outline and wash. The grid fits as many 160px columns as there is room for.
+.c-radio-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: var(--space-2);
+  width: 100%;
+}
+
+body label.c-radio-card.ant-radio-wrapper {
+  --tone: var(--ink-900);
+  --wash: var(--paper);
+
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-2);
+  margin: 0;
+  padding: var(--space-3);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--surface);
+  line-height: 1.35;
+  white-space: normal;
+  transition: border-color var(--dur) var(--ease), background-color var(--dur) var(--ease);
+
+  &:hover {
+    border-color: var(--ink-300);
+  }
+
+  &::after {
+    display: none;
+  }
+
+  &[data-tone='ok'] { --tone: var(--ok-text); --wash: var(--ok-wash); }
+  &[data-tone='bad'] { --tone: var(--bad-text); --wash: var(--bad-wash); }
+  &[data-tone='info'] { --tone: var(--info-text); --wash: var(--info-wash); }
+
+  &.ant-radio-wrapper-checked {
+    border-color: var(--tone);
+    box-shadow: inset 0 0 0 1px var(--tone);
+    background: var(--wash);
+  }
+
+  // nz-radio renders the projected label inside its own trailing span.
+  > span:last-child {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 0;
+  }
+}
+
+.c-radio-card__title {
+  color: var(--ink-900);
+  font-weight: 650;
+
+  .anticon {
+    margin-right: 6px;
+    color: var(--tone);
+  }
+}
+
+.c-radio-card__hint {
+  color: var(--ink-600);
+  font-size: var(--text-sm);
 }
 
 // --- Modal ---

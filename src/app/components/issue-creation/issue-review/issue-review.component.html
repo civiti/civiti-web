@@ -143,9 +143,7 @@
                 <span nz-icon [nzType]="issueData.category.icon" nzTheme="outline" aria-hidden="true"></span>
                 <span>{{ issueData.category.name }}</span>
               </span>
-              <span class="c-tag urgency" [attr.data-tone]="getUrgencyStatus(issueData.urgency)">
-                Urgență: {{ getUrgencyLabel(issueData.urgency) }}
-              </span>
+              <span class="c-tag" [attr.data-tone]="issueData.urgency | urgencyTone">{{ issueData.urgency | urgencyLabel:'tag' }}</span>
             </div>
             <p class="case__place">
               <span nz-icon nzType="environment" nzTheme="outline" aria-hidden="true"></span>

@@ -186,15 +186,15 @@ describe('AuthInterceptor Security Tests', () => {
       req.flush([]);
     });
 
-    it('should handle malformed URLs safely', () => {
+    it('should handle relative URLs safely and keep the token to the API origin', () => {
       authService.getAccessToken.and.returnValue('test-token');
 
-      // Relative URL that might cause parsing issues
+      // A relative URL resolves against the site's own origin, not environment.apiUrl.
+      // It must pass through without throwing, and without the bearer token.
       httpClient.get('/api/user/profile').subscribe();
 
       const req = httpTestingController.expectOne('/api/user/profile');
-      // Should still add auth since it doesn't match public endpoints
-      expect(req.request.headers.get('Authorization')).toBe('Bearer test-token');
+      expect(req.request.headers.has('Authorization')).toBeFalse();
       req.flush({});
     });
   });

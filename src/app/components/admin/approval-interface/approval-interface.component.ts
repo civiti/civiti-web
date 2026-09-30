@@ -20,11 +20,14 @@ import { NzCheckboxModule } from 'ng-zorro-antd/checkbox';
 import { ApiService } from '../../../services/api.service';
 import { CategoryLabelPipe } from '../../../pipes/category.pipe';
 import { TimeAgoPipe } from '../../../pipes/date.pipe';
+import { UrgencyLabelPipe, UrgencyTonePipe } from '../../../pipes/urgency.pipe';
+import { RoPluralPipe, roCount } from '../../../pipes/plural.pipe';
 import {
   AdminIssueListItem,
   AdminStatisticsResponse,
   ApproveIssueRequest,
   RejectIssueRequest,
+  RequestChangesRequest,
   BulkApproveRequest
 } from '../../../types/civica-api.types';
 
@@ -47,7 +50,10 @@ import {
     NzPaginationModule,
     NzCheckboxModule,
     CategoryLabelPipe,
-    TimeAgoPipe
+    TimeAgoPipe,
+    UrgencyLabelPipe,
+    UrgencyTonePipe,
+    RoPluralPipe
   ],
   templateUrl: './approval-interface.component.html',
   styleUrls: ['./approval-interface.component.scss']
@@ -72,6 +78,8 @@ export class ApprovalInterfaceComponent implements OnInit {
   isApprovalModalVisible = false;
   selectedIssue: AdminIssueListItem | null = null;
   approvalForm!: FormGroup;
+  /** Mirrors the form's decision so the template can relabel the notes field. */
+  decision = '';
 
   // Bulk approval modal state
   isBulkApprovalModalVisible = false;
@@ -80,15 +88,6 @@ export class ApprovalInterfaceComponent implements OnInit {
   // Queue list paging (presentation only: the whole queue is loaded at once)
   pageIndex = 1;
   readonly pageSize = 10;
-
-  /** Romanian urgency labels, keyed lowercase to match the API's UrgencyLevel values. */
-  readonly urgencyLabels: Record<string, string> = {
-    unspecified: 'Nespecificată',
-    low: 'Scăzută',
-    medium: 'Medie',
-    high: 'Ridicată',
-    urgent: 'Urgentă'
-  };
 
   /** Romanian category labels, keyed lowercase so PascalCase and camelCase API values both match. */
   readonly categoryLabels: Record<string, string> = {
@@ -118,6 +117,17 @@ export class ApprovalInterfaceComponent implements OnInit {
       decision: ['', [Validators.required]],
       notes: ['']
     });
+
+    // Requesting changes sends the notes to the author as the list of changes, so they
+    // must say something; for approve/reject the notes stay optional.
+    this.approvalForm.get('decision')?.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(decision => {
+        this.decision = decision || '';
+        const notes = this.approvalForm.get('notes');
+        notes?.setValidators(decision === 'request_changes' ? [Validators.required, Validators.pattern(/\S/)] : []);
+        notes?.updateValueAndValidity();
+      });
   }
 
   private loadData(): void {
@@ -223,15 +233,15 @@ export class ApprovalInterfaceComponent implements OnInit {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (result) => {
+            if (!result.success) {
+              this.handleDecisionFailure('Aprobarea a eșuat. Încearcă din nou.', result);
+              return;
+            }
             console.log('[ADMIN] Issue approved successfully:', result);
             this.message.success('Problema a fost aprobată cu succes');
             this.handleDecisionSuccess('approve');
           },
-          error: (error) => {
-            console.error('[ADMIN] Failed to approve issue:', error);
-            this.message.error('Aprobarea a eșuat. Încearcă din nou.');
-            this.isProcessing = false;
-          }
+          error: (error) => this.handleDecisionFailure('Aprobarea a eșuat. Încearcă din nou.', error)
         });
     } else if (formValue.decision === 'reject') {
       const rejectionData: RejectIssueRequest = {
@@ -243,16 +253,39 @@ export class ApprovalInterfaceComponent implements OnInit {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (result) => {
+            if (!result.success) {
+              this.handleDecisionFailure('Respingerea a eșuat. Încearcă din nou.', result);
+              return;
+            }
             console.log('[ADMIN] Issue rejected successfully:', result);
             this.message.success('Problema a fost respinsă');
             this.handleDecisionSuccess('reject');
           },
-          error: (error) => {
-            console.error('[ADMIN] Failed to reject issue:', error);
-            this.message.error('Respingerea a eșuat. Încearcă din nou.');
-            this.isProcessing = false;
-          }
+          error: (error) => this.handleDecisionFailure('Respingerea a eșuat. Încearcă din nou.', error)
         });
+    } else if (formValue.decision === 'request_changes') {
+      const changes = (formValue.notes || '').trim();
+      const changesData: RequestChangesRequest = {
+        requestedChanges: changes,
+        adminNotes: changes
+      };
+
+      this.apiService.requestChanges(issueId, changesData)
+        .pipe(takeUntilDestroyed(this.destroyRef))
+        .subscribe({
+          next: (result) => {
+            if (!result.success) {
+              this.handleDecisionFailure('Solicitarea modificărilor a eșuat. Încearcă din nou.', result);
+              return;
+            }
+            console.log('[ADMIN] Changes requested successfully:', result);
+            this.message.success('Modificările au fost solicitate autorului');
+            this.handleDecisionSuccess('request_changes');
+          },
+          error: (error) => this.handleDecisionFailure('Solicitarea modificărilor a eșuat. Încearcă din nou.', error)
+        });
+    } else {
+      this.isProcessing = false;
     }
   }
 
@@ -269,7 +302,17 @@ export class ApprovalInterfaceComponent implements OnInit {
     }
   }
 
-  private handleDecisionSuccess(decision: 'approve' | 'reject'): void {
+  /**
+   * A decision that did not go through: an HTTP error, or a 200 whose body says
+   * `success: false`. Either way the report stays in the queue for another try.
+   */
+  private handleDecisionFailure(text: string, detail: unknown): void {
+    console.error('[ADMIN] Decision failed:', detail);
+    this.message.error(text);
+    this.isProcessing = false;
+  }
+
+  private handleDecisionSuccess(decision: 'approve' | 'reject' | 'request_changes'): void {
     const processedIssueId = this.selectedIssue?.id;
 
     // Remove processed issue from pending list
@@ -288,11 +331,10 @@ export class ApprovalInterfaceComponent implements OnInit {
     // Update stats
     if (this.adminStats) {
       this.adminStats.pendingReview--;
+      this.adminStats.reviewedToday++;
       if (decision === 'approve') {
-        this.adminStats.reviewedToday++;
         this.adminStats.approved++;
       } else if (decision === 'reject') {
-        this.adminStats.reviewedToday++;
         this.adminStats.rejected++;
       }
     }
@@ -370,10 +412,10 @@ export class ApprovalInterfaceComponent implements OnInit {
         next: (response) => {
           console.log('[ADMIN] Bulk approval completed:', response);
 
-          this.message.success(`${response.successfullyApproved} probleme aprobate cu succes`);
+          this.message.success(`${roCount(response.successfullyApproved, 'problemă aprobată', 'probleme aprobate')} cu succes`);
 
           if (response.failed > 0) {
-            this.message.warning(`${response.failed} probleme nu au putut fi aprobate`);
+            this.message.warning(roCount(response.failed, 'problemă nu a putut fi aprobată', 'probleme nu au putut fi aprobate'));
           }
 
           // Remove approved issues from the list

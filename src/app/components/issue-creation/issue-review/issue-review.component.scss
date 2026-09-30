@@ -94,27 +94,6 @@
   margin-bottom: var(--space-4);
 }
 
-// Urgency: a tone dot from getUrgencyStatus(); the label carries the meaning.
-.urgency {
-  &::before {
-    content: '';
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    background: var(--ink-400);
-  }
-
-  &[data-tone='processing']::before { background: var(--info-text); }
-  &[data-tone='warning']::before { background: var(--signal-600); }
-
-  &[data-tone='error'] {
-    background: var(--bad-wash);
-    color: var(--bad-text);
-
-    &::before { background: var(--bad-fill); }
-  }
-}
-
 .case__place,
 .case__meta > span,
 .done__next li {

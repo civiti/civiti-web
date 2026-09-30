@@ -26,30 +26,7 @@
 }
 
 .crumbs {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-2);
   margin-bottom: var(--space-8);
-  color: var(--ink-500);
-  font-size: var(--text-sm);
-  font-weight: 600;
-
-  a {
-    color: var(--ink-600);
-    text-decoration: none;
-
-    &:hover {
-      color: var(--ink-900);
-      text-decoration: underline;
-      text-decoration-color: var(--signal-500);
-      text-decoration-thickness: 2px;
-      text-underline-offset: 3px;
-    }
-  }
-}
-
-.crumbs-sep {
-  color: var(--ink-300);
 }
 
 .hero-lead {

@@ -454,21 +454,21 @@
           <!-- Case record -->
           <section class="c-card side-card o-info" aria-labelledby="info-title">
             <h2 class="side-title" id="info-title">Informații problemă</h2>
-            <dl class="record">
-              <div class="record-row--stacked">
+            <dl class="c-kv">
+              <div class="c-kv__row c-kv__row--stacked">
                 <dt>ID</dt>
                 <dd class="record-id">{{ issue.id }}</dd>
               </div>
-              <div>
+              <div class="c-kv__row">
                 <dt>Data raportării</dt>
                 <dd>{{ issue.createdAt | date:'dd/MM/yyyy' }}</dd>
               </div>
-              <div>
+              <div class="c-kv__row">
                 <dt>Status</dt>
                 <dd><span class="c-status" [attr.data-tone]="issue.status | statusTone">{{ issue.status | statusText }}</span></dd>
               </div>
               @if ((issue.status | isResolved) && issue.resolvedAt) {
-                <div>
+                <div class="c-kv__row">
                   <dt>Data rezolvării</dt>
                   <dd>{{ issue.resolvedAt | date:'dd/MM/yyyy' }}</dd>
                 </div>

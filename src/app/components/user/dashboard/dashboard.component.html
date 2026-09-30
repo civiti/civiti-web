@@ -246,7 +246,7 @@
                   <p class="goal-desc">
                     {{ achievement.descriptionRo }}
                     @if (achievement.rewardPoints) {
-                      <span class="goal-reward">+{{ achievement.rewardPoints }} puncte</span>
+                      <span class="goal-reward">+{{ achievement.rewardPoints | roPlural:'punct':'puncte' }}</span>
                     }
                   </p>
                 </li>

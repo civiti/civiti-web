@@ -880,8 +880,9 @@ export interface FilterOptions {
 // Note: Categories are loaded from backend via GET /api/categories
 // Use CategoryService for category labels
 
+/** Romanian urgency labels ("urgență" is feminine). Read through the urgencyLabel pipe. */
 export const URGENCY_LEVELS: Record<UrgencyLevel, string> = {
-  unspecified: 'Nespecificat',
+  unspecified: 'Nespecificată',
   low: 'Scăzută',
   medium: 'Medie',
   high: 'Ridicată',
@@ -895,15 +896,6 @@ export const URGENCY_OPTIONS: Array<{ value: UrgencyLevel; label: string; descri
   { value: 'high', label: 'Ridicată', description: 'Necesită atenție promptă' },
   { value: 'urgent', label: 'Urgentă', description: 'Pericol de siguranță sau urgență' }
 ];
-
-/** Tag colors for urgency levels */
-export const URGENCY_COLORS: Record<UrgencyLevel, string> = {
-  unspecified: 'default',
-  low: 'default',
-  medium: 'processing',
-  high: 'warning',
-  urgent: 'error'
-};
 
 export const ISSUE_STATUSES: Record<IssueStatus, string> = {
   Unspecified: 'Nespecificat',

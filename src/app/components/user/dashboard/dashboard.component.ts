@@ -13,6 +13,7 @@ import { StatusTextPipe, StatusTonePipe, IsOwnerEditablePipe } from '../../../pi
 import { ActivityIconPipe } from '../../../pipes/activity.pipe';
 import { LevelTitlePipe } from '../../../pipes/dashboard.pipe';
 import { TimeAgoPipe } from '../../../pipes/date.pipe';
+import { RoPluralPipe, roCount } from '../../../pipes/plural.pipe';
 import { AppState } from '../../../store/app.state';
 import * as UserActions from '../../../store/user/user.actions';
 import * as UserIssuesActions from '../../../store/user-issues/user-issues.actions';
@@ -47,13 +48,6 @@ import {
   selectGamificationData
 } from '../../../store/user/user.selectors';
 
-/** Romanian count agreement: "1 punct", "19 puncte", "20 de puncte", "101 puncte". */
-function roCount(n: number, one: string, many: string): string {
-  if (n === 1) return `${n} ${one}`;
-  const lastTwo = n % 100;
-  return n >= 20 && (lastTwo === 0 || lastTwo >= 20) ? `${n} de ${many}` : `${n} ${many}`;
-}
-
 @Component({
   selector: 'app-dashboard',
   standalone: true,
@@ -67,7 +61,8 @@ function roCount(n: number, one: string, many: string): string {
     IsOwnerEditablePipe,
     ActivityIconPipe,
     LevelTitlePipe,
-    TimeAgoPipe
+    TimeAgoPipe,
+    RoPluralPipe
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']

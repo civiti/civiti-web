@@ -9,7 +9,7 @@
         </p>
         <h1 class="c-h1">Probleme civice în {{ currentCity() }}</h1>
         <p class="head-count">
-          <strong>{{ (totalIssues$ | async) || 0 }} probleme documentate</strong>
+          <strong>{{ (totalIssues$ | async) | roPlural:'problemă documentată':'probleme documentate' }}</strong>
           @if (paginationInfo$ | async; as pagination) {
             <span class="head-range">
               @if (isMapView()) {
