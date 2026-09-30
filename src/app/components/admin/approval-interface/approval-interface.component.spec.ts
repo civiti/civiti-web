@@ -36,7 +36,7 @@ describe('ApprovalInterfaceComponent: request changes', () => {
 
   beforeEach(async () => {
     stats = { pendingReview: 2, reviewedToday: 0, approved: 0, rejected: 0, approvalRate: 0, averageReviewTimeHours: 0 } as AdminStatisticsResponse;
-    api = jasmine.createSpyObj<ApiService>('ApiService', ['getPendingIssues', 'getAdminStatistics', 'requestChanges']);
+    api = jasmine.createSpyObj<ApiService>('ApiService', ['getPendingIssues', 'getAdminStatistics', 'approveIssue', 'rejectIssue', 'requestChanges']);
     api.getPendingIssues.and.returnValue(of({ items: [pendingIssue('a'), pendingIssue('b')], totalItems: 2, page: 1, pageSize: 50, totalPages: 1 }));
     api.getAdminStatistics.and.returnValue(of(stats));
     message = jasmine.createSpyObj<NzMessageService>('NzMessageService', ['success', 'error', 'warning', 'info']);
@@ -102,5 +102,41 @@ describe('ApprovalInterfaceComponent: request changes', () => {
     expect(component.pendingIssues.map(i => i.id)).toEqual(['a', 'b']);
     expect(component.isProcessing).toBeFalse();
     expect(message.error).toHaveBeenCalled();
+  });
+
+  // A 200 whose body says the decision was not applied must not look like one
+  // that was: the report stays queued and the counters stay put.
+  const refused = { success: false, message: 'refuzat', issueId: 'a' };
+
+  it('keeps the report when the server answers success: false', () => {
+    api.requestChanges.and.returnValue(of(refused));
+    const component = openReview('a');
+    component.approvalForm.patchValue({ notes: 'Completează adresa.' });
+
+    component.submitDecision();
+
+    expect(component.pendingIssues.map(i => i.id)).toEqual(['a', 'b']);
+    expect(component.isProcessing).toBeFalse();
+    expect(stats.pendingReview).toBe(2);
+    expect(message.success).not.toHaveBeenCalled();
+    expect(message.error).toHaveBeenCalled();
+  });
+
+  it('applies the same check to approve and reject', () => {
+    api.approveIssue.and.returnValue(of(refused));
+    api.rejectIssue.and.returnValue(of(refused));
+    const component = openReview('a');
+
+    component.approvalForm.patchValue({ decision: 'approve', notes: '' });
+    component.submitDecision();
+    component.approvalForm.patchValue({ decision: 'reject', notes: 'Duplicat.' });
+    component.submitDecision();
+
+    expect(api.approveIssue).toHaveBeenCalled();
+    expect(api.rejectIssue).toHaveBeenCalled();
+    expect(component.pendingIssues.map(i => i.id)).toEqual(['a', 'b']);
+    expect(component.isProcessing).toBeFalse();
+    expect(message.success).not.toHaveBeenCalled();
+    expect(message.error).toHaveBeenCalledTimes(2);
   });
 });

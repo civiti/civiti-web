@@ -233,15 +233,15 @@ export class ApprovalInterfaceComponent implements OnInit {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (result) => {
+            if (!result.success) {
+              this.handleDecisionFailure('Aprobarea a eșuat. Încearcă din nou.', result);
+              return;
+            }
             console.log('[ADMIN] Issue approved successfully:', result);
             this.message.success('Problema a fost aprobată cu succes');
             this.handleDecisionSuccess('approve');
           },
-          error: (error) => {
-            console.error('[ADMIN] Failed to approve issue:', error);
-            this.message.error('Aprobarea a eșuat. Încearcă din nou.');
-            this.isProcessing = false;
-          }
+          error: (error) => this.handleDecisionFailure('Aprobarea a eșuat. Încearcă din nou.', error)
         });
     } else if (formValue.decision === 'reject') {
       const rejectionData: RejectIssueRequest = {
@@ -253,15 +253,15 @@ export class ApprovalInterfaceComponent implements OnInit {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (result) => {
+            if (!result.success) {
+              this.handleDecisionFailure('Respingerea a eșuat. Încearcă din nou.', result);
+              return;
+            }
             console.log('[ADMIN] Issue rejected successfully:', result);
             this.message.success('Problema a fost respinsă');
             this.handleDecisionSuccess('reject');
           },
-          error: (error) => {
-            console.error('[ADMIN] Failed to reject issue:', error);
-            this.message.error('Respingerea a eșuat. Încearcă din nou.');
-            this.isProcessing = false;
-          }
+          error: (error) => this.handleDecisionFailure('Respingerea a eșuat. Încearcă din nou.', error)
         });
     } else if (formValue.decision === 'request_changes') {
       const changes = (formValue.notes || '').trim();
@@ -274,15 +274,15 @@ export class ApprovalInterfaceComponent implements OnInit {
         .pipe(takeUntilDestroyed(this.destroyRef))
         .subscribe({
           next: (result) => {
+            if (!result.success) {
+              this.handleDecisionFailure('Solicitarea modificărilor a eșuat. Încearcă din nou.', result);
+              return;
+            }
             console.log('[ADMIN] Changes requested successfully:', result);
             this.message.success('Modificările au fost solicitate autorului');
             this.handleDecisionSuccess('request_changes');
           },
-          error: (error) => {
-            console.error('[ADMIN] Failed to request changes:', error);
-            this.message.error('Solicitarea modificărilor a eșuat. Încearcă din nou.');
-            this.isProcessing = false;
-          }
+          error: (error) => this.handleDecisionFailure('Solicitarea modificărilor a eșuat. Încearcă din nou.', error)
         });
     } else {
       this.isProcessing = false;
@@ -300,6 +300,16 @@ export class ApprovalInterfaceComponent implements OnInit {
     if (this.pageIndex > lastPage) {
       this.pageIndex = lastPage;
     }
+  }
+
+  /**
+   * A decision that did not go through: an HTTP error, or a 200 whose body says
+   * `success: false`. Either way the report stays in the queue for another try.
+   */
+  private handleDecisionFailure(text: string, detail: unknown): void {
+    console.error('[ADMIN] Decision failed:', detail);
+    this.message.error(text);
+    this.isProcessing = false;
   }
 
   private handleDecisionSuccess(decision: 'approve' | 'reject' | 'request_changes'): void {
