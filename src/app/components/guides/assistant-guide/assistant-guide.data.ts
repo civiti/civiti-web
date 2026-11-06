@@ -392,7 +392,7 @@ export interface GuideScreenshot {
   caption: string;
 }
 
-/** Real captures only, taken with a demo account. The section hides itself while this is empty. */
+/** Real captures or real output, labelled as such, never with real personal data. */
 export const SCREENSHOTS: readonly GuideScreenshot[] = [
   {
     src: '/media/asistent-ai/login.png',
@@ -405,7 +405,7 @@ export const SCREENSHOTS: readonly GuideScreenshot[] = [
     src: '/media/asistent-ai/skill-run.png',
     width: 1740,
     height: 783,
-    alt: 'Fragment de terminal: asistentul apelează get_issue și list_authorities, apoi arată trei autorități cu emailul verificat și tipul de petiție, sesizare, propunere și cerere.',
-    caption: 'Fragment dintr-o rulare reală în Claude Code, cu un petiționar fictiv. Asistentul se oprește înainte de trimitere.',
+    alt: 'Text de terminal: asistentul apelează get_issue și list_authorities, apoi arată trei autorități cu emailul verificat și tipul de petiție, sesizare, propunere și cerere.',
+    caption: 'Text dintr-o rulare reală în Claude Code, cu un petiționar fictiv, reașezat ca să se citească ușor. Asistentul se oprește înainte de trimitere.',
   },
 ];
