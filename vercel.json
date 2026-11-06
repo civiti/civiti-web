@@ -2,10 +2,32 @@
   "framework": "angular",
   "trailingSlash": false,
   "redirects": [
-    { "source": "/location", "destination": "/", "permanent": true }
+    {
+      "source": "/location",
+      "destination": "/",
+      "permanent": true
+    }
   ],
   "rewrites": [
-    { "source": "/(.*)", "destination": "/api" }
+    {
+      "source": "/(.*)",
+      "destination": "/api"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/skills/:skill/SKILL.md",
+      "headers": [
+        {
+          "key": "Content-Type",
+          "value": "text/plain; charset=utf-8"
+        },
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        }
+      ]
+    }
   ],
   "functions": {
     "api/index.mjs": {

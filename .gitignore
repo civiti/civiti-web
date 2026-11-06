@@ -61,5 +61,12 @@ src/environments/environment.prod.ts
 # Auto-generated guide data
 src/app/generated/guide-data.ts
 
+# Built from SKILL.md by scripts/build-skill-zip.js
+public/skills/civiti-petitions/civiti-petitions.zip
+
 .vercel
 .env*.local
+
+# Explainer video build output (the deliverables live in public/media)
+/media/explainer-video/node_modules
+/media/explainer-video/out
