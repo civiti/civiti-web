@@ -1,0 +1,221 @@
+/* The film's stage: 1920x1080, tokens copied from src/styles.scss.
+   Nothing here animates by itself. stage.js writes every moving value. */
+
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-weight: 200 800;
+  font-display: block;
+  src: url('../../../public/fonts/bricolage-grotesque-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Bricolage Grotesque';
+  font-weight: 200 800;
+  font-display: block;
+  src: url('../../../public/fonts/bricolage-grotesque-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+@font-face {
+  font-family: 'Public Sans';
+  font-weight: 100 900;
+  font-display: block;
+  src: url('../../../public/fonts/public-sans-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Public Sans';
+  font-weight: 100 900;
+  font-display: block;
+  src: url('../../../public/fonts/public-sans-latin-ext.woff2') format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+
+:root {
+  --paper: #F6F4EF;
+  --paper-2: #EEEAE2;
+  --paper-3: #E4DFD4;
+  --surface: #FFFFFF;
+  --line: #E6E1D7;
+  --line-strong: #D5CEC0;
+  --ink-950: #0A1428;
+  --ink-900: #14213D;
+  --ink-700: #36456A;
+  --ink-600: #4A587A;
+  --ink-500: #5B6785;
+  --ink-300: #B6BDCC;
+  --signal-500: #FCA311;
+  --signal-600: #F29100;
+  --signal-text: #9E6200;
+  --signal-100: #FEECC8;
+  --signal-50: #FFF7E8;
+  --ok: #1E7E34;
+  --ok-wash: #E7F4EA;
+  --display: 'Bricolage Grotesque', sans-serif;
+  --sans: 'Public Sans', sans-serif;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  width: 1920px;
+  height: 1080px;
+  overflow: hidden;
+  background: var(--paper);
+  color: var(--ink-900);
+  font-family: var(--sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+#stage { position: relative; width: 1920px; height: 1080px; overflow: hidden; }
+
+.scene { position: absolute; inset: 0; opacity: 0; visibility: hidden; }
+.scene--ink { background: var(--ink-900); color: #FFFFFF; }
+
+/* Everything that matters stays above y=860: the caption track lives below it. */
+.headline {
+  position: absolute;
+  left: 110px;
+  top: 84px;
+  margin: 0;
+  font-family: var(--display);
+  font-weight: 700;
+  font-size: 88px;
+  line-height: 1.04;
+  letter-spacing: -0.02em;
+}
+.headline small {
+  display: block;
+  margin-top: 16px;
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 34px;
+  letter-spacing: 0;
+  color: var(--ink-600);
+}
+
+.card {
+  position: absolute;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: 28px;
+  box-shadow: 0 24px 60px rgba(20, 33, 61, 0.1);
+}
+
+.tag {
+  display: inline-flex;
+  align-items: center;
+  height: 46px;
+  padding: 0 20px;
+  border-radius: 999px;
+  background: var(--paper-2);
+  color: var(--ink-700);
+  font-size: 24px;
+  font-weight: 600;
+}
+.tag--active { background: var(--signal-100); color: #8F5900; }
+.tag--ok { background: var(--ok-wash); color: var(--ok); }
+
+/* --- street ------------------------------------------------------------ */
+#street-art { position: absolute; left: 0; top: 0; width: 1920px; height: 1080px; transform-origin: 0 0; }
+
+/* --- issue ------------------------------------------------------------- */
+.issue-card { left: 200px; top: 130px; width: 1520px; height: 640px; }
+.issue-card__body { position: absolute; left: 800px; top: 60px; right: 60px; }
+.issue-card__title { margin: 20px 0 0; font-family: var(--display); font-size: 60px; line-height: 1.08; font-weight: 700; letter-spacing: -0.01em; }
+.issue-card__address { margin: 20px 0 0; font-size: 28px; color: var(--ink-600); }
+.issue-card__tags { display: flex; gap: 14px; margin-top: 8px; }
+.issue-card__stats { display: flex; gap: 60px; margin-top: 52px; }
+.stat__value { display: block; font-family: var(--display); font-size: 84px; font-weight: 700; line-height: 1; }
+.stat__label { display: block; margin-top: 8px; font-size: 26px; color: var(--ink-600); }
+.issue-card__authorities { margin-top: 44px; font-size: 26px; color: var(--ink-600); }
+.issue-card__authorities b { color: var(--ink-900); font-weight: 650; }
+
+/* --- connect ----------------------------------------------------------- */
+#connect-art { position: absolute; left: 0; top: 0; width: 1920px; height: 860px; }
+.node { position: absolute; display: flex; flex-direction: column; align-items: center; justify-content: center; width: 340px; height: 340px; top: 270px; }
+.node__label { margin-top: 18px; font-size: 32px; font-weight: 650; text-align: center; }
+.node__tile { display: flex; align-items: center; justify-content: center; width: 208px; height: 208px; border-radius: 48px; background: var(--ink-900); color: #FFFFFF; }
+.node--client { left: 170px; }
+.node--civiti { right: 170px; }
+.consent { left: 640px; top: 200px; width: 640px; padding: 40px 46px; }
+.consent h3 { margin: 0; font-family: var(--display); font-size: 44px; font-weight: 700; }
+.consent p { margin: 12px 0 0; font-size: 26px; color: var(--ink-600); }
+.consent ul { list-style: none; margin: 28px 0 0; padding: 0; }
+.consent li { padding: 16px 0; border-top: 2px solid var(--line); font-size: 26px; font-weight: 650; }
+.consent li span { display: block; font-size: 22px; font-weight: 400; color: var(--ink-600); margin-top: 4px; }
+.consent__actions { display: flex; justify-content: flex-end; gap: 14px; margin-top: 22px; }
+.btn { display: inline-flex; align-items: center; justify-content: center; height: 66px; padding: 0 34px; border-radius: 16px; border: 2px solid var(--line-strong); background: var(--surface); font-size: 26px; font-weight: 650; color: var(--ink-900); }
+.btn--signal { background: var(--signal-500); border-color: var(--signal-500); }
+.connected { position: absolute; left: 50%; top: 680px; transform: translateX(-50%); }
+.connected .tag { height: 76px; padding: 0 38px; font-size: 34px; }
+
+/* --- ask --------------------------------------------------------------- */
+.chat { left: 260px; top: 76px; width: 1400px; height: 760px; overflow: hidden; }
+.chat__bar { display: flex; align-items: center; gap: 16px; height: 86px; padding: 0 40px; border-bottom: 2px solid var(--line); font-size: 26px; font-weight: 650; }
+.chat__dot { width: 18px; height: 18px; border-radius: 50%; background: var(--signal-500); }
+.chat__log { position: absolute; left: 40px; right: 40px; top: 118px; display: flex; flex-direction: column; gap: 18px; }
+.bubble { align-self: flex-end; max-width: 980px; padding: 22px 30px; border-radius: 24px 24px 6px 24px; background: var(--ink-900); color: #FFFFFF; font-size: 36px; font-weight: 500; }
+.reply { max-width: 1120px; font-size: 32px; line-height: 1.4; }
+.toolline { display: flex; align-items: center; gap: 16px; font-size: 26px; color: var(--ink-600); }
+.toolline b { font-family: ui-monospace, 'DejaVu Sans Mono', monospace; font-weight: 500; color: var(--ink-900); }
+.tick { display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: var(--ok-wash); color: var(--ok); font-size: 22px; font-weight: 700; flex: none; }
+.composer { position: absolute; left: 40px; right: 40px; bottom: 34px; display: flex; align-items: center; height: 104px; padding: 0 30px; border: 2px solid var(--line-strong); border-radius: 22px; font-size: 36px; color: var(--ink-900); }
+.composer__caret { display: inline-block; width: 3px; height: 40px; margin-left: 4px; background: var(--ink-900); }
+
+/* --- petitions --------------------------------------------------------- */
+#petitions-art { position: absolute; left: 0; top: 0; width: 1920px; height: 860px; }
+.source { left: 110px; top: 300px; width: 440px; padding: 34px 36px; }
+.source h3 { margin: 12px 0 0; font-family: var(--display); font-size: 40px; line-height: 1.1; font-weight: 700; }
+.source p { margin: 12px 0 0; font-size: 24px; color: var(--ink-600); }
+.sheet { position: absolute; left: 860px; width: 950px; height: 200px; padding: 26px 40px; background: var(--surface); border: 2px solid var(--line); border-radius: 22px; box-shadow: 0 16px 40px rgba(20, 33, 61, 0.08); }
+.sheet__kind { margin: 0; font-size: 34px; font-weight: 700; letter-spacing: 0.16em; }
+.sheet__to { margin: 6px 0 0; font-size: 28px; font-weight: 600; color: var(--ink-700); }
+.sheet__ask { margin: 10px 0 0; font-size: 25px; color: var(--ink-600); }
+.sheet__art { position: absolute; right: 36px; top: 26px; padding: 8px 16px; border-radius: 10px; background: var(--signal-100); color: #8F5900; font-size: 22px; font-weight: 650; }
+
+/* --- email ------------------------------------------------------------- */
+.mail { left: 110px; top: 56px; width: 1130px; height: 776px; overflow: hidden; }
+.mail__head { padding: 26px 40px 20px; border-bottom: 2px solid var(--line); font-size: 24px; color: var(--ink-600); }
+.mail__head b { color: var(--ink-900); font-weight: 650; }
+.mail__head div + div { margin-top: 6px; }
+.mail__body { padding: 26px 44px; font-family: Arial, Helvetica, sans-serif; font-size: 27px; line-height: 1.42; color: #1a1a1a; }
+.mail__body p { margin: 0 0 14px; }
+.mail__kind { text-align: center; font-weight: 700; letter-spacing: 6px; margin: 16px 0; }
+.mail__box { background: #F5F5F5; border-left: 5px solid #888; padding: 12px 18px; }
+.mail__mark { background: var(--signal-100); padding: 0 6px; border-radius: 6px; }
+.checks { position: absolute; left: 1290px; top: 76px; width: 520px; margin: 0; padding: 0; list-style: none; }
+.checks li { display: flex; align-items: center; gap: 18px; padding: 15px 0; border-bottom: 2px solid var(--line-strong); font-size: 30px; font-weight: 600; }
+.approve { position: absolute; left: 1290px; top: 500px; width: 520px; }
+.approve p { margin: 0 0 18px; font-size: 28px; font-weight: 600; }
+.approve .btn { width: 100%; height: 92px; font-size: 34px; }
+.sent { position: absolute; left: 1290px; top: 690px; width: 520px; font-size: 30px; font-weight: 650; color: var(--ok); }
+
+/* --- registered -------------------------------------------------------- */
+.ack { left: 170px; top: 170px; width: 900px; padding: 44px 50px; }
+.ack__from { margin: 0; font-size: 26px; color: var(--ink-600); }
+.ack__subject { margin: 14px 0 0; font-size: 34px; font-weight: 650; }
+.ack__body { margin: 26px 0 0; font-size: 34px; line-height: 1.4; }
+.ack__num { background: var(--signal-100); padding: 2px 10px; border-radius: 8px; font-weight: 700; white-space: nowrap; }
+.clock { position: absolute; left: 1180px; top: 150px; width: 560px; }
+.clock__value { display: block; font-family: var(--display); font-size: 240px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; }
+.clock__label { display: block; margin-top: 12px; font-size: 38px; font-weight: 600; }
+.clock__law { display: block; margin-top: 10px; font-size: 28px; color: var(--ink-600); }
+.meter { margin-top: 34px; height: 22px; border-radius: 11px; background: var(--paper-3); overflow: hidden; }
+.meter__fill { width: 100%; height: 100%; transform-origin: 0 0; background: var(--signal-500); }
+
+/* --- followup ---------------------------------------------------------- */
+.weeks { position: absolute; left: 110px; right: 110px; top: 300px; display: grid; grid-template-columns: repeat(6, 1fr); gap: 18px; }
+.week { height: 148px; padding: 20px 24px; border: 2px solid var(--line-strong); border-radius: 20px; background: var(--surface); }
+.week__n { font-size: 24px; color: var(--ink-600); }
+.week__label { margin-top: 6px; font-size: 30px; font-weight: 650; }
+.week--filled { background: var(--signal-100); border-color: var(--signal-500); }
+.revenire { left: 330px; top: 500px; width: 1260px; padding: 28px 44px; }
+.revenire h3 { margin: 0; font-size: 34px; font-weight: 700; }
+.revenire p { margin: 10px 0 0; font-size: 28px; line-height: 1.35; color: var(--ink-700); }
+
+/* --- end --------------------------------------------------------------- */
+.endcard { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding-bottom: 160px; text-align: center; }
+.endcard__mark { width: 156px; height: 156px; }
+.endcard h2 { margin: 28px 0 0; font-family: var(--display); font-size: 92px; line-height: 1.06; font-weight: 700; letter-spacing: -0.02em; }
+.endcard__url { margin-top: 42px; padding: 18px 44px; border-radius: 22px; background: var(--signal-500); color: var(--ink-950); font-size: 50px; font-weight: 700; }
