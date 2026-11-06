@@ -285,7 +285,7 @@ export const GUIDE_CLIENTS: readonly GuideClient[] = [
         code: { label: 'Fișierul abilității', code: SKILL_URL },
       },
     ],
-    disconnect: 'Dezinstalează pluginul din chatgpt.com/plugins.',
+    disconnect: 'Din pagina de setări a pluginului poți opri uneltele una câte una. Documentația OpenAI nu descrie ștergerea pluginului.',
     docs: [{ label: 'Server MCP personalizat (OpenAI)', url: 'https://developers.openai.com/api/docs/guides/custom-mcp-server' }],
   },
 ];
