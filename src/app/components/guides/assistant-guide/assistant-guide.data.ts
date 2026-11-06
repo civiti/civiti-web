@@ -305,14 +305,21 @@ export interface TestRow {
 }
 
 const NOT_TESTED: TestCell = { tone: 'neutral', label: 'Netestat' };
+const PASSED: TestCell = { tone: 'resolved', label: 'Trecut' };
 
 /** Filled in from real runs of the prompts in a fresh session. Nothing here is assumed. */
 export const TEST_ROWS: readonly TestRow[] = [
-  { client: 'Claude Code', detail: 'În curs de testare', connect: NOT_TESTED, skill: NOT_TESTED, full: NOT_TESTED },
-  { client: 'Claude', detail: 'Se testează de un om, cu un cont demo', connect: NOT_TESTED, skill: NOT_TESTED, full: NOT_TESTED },
-  { client: 'Claude Desktop', detail: 'Se testează de un om, cu un cont demo', connect: NOT_TESTED, skill: NOT_TESTED, full: NOT_TESTED },
-  { client: 'Cursor', detail: 'Netestat', connect: NOT_TESTED, skill: NOT_TESTED, full: NOT_TESTED },
-  { client: 'ChatGPT', detail: 'Netestat', connect: NOT_TESTED, skill: NOT_TESTED, full: NOT_TESTED },
+  {
+    client: 'Claude Code',
+    detail: 'Versiunea 2.1.319, 6 noiembrie 2026. Conectare pe endpointul public și prin conectorul de pe claude.ai.',
+    connect: PASSED,
+    skill: PASSED,
+    full: { tone: 'resolved', label: 'Trecut, fără trimitere' },
+  },
+  { client: 'Claude', detail: 'Conectorul funcționează. Prompturile nu au fost rulate încă în aplicație.', connect: NOT_TESTED, skill: NOT_TESTED, full: NOT_TESTED },
+  { client: 'Claude Desktop', detail: 'Prompturile nu au fost rulate încă în aplicație.', connect: NOT_TESTED, skill: NOT_TESTED, full: NOT_TESTED },
+  { client: 'Cursor', detail: 'Prompturile nu au fost rulate încă în aplicație.', connect: NOT_TESTED, skill: NOT_TESTED, full: NOT_TESTED },
+  { client: 'ChatGPT', detail: 'Prompturile nu au fost rulate încă în aplicație.', connect: NOT_TESTED, skill: NOT_TESTED, full: NOT_TESTED },
 ];
 
 export interface PetitionKind {
@@ -393,5 +400,12 @@ export const SCREENSHOTS: readonly GuideScreenshot[] = [
     height: 1342,
     alt: 'Pagina de autentificare Civiti, în engleză, cu câmpuri pentru email și parolă, butonul Sign in și varianta Sign in with Google.',
     caption: 'Pagina de autentificare Civiti. Aici îți introduci parola, nu în conversația cu asistentul.',
+  },
+  {
+    src: '/media/asistent-ai/skill-run.png',
+    width: 1740,
+    height: 783,
+    alt: 'Fragment de terminal: asistentul apelează get_issue și list_authorities, apoi arată trei autorități cu emailul verificat și tipul de petiție, sesizare, propunere și cerere.',
+    caption: 'Fragment dintr-o rulare reală în Claude Code, cu un petiționar fictiv. Asistentul se oprește înainte de trimitere.',
   },
 ];

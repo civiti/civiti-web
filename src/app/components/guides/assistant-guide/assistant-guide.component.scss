@@ -59,7 +59,7 @@
 
 .toc {
   position: sticky;
-  top: var(--sticky-top);
+  top: var(--header-h);
   z-index: 5;
   border-bottom: 1px solid var(--line);
   background: var(--paper);
@@ -82,7 +82,7 @@
 
 .block {
   margin-top: var(--space-16);
-  scroll-margin-top: calc(var(--sticky-top) + 72px);
+  scroll-margin-top: calc(var(--header-h) + 72px);
 
   &__head {
     max-width: 760px;
