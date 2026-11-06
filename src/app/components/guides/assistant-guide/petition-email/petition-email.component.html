@@ -1,0 +1,49 @@
+<figure class="annotated">
+  <div class="mail" role="img" aria-label="Exemplu de petiție formatată ca email, trimisă de o persoană fictivă către Poliția Locală Sector 5. Explicațiile fiecărei părți sunt în lista de lângă.">
+    <dl class="mail__meta">
+      <div><dt>De la</dt><dd>Ion Popescu</dd></div>
+      <div><dt>Către</dt><dd>Poliția Locală Sector 5</dd></div>
+      <div><dt>Subiect</dt><dd>Sesizare privind trotuarul blocat, Strada Exemplului nr. 12, Sector 5</dd></div>
+    </dl>
+    <div class="mail__body">
+      <p class="part" [class.is-on]="active() === 1"><b>Către: Poliția Locală Sector 5</b><span class="pin" aria-hidden="true">1</span></p>
+      <p>Stimați domni,</p>
+      <p>Subsemnatul <b>Ion Popescu</b>, domiciliat în Str. Exemplului nr. 1, Sector 5, București, telefon 0700 000 000, în temeiul dreptului de petiționare reglementat de O.G. nr. 27/2002 privind reglementarea activității de soluționare a petițiilor, formulez prezenta</p>
+      <p class="part mail__kind" [class.is-on]="active() === 2">SESIZARE<span class="pin" aria-hidden="true">2</span></p>
+      <p>prin care vă aduc la cunoștință că trotuarul de pe Strada Exemplului nr. 12, Sector 5, este blocat de mașini parcate, iar pietonii sunt nevoiți să treacă pe carosabil.</p>
+      <p>Față de cele expuse, vă solicit respectuos:</p>
+      <div class="part" [class.is-on]="active() === 3">
+        <span class="pin" aria-hidden="true">3</span>
+        <ol class="mail__asks">
+          <li>verificarea situației la fața locului;</li>
+          <li>constatarea și sancționarea încălcărilor;</li>
+          <li>controale periodice pe acest tronson.</li>
+        </ol>
+      </div>
+      <p class="part mail__box" [class.is-on]="active() === 4">
+        <b>Documentație fotografică</b><br />
+        Pagina sesizării: civiti.ro/issue/exemplu<br />
+        Fotografii: Foto 1 · Foto 2 · Hartă
+        <span class="pin" aria-hidden="true">4</span>
+      </p>
+      <p class="part" [class.is-on]="active() === 5">Vă rog să îmi comunicați numărul de înregistrare atribuit prezentei sesizări.<span class="pin" aria-hidden="true">5</span></p>
+      <p class="part" [class.is-on]="active() === 6">În conformitate cu art. 8 din O.G. nr. 27/2002, vă rog să îmi comunicați răspunsul în termenul legal de 30 de zile de la înregistrare.<span class="pin" aria-hidden="true">6</span></p>
+      <p>Vă mulțumesc pentru atenția acordată.</p>
+      <p>Cu deosebită considerație,<br /><b>Ion Popescu</b></p>
+    </div>
+  </div>
+
+  <figcaption class="notes">
+    <ol class="notes__list">
+      @for (note of notes(); track note.number) {
+        <li>
+          <button type="button" class="note" [class.is-on]="note.on" [attr.aria-pressed]="note.on" (click)="select(note.number)" (mouseenter)="select(note.number)" (focus)="select(note.number)">
+            <span class="note__pin" aria-hidden="true">{{ note.number }}</span>
+            <span><b>{{ note.title }}</b><span class="note__text">{{ note.text }}</span></span>
+          </button>
+        </li>
+      }
+    </ol>
+    <p class="c-small c-muted">Persoana, adresa și sesizarea din exemplu sunt inventate.</p>
+  </figcaption>
+</figure>

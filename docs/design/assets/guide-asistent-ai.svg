@@ -1,0 +1,69 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 480" width="800" height="480" role="img" aria-labelledby="t d">
+  <title id="t">Cetățeanul și asistentul lui AI</title>
+  <desc id="d">O persoană stilizată întinde o cerere către un asistent AI, care ține o petiție gata de trimis. Un cablu portocaliu îi leagă, iar un balon de dialog arată o scânteie.</desc>
+  <defs>
+    <radialGradient id="paper" cx="50%" cy="46%" r="72%">
+      <stop offset="0%" stop-color="#F7F7F5"/>
+      <stop offset="100%" stop-color="#EDEDEA"/>
+    </radialGradient>
+    <linearGradient id="sheet" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FFFFFF"/>
+      <stop offset="100%" stop-color="#F8F8F8"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="480" fill="url(#paper)"/>
+
+  <!-- The cable between the two figures: the connection this guide sets up. -->
+  <path d="M300 422 C 300 462, 372 464, 400 442 S 496 416, 520 438" fill="none" stroke="#F29100" stroke-width="7" stroke-linecap="round"/>
+  <rect x="381" y="436" width="40" height="23" rx="7" fill="#14213D" transform="rotate(-9 401 447)"/>
+  <rect x="373" y="440" width="10" height="5" rx="2" fill="#F29100" transform="rotate(-9 378 442)"/>
+  <rect x="373" y="450" width="10" height="5" rx="2" fill="#F29100" transform="rotate(-9 378 452)"/>
+
+  <!-- Person, in the proportions of the other guide covers. -->
+  <g stroke="#14213D" stroke-linecap="round" stroke-linejoin="round" fill="none">
+    <path d="M238 214 C 232 262, 236 300, 244 326" stroke-width="34"/>
+    <path d="M302 210 C 346 214, 372 222, 402 212" stroke-width="30"/>
+    <path d="M250 330 L250 416" stroke-width="42"/>
+    <path d="M300 330 L300 416" stroke-width="42"/>
+  </g>
+  <rect x="222" y="178" width="102" height="170" rx="46" fill="#14213D"/>
+  <ellipse cx="246" cy="434" rx="44" ry="16" fill="#14213D"/>
+  <ellipse cx="304" cy="434" rx="44" ry="16" fill="#14213D"/>
+  <circle cx="272" cy="118" r="52" fill="#14213D"/>
+  <circle cx="252" cy="116" r="14" fill="#F7F7F5"/>
+  <circle cx="292" cy="116" r="14" fill="#F7F7F5"/>
+
+  <!-- Speech bubble with the spark. -->
+  <circle cx="136" cy="96" r="60" fill="#FFFFFF"/>
+  <path d="M176 134 L214 156 L190 112 Z" fill="#FFFFFF"/>
+  <path d="M132 58 C 135 84, 138 87, 164 90 C 138 93, 135 96, 132 122 C 129 96, 126 93, 100 90 C 126 87, 129 84, 132 58 Z" fill="#FCA311"/>
+  <path d="M170 110 C 171 119, 173 121, 182 122 C 173 123, 171 125, 170 134 C 169 125, 167 123, 158 122 C 167 121, 169 119, 170 110 Z" fill="#C97500"/>
+
+  <!-- Assistant: same ink, same eyes, a square head and an antenna. -->
+  <g stroke="#14213D" stroke-linecap="round" fill="none">
+    <path d="M556 330 L556 414" stroke-width="38"/>
+    <path d="M618 330 L618 414" stroke-width="38"/>
+    <path d="M650 244 C 680 262, 690 286, 690 312" stroke-width="28"/>
+  </g>
+  <rect x="514" y="196" width="146" height="152" rx="36" fill="#14213D"/>
+  <ellipse cx="552" cy="432" rx="42" ry="16" fill="#14213D"/>
+  <ellipse cx="622" cy="432" rx="42" ry="16" fill="#14213D"/>
+  <rect x="516" y="70" width="142" height="112" rx="36" fill="#14213D"/>
+  <circle cx="560" cy="124" r="14" fill="#F7F7F5"/>
+  <circle cx="614" cy="124" r="14" fill="#F7F7F5"/>
+  <path d="M587 70 L587 42" stroke="#14213D" stroke-width="9" stroke-linecap="round"/>
+  <circle cx="587" cy="30" r="13" fill="#FCA311"/>
+  <path d="M500 112 L516 112 M658 112 L674 112" stroke="#14213D" stroke-width="16" stroke-linecap="round"/>
+
+  <!-- The petition, passed between them. -->
+  <g transform="rotate(-6 470 268)">
+    <rect x="404" y="176" width="134" height="178" rx="4" fill="url(#sheet)"/>
+    <rect x="404.5" y="176.5" width="133" height="177" rx="4" fill="none" stroke="#14213D" stroke-opacity=".08"/>
+    <rect x="420" y="196" width="40" height="40" rx="6" fill="none" stroke="#F29100" stroke-width="5"/>
+    <path d="M427 216 l10 11 l24 -27" fill="none" stroke="#C97500" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+    <path d="M474 204 L522 204 M474 222 L522 222 M420 254 L522 254 M420 274 L522 274 M420 294 L522 294 M420 314 L482 314" stroke="#F29100" stroke-width="5" stroke-linecap="round"/>
+  </g>
+  <path d="M392 222 L411 225" stroke="#14213D" stroke-width="20" stroke-linecap="round"/>
+  <path d="M566 250 C 556 258, 544 262, 526 262" stroke="#14213D" stroke-width="24" stroke-linecap="round" fill="none"/>
+</svg>

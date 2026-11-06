@@ -1,0 +1,238 @@
+<article class="guide">
+  <header class="hero">
+    <div class="c-container hero__grid">
+      <div class="hero__copy">
+        <nav class="c-breadcrumb" aria-label="Breadcrumb">
+          <a routerLink="/ghid">Ghid civic</a>
+          <span class="c-breadcrumb__sep" aria-hidden="true">/</span>
+          <span aria-current="page">Asistent AI</span>
+        </nav>
+        <h1 class="c-display hero__title">{{ article.title }}</h1>
+        <p class="c-lead">Asistentul tău citește problema de pe Civiti, scrie câte o petiție formală pentru fiecare autoritate și o pregătește de trimis din căsuța ta de email. Tu aprobi fiecare mesaj.</p>
+        <div class="hero__actions">
+          <app-copy-button [text]="fullPrompt.text" label="Copiază promptul complet" tone="c-btn--signal c-btn--lg" />
+          <a class="c-btn c-btn--lg" href="/ghid/asistent-ai#film" (click)="jump($event, 'film')">
+            <span nz-icon nzType="play-circle" nzTheme="outline" aria-hidden="true"></span>
+            <span>Vezi filmul</span>
+          </a>
+        </div>
+        <p class="c-small c-muted hero__hint">Lipești promptul în Claude, Claude Code sau alt asistent. Îți spune el ce mai are nevoie de la tine.</p>
+      </div>
+      <div class="hero__art">
+        <img [src]="article.image" [attr.width]="article.imageWidth" [attr.height]="article.imageHeight" alt="Un personaj stilizat și un asistent AI țin împreună o petiție, legați printr-un cablu portocaliu." fetchpriority="high" />
+      </div>
+    </div>
+  </header>
+
+  <nav class="toc" aria-label="Cuprins">
+    <div class="c-container toc__list">
+      @for (section of sections; track section.id) {
+        <a class="c-chip" [href]="'/ghid/asistent-ai#' + section.id" (click)="jump($event, section.id)">{{ section.label }}</a>
+      }
+    </div>
+  </nav>
+
+  <div class="c-container">
+    <section class="block" id="pe-scurt" aria-labelledby="pe-scurt-title">
+      <div class="block__head">
+        <p class="c-eyebrow">Pe scurt</p>
+        <h2 class="c-h2" id="pe-scurt-title">Două piese, un singur rezultat</h2>
+        <p class="c-lead">Conectorul îi dă asistentului acces la Civiti. Abilitatea îl învață să scrie petiții. Le poți instala separat, dar împreună fac toată treaba.</p>
+      </div>
+      <div class="pair">
+        <div class="c-card c-card--pad">
+          <span class="pair__icon" nz-icon nzType="apartment" nzTheme="outline" aria-hidden="true"></span>
+          <h3 class="c-h3">Conectorul Civiti (MCP)</h3>
+          <p>MCP e felul standard în care un asistent AI se leagă de un serviciu. Te autentifici pe Civiti, fără chei API, sau folosești varianta publică, fără cont.</p>
+          <dl class="facts">
+            <div><dt>Fără cont</dt><dd>Caută și citește problemele publice, vede autoritățile și emailurile lor verificate, categoriile și clasamentul.</dd></div>
+            <div><dt>Cu contul tău, citire</dt><dd>Vezi problemele tale, activitatea, profilul și punctele.</dd></div>
+            <div><dt>Cu contul tău, acțiuni</dt><dd>Creează o sesizare, votează, comentează, raportează conținut, actualizează profilul.</dd></div>
+          </dl>
+        </div>
+        <div class="c-card c-card--pad">
+          <span class="pair__icon" nz-icon nzType="file-text" nzTheme="outline" aria-hidden="true"></span>
+          <h3 class="c-h3">Abilitatea civiti-petitions</h3>
+          <p>O abilitate (în engleză, skill) e un set de instrucțiuni pe care asistentul le urmează pas cu pas. Asta îl învață să scrie ca o petiție, nu ca un comentariu.</p>
+          <ul class="ticks">
+            <li>O petiție pentru fiecare autoritate, de tipul potrivit</li>
+            <li>Temei legal în OG 27/2002 și cererea numărului de înregistrare</li>
+            <li>Verificare înainte de orice trimitere</li>
+            <li>Email formatat, cu variantă text</li>
+            <li>Reveniri la cel puțin 5 săptămâni, cât timp problema e activă</li>
+          </ul>
+          <a class="c-link" [href]="skillUrl" target="_blank" rel="noopener">Citește abilitatea</a>
+        </div>
+      </div>
+      <div class="c-callout c-callout--signal">
+        <span nz-icon nzType="safety-certificate" nzTheme="outline" aria-hidden="true"></span>
+        <p>Nimic nu se trimite fără aprobarea ta sau fără o instrucțiune permanentă pe care ai dat-o tu, de exemplu o sarcină programată.</p>
+      </div>
+    </section>
+
+    <section class="block" id="film" aria-labelledby="film-title">
+      <div class="block__head">
+        <p class="c-eyebrow">Film</p>
+        <h2 class="c-h2" id="film-title">De la trotuar blocat la număr de înregistrare</h2>
+      </div>
+      <app-explainer-player />
+    </section>
+
+    <section class="block" id="prompturi" aria-labelledby="prompturi-title">
+      <div class="block__head">
+        <p class="c-eyebrow">Prompturi</p>
+        <h2 class="c-h2" id="prompturi-title">Lasă asistentul să facă instalarea</h2>
+        <p class="c-lead">Copiază un prompt și lipește-l într-o conversație nouă. Unde poate, asistentul face singur configurarea. Unde nu poate, îți spune exact ce să apeși. Prompturile sunt în engleză, ca numele uneltelor să rămână exacte; asistentul îți poate răspunde în română.</p>
+      </div>
+      <div class="prompts">
+        @for (prompt of prompts; track prompt.id; let first = $first) {
+          <app-prompt-card [prompt]="prompt" [primary]="first" />
+        }
+      </div>
+
+      <h3 class="c-h3 tests__title" id="teste">Unde au fost testate</h3>
+      <p class="c-muted">Fiecare prompt, rulat într-o sesiune nouă, fără context. Unde scrie „Netestat”, nu știm încă.</p>
+      <div class="tests" role="region" aria-labelledby="teste" tabindex="0">
+        <table>
+          <thead>
+            <tr><th scope="col">Aplicație</th><th scope="col">Conectare</th><th scope="col">Abilitate</th><th scope="col">Tot, plus petiție</th></tr>
+          </thead>
+          <tbody>
+            @for (row of tests; track row.client) {
+              <tr>
+                <th scope="row">{{ row.client }}<span class="c-small c-muted tests__detail">{{ row.detail }}</span></th>
+                <td><span class="c-status" [attr.data-tone]="row.connect.tone">{{ row.connect.label }}</span></td>
+                <td><span class="c-status" [attr.data-tone]="row.skill.tone">{{ row.skill.label }}</span></td>
+                <td><span class="c-status" [attr.data-tone]="row.full.tone">{{ row.full.label }}</span></td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="block" id="pas-cu-pas" aria-labelledby="pas-cu-pas-title">
+      <div class="block__head">
+        <p class="c-eyebrow">Pas cu pas</p>
+        <h2 class="c-h2" id="pas-cu-pas-title">Preferi să o faci singur?</h2>
+        <p class="c-lead">Alege aplicația. Stările de mai jos spun ce am verificat noi, nu ce promite teoria.</p>
+      </div>
+      <app-client-setup [clients]="clients" />
+    </section>
+
+    <section class="block" id="cum-functioneaza" aria-labelledby="cum-functioneaza-title">
+      <div class="block__head">
+        <p class="c-eyebrow">Cum funcționează</p>
+        <h2 class="c-h2" id="cum-functioneaza-title">Cine vorbește cu cine</h2>
+        <p class="c-lead">Alege un drum și urmărește pe unde trec datele tale.</p>
+      </div>
+      <app-connection-diagram />
+    </section>
+
+    <section class="block" id="petitii" aria-labelledby="petitii-title">
+      <div class="block__head">
+        <p class="c-eyebrow">Petițiile</p>
+        <h2 class="c-h2" id="petitii-title">Ce face abilitatea, pas cu pas</h2>
+      </div>
+      <app-petition-flow />
+
+      <h3 class="c-h3 block__sub">Fiecare autoritate, tipul ei de petiție</h3>
+      <ul class="kinds">
+        @for (item of kinds; track item.kind) {
+          <li class="c-card c-card--pad">
+            <p class="kinds__kind">{{ item.kind }}</p>
+            <p class="kinds__who">{{ item.authorities }}</p>
+            <p class="c-small c-muted">{{ item.ask }}</p>
+          </li>
+        }
+      </ul>
+
+      <h3 class="c-h3 block__sub">Cum arată o petiție</h3>
+      <app-petition-email />
+
+      <h3 class="c-h3 block__sub">De ce e scrisă așa: OG 27/2002</h3>
+      <dl class="c-card legal">
+        @for (point of legal; track point.article) {
+          <div class="legal__row">
+            <dt class="c-num">{{ point.article }}</dt>
+            <dd><b>{{ point.rule }}</b> {{ point.effect }}</dd>
+          </div>
+        }
+      </dl>
+
+      <div class="clock">
+        <div class="clock__item"><span class="c-num">Ziua 0</span><span class="c-small c-muted">Petiția pleacă din emailul tău</span></div>
+        <div class="clock__item"><span class="c-num">30 de zile</span><span class="c-small c-muted">Termenul legal de răspuns, de la înregistrare</span></div>
+        <div class="clock__item clock__item--signal"><span class="c-num">5 săptămâni</span><span class="c-small">Cel mai devreme, revenirea: citează ce s-a întâmplat și cere ceva nou</span></div>
+      </div>
+
+      <h3 class="c-h3 block__sub">De ce ai nevoie</h3>
+      <dl class="c-card c-card--pad facts needs">
+        <div><dt>Conectorul Civiti</dt><dd>Obligatoriu. Varianta publică ajunge, dacă îi dai linkul problemei.</dd></div>
+        <div><dt>Un conector Gmail</dt><dd>Opțional. Fără el, primești textul gata de copiat și trimiți singur.</dd></div>
+        <div><dt>O sarcină programată</dt><dd>Opțional. O verificare săptămânală care acționează doar când ultima petiție are cel puțin 34 de zile.</dd></div>
+        <div><dt>Datele tale</dt><dd>La prima folosire, asistentul îți cere o singură dată numele, forma Subsemnatul sau Subsemnata, adresa și telefonul.</dd></div>
+      </dl>
+      <p class="c-muted">Fundalul legal e explicat în <a class="c-link" routerLink="/ghid/cum-sa-scrii-o-petitie">Cum să scrii o petiție</a>, <a class="c-link" routerLink="/ghid/petitii-si-sesizari-legale">Petiții și sesizări legale</a> și <a class="c-link" routerLink="/ghid/drepturile-cetateanului">Drepturile cetățeanului</a>.</p>
+    </section>
+
+    @if (screens.length) {
+      <section class="block" id="capturi" aria-labelledby="capturi-title">
+        <div class="block__head">
+          <p class="c-eyebrow">Capturi</p>
+          <h2 class="c-h2" id="capturi-title">Ce vei vedea pe ecran</h2>
+        </div>
+        <div class="screens">
+          @for (screen of screens; track screen.src) {
+            <figure class="screens__item">
+              <img [src]="screen.src" [attr.width]="screen.width" [attr.height]="screen.height" [alt]="screen.alt" loading="lazy" />
+              <figcaption class="c-small c-muted">{{ screen.caption }}</figcaption>
+            </figure>
+          }
+        </div>
+      </section>
+    }
+
+    <section class="block" id="siguranta" aria-labelledby="siguranta-title">
+      <div class="block__head">
+        <p class="c-eyebrow">Siguranță</p>
+        <h2 class="c-h2" id="siguranta-title">Ce rămâne la tine</h2>
+      </div>
+      <ul class="safety">
+        <li class="c-card c-card--pad"><h3 class="c-h3">Doar OAuth, cu acordul tău</h3><p>Te autentifici pe pagina Civiti, vezi ce cere asistentul și aprobi. Parola nu ajunge la asistent. Accesul îl retragi din aplicația unde ai conectat Civiti.</p></li>
+        <li class="c-card c-card--pad"><h3 class="c-h3">Petițiile pleacă din căsuța ta</h3><p>Civiti nu trimite petițiile și nu le vede conținutul. După o trimitere reală, asistentul crește doar un contor public al problemei.</p></li>
+        <li class="c-card c-card--pad"><h3 class="c-h3">Conținutul Civiti e tratat ca date</h3><p>Textele de pe Civiti sunt scrise de alți oameni. Ajung la asistent marcate ca neverificate, iar abilitatea nu execută instrucțiuni din ele.</p></li>
+        <li class="c-card c-card--pad"><h3 class="c-h3">Datele tale rămân în copia ta</h3><p>Abilitatea publică e goală. Numele și adresa rămân în copia ta. Ce vede asistentul ajunge totuși la furnizorul lui de AI, conform termenilor acestuia.</p></li>
+      </ul>
+      <p class="c-muted">Pașii de deconectare sunt în fila fiecărei aplicații, la <a class="c-link" href="/ghid/asistent-ai#pas-cu-pas" (click)="jump($event, 'pas-cu-pas')">Pas cu pas</a>.</p>
+    </section>
+
+    <section class="block" id="probleme" aria-labelledby="probleme-title">
+      <div class="block__head">
+        <p class="c-eyebrow">Probleme frecvente</p>
+        <h2 class="c-h2" id="probleme-title">Dacă ceva nu merge</h2>
+      </div>
+      <div class="c-card faq">
+        @for (item of troubleshooting; track item.question) {
+          <details>
+            <summary>{{ item.question }}</summary>
+            <p>{{ item.answer }}</p>
+          </details>
+        }
+      </div>
+
+      <aside class="devs c-card c-card--dark c-card--pad" aria-labelledby="devs-title">
+        <h3 class="c-h3" id="devs-title">Pentru dezvoltatori</h3>
+        <p>Inventarul celor 21 de unelte, permisiunile, autentificarea și limitele sunt în referința tehnică din civiti-server.</p>
+        <div class="devs__links">
+          <a class="c-btn c-btn--on-dark" [href]="referenceUrl" target="_blank" rel="noopener"><span nz-icon nzType="github" nzTheme="outline" aria-hidden="true"></span><span>Referința tehnică</span></a>
+          <a class="c-btn c-btn--on-dark" [href]="referenceIssueUrl" target="_blank" rel="noopener"><span>civiti-server#167</span></a>
+        </div>
+        <dl class="devs__urls">
+          <div><dt>Autentificat</dt><dd><code>{{ mcpUrl }}</code></dd></div>
+          <div><dt>Public</dt><dd><code>{{ mcpPublicUrl }}</code></dd></div>
+        </dl>
+      </aside>
+    </section>
+  </div>
+</article>

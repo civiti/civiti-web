@@ -1,0 +1,11 @@
+<ol class="flow" aria-label="Drumul unei petiții, în șapte pași">
+  @for (step of steps(); track step.index) {
+    <li class="flow__item" [class.is-on]="step.on">
+      <button type="button" class="flow__step" [attr.aria-pressed]="step.on" (click)="select(step.index)" (mouseenter)="select(step.index)" (focus)="select(step.index)">
+        <span class="flow__number" aria-hidden="true">{{ step.number }}</span>
+        <span class="flow__title">{{ step.title }}</span>
+      </button>
+      <p class="flow__detail">{{ step.detail }}</p>
+    </li>
+  }
+</ol>

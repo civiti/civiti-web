@@ -1,0 +1,407 @@
+// Page frame only. Each interactive piece owns its styles, which keeps every
+// file inside the per-component style budget.
+
+:host {
+  display: block;
+}
+
+.guide {
+  padding-bottom: var(--space-16);
+}
+
+// --- Hero ---------------------------------------------------------------------
+
+.hero {
+  padding-block: var(--space-8);
+  border-bottom: 1px solid var(--line);
+  background: var(--surface);
+
+  &__grid {
+    display: grid;
+    gap: var(--space-8);
+    align-items: center;
+
+    @media (min-width: 960px) {
+      grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+      gap: var(--space-12);
+    }
+  }
+
+  &__title {
+    margin-block: var(--space-4) var(--space-4);
+  }
+
+  &__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-6);
+  }
+
+  &__hint {
+    margin-top: var(--space-3);
+  }
+
+  &__art {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+
+    img {
+      display: block;
+      width: 100%;
+      height: auto;
+    }
+  }
+}
+
+// --- Contents -----------------------------------------------------------------
+
+.toc {
+  position: sticky;
+  top: var(--sticky-top);
+  z-index: 5;
+  border-bottom: 1px solid var(--line);
+  background: var(--paper);
+
+  &__list {
+    display: flex;
+    gap: var(--space-2);
+    padding-block: var(--space-2);
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  a {
+    flex: none;
+    text-decoration: none;
+  }
+}
+
+// --- Sections -----------------------------------------------------------------
+
+.block {
+  margin-top: var(--space-16);
+  scroll-margin-top: calc(var(--sticky-top) + 72px);
+
+  &__head {
+    max-width: 760px;
+    margin-bottom: var(--space-6);
+
+    h2 {
+      margin: 0;
+    }
+
+    .c-lead {
+      margin-top: var(--space-3);
+    }
+  }
+
+  &__sub {
+    margin: var(--space-12) 0 var(--space-4);
+  }
+}
+
+.pair {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+
+  @media (min-width: 760px) {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  h3 {
+    margin: var(--space-3) 0 var(--space-2);
+  }
+
+  p {
+    margin: 0 0 var(--space-3);
+  }
+
+  &__icon {
+    color: var(--ink-500);
+    font-size: var(--text-2xl);
+  }
+}
+
+.facts {
+  margin: 0;
+
+  div {
+    padding-block: var(--space-2);
+
+    & + div {
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  dt {
+    color: var(--ink-500);
+    font-size: var(--text-sm);
+  }
+
+  dd {
+    margin: 0;
+  }
+}
+
+.ticks {
+  margin: 0 0 var(--space-4);
+  padding-left: var(--space-5);
+  list-style: disc;
+
+  li + li {
+    margin-top: var(--space-1);
+  }
+}
+
+.c-callout p {
+  margin: 0;
+}
+
+.prompts {
+  display: grid;
+  gap: var(--space-4);
+}
+
+// --- Test results -------------------------------------------------------------
+
+.tests {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+
+  &__title {
+    margin: var(--space-10) 0 var(--space-1);
+  }
+
+  &__detail {
+    display: block;
+    font-weight: 400;
+  }
+
+  table {
+    width: 100%;
+    min-width: 620px;
+    border-collapse: collapse;
+  }
+
+  th,
+  td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: top;
+  }
+
+  tbody tr:last-child > * {
+    border-bottom: 0;
+  }
+
+  thead th {
+    color: var(--ink-500);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
+}
+
+// --- Petition reference -------------------------------------------------------
+
+.kinds,
+.safety {
+  display: grid;
+  gap: var(--space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+
+  @media (min-width: 760px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.kinds {
+  @media (min-width: 1120px) {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  p {
+    margin: 0;
+  }
+
+  &__kind {
+    font-size: var(--text-sm);
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  &__who {
+    margin-block: var(--space-2);
+    font-family: var(--font-display);
+    font-size: var(--text-lg);
+    font-weight: 700;
+    line-height: 1.2;
+  }
+}
+
+.safety {
+  h3 {
+    margin: 0 0 var(--space-2);
+  }
+
+  p {
+    margin: 0;
+    color: var(--ink-600);
+  }
+
+  + p {
+    margin-top: var(--space-4);
+  }
+}
+
+.legal {
+  margin: 0;
+
+  &__row {
+    display: grid;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+
+    @media (min-width: 640px) {
+      grid-template-columns: 7rem 1fr;
+      gap: var(--space-4);
+    }
+
+    & + & {
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  dt {
+    font-size: var(--text-xl);
+  }
+
+  dd {
+    margin: 0;
+    color: var(--ink-600);
+  }
+
+  b {
+    color: var(--ink-900);
+    font-weight: 600;
+  }
+}
+
+.clock {
+  display: grid;
+  gap: var(--space-3);
+  margin-top: var(--space-4);
+
+  @media (min-width: 760px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  &__item {
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-1);
+    padding: var(--space-4) var(--space-5);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-md);
+
+    .c-num {
+      font-size: var(--text-2xl);
+    }
+
+    &--signal {
+      border-color: var(--signal-200);
+      background: var(--signal-50);
+    }
+  }
+}
+
+.needs {
+  margin-bottom: var(--space-4);
+}
+
+.screens {
+  display: grid;
+  gap: var(--space-5);
+
+  @media (min-width: 760px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  &__item {
+    margin: 0;
+  }
+
+  img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin-bottom: var(--space-2);
+    border: 1px solid var(--line);
+    border-radius: var(--radius-lg);
+  }
+}
+
+// --- Troubleshooting and developers -------------------------------------------
+
+.faq {
+  details + details {
+    border-top: 1px solid var(--line);
+  }
+
+  summary {
+    padding: var(--space-4) var(--space-5);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  p {
+    margin: 0;
+    padding: 0 var(--space-5) var(--space-4);
+    color: var(--ink-600);
+  }
+}
+
+.devs {
+  margin-top: var(--space-8);
+
+  h3 {
+    color: var(--white);
+  }
+
+  p {
+    margin: var(--space-2) 0 var(--space-4);
+    color: var(--white-82);
+  }
+
+  &__links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+  }
+
+  &__urls {
+    margin: var(--space-5) 0 0;
+    font-size: var(--text-sm);
+
+    div + div {
+      margin-top: var(--space-2);
+    }
+
+    dt {
+      color: var(--white-78);
+    }
+
+    dd {
+      margin: 0;
+      overflow-wrap: anywhere;
+    }
+  }
+}

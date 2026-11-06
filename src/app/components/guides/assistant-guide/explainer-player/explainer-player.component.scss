@@ -1,0 +1,48 @@
+:host {
+  display: block;
+}
+
+.player {
+  margin: 0;
+
+  &__frame {
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-xl);
+    background: var(--ink-900);
+    box-shadow: var(--shadow-lg);
+  }
+
+  video {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+
+  figcaption {
+    margin-top: var(--space-3);
+  }
+}
+
+.transcript {
+  margin-top: var(--space-4);
+  border-top: 1px solid var(--line);
+  padding-top: var(--space-3);
+
+  summary {
+    cursor: pointer;
+    font-weight: 600;
+  }
+
+  &__list {
+    margin: var(--space-3) 0 0;
+    padding-left: var(--space-5);
+    color: var(--ink-600);
+    list-style: disc;
+
+    li + li {
+      margin-top: var(--space-1);
+    }
+  }
+}

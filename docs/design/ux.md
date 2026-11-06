@@ -256,3 +256,14 @@ Optional fields marked clearly
 No spam - one email per authority per user per issue
 Transparent email counter (no fake numbers)
 Location selection as landing page removes barriers to entry
+
+
+🤖 Assistant Guide (/ghid/asistent-ai)
+
+Listed in /ghid like any guide, from the stub in src/content/guides/asistent-ai.md, but it has its own component
+Two readers: a citizen who isn't technical, and that citizen's AI agent, which follows the copy/paste prompts literally
+Primary action: copy the full prompt (hero and the first prompt card). Secondary: watch the film
+Prompts first, manual steps second: the agent does the setup where it can and tells the person what to press where it can't
+Client tabs show what was actually verified, never what should work in theory
+Client status and test results live in assistant-guide.data.ts, so a server fix is a one-line change on the page
+Nothing is sent without the person's approval, and the page says so before they start

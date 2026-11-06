@@ -1,0 +1,23 @@
+<article class="prompt c-card" [class.prompt--primary]="primary()">
+  <header class="prompt__head">
+    <div class="prompt__copy">
+      @if (primary()) {
+        <p class="c-eyebrow prompt__badge">Recomandat</p>
+      }
+      <h3 class="c-h3">{{ prompt().title }}</h3>
+      <p class="prompt__intro">{{ prompt().intro }}</p>
+    </div>
+    <app-copy-button [text]="prompt().text" label="Copiază promptul" [tone]="copyTone()" />
+  </header>
+
+  <div class="prompt__body" [class.is-open]="expanded()">
+    <pre [id]="panelId()" tabindex="0" lang="en"><code>{{ prompt().text }}</code></pre>
+  </div>
+  <div class="prompt__foot">
+    <button type="button" class="c-btn c-btn--ghost c-btn--sm" [attr.aria-expanded]="expanded()" [attr.aria-controls]="panelId()" (click)="toggle()">
+      <span nz-icon nzType="down" nzTheme="outline" class="prompt__chevron" [class.is-open]="expanded()" aria-hidden="true"></span>
+      <span>{{ expanded() ? 'Restrânge' : 'Arată tot' }}</span>
+    </button>
+    <span class="c-small c-muted">{{ lineCount() }} de rânduri, în engleză</span>
+  </div>
+</article>

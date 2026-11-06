@@ -10,6 +10,15 @@
  */
 export const SITE_URL = 'https://civiti.ro';
 
+/**
+ * Civiti MCP server. The OAuth `resource` it advertises must equal the URL a
+ * client is given, so moving to a custom domain also needs the server's public
+ * origin changed. Everything on /ghid/asistent-ai is built from this constant.
+ */
+export const CIVITI_MCP_ORIGIN = 'https://civiti-mcp-production.up.railway.app';
+export const CIVITI_MCP_URL = `${CIVITI_MCP_ORIGIN}/mcp`;
+export const CIVITI_MCP_PUBLIC_URL = `${CIVITI_MCP_ORIGIN}/mcp/public`;
+
 /** Shared external URLs — keep in sync with marketing surfaces */
 export const APP_STORE_URL = 'https://apps.apple.com/ro/app/civiti/id6760908767';
 export const GITHUB_URL = 'https://github.com/civiti';

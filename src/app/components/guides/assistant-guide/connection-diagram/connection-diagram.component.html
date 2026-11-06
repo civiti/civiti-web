@@ -1,0 +1,28 @@
+<figure class="diagram c-card">
+  <div class="diagram__modes" role="group" aria-label="Alege ce drum vrei să vezi">
+    @for (item of views; track item.id) {
+      <button type="button" class="c-chip" [attr.aria-pressed]="mode() === item.id" (click)="setMode(item.id)">
+        {{ item.label }}
+      </button>
+    }
+  </div>
+
+  @for (draw of layouts(); track draw.layout) {
+    <svg class="diagram__art" [class]="'diagram__art--' + draw.layout" [attr.viewBox]="draw.viewBox" role="img" [attr.aria-label]="description">
+      @for (edge of draw.edges; track edge.id) {
+        <path class="edge" [class.is-on]="edge.on" [attr.d]="edge.d" />
+      }
+      @for (node of draw.nodes; track node.id) {
+        <g class="node" [class.is-on]="node.on">
+          <rect [attr.x]="node.box.x" [attr.y]="node.box.y" [attr.width]="node.box.w" [attr.height]="node.box.h" rx="14" />
+          <text class="node__title" [attr.x]="node.textX" [attr.y]="node.titleY">{{ node.title }}</text>
+          @for (line of node.lines; track line.text) {
+            <text class="node__line" [attr.x]="node.textX" [attr.y]="line.y">{{ line.text }}</text>
+          }
+        </g>
+      }
+    </svg>
+  }
+
+  <figcaption class="diagram__caption" aria-live="polite">{{ view().caption }}</figcaption>
+</figure>

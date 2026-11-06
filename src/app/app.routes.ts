@@ -182,6 +182,17 @@ export const routes: Routes = [
           }
         }
       },
+      // Listed in GUIDE_ARTICLES like any guide, but with its own component: it
+      // needs copy buttons, client tabs and a video. Must stay above ':slug'.
+      {
+        path: 'asistent-ai',
+        loadComponent: () => import('./components/guides/assistant-guide/assistant-guide.component').then(m => m.AssistantGuideComponent),
+        data: {
+          animation: 'AssistantGuidePage',
+          headerTitle: 'Ghid civic',
+          showFooter: true,
+        }
+      },
       {
         path: ':slug',
         loadComponent: () => import('./components/guides/guide-detail/guide-detail.component').then(m => m.GuideDetailComponent),
