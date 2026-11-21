@@ -96,10 +96,11 @@ function ask(t) {
   $('ask-typed').textContent = sent ? '' : REQUEST.slice(0, typed);
   $('ask-caret').style.opacity = sent || Math.floor(t * 2.4) % 2 ? 0 : 1;
   appear($('ask-bubble'), t, 3.5, 14, 0.35);
-  appear($('ask-reply'), t, 4.3, 14, 0.4);
-  appear($('ask-tool-1'), t, 5, 10, 0.3);
-  appear($('ask-tool-2'), t, 5.7, 10, 0.3);
-  appear($('ask-tool-3'), t, 6.4, 10, 0.3);
+  appear($('ask-reply'), t, 4.9, 14, 0.4);
+  appear($('ask-tool-0'), t, 4.3, 10, 0.3);
+  appear($('ask-tool-1'), t, 5.5, 10, 0.3);
+  appear($('ask-tool-2'), t, 6.1, 10, 0.3);
+  appear($('ask-tool-3'), t, 6.7, 10, 0.3);
 }
 
 // --- petitions ------------------------------------------------------------

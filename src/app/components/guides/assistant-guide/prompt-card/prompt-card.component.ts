@@ -18,7 +18,12 @@ export class PromptCardComponent {
 
   readonly expanded = signal(false);
   readonly copyTone = computed(() => (this.primary() ? 'c-btn--signal' : 'c-btn--ink'));
-  readonly lineCount = computed(() => this.prompt().text.split('\n').length);
+  /** Romanian puts "de" between a number and its noun from 20 up: 9 rânduri, 27 de rânduri. */
+  readonly lineLabel = computed(() => {
+    const n = this.prompt().text.split('\n').length;
+    const rest = n % 100;
+    return `${n} ${rest === 0 || rest >= 20 ? 'de ' : ''}rânduri, în engleză`;
+  });
   readonly panelId = computed(() => `prompt-${this.prompt().id}`);
 
   toggle(): void {

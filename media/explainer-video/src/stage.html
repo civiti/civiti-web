@@ -109,14 +109,15 @@
       </div>
       <div class="node__label">Civiti</div>
     </div>
+    <!-- Mirrors Civiti.Auth's consent page, which is English and marks self-registered apps Unverified. -->
     <div class="card consent" id="consent">
-      <h3>Autorizezi accesul</h3>
-      <p>Asistentul cere acces la contul tău Civiti.</p>
+      <h3>Asistentul tău AI <span class="badge">Unverified</span></h3>
+      <p>This application is asking to access your Civiti account.</p>
       <ul>
-        <li>Citire<span>Probleme, autorități, profilul tău.</span></li>
-        <li>Acțiuni în numele tău<span>Vot, comentarii, sesizări noi.</span></li>
+        <li>Read your civic data<span>Problemele, autoritățile, profilul tău</span></li>
+        <li>Take actions on your behalf<span>Vot, comentarii, probleme noi</span></li>
       </ul>
-      <div class="consent__actions"><span class="btn">Refuză</span><span class="btn btn--signal" id="consent-approve">Aprobă</span></div>
+      <div class="consent__actions"><span class="btn">Deny</span><span class="btn btn--signal" id="consent-approve">Approve</span></div>
     </div>
     <div class="connected" id="connected"><span class="tag tag--ok">Conectat. Fără chei API.</span></div>
   </section>
@@ -126,6 +127,7 @@
       <div class="chat__bar"><span class="chat__dot"></span>Asistentul tău AI</div>
       <div class="chat__log">
         <div class="bubble" id="ask-bubble">Trimite petiții pentru problemele mele active</div>
+        <div class="toolline" id="ask-tool-0"><span class="tick">✓</span>Caut problemele tale active <b>list_my_issues</b></div>
         <div class="reply" id="ask-reply">Am găsit o problemă activă: <b>Trotuar blocat pe Strada Exemplului</b>.</div>
         <div class="toolline" id="ask-tool-1"><span class="tick">✓</span>Citesc problema <b>get_issue</b></div>
         <div class="toolline" id="ask-tool-2"><span class="tick">✓</span>Verific emailurile autorităților <b>list_authorities</b></div>
@@ -199,8 +201,8 @@
   <section class="scene" id="followup">
     <h1 class="headline">Cinci săptămâni mai târziu.<small>Problema e tot activă.</small></h1>
     <div class="weeks">
-      <div class="week" id="week-1"><div class="week__n">Săpt. 1</div><div class="week__label">Trimisă</div></div>
-      <div class="week" id="week-2"><div class="week__n">Săpt. 2</div><div class="week__label">Înregistrată</div></div>
+      <div class="week" id="week-1"><div class="week__n">Săpt. 1</div><div class="week__label">Trimisă și înregistrată</div></div>
+      <div class="week" id="week-2"><div class="week__n">Săpt. 2</div></div>
       <div class="week" id="week-3"><div class="week__n">Săpt. 3</div></div>
       <div class="week" id="week-4"><div class="week__n">Săpt. 4</div></div>
       <div class="week" id="week-5"><div class="week__n">Săpt. 5</div><div class="week__label">Termen depășit</div></div>

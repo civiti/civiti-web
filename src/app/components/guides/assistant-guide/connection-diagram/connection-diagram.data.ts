@@ -37,7 +37,7 @@ export const NODES: readonly DiagramNode[] = [
   {
     id: 'client',
     title: 'Asistentul tău AI',
-    lines: ['Claude, Cursor, ChatGPT'],
+    lines: ['Claude, Desktop sau Code'],
     wide: { x: 10, y: 150, w: 270, h: 110 },
     tall: { x: 60, y: 8, w: 290, h: 84 },
   },
@@ -92,7 +92,7 @@ export const VIEWS: readonly DiagramView[] = [
     id: 'account',
     label: 'Cu contul tău',
     caption:
-      'Te autentifici pe pagina Civiti și aprobi accesul. Asistentul primește permisiunile civiti.read și civiti.write, doar pentru contul tău, și le poți retrage oricând.',
+      'Cu contul tău de pe civiti.ro, te autentifici pe pagina Civiti și aprobi accesul. Asistentul primește permisiunile civiti.read și civiti.write, doar pentru contul tău. Le oprești scoțând conectorul din aplicație.',
     nodes: ['client', 'mcp', 'auth', 'data'],
     edges: ['client-mcp', 'client-auth', 'mcp-auth', 'mcp-data'],
   },
@@ -100,7 +100,7 @@ export const VIEWS: readonly DiagramView[] = [
     id: 'public',
     label: 'Fără cont',
     caption:
-      'Endpointul /mcp/public nu cere autentificare. Vede doar ce e public: probleme, autorități, categorii. Ajunge pentru petiții, dar nu vede problemele tale.',
+      'Endpointul /mcp/public nu cere cont. Vede doar ce e public: probleme publicate, autorități, categorii. Ajunge pentru petiții, dar nu știe care probleme sunt ale tale și nu le vede pe cele încă neaprobate.',
     nodes: ['client', 'mcp', 'data'],
     edges: ['client-mcp', 'mcp-data'],
   },

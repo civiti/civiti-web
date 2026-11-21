@@ -13,26 +13,31 @@ import {
   LEGAL_POINTS,
   PETITION_KINDS,
   SCREENSHOTS,
-  SERVER_REFERENCE_ISSUE_URL,
   SERVER_REFERENCE_URL,
   SKILL_URL,
   TEST_ROWS,
+  TOOL_INVENTORY_URL,
   TROUBLESHOOTING,
 } from './assistant-guide.data';
+import { CodeSpansPipe } from './code-spans.pipe';
 import { ClientSetupComponent } from './client-setup/client-setup.component';
+import { ConnectWalkthroughComponent } from './connect-walkthrough/connect-walkthrough.component';
 import { ConnectionDiagramComponent } from './connection-diagram/connection-diagram.component';
 import { CopyButtonComponent } from './copy-button/copy-button.component';
 import { ExplainerPlayerComponent } from './explainer-player/explainer-player.component';
 import { PetitionEmailComponent } from './petition-email/petition-email.component';
 import { PetitionFlowComponent } from './petition-flow/petition-flow.component';
 import { PromptCardComponent } from './prompt-card/prompt-card.component';
+import { ToolCatalogComponent } from './tool-catalog/tool-catalog.component';
 
 const SECTIONS = [
   { id: 'pe-scurt', label: 'Pe scurt' },
   { id: 'film', label: 'Film' },
   { id: 'prompturi', label: 'Prompturi' },
   { id: 'pas-cu-pas', label: 'Pas cu pas' },
+  { id: 'conectare', label: 'Conectarea' },
   { id: 'cum-functioneaza', label: 'Cum funcționează' },
+  { id: 'unelte', label: 'Uneltele' },
   { id: 'petitii', label: 'Petițiile' },
   { id: 'siguranta', label: 'Siguranță' },
   { id: 'probleme', label: 'Probleme frecvente' },
@@ -45,12 +50,15 @@ const SECTIONS = [
     RouterLink,
     NzIconModule,
     ClientSetupComponent,
+    CodeSpansPipe,
+    ConnectWalkthroughComponent,
     ConnectionDiagramComponent,
     CopyButtonComponent,
     ExplainerPlayerComponent,
     PetitionEmailComponent,
     PetitionFlowComponent,
     PromptCardComponent,
+    ToolCatalogComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './assistant-guide.component.html',
@@ -78,7 +86,7 @@ export class AssistantGuideComponent implements OnInit {
   readonly mcpPublicUrl = CIVITI_MCP_PUBLIC_URL;
   readonly skillUrl = SKILL_URL;
   readonly referenceUrl = SERVER_REFERENCE_URL;
-  readonly referenceIssueUrl = SERVER_REFERENCE_ISSUE_URL;
+  readonly inventoryUrl = TOOL_INVENTORY_URL;
 
   ngOnInit(): void {
     this.seo.updateMetaTags({

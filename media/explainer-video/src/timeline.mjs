@@ -38,7 +38,7 @@ export const SCENES = [
     end: 25,
     captions: [
       { from: 15.2, to: 19, text: 'Conectezi Civiti la asistentul tău AI, o singură dată.' },
-      { from: 19.1, to: 24.8, text: 'Te autentifici cu contul tău și aprobi ce are voie să facă. Nu există chei API.' },
+      { from: 19.1, to: 24.8, text: 'Te autentifici cu contul tău de pe civiti.ro și aprobi ce are voie să facă. Nu există chei API.' },
     ],
   },
   {
@@ -47,7 +47,7 @@ export const SCENES = [
     end: 33,
     captions: [
       { from: 25.2, to: 28.6, text: 'Apoi îi ceri, în cuvintele tale.' },
-      { from: 28.7, to: 32.8, text: 'Citește problema și verifică autoritățile legate de ea.' },
+      { from: 28.7, to: 32.8, text: 'Îți găsește problema, o citește și verifică autoritățile legate de ea.' },
     ],
   },
   {

@@ -36,7 +36,7 @@ The CIVITI MCP reads issues and authorities; it does **not** send email. A petit
 
 Never say a petition was sent unless the send call succeeded and the message shows in Sent.
 
-The CIVITI MCP tool `generate_petition_body` belongs to the issue-creation flow. Do not use it to write petitions — petitions are written with this skill.
+The CIVITI MCP tool `generate_petition_body` belongs to the issue flow: it backs the email dialog on an issue's page. Do not use it to write petitions — petitions are written with this skill.
 
 There is exactly one MCP write action related to petitions: `mark_email_sent`, which only increments a public counter recording that a petition was sent for an issue. It does not send anything. Only call it **after the petition was actually sent** — never before, and never as a substitute for sending.
 
@@ -323,7 +323,7 @@ Petitions are written in **Romanian only**, in the formal administrative registe
 - DO include the phone number in the body when the profile has one (it isn't in the email header).
 - DO send a formatted HTML email with a plain-text alternative, one authority per email, with the civiti.ro issue link.
 - DON'T write the petitioner's email address, an "Obiect:" line, a date line or a signature line in the body. End with the petitioner's name.
-- DON'T use `generate_petition_body` — it belongs to issue creation.
+- DON'T use `generate_petition_body` — it backs the issue page's email dialog, not petitions.
 - DON'T escalate to other bodies unless the user asks; keep the pressure with follow-ups.
 - DON'T send anything yourself without explicit confirmation or a standing instruction; DON'T resend without checking Sent.
 - DON'T call `mark_email_sent` before a real send.

@@ -8,7 +8,7 @@
           <span aria-current="page">Asistent AI</span>
         </nav>
         <h1 class="c-display hero__title">{{ article.title }}</h1>
-        <p class="c-lead">Asistentul tău citește problema de pe Civiti, scrie câte o petiție formală pentru fiecare autoritate și o pregătește de trimis din căsuța ta de email. Tu aprobi fiecare mesaj.</p>
+        <p class="c-lead">Asistentul tău citește problema de pe Civiti, scrie câte o petiție formală pentru fiecare autoritate și o pregătește de trimis din căsuța ta de email. Nimic nu pleacă fără acordul tău.</p>
         <div class="hero__actions">
           <app-copy-button [text]="fullPrompt.text" label="Copiază promptul complet" tone="c-btn--signal c-btn--lg" />
           <a class="c-btn c-btn--lg" href="/ghid/asistent-ai#film" (click)="jump($event, 'film')">
@@ -43,12 +43,13 @@
         <div class="c-card c-card--pad">
           <span class="pair__icon" nz-icon nzType="apartment" nzTheme="outline" aria-hidden="true"></span>
           <h3 class="c-h3">Conectorul Civiti (MCP)</h3>
-          <p>MCP e felul standard în care un asistent AI se leagă de un serviciu. Te autentifici pe Civiti, fără chei API, sau folosești varianta publică, fără cont.</p>
+          <p>MCP e felul standard în care un asistent AI se leagă de un serviciu. Dacă ai deja cont pe civiti.ro, te autentifici pe Civiti, fără chei API. Fără cont, folosești varianta publică.</p>
           <dl class="facts">
-            <div><dt>Fără cont</dt><dd>Caută și citește problemele publice, vede autoritățile și emailurile lor verificate, categoriile și clasamentul.</dd></div>
-            <div><dt>Cu contul tău, citire</dt><dd>Vezi problemele tale, activitatea, profilul și punctele.</dd></div>
-            <div><dt>Cu contul tău, acțiuni</dt><dd>Creează o sesizare, votează, comentează, raportează conținut, actualizează profilul.</dd></div>
+            <div><dt>Fără cont</dt><dd>Caută și citește problemele publice, vede autoritățile cu emailurile lor, categoriile și clasamentul. Poate număra o petiție trimisă în contorul public al problemei.</dd></div>
+            <div><dt>Cu contul tău, citire</dt><dd>Vezi problemele tale, noutățile de pe problemele pe care le urmărești, profilul și punctele.</dd></div>
+            <div><dt>Cu contul tău, acțiuni</dt><dd>Adaugă o problemă nouă, care devine publică după aprobarea unui moderator, votează, comentează, raportează conținut, actualizează profilul.</dd></div>
           </dl>
+          <a class="c-link" href="/ghid/asistent-ai#unelte" (click)="jump($event, 'unelte')">Toate cele 21 de unelte</a>
         </div>
         <div class="c-card c-card--pad">
           <span class="pair__icon" nz-icon nzType="file-text" nzTheme="outline" aria-hidden="true"></span>
@@ -115,9 +116,18 @@
       <div class="block__head">
         <p class="c-eyebrow">Pas cu pas</p>
         <h2 class="c-h2" id="pas-cu-pas-title">Preferi să o faci singur?</h2>
-        <p class="c-lead">Alege aplicația. Stările de mai jos spun ce am verificat noi, nu ce promite teoria.</p>
+        <p class="c-lead">Alege aplicația. Fiecare filă spune ce e verificat, ce n-am testat încă și ce nu merge.</p>
       </div>
       <app-client-setup [clients]="clients" />
+    </section>
+
+    <section class="block" id="conectare" aria-labelledby="conectare-title">
+      <div class="block__head">
+        <p class="c-eyebrow">Conectarea</p>
+        <h2 class="c-h2" id="conectare-title">Ce vezi când conectezi contul</h2>
+        <p class="c-lead">Paginile Civiti de autentificare și acord, recreate după cele reale și explicate. Sunt în engleză și durează un minut.</p>
+      </div>
+      <app-connect-walkthrough />
     </section>
 
     <section class="block" id="cum-functioneaza" aria-labelledby="cum-functioneaza-title">
@@ -127,6 +137,15 @@
         <p class="c-lead">Alege un drum și urmărește pe unde trec datele tale.</p>
       </div>
       <app-connection-diagram />
+    </section>
+
+    <section class="block" id="unelte" aria-labelledby="unelte-title">
+      <div class="block__head">
+        <p class="c-eyebrow">Uneltele</p>
+        <h2 class="c-h2" id="unelte-title">Ce poate face asistentul pe Civiti</h2>
+        <p class="c-lead">Conectorul îi dă asistentului 21 de unelte. Abilitatea de petiții folosește doar trei, toate fără cont.</p>
+      </div>
+      <app-tool-catalog />
     </section>
 
     <section class="block" id="petitii" aria-labelledby="petitii-title">
@@ -170,8 +189,8 @@
       <dl class="c-card c-card--pad facts needs">
         <div><dt>Conectorul Civiti</dt><dd>Obligatoriu. Varianta publică ajunge, dacă îi dai linkul problemei.</dd></div>
         <div><dt>Un conector Gmail</dt><dd>Opțional. Fără el, primești textul gata de copiat și trimiți singur.</dd></div>
-        <div><dt>O sarcină programată</dt><dd>Opțional. O verificare săptămânală care acționează doar când ultima petiție are cel puțin 34 de zile.</dd></div>
-        <div><dt>Datele tale</dt><dd>La prima folosire, asistentul îți cere o singură dată numele, forma Subsemnatul sau Subsemnata, adresa și telefonul.</dd></div>
+        <div><dt>O sarcină programată</dt><dd>Opțional. O verificare săptămânală a problemelor tale active, care pregătește o revenire doar după cel puțin 5 săptămâni de la ultima petiție către acea autoritate. Are nevoie de contul Civiti conectat și de Gmail.</dd></div>
+        <div><dt>Datele tale</dt><dd>La prima folosire, asistentul îți cere o singură dată numele, forma Subsemnatul sau Subsemnata, adresa și, dacă vrei, telefonul.</dd></div>
       </dl>
       <p class="c-muted">Fundalul legal e explicat în <a class="c-link" routerLink="/ghid/cum-sa-scrii-o-petitie">Cum să scrii o petiție</a>, <a class="c-link" routerLink="/ghid/petitii-si-sesizari-legale">Petiții și sesizări legale</a> și <a class="c-link" routerLink="/ghid/drepturile-cetateanului">Drepturile cetățeanului</a>.</p>
     </section>
@@ -179,8 +198,8 @@
     @if (screens.length) {
       <section class="block" id="capturi" aria-labelledby="capturi-title">
         <div class="block__head">
-          <p class="c-eyebrow">Capturi</p>
-          <h2 class="c-h2" id="capturi-title">Ce vei vedea pe ecran</h2>
+          <p class="c-eyebrow">O rulare reală</p>
+          <h2 class="c-h2" id="capturi-title">Cum arată abilitatea la lucru</h2>
         </div>
         <div class="screens">
           @for (screen of screens; track screen.src) {
@@ -199,12 +218,12 @@
         <h2 class="c-h2" id="siguranta-title">Ce rămâne la tine</h2>
       </div>
       <ul class="safety">
-        <li class="c-card c-card--pad"><h3 class="c-h3">Doar OAuth, cu acordul tău</h3><p>Te autentifici pe pagina Civiti, vezi ce cere asistentul și aprobi. Parola nu ajunge la asistent. Accesul îl retragi din aplicația unde ai conectat Civiti.</p></li>
+        <li class="c-card c-card--pad"><h3 class="c-h3">Doar OAuth, cu acordul tău</h3><p>Te autentifici pe pagina Civiti, vezi ce cere asistentul și aprobi. Parola nu ajunge la asistent. Ca să oprești accesul, scoți conectorul din aplicație; pe civiti.ro nu există încă o pagină cu aplicațiile conectate.</p></li>
         <li class="c-card c-card--pad"><h3 class="c-h3">Petițiile pleacă din căsuța ta</h3><p>Civiti nu trimite petițiile și nu le vede conținutul. După o trimitere reală, asistentul crește doar un contor public al problemei.</p></li>
-        <li class="c-card c-card--pad"><h3 class="c-h3">Conținutul Civiti e tratat ca date</h3><p>Textele de pe Civiti sunt scrise de alți oameni. Ajung la asistent marcate ca neverificate, iar abilitatea nu execută instrucțiuni din ele.</p></li>
+        <li class="c-card c-card--pad"><h3 class="c-h3">Conținutul Civiti e tratat ca date</h3><p>Textele de pe Civiti sunt scrise de alți oameni. Ajung la asistent marcate ca text de la utilizatori, nu ca instrucțiuni, iar abilitatea nu execută instrucțiuni din ele.</p></li>
         <li class="c-card c-card--pad"><h3 class="c-h3">Datele tale rămân în copia ta</h3><p>Abilitatea publică e goală. Numele și adresa rămân în copia ta. Ce vede asistentul ajunge totuși la furnizorul lui de AI, conform termenilor acestuia.</p></li>
       </ul>
-      <p class="c-muted">Pașii de deconectare sunt în fila fiecărei aplicații, la <a class="c-link" href="/ghid/asistent-ai#pas-cu-pas" (click)="jump($event, 'pas-cu-pas')">Pas cu pas</a>.</p>
+      <p class="c-muted">Cum scoți conectorul și abilitatea din fiecare aplicație găsești în fila ei, la <a class="c-link" href="/ghid/asistent-ai#pas-cu-pas" (click)="jump($event, 'pas-cu-pas')">Pas cu pas</a>.</p>
     </section>
 
     <section class="block" id="probleme" aria-labelledby="probleme-title">
@@ -215,18 +234,34 @@
       <div class="c-card faq">
         @for (item of troubleshooting; track item.question) {
           <details>
-            <summary>{{ item.question }}</summary>
-            <p>{{ item.answer }}</p>
+            <summary>
+              @for (span of item.question | codeSpans; track $index) {
+                @if (span.code) {
+                  <code>{{ span.text }}</code>
+                } @else {
+                  <span>{{ span.text }}</span>
+                }
+              }
+            </summary>
+            <p>
+              @for (span of item.answer | codeSpans; track $index) {
+                @if (span.code) {
+                  <code>{{ span.text }}</code>
+                } @else {
+                  <span>{{ span.text }}</span>
+                }
+              }
+            </p>
           </details>
         }
       </div>
 
       <aside class="devs c-card c-card--dark c-card--pad" aria-labelledby="devs-title">
         <h3 class="c-h3" id="devs-title">Pentru dezvoltatori</h3>
-        <p>Inventarul celor 21 de unelte, permisiunile, autentificarea și limitele sunt în referința tehnică din civiti-server.</p>
+        <p>Adresele, aplicațiile suportate, autentificarea, limitele și inventarul celor 21 de unelte sunt în referința tehnică din civiti-server.</p>
         <div class="devs__links">
           <a class="c-btn c-btn--on-dark" [href]="referenceUrl" target="_blank" rel="noopener"><span nz-icon nzType="github" nzTheme="outline" aria-hidden="true"></span><span>Referința tehnică</span></a>
-          <a class="c-btn c-btn--on-dark" [href]="referenceIssueUrl" target="_blank" rel="noopener"><span>civiti-server#167</span></a>
+          <a class="c-btn c-btn--on-dark" [href]="inventoryUrl" target="_blank" rel="noopener"><span>Inventarul uneltelor</span></a>
         </div>
         <dl class="devs__urls">
           <div><dt>Autentificat</dt><dd><code>{{ mcpUrl }}</code></dd></div>
