@@ -23,6 +23,8 @@ export interface WalkStep {
   title: string;
   /** Path on the auth host shown in the address bar, when the step is a Civiti page. */
   path?: string;
+  /** Says what the recreated screen is, under it. */
+  caption?: string;
   notes: readonly WalkNote[];
 }
 
@@ -58,7 +60,7 @@ export const WALK_STEPS: readonly WalkStep[] = [
       },
       {
         title: 'Același email, aceeași metodă',
-        text: 'La conectare intri exact cum intri pe civiti.ro: cu emailul și parola sau cu contul Google. Dacă ai conectat ceva în ultima jumătate de oră, din același browser, s-ar putea să sari peste pasul ăsta.',
+        text: 'La conectare intri exact cum intri pe civiti.ro: cu emailul și parola sau cu contul Google. Dacă ai mai conectat o aplicație la Civiti în ultima jumătate de oră, din același browser, s-ar putea să nu mai vezi pagina de autentificare și să ajungi direct la pagina de acord.',
       },
     ],
   },
@@ -67,6 +69,7 @@ export const WALK_STEPS: readonly WalkStep[] = [
     label: 'Autentificarea',
     title: 'Pagina de autentificare Civiti',
     path: '/Login',
+    caption: 'Recreare după pagina reală, nu o captură. Textul e cel de pe ecran, în engleză.',
     notes: [
       {
         title: 'Verifică adresa',
@@ -91,6 +94,7 @@ export const WALK_STEPS: readonly WalkStep[] = [
     label: 'Acordul',
     title: 'Pagina de acord',
     path: '/Consent',
+    caption: 'Recreare după pagina reală, nu o captură, cu textul de pe ecran, în engleză. În locul chenarului punctat, pagina reală arată numele cu care s-a înregistrat aplicația.',
     notes: [
       {
         title: 'Unverified e normal',
@@ -106,7 +110,7 @@ export const WALK_STEPS: readonly WalkStep[] = [
       },
       {
         title: 'Approve sau Deny',
-        text: 'Aprobi tot sau nimic. Approve te duce direct înapoi în aplicație. Deny refuză și te scoate din contul Civiti din browser. Ai 10 minute, într-o singură filă: altfel primești `Consent context missing or expired` sau `This consent form is stale` și o iei de la capăt.',
+        text: 'Aprobi tot sau nimic. Approve te duce direct înapoi în aplicație. Deny refuză cererea și închide sesiunea de pe serverul de autentificare Civiti, așa că data viitoare te autentifici din nou; pe civiti.ro rămâi conectat. Ai 10 minute, într-o singură filă: altfel primești `Consent context missing or expired` sau `This consent form is stale` și o iei de la capăt.',
       },
     ],
   },
@@ -124,7 +128,7 @@ export const WALK_STEPS: readonly WalkStep[] = [
         text: 'Scoate conectorul din aplicație. Pe civiti.ro nu există încă o pagină cu aplicațiile conectate.',
       },
       {
-        title: 'Actualizările nu te deconectează',
+        title: 'Actualizările Civiti nu te deconectează',
         text: 'Când Civiti își actualizează serverul, rămâi conectat. Nu trebuie să adaugi conectorul din nou.',
       },
     ],

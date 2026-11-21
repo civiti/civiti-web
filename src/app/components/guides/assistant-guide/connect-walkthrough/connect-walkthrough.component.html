@@ -39,8 +39,8 @@
               <span class="pin" aria-hidden="true">2</span>
             </div>
             <div class="spot tile tile--row" [class.is-on]="note() === 3">
-              <span class="c-chip">Email și parolă</span>
-              <span class="c-chip"><span nz-icon nzType="google" nzTheme="outline" aria-hidden="true"></span><span>Google</span></span>
+              <span class="tile__method">Email și parolă</span>
+              <span class="tile__method"><span nz-icon nzType="google" nzTheme="outline" aria-hidden="true"></span><span>Google</span></span>
               <span class="pin" aria-hidden="true">3</span>
             </div>
           </div>
@@ -124,15 +124,15 @@
             </div>
             <div class="spot tile" [class.is-on]="note() === 3">
               <span class="tile__icon" nz-icon nzType="check-circle" nzTheme="outline" aria-hidden="true"></span>
-              <p class="tile__title">Rămâi conectat la actualizări</p>
-              <p class="c-small c-muted">Nu adaugi conectorul din nou.</p>
+              <p class="tile__title">Actualizările Civiti nu te deconectează</p>
+              <p class="c-small c-muted">Nu trebuie să adaugi conectorul din nou.</p>
               <span class="pin" aria-hidden="true">3</span>
             </div>
           </div>
         }
       }
-      @if (step.path) {
-        <p class="c-small c-muted stage__caption">Recreare după pagina reală, nu o captură. Textul e cel de pe ecran, în engleză; numele aplicației e cel cu care s-a înregistrat ea.</p>
+      @if (step.caption) {
+        <p class="c-small c-muted stage__caption">{{ step.caption }}</p>
       }
     </div>
 
@@ -141,7 +141,7 @@
       <ol class="notes__list">
         @for (item of step.notes; track item.number) {
           <li>
-            <button type="button" class="note" [class.is-on]="note() === item.number" [attr.aria-pressed]="note() === item.number" (click)="pick(item.number)" (mouseenter)="pick(item.number)" (focus)="pick(item.number)">
+            <button type="button" class="note" [class.is-on]="note() === item.number" (click)="pick(item.number)" (mouseenter)="pick(item.number)" (focus)="pick(item.number)">
               <span class="note__pin" aria-hidden="true">{{ item.number }}</span>
               <span>
                 <b>{{ item.title }}</b>

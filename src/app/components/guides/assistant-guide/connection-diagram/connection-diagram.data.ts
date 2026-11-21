@@ -37,7 +37,7 @@ export const NODES: readonly DiagramNode[] = [
   {
     id: 'client',
     title: 'Asistentul tău AI',
-    lines: ['Claude, Desktop sau Code'],
+    lines: ['Claude: web, Desktop, Code'],
     wide: { x: 10, y: 150, w: 270, h: 110 },
     tall: { x: 60, y: 8, w: 290, h: 84 },
   },
@@ -100,7 +100,7 @@ export const VIEWS: readonly DiagramView[] = [
     id: 'public',
     label: 'Fără cont',
     caption:
-      'Endpointul /mcp/public nu cere cont. Vede doar ce e public: probleme publicate, autorități, categorii. Ajunge pentru petiții, dar nu știe care probleme sunt ale tale și nu le vede pe cele încă neaprobate.',
+      'Adresa publică /mcp/public nu cere cont. Vede doar ce e public: probleme publicate, autorități, categorii. Ajunge pentru petiții, dar nu știe care probleme sunt ale tale și nu le vede pe cele încă neaprobate.',
     nodes: ['client', 'mcp', 'data'],
     edges: ['client-mcp', 'mcp-data'],
   },

@@ -9,6 +9,9 @@ import {
   TEST_ROWS,
   TROUBLESHOOTING,
 } from './assistant-guide.data';
+import { WALK_STEPS } from './connect-walkthrough/connect-walkthrough.data';
+import { VIEWS } from './connection-diagram/connection-diagram.data';
+import { TOOL_GROUPS } from './tool-catalog/tool-catalog.data';
 
 const prompt = (id: PromptId) => AGENT_PROMPTS.find((p) => p.id === id)!.text;
 
@@ -84,6 +87,10 @@ describe('guide clients', () => {
 
 // Server facts from civiti-server Civiti.Mcp/README.md that the page must not drift from.
 describe('server facts', () => {
+  // Copy that lives in data files. Text written straight into templates is covered by
+  // the component specs that render it.
+  const pageCopy = JSON.stringify({ AGENT_PROMPTS, GUIDE_CLIENTS, TROUBLESHOOTING, TEST_ROWS, VIEWS, WALK_STEPS, TOOL_GROUPS });
+
   it('mark only claude.ai and Claude Desktop as verified', () => {
     expect(GUIDE_CLIENTS.filter((c) => c.tone === 'resolved').map((c) => c.id)).toEqual(['claude', 'claude-desktop']);
   });
@@ -97,14 +104,13 @@ describe('server facts', () => {
   });
 
   it('never name the custom domain, which has no TLS', () => {
-    expect(JSON.stringify({ AGENT_PROMPTS, GUIDE_CLIENTS, TROUBLESHOOTING })).not.toContain('mcp.civiti.ro');
+    expect(pageCopy).not.toContain('mcp.civiti.ro');
   });
 
   // README "Revocation": users have no page to see or revoke connections yet.
   it('never promise a Civiti page for revoking access', () => {
-    const text = JSON.stringify({ AGENT_PROMPTS, GUIDE_CLIENTS, TROUBLESHOOTING });
-    expect(text).not.toContain('account settings');
-    expect(text).not.toContain('retrage oricând');
+    expect(pageCopy).not.toContain('account settings');
+    expect(pageCopy).not.toContain('retrage oricând');
   });
 
   it('cover the sign-in failures a citizen can hit', () => {

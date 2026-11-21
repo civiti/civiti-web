@@ -36,7 +36,7 @@ export const TOOL_GROUPS: readonly ToolGroup[] = [
       { name: 'list_authorities', label: 'Autoritățile', text: 'Autoritățile locale active dintr-un oraș sau sector, cu emailurile lor.', writes: false, skill: true },
       { name: 'get_categories', label: 'Categoriile', text: 'Categoriile de probleme, cu numele lor în română.', writes: false, skill: false },
       { name: 'get_leaderboard', label: 'Clasamentul', text: 'Cei mai activi oameni, după puncte, probleme, rezolvări sau voturi.', writes: false, skill: false },
-      { name: 'mark_email_sent', label: 'Numără un email trimis', text: 'După ce ai trimis petiția, crește cu unu contorul public de emailuri al problemei. Nu trimite nimic și merge cel mult o dată pe oră.', writes: true, skill: true },
+      { name: 'mark_email_sent', label: 'Numără un email trimis', text: 'După ce ai trimis petiția, crește cu unu contorul public de emailuri al problemei. Nu trimite nimic. Merge doar la problemele active și cel mult o dată pe oră pentru aceeași problemă, de la aceeași adresă IP.', writes: true, skill: true },
       { name: 'whoami', label: 'Verifică conexiunea', text: 'Spune dacă asistentul e conectat cu contul tău sau doar public.', writes: false, skill: false },
     ],
   },
@@ -50,7 +50,7 @@ export const TOOL_GROUPS: readonly ToolGroup[] = [
       { name: 'get_my_gamification', label: 'Punctele tale', text: 'Punctele, nivelul, insignele și seria de zile active.', writes: false, skill: false },
       { name: 'list_my_activity', label: 'Activitatea', text: 'Ce s-a întâmplat la problemele pe care le urmărești.', writes: false, skill: false },
       { name: 'list_my_blocked_users', label: 'Utilizatori blocați', text: 'Lista oamenilor pe care i-ai blocat.', writes: false, skill: false },
-      { name: 'generate_petition_body', label: 'Emailul de pe pagina problemei', text: 'Textul de pornire din fereastra de email a unei probleme, pe civiti.ro. Nu scrie petiții: pe acelea le scrie abilitatea.', writes: false, skill: false },
+      { name: 'generate_petition_body', label: 'Emailul de pe pagina problemei', text: 'Compune textul de pornire din fereastra de email a unei probleme, pe civiti.ro: o petiție-șablon după O.G. 27/2002. Nu scrie petițiile din ghidul acesta: pe acelea le scrie abilitatea.', writes: false, skill: false },
     ],
   },
   {

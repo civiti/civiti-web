@@ -135,6 +135,21 @@
   &--row {
     flex-flow: row wrap;
   }
+
+  // Static labels, so not the interactive c-chip.
+  &__method {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-2);
+    height: 32px;
+    padding: 0 var(--space-3);
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-pill);
+    background: var(--surface);
+    color: var(--ink-700);
+    font-size: var(--text-sm);
+    font-weight: 600;
+  }
 }
 
 // --- Recreated Civiti.Auth pages ------------------------------------------------

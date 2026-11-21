@@ -10,8 +10,8 @@ const FILTERS: readonly { id: ToolFilter; label: string }[] = [
 ];
 
 /**
- * Every Civiti MCP tool, grouped by what it needs. The filter only dims the others,
- * so the full list stays in the prerendered page for agents and search engines.
+ * Every Civiti MCP tool, grouped by what it needs. The filter hides the others only
+ * in the browser: the prerendered page always has all of them, for agents and search.
  */
 @Component({
   selector: 'app-tool-catalog',
@@ -36,6 +36,13 @@ export class ToolCatalogComponent {
   });
 
   readonly total = TOOL_GROUPS.reduce((sum, group) => sum + group.tools.length, 0);
+
+  /** Announced to screen readers when the filter changes. */
+  readonly status = computed(() =>
+    this.filter() === 'all'
+      ? ''
+      : `${this.groups().reduce((sum, group) => sum + group.matches, 0)} din ${this.total} unelte se potrivesc filtrului.`,
+  );
 
   setFilter(id: ToolFilter): void {
     this.filter.set(id);

@@ -36,11 +36,12 @@ describe('ToolCatalogComponent', () => {
     fixture.detectChanges();
   });
 
-  it('keeps every tool on the page when filtering, and only dims the rest', () => {
+  it('keeps every tool in the DOM when filtering, and hides the rest', () => {
     fixture.componentInstance.setFilter('skill');
     fixture.detectChanges();
     const items = fixture.nativeElement.querySelectorAll('.tool');
     expect(items.length).toBe(21);
-    expect(fixture.nativeElement.querySelectorAll('.tool:not(.is-dim)').length).toBe(3);
+    expect(fixture.nativeElement.querySelectorAll('.tool:not([hidden])').length).toBe(3);
+    expect(fixture.nativeElement.querySelector('[aria-live]').textContent).toContain('3 din 21');
   });
 });

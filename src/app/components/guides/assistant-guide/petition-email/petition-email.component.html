@@ -37,7 +37,7 @@
     <ol class="notes__list">
       @for (note of notes(); track note.number) {
         <li>
-          <button type="button" class="note" [class.is-on]="note.on" [attr.aria-pressed]="note.on" (click)="select(note.number)" (mouseenter)="select(note.number)" (focus)="select(note.number)">
+          <button type="button" class="note" [class.is-on]="note.on" (click)="select(note.number)" (mouseenter)="select(note.number)" (focus)="select(note.number)">
             <span class="note__pin" aria-hidden="true">{{ note.number }}</span>
             <span><b>{{ note.title }}</b><span class="note__text">{{ note.text }}</span></span>
           </button>

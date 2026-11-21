@@ -54,15 +54,10 @@
 
 .tool {
   padding-block: var(--space-3);
-  transition: opacity var(--dur) var(--ease);
 
-  & + & {
+  // Between visible items only, so a filtered list has no stray line at the top.
+  &:not([hidden]) ~ & {
     border-top: 1px solid var(--line);
-  }
-
-  // Filtered out: kept on the page, only quieter.
-  &.is-dim {
-    opacity: 0.35;
   }
 
   // Zero specificity, so the element rules below can set their own margins.

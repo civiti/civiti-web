@@ -46,8 +46,8 @@
           <p>MCP e felul standard în care un asistent AI se leagă de un serviciu. Dacă ai deja cont pe civiti.ro, te autentifici pe Civiti, fără chei API. Fără cont, folosești varianta publică.</p>
           <dl class="facts">
             <div><dt>Fără cont</dt><dd>Caută și citește problemele publice, vede autoritățile cu emailurile lor, categoriile și clasamentul. Poate număra o petiție trimisă în contorul public al problemei.</dd></div>
-            <div><dt>Cu contul tău, citire</dt><dd>Vezi problemele tale, noutățile de pe problemele pe care le urmărești, profilul și punctele.</dd></div>
-            <div><dt>Cu contul tău, acțiuni</dt><dd>Adaugă o problemă nouă, care devine publică după aprobarea unui moderator, votează, comentează, raportează conținut, actualizează profilul.</dd></div>
+            <div><dt>Cu contul tău, citire</dt><dd>Vede problemele tale, noutățile de pe problemele pe care le urmărești, profilul și punctele.</dd></div>
+            <div><dt>Cu contul tău, acțiuni</dt><dd>Votează, comentează, raportează conținut, actualizează profilul și adaugă probleme noi, care apar public abia după ce le aprobă un moderator.</dd></div>
           </dl>
           <a class="c-link" href="/ghid/asistent-ai#unelte" (click)="jump($event, 'unelte')">Toate cele 21 de unelte</a>
         </div>
@@ -125,7 +125,7 @@
       <div class="block__head">
         <p class="c-eyebrow">Conectarea</p>
         <h2 class="c-h2" id="conectare-title">Ce vezi când conectezi contul</h2>
-        <p class="c-lead">Paginile Civiti de autentificare și acord, recreate după cele reale și explicate. Sunt în engleză și durează un minut.</p>
+        <p class="c-lead">Paginile Civiti de autentificare și acord, recreate după cele reale și explicate. Sunt în engleză, iar conectarea durează un minut.</p>
       </div>
       <app-connect-walkthrough />
     </section>
@@ -189,7 +189,7 @@
       <dl class="c-card c-card--pad facts needs">
         <div><dt>Conectorul Civiti</dt><dd>Obligatoriu. Varianta publică ajunge, dacă îi dai linkul problemei.</dd></div>
         <div><dt>Un conector Gmail</dt><dd>Opțional. Fără el, primești textul gata de copiat și trimiți singur.</dd></div>
-        <div><dt>O sarcină programată</dt><dd>Opțional. O verificare săptămânală a problemelor tale active, care pregătește o revenire doar după cel puțin 5 săptămâni de la ultima petiție către acea autoritate. Are nevoie de contul Civiti conectat și de Gmail.</dd></div>
+        <div><dt>O sarcină programată</dt><dd>Opțional. O verificare săptămânală a problemelor tale active. Pregătește o revenire către o autoritate doar dacă au trecut cel puțin 5 săptămâni de la ultima petiție trimisă acesteia. Are nevoie de contul Civiti conectat și de Gmail.</dd></div>
         <div><dt>Datele tale</dt><dd>La prima folosire, asistentul îți cere o singură dată numele, forma Subsemnatul sau Subsemnata, adresa și, dacă vrei, telefonul.</dd></div>
       </dl>
       <p class="c-muted">Fundalul legal e explicat în <a class="c-link" routerLink="/ghid/cum-sa-scrii-o-petitie">Cum să scrii o petiție</a>, <a class="c-link" routerLink="/ghid/petitii-si-sesizari-legale">Petiții și sesizări legale</a> și <a class="c-link" routerLink="/ghid/drepturile-cetateanului">Drepturile cetățeanului</a>.</p>
@@ -220,7 +220,7 @@
       <ul class="safety">
         <li class="c-card c-card--pad"><h3 class="c-h3">Doar OAuth, cu acordul tău</h3><p>Te autentifici pe pagina Civiti, vezi ce cere asistentul și aprobi. Parola nu ajunge la asistent. Ca să oprești accesul, scoți conectorul din aplicație; pe civiti.ro nu există încă o pagină cu aplicațiile conectate.</p></li>
         <li class="c-card c-card--pad"><h3 class="c-h3">Petițiile pleacă din căsuța ta</h3><p>Civiti nu trimite petițiile și nu le vede conținutul. După o trimitere reală, asistentul crește doar un contor public al problemei.</p></li>
-        <li class="c-card c-card--pad"><h3 class="c-h3">Conținutul Civiti e tratat ca date</h3><p>Textele de pe Civiti sunt scrise de alți oameni. Ajung la asistent marcate ca text de la utilizatori, nu ca instrucțiuni, iar abilitatea nu execută instrucțiuni din ele.</p></li>
+        <li class="c-card c-card--pad"><h3 class="c-h3">Conținutul Civiti e tratat ca date</h3><p>Textele de pe Civiti sunt scrise de alți oameni. Asistentul le tratează pe toate ca date, nu ca instrucțiuni, iar abilitatea nu execută instrucțiuni din ele.</p></li>
         <li class="c-card c-card--pad"><h3 class="c-h3">Datele tale rămân în copia ta</h3><p>Abilitatea publică e goală. Numele și adresa rămân în copia ta. Ce vede asistentul ajunge totuși la furnizorul lui de AI, conform termenilor acestuia.</p></li>
       </ul>
       <p class="c-muted">Cum scoți conectorul și abilitatea din fiecare aplicație găsești în fila ei, la <a class="c-link" href="/ghid/asistent-ai#pas-cu-pas" (click)="jump($event, 'pas-cu-pas')">Pas cu pas</a>.</p>

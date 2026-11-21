@@ -31,8 +31,17 @@ describe('ConnectWalkthroughComponent', () => {
   });
 
   it('shows the Unverified badge and explains it as normal', () => {
-    expect(host.textContent).toContain('Unverified');
-    expect(host.textContent).toContain('Unverified e normal');
+    const consent = host.querySelector<HTMLElement>('#walk-panel-acord')!;
+    expect(consent.querySelector('.stage .screen__badge')?.textContent?.trim()).toBe('Unverified');
+    expect(consent.querySelector('.notes')?.textContent).toContain('Unverified e normal');
+  });
+
+  // The login page never names the app, so its caption must not claim it does.
+  it('captions each recreation for what it shows', () => {
+    const caption = (id: string) => host.querySelector(`#walk-panel-${id} .stage__caption`)?.textContent ?? '';
+    expect(caption('login')).toContain('Recreare');
+    expect(caption('login')).not.toContain('numele');
+    expect(caption('acord')).toContain('numele cu care s-a înregistrat');
   });
 
   // The consent page's placeholder notice promises a revocation page that doesn't exist.
