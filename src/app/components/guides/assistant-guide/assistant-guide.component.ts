@@ -102,7 +102,11 @@ export class AssistantGuideComponent implements OnInit {
    * Scrolls itself instead of leaving the fragment to the router, which is set up
    * to return to the top of the page and ignores `scroll-margin-top`.
    */
-  jump(event: Event, id: string): void {
+  jump(event: MouseEvent, id: string): void {
+    // Leave modified clicks to the browser, so a section can still open in a new tab.
+    if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) {
+      return;
+    }
     const target = this.document.getElementById(id);
     if (!target) {
       return;

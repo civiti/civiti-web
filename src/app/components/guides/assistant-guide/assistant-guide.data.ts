@@ -171,6 +171,14 @@ const CLAUDE_SKILL_DOCS: VendorLink = {
   url: 'https://support.claude.com/en/articles/12512180-use-skills-in-claude',
 };
 
+/**
+ * Shell command that installs the skill only if there is no copy yet: an installed
+ * SKILL.md may hold the petitioner details saved on first use.
+ */
+function installCommand(dir: string): string {
+  return `if [ -e ${dir}/SKILL.md ]; then echo "${dir}/SKILL.md există deja; nu l-am suprascris."; else mkdir -p ${dir} && curl -fsSL ${SKILL_URL} -o ${dir}/SKILL.md; fi`;
+}
+
 const CONNECTOR_STEPS: readonly SetupStep[] = [
   { text: 'Ai nevoie de un cont pe civiti.ro. Conectorul nu creează unul: fără cont, conectarea se oprește cu no_civiti_account.' },
   { text: 'Deschide Customize > Connectors. Pe planurile Team și Enterprise, conectorul îl adaugă un administrator.' },
@@ -232,11 +240,8 @@ export const GUIDE_CLIENTS: readonly GuideClient[] = [
     ],
     skill: [
       {
-        text: 'Copiază abilitatea în dosarul tău personal. Claude Code o vede fără repornire.',
-        code: {
-          label: 'Comandă',
-          code: `mkdir -p ~/.claude/skills/civiti-petitions && curl -fsSL ${SKILL_URL} -o ~/.claude/skills/civiti-petitions/SKILL.md`,
-        },
+        text: 'Copiază abilitatea în dosarul tău personal. Dacă o ai deja, comanda nu o suprascrie: copia ta poate păstra datele tale.',
+        code: { label: 'Comandă', code: installCommand('~/.claude/skills/civiti-petitions') },
       },
     ],
     disconnect: 'Rulează claude mcp remove civiti-public. Conectorul de cont îl scoți de pe claude.ai. Abilitatea o ștergi cu rm -r ~/.claude/skills/civiti-petitions.',
@@ -263,11 +268,8 @@ export const GUIDE_CLIENTS: readonly GuideClient[] = [
     ],
     skill: [
       {
-        text: 'Copiază abilitatea în dosarul personal de abilități:',
-        code: {
-          label: 'Comandă',
-          code: `mkdir -p ~/.cursor/skills/civiti-petitions && curl -fsSL ${SKILL_URL} -o ~/.cursor/skills/civiti-petitions/SKILL.md`,
-        },
+        text: 'Copiază abilitatea în dosarul personal de abilități. Dacă o ai deja, comanda nu o suprascrie.',
+        code: { label: 'Comandă', code: installCommand('~/.cursor/skills/civiti-petitions') },
       },
     ],
     disconnect: 'Scoate intrarea civiti-public din ~/.cursor/mcp.json și șterge dosarul ~/.cursor/skills/civiti-petitions.',

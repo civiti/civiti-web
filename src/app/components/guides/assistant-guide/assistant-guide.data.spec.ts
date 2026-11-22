@@ -75,6 +75,17 @@ describe('agent prompts', () => {
 });
 
 describe('guide clients', () => {
+  // An installed SKILL.md may hold the petitioner details saved on first use.
+  it('never overwrite an installed skill from the manual steps', () => {
+    const commands = GUIDE_CLIENTS.flatMap((c) => c.skill.map((step) => step.code?.code ?? '')).filter((code) =>
+      code.includes('curl'),
+    );
+    expect(commands.length).toBe(2);
+    for (const code of commands) {
+      expect(code).toMatch(/^if \[ -e .*SKILL\.md \]; then echo .*; else mkdir -p .* && curl -fsSL .*; fi$/);
+    }
+  });
+
   it('give every client steps for both pieces, a way out and vendor docs', () => {
     for (const client of GUIDE_CLIENTS) {
       expect(client.connect.length).withContext(client.id).toBeGreaterThan(0);
