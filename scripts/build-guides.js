@@ -20,6 +20,8 @@ const ARTICLE_INTERFACE = `export interface GuideArticle {
   imageWidth?: number;
   imageHeight?: number;
   imageType?: string;
+  /** True when the guide has its own route and component, not /ghid/:slug. */
+  dedicated: boolean;
   htmlContent: string;
 }`;
 
@@ -128,10 +130,12 @@ function buildGuides() {
       description: data.description || '',
       category: data.category || 'general',
       publishedAt: data.publishedAt || new Date().toISOString().split('T')[0],
-      readingTime,
+      // A dedicated page's reading time cannot be measured from its stub.
+      readingTime: data.readingTime || readingTime,
       featured: data.featured || false,
       image,
       ...measureImage(image),
+      dedicated: data.dedicated === true,
       htmlContent,
     };
   });

@@ -5,28 +5,8 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { GUIDE_ARTICLES, GuideArticle } from '../../../generated/guide-data';
 import { TrustedHtmlPipe } from '../../../pipes/trusted-html.pipe';
-import { SeoService, SocialImage } from '../../../services/seo.service';
-import { SITE_URL } from '../../../constants/urls';
-
-/**
- * Each guide ships its own illustration in `public/guides/`. The page shows it
- * as a decorative hero, but crawlers only unfurl what `og:image` declares, so
- * without this every guide would share the same generic Civiti card.
- * Dimensions come from the build-time measurement in `scripts/build-guides.js`,
- * never from a hardcoded guess.
- */
-function socialCard(article: GuideArticle): SocialImage | undefined {
-  if (!article.image) {
-    return undefined;
-  }
-  return {
-    url: `${SITE_URL}${article.image}`,
-    width: article.imageWidth,
-    height: article.imageHeight,
-    type: article.imageType,
-    alt: article.title,
-  };
-}
+import { SeoService } from '../../../services/seo.service';
+import { guideSocialCard } from '../guide-social-card';
 
 @Component({
   selector: 'app-guide-detail',
@@ -71,7 +51,7 @@ export class GuideDetailComponent implements OnInit {
       description: this.article.description,
       ogType: 'article',
       publishedTime: this.article.publishedAt,
-      ogImage: socialCard(this.article),
+      ogImage: guideSocialCard(this.article),
     });
 
     this.relatedArticles = GUIDE_ARTICLES

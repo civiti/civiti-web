@@ -17,11 +17,13 @@ export const serverRoutes: ServerRoute[] = [
   // Guides — content is static (built from markdown into GUIDE_ARTICLES at
   // build time), so prerender every slug instead of paying for SSR per request.
   { path: 'ghid', renderMode: RenderMode.Prerender },
+  // Has its own component, so it must match before the `:slug` route below.
+  { path: 'ghid/asistent-ai', renderMode: RenderMode.Prerender },
   {
     path: 'ghid/:slug',
     renderMode: RenderMode.Prerender,
     getPrerenderParams: async () =>
-      GUIDE_ARTICLES.map((article) => ({ slug: article.slug })),
+      GUIDE_ARTICLES.filter((article) => !article.dedicated).map((article) => ({ slug: article.slug })),
   },
 
   // Dynamic public pages — server-rendered on demand for freshness

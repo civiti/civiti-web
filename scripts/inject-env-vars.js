@@ -16,9 +16,11 @@ const envVars = {
   // API URLs - Default to local backend service
   apiUrl: process.env.API_URL || 'http://localhost:8080/api',
 
-  // Supabase configuration
-  supabaseUrl: process.env.SUPABASE_URL || '',
-  supabasePublishableKey: process.env.SUPABASE_PUBLISHABLE_KEY || '',
+  // Supabase configuration. The NEXT_PUBLIC_ names are the ones Vercel's Supabase
+  // integration creates; accept them too so a project set up that way still builds.
+  supabaseUrl: process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+  supabasePublishableKey:
+    process.env.SUPABASE_PUBLISHABLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY || '',
   
   // Google Maps (consider renaming VITE_GOOGLE_MAPS_API_KEY to GOOGLE_MAPS_API_KEY)
   googleMapsApiKey: process.env.GOOGLE_MAPS_API_KEY || process.env.VITE_GOOGLE_MAPS_API_KEY || '',

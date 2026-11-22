@@ -1,0 +1,99 @@
+:host {
+  display: block;
+}
+
+.prompt {
+  overflow: hidden;
+
+  &--primary {
+    border-color: var(--ink-900);
+    box-shadow: var(--shadow-md);
+  }
+
+  &__head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-5) var(--space-6);
+  }
+
+  &__copy {
+    flex: 1 1 320px;
+    min-width: 0;
+
+    h3 {
+      margin: 0;
+    }
+  }
+
+  &__badge {
+    margin: 0 0 var(--space-1);
+    color: var(--signal-text);
+  }
+
+  &__intro {
+    margin: var(--space-2) 0 0;
+    color: var(--ink-600);
+  }
+
+  // The whole prompt stays in the DOM: an agent reading the page gets all of it,
+  // and only the view is clipped.
+  &__body {
+    position: relative;
+    max-height: 13.5rem;
+    overflow: hidden;
+    border-block: 1px solid var(--ink-800);
+    background: var(--ink-950);
+
+    &::after {
+      content: '';
+      position: absolute;
+      inset: auto 0 0;
+      height: 4rem;
+      background: linear-gradient(transparent, var(--ink-950));
+      pointer-events: none;
+    }
+
+    &.is-open {
+      max-height: none;
+
+      &::after {
+        display: none;
+      }
+    }
+
+    pre {
+      margin: 0;
+      padding: var(--space-5) var(--space-6);
+      overflow-x: auto;
+      color: var(--white-82);
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font-size: 0.8125rem;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+
+    code {
+      font: inherit;
+    }
+  }
+
+  &__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-3);
+    padding: var(--space-2) var(--space-4);
+  }
+
+  &__chevron {
+    transition: transform var(--dur) var(--ease);
+
+    &.is-open {
+      transform: rotate(180deg);
+    }
+  }
+}

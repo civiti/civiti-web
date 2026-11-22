@@ -1,0 +1,17 @@
+{
+  "name": "civiti-explainer-video",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Code-generated explainer for /ghid/asistent-ai. Separate from the app on purpose: nothing here is installed or built by the site.",
+  "type": "module",
+  "scripts": {
+    "render": "node render.mjs",
+    "render:fast": "node render.mjs --draft",
+    "still": "node render.mjs --still",
+    "postinstall": "playwright install chromium-headless-shell"
+  },
+  "devDependencies": {
+    "ffmpeg-static": "5.3.0",
+    "playwright": "1.65.0"
+  }
+}

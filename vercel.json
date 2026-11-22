@@ -7,6 +7,15 @@
   "rewrites": [
     { "source": "/(.*)", "destination": "/api" }
   ],
+  "headers": [
+    {
+      "source": "/skills/:skill/SKILL.md",
+      "headers": [
+        { "key": "Content-Type", "value": "text/plain; charset=utf-8" },
+        { "key": "X-Content-Type-Options", "value": "nosniff" }
+      ]
+    }
+  ],
   "functions": {
     "api/index.mjs": {
       "includeFiles": "dist/Civica/server/**"

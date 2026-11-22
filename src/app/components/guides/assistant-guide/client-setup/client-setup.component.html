@@ -1,0 +1,77 @@
+<div class="tabs" role="tablist" aria-label="Alege aplicația ta" (keydown)="onKeydown($event)">
+  @for (client of clients(); track client.id; let i = $index) {
+    <button
+      type="button"
+      role="tab"
+      class="tabs__tab"
+      [id]="'client-tab-' + client.id"
+      [attr.aria-selected]="active() === i"
+      [attr.aria-controls]="'client-panel-' + client.id"
+      [attr.tabindex]="active() === i ? 0 : -1"
+      (click)="select(i)">
+      {{ client.name }}
+    </button>
+  }
+</div>
+
+@for (client of clients(); track client.id; let i = $index) {
+  <section
+    class="panel c-card"
+    role="tabpanel"
+    tabindex="0"
+    [id]="'client-panel-' + client.id"
+    [attr.aria-labelledby]="'client-tab-' + client.id"
+    [hidden]="active() !== i">
+    <header class="panel__head">
+      <div>
+        <h3 class="c-h3">{{ client.name }}</h3>
+        <p class="panel__summary">{{ client.summary }}</p>
+      </div>
+      <span class="c-status" [attr.data-tone]="client.tone">{{ client.status }}</span>
+    </header>
+
+    <div class="panel__columns">
+      <div>
+        <h4 class="panel__label">1. Conectează Civiti</h4>
+        <ol class="steps">
+          @for (step of client.connect; track step.text) {
+            <li>
+              <p>{{ step.text }}</p>
+              @if (step.code; as code) {
+                <div class="snippet">
+                  <pre tabindex="0"><code>{{ code.code }}</code></pre>
+                  <app-copy-button class="snippet__copy" [text]="code.code" tone="c-btn--sm" />
+                </div>
+              }
+            </li>
+          }
+        </ol>
+      </div>
+      <div>
+        <h4 class="panel__label">2. Instalează abilitatea</h4>
+        <ol class="steps">
+          @for (step of client.skill; track step.text) {
+            <li>
+              <p>{{ step.text }}</p>
+              @if (step.code; as code) {
+                <div class="snippet">
+                  <pre tabindex="0"><code>{{ code.code }}</code></pre>
+                  <app-copy-button class="snippet__copy" [text]="code.code" tone="c-btn--sm" />
+                </div>
+              }
+            </li>
+          }
+        </ol>
+        <h4 class="panel__label panel__label--gap">Cum te deconectezi</h4>
+        <p class="panel__note">{{ client.disconnect }}</p>
+      </div>
+    </div>
+
+    <footer class="panel__docs">
+      <span class="c-small c-muted">Documentația producătorului:</span>
+      @for (doc of client.docs; track doc.url) {
+        <a class="c-link c-small" [href]="doc.url" target="_blank" rel="noopener">{{ doc.label }}</a>
+      }
+    </footer>
+  </section>
+}
