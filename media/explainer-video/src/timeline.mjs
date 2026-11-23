@@ -91,7 +91,7 @@ export const SCENES = [
     start: 70,
     end: 76,
     captions: [
-      { from: 70.2, to: 75.7, text: 'Ghidul complet și prompturile sunt pe civiti.ro/ghid/asistent-ai.' },
+      { from: 70.2, to: 75.7, text: 'Ghidul și promptul sunt pe civiti.ro/ghid/asistent-ai.' },
     ],
   },
 ];

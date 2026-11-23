@@ -18,5 +18,5 @@ export const EXPLAINER_TRANSCRIPT: readonly string[] = [
   "Din acel moment are 30 de zile să îți dea un răspuns.",
   "Dacă problema rămâne activă, revii după cel puțin 5 săptămâni.",
   "Revenirea citează numărul primit și cere ceva nou.",
-  "Ghidul complet și prompturile sunt pe civiti.ro/ghid/asistent-ai.",
+  "Ghidul și promptul sunt pe civiti.ro/ghid/asistent-ai.",
 ];
