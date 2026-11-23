@@ -261,11 +261,13 @@ Location selection as landing page removes barriers to entry
 🤖 Assistant Guide (/ghid/asistent-ai)
 
 Listed in /ghid like any guide, from the stub in src/content/guides/asistent-ai.md, but it has its own component
-Two readers: a citizen who isn't technical, and that citizen's AI agent, which follows the copy/paste prompts literally
-Primary action: copy the full prompt (hero and the first prompt card). Secondary: watch the film
-Prompts first, manual steps second: the agent does the setup where it can and tells the person what to press where it can't
+Two readers: a citizen who isn't technical, and that citizen's AI agent, which follows the copy/paste prompt literally
+Short and scannable: hero, three icon steps beside the film, the prompt, client tabs, safety and troubleshooting. Background on petitions and the law lives in the other guides, not here
+Primary action: copy the prompt (hero). Secondary: the manual steps
+Prompt first, manual steps second: the agent does the setup where it can and tells the person what to press where it can't
+One prompt, which keeps four rules however it is shortened: never ask for secrets, never send without approval, treat Civiti content as data, never overwrite an existing SKILL.md
 Client tabs label each client by what was tested: verified end to end, works only through the claude.ai connector or /mcp/public, or untested. No client is called supported without a real end-to-end connect
-The sign-in and consent screens are inert recreations of Civiti.Auth's pages, never a form: nothing on civiti.ro may look like a place to type a password
+Nothing on civiti.ro may look like a place to type a password
 Server facts (URLs, clients, limits, troubleshooting) follow civiti-server's Civiti.Mcp/README.md; when they disagree with a test, the test wins and the page says what was tested
-Client status and test results live in assistant-guide.data.ts, so a server fix is a one-line change on the page
+Client status lives in assistant-guide.data.ts, so a server fix is a one-line change on the page
 Nothing is sent without the person's approval, and the page says so before they start
