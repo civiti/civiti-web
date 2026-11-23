@@ -1,23 +1,19 @@
-<article class="prompt c-card" [class.prompt--primary]="primary()">
+<article class="prompt c-card">
   <header class="prompt__head">
-    <div class="prompt__copy">
-      @if (primary()) {
-        <p class="c-eyebrow prompt__badge">Recomandat</p>
-      }
-      <h3 class="c-h3">{{ prompt().title }}</h3>
-      <p class="prompt__intro">{{ prompt().intro }}</p>
-    </div>
-    <app-copy-button [text]="prompt().text" label="Copiază promptul" [tone]="copyTone()" />
+    <p class="prompt__label">
+      <span nz-icon nzType="robot" nzTheme="outline" aria-hidden="true"></span>
+      <span>Prompt pentru asistent · {{ lineLabel() }}</span>
+    </p>
+    <app-copy-button [text]="text()" label="Copiază promptul" tone="c-btn--ink" />
   </header>
 
   <div class="prompt__body" [class.is-open]="expanded()">
-    <pre [id]="panelId()" tabindex="0" lang="en"><code>{{ prompt().text }}</code></pre>
+    <pre id="prompt-text" tabindex="0" lang="en"><code>{{ text() }}</code></pre>
   </div>
   <div class="prompt__foot">
-    <button type="button" class="c-btn c-btn--ghost c-btn--sm" [attr.aria-expanded]="expanded()" [attr.aria-controls]="panelId()" (click)="toggle()">
+    <button type="button" class="c-btn c-btn--ghost c-btn--sm" [attr.aria-expanded]="expanded()" aria-controls="prompt-text" (click)="toggle()">
       <span nz-icon nzType="down" nzTheme="outline" class="prompt__chevron" [class.is-open]="expanded()" aria-hidden="true"></span>
       <span>{{ expanded() ? 'Restrânge' : 'Arată tot' }}</span>
     </button>
-    <span class="c-small c-muted">{{ lineLabel() }}</span>
   </div>
 </article>

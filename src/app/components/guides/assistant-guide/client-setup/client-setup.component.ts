@@ -1,5 +1,5 @@
 import { DOCUMENT } from '@angular/common';
-import { ChangeDetectionStrategy, Component, inject, input, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
 import { NzIconModule } from 'ng-zorro-antd/icon';
 import { GuideClient } from '../assistant-guide.data';
 import { CopyButtonComponent } from '../copy-button/copy-button.component';
@@ -21,6 +21,17 @@ export class ClientSetupComponent {
 
   readonly clients = input.required<readonly GuideClient[]>();
   readonly active = signal(0);
+
+  /** Each client with its two columns: connecting Civiti, then adding the skill. */
+  readonly panels = computed(() =>
+    this.clients().map((client) => ({
+      ...client,
+      parts: [
+        { icon: 'link', title: 'Conectează Civiti', steps: client.connect },
+        { icon: 'file-text', title: 'Adaugă abilitatea', steps: client.skill },
+      ],
+    })),
+  );
 
   select(index: number): void {
     this.active.set(index);

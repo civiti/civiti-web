@@ -13,8 +13,7 @@ export const SITE_URL = 'https://civiti.ro';
 /**
  * Civiti MCP server. The OAuth `resource` it advertises must equal the URL a
  * client is given, so moving to a custom domain also needs the server's public
- * origin changed. Every MCP URL on /ghid/asistent-ai is built from this constant; the
- * Civiti.Auth host its walkthrough shows is CIVITI_AUTH_HOST in connect-walkthrough.data.ts.
+ * origin changed. Every MCP URL on /ghid/asistent-ai is built from this constant.
  */
 export const CIVITI_MCP_ORIGIN = 'https://civiti-mcp-production.up.railway.app';
 export const CIVITI_MCP_URL = `${CIVITI_MCP_ORIGIN}/mcp`;

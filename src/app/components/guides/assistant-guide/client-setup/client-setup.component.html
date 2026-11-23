@@ -14,7 +14,7 @@
   }
 </div>
 
-@for (client of clients(); track client.id; let i = $index) {
+@for (client of panels(); track client.id; let i = $index) {
   <section
     class="panel c-card"
     role="tabpanel"
@@ -23,52 +23,42 @@
     [attr.aria-labelledby]="'client-tab-' + client.id"
     [hidden]="active() !== i">
     <header class="panel__head">
-      <div>
-        <h3 class="c-h3">{{ client.name }}</h3>
-        <p class="panel__summary">{{ client.summary }}</p>
-      </div>
       <span class="c-status" [attr.data-tone]="client.tone">{{ client.status }}</span>
+      <p class="panel__summary">{{ client.summary }}</p>
     </header>
 
     <div class="panel__columns">
-      <div>
-        <h4 class="panel__label">1. Conectează Civiti</h4>
-        <ol class="steps">
-          @for (step of client.connect; track step.text) {
-            <li>
-              <p>{{ step.text }}</p>
-              @if (step.code; as code) {
-                <div class="snippet">
-                  <pre tabindex="0"><code>{{ code.code }}</code></pre>
-                  <app-copy-button class="snippet__copy" [text]="code.code" tone="c-btn--sm" />
-                </div>
-              }
-            </li>
-          }
-        </ol>
-      </div>
-      <div>
-        <h4 class="panel__label">2. Instalează abilitatea</h4>
-        <ol class="steps">
-          @for (step of client.skill; track step.text) {
-            <li>
-              <p>{{ step.text }}</p>
-              @if (step.code; as code) {
-                <div class="snippet">
-                  <pre tabindex="0"><code>{{ code.code }}</code></pre>
-                  <app-copy-button class="snippet__copy" [text]="code.code" tone="c-btn--sm" />
-                </div>
-              }
-            </li>
-          }
-        </ol>
-        <h4 class="panel__label panel__label--gap">Cum te deconectezi</h4>
-        <p class="panel__note">{{ client.disconnect }}</p>
-      </div>
+      @for (part of client.parts; track part.icon) {
+        <div>
+          <h3 class="panel__label">
+            <span nz-icon [nzType]="part.icon" nzTheme="outline" aria-hidden="true"></span>
+            <span>{{ part.title }}</span>
+          </h3>
+          <ol class="steps">
+            @for (step of part.steps; track step.text) {
+              <li>
+                <p>{{ step.text }}</p>
+                @if (step.code; as code) {
+                  <div class="snippet">
+                    <pre tabindex="0"><code>{{ code }}</code></pre>
+                    <app-copy-button class="snippet__copy" [text]="code" tone="c-btn--sm" />
+                  </div>
+                }
+                @if (step.download; as file) {
+                  <a class="c-btn c-btn--sm steps__download" [href]="file.url" download>
+                    <span nz-icon nzType="download" nzTheme="outline" aria-hidden="true"></span>
+                    <span>{{ file.label }}</span>
+                  </a>
+                }
+              </li>
+            }
+          </ol>
+        </div>
+      }
     </div>
 
     <footer class="panel__docs">
-      <span class="c-small c-muted">Documentația producătorului:</span>
+      <span class="c-small c-muted">Documentație:</span>
       @for (doc of client.docs; track doc.url) {
         <a class="c-link c-small" [href]="doc.url" target="_blank" rel="noopener">{{ doc.label }}</a>
       }

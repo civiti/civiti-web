@@ -6,8 +6,8 @@ category: "ghid-practic"
 publishedAt: "2026-11-22"
 featured: false
 image: "/guides/asistent-ai.png"
-readingTime: "10 min citire"
+readingTime: "3 min citire"
 dedicated: true
 ---
 
-Acest fișier ține doar metadatele ghidului: cartea din /ghid, sitemapul și etichetele SEO. Pagina are propria componentă, `AssistantGuideComponent`, pentru că are butoane de copiere, file pentru clienți și un film.
+Acest fișier ține doar metadatele ghidului: cartea din /ghid, sitemapul și etichetele SEO. Pagina are propria componentă, `AssistantGuideComponent`, pentru că are un prompt de copiat, file pentru clienți și un film.
