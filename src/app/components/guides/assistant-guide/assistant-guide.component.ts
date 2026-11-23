@@ -77,6 +77,8 @@ export class AssistantGuideComponent implements OnInit {
     event.preventDefault();
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
-    history.replaceState(history.state, '', `#${id}`);
+    // A bare `#id` would resolve against <base href="/"> and point the URL at the home page.
+    const { pathname, search } = this.document.location;
+    history.replaceState(history.state, '', `${pathname}${search}#${id}`);
   }
 }
