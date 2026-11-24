@@ -1,21 +1,27 @@
 #!/usr/bin/env node
 // One-command render of the /ghid/asistent-ai explainer.
 //
-//   npm run render          full 1080p30 MP4, poster, WebVTT, page transcript
-//   npm run render:fast     540p at 15 fps, to check timing quickly
-//   npm run still -- 39.5,48   frames as out/still-<t>.png, to check a scene
+//   npm run render          full 1080p30 MP4 with sound, poster, WebVTT, page transcript
+//   npm run render:fast     540p at 15 fps, with sound, to check timing quickly
+//   npm run still -- 23,31  frames as out/still-<t>.png, to check a scene
+//   npm run audio           the soundtrack alone, as out/soundtrack.wav
+//
+//   --audio <file.wav>      use another soundtrack instead of the generated one
+//   --mute                  render without sound
 //
 // The film is a plain web page (src/stage.*) whose whole state is a function of
 // time. Each frame seeks that function, takes a screenshot and pipes it into
-// ffmpeg. Nothing depends on wall-clock time, so a render is reproducible.
+// ffmpeg. The soundtrack is synthesized by src/soundtrack.mjs on the same clock.
+// Nothing depends on wall-clock time, so a render is reproducible.
 
-import { spawn } from 'node:child_process';
+import { spawn, spawnSync } from 'node:child_process';
 import { createReadStream, existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { dirname, extname, join, normalize, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ffmpegPath from 'ffmpeg-static';
 import { chromium } from 'playwright';
+import { renderSoundtrack, writeWav } from './src/soundtrack.mjs';
 import { DURATION, FPS, HEIGHT, POSTER_AT, WIDTH, cues, toVtt } from './src/timeline.mjs';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -31,6 +37,13 @@ const args = process.argv.slice(2);
 const draft = args.includes('--draft');
 const stillArg = args.includes('--still') ? (args[args.indexOf('--still') + 1] ?? String(POSTER_AT)) : null;
 const stills = stillArg === null ? null : stillArg.split(',').map(Number);
+const mute = args.includes('--mute');
+const audioArg = args.includes('--audio') ? args[args.indexOf('--audio') + 1] : null;
+
+/** Web loudness: -16 LUFS integrated, peaks below -1.5 dB. */
+const TARGET_LUFS = -16;
+const TARGET_PEAK_DB = -1.5;
+const LOUDNESS = `I=${TARGET_LUFS}:TP=${TARGET_PEAK_DB}:LRA=11`;
 
 mkdirSync(outDir, { recursive: true });
 
@@ -101,7 +114,45 @@ async function renderPoster() {
   await close();
 }
 
-async function renderFilm() {
+function ffmpegSync(argv) {
+  const run = spawnSync(ffmpegPath, ['-hide_banner', '-nostats', ...argv], { encoding: 'utf8' });
+  if (run.status !== 0) {
+    throw new Error(`ffmpeg failed: ${run.stderr}`);
+  }
+  return run.stderr;
+}
+
+/**
+ * The soundtrack, normalised in two passes: the first measures it, the second
+ * applies one fixed gain, so the music keeps its shape instead of pumping. The
+ * limiter is a safety net for a louder track swapped in with --audio; the
+ * generated one never reaches it.
+ */
+function prepareAudio() {
+  if (mute) {
+    return null;
+  }
+  let source = audioArg && resolve(audioArg);
+  if (!source) {
+    source = join(outDir, 'soundtrack.wav');
+    writeWav(source, renderSoundtrack());
+  }
+  // Measure exactly what ships: the first DURATION seconds.
+  const measured = ffmpegSync(['-t', String(DURATION), '-i', source, '-af', `loudnorm=${LOUDNESS}:print_format=json`, '-f', 'null', '-']);
+  const stats = JSON.parse(measured.slice(measured.lastIndexOf('{'), measured.lastIndexOf('}') + 1));
+  const gain = TARGET_LUFS - Number(stats.input_i);
+  const target = join(outDir, 'soundtrack.normalised.wav');
+  ffmpegSync([
+    '-y', '-t', String(DURATION), '-i', source,
+    '-af', `volume=${gain.toFixed(2)}dB,alimiter=limit=${10 ** (TARGET_PEAK_DB / 20)}:level=disabled`,
+    '-ar', '48000', '-c:a', 'pcm_s24le', target,
+  ]);
+  const peak = Number(stats.input_tp) + gain;
+  console.log(`soundtrack ${source}: ${stats.input_i} LUFS, gain ${gain.toFixed(2)} dB, true peak about ${peak.toFixed(1)} dBTP`);
+  return target;
+}
+
+async function renderFilm(audio) {
   const fps = draft ? 15 : FPS;
   const size = draft ? '960:540' : `${WIDTH}:${HEIGHT}`;
   const target = draft ? join(outDir, 'draft.mp4') : join(publicDir, 'explainer.mp4');
@@ -112,10 +163,13 @@ async function renderFilm() {
     [
       '-y', '-hide_banner', '-loglevel', 'error',
       '-f', 'image2pipe', '-framerate', String(fps), '-c:v', 'mjpeg', '-i', 'pipe:0',
+      ...(audio ? ['-i', audio, '-map', '0:v', '-map', '1:a'] : []),
       '-vf', `scale=${size}:flags=lanczos,format=yuv420p`,
       '-c:v', 'libx264', '-profile:v', 'high', '-preset', draft ? 'veryfast' : 'slow',
       '-crf', draft ? '30' : '25', '-g', String(fps * 2),
-      '-movflags', '+faststart', '-an',
+      ...(audio ? ['-c:a', 'aac', '-b:a', draft ? '96k' : '160k', '-ar', '48000'] : ['-an']),
+      '-t', String(DURATION),
+      '-movflags', '+faststart',
       target,
     ],
     { stdio: ['pipe', 'inherit', 'inherit'] },
@@ -164,5 +218,5 @@ if (stills) {
     writeTextTracks();
     await renderPoster();
   }
-  await renderFilm();
+  await renderFilm(prepareAudio());
 }
