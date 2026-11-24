@@ -148,7 +148,7 @@ export const GUIDE_CLIENTS: readonly GuideClient[] = [
     id: 'cursor',
     name: 'Cursor',
     tone: 'neutral',
-    status: 'Doar public, netestat',
+    status: 'Fără cont, netestat',
     summary: `${NOT_EXPECTED} Adresa publică nu cere cont, dar nu am testat-o încă în Cursor.`,
     connect: [
       {
@@ -171,7 +171,7 @@ export const GUIDE_CLIENTS: readonly GuideClient[] = [
     id: 'chatgpt',
     name: 'ChatGPT',
     tone: 'neutral',
-    status: 'Doar public, netestat',
+    status: 'Fără cont, netestat',
     summary: `${NOT_EXPECTED} Adresa publică nu cere cont, dar nu am testat-o încă în ChatGPT.`,
     connect: [
       { text: 'În chatgpt.com/plugins, apasă + și alege Add custom MCP server.' },
