@@ -59,6 +59,16 @@ describe('agent prompt', () => {
     expect(AGENT_PROMPT).toContain('offer to send it through my Gmail if it is connected, and send only when I say so');
   });
 
+  // The weekly task is the one place something may go out unattended, so it needs the
+  // person's say-so, and it must run the skill's Follow-up cycle rather than its own rules.
+  it('offers weekly follow-ups only on request, and sends unattended only if allowed', () => {
+    expect(AGENT_PROMPT).toContain('The one exception is the weekly task in PART 4, and only if I say it may send on its own');
+    expect(AGENT_PROMPT).toContain('PART 4. Weekly follow-ups. Optional: ask me first');
+    expect(AGENT_PROMPT).toContain(`runs the skill's Follow-up cycle on each issue`);
+    expect(AGENT_PROMPT).toContain('If the installed skill has no "Follow-up cycle" section');
+    expect(AGENT_PROMPT).toContain('Ask me whether the task may send on its own or should only draft and report');
+  });
+
   // Without the skill, an agent would draft free-form, without its recipient checks.
   it('falls back to the published skill when it is not loaded', () => {
     expect(AGENT_PROMPT).toContain(`If it is not available in this session, read ${SKILL_URL} and follow it`);
@@ -109,7 +119,8 @@ describe('server facts', () => {
   it('never say Cursor or ChatGPT should work', () => {
     for (const client of GUIDE_CLIENTS.filter((c) => c.id === 'cursor' || c.id === 'chatgpt')) {
       expect(client.summary).withContext(client.id).not.toContain('ar trebui să meargă');
-      expect(client.summary).withContext(client.id).toContain('nu e de așteptat să meargă');
+      expect(client.summary).withContext(client.id).not.toContain('ar trebui să funcționeze');
+      expect(client.summary).withContext(client.id).toContain('cel mai probabil nu funcționează');
     }
   });
 

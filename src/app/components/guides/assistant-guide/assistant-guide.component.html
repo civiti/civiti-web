@@ -8,7 +8,7 @@
           <span aria-current="page">Asistent AI</span>
         </nav>
         <h1 class="c-display hero__title">{{ article.title }}</h1>
-        <p class="c-lead">Asistentul tău AI scrie petițiile pentru problemele de pe Civiti. Tu le aprobi, iar ele pleacă din emailul tău.</p>
+        <p class="c-lead">Asistentul tău AI scrie petițiile pentru problemele de pe Civiti. Tu le aprobi, iar ele se trimit din contul tău de email.</p>
         <div class="hero__actions">
           <app-copy-button [text]="prompt" label="Copiază promptul" tone="c-btn--signal c-btn--lg" />
           <a class="c-btn c-btn--lg" href="/ghid/asistent-ai#pas-cu-pas" (click)="jump($event, 'pas-cu-pas')">
@@ -19,11 +19,11 @@
         <ul class="points points--hero">
           <li>
             <span nz-icon nzType="robot" nzTheme="outline" aria-hidden="true"></span>
-            <p>Lipește-l în Claude sau alt asistent AI. Îți spune el ce să apeși.</p>
+            <p>Lipește-l în Claude sau în alt asistent AI, iar el îți spune ce ai de făcut.</p>
           </li>
           <li>
             <span nz-icon nzType="user-add" nzTheme="outline" aria-hidden="true"></span>
-            <p>Pentru conectare ai nevoie de un cont pe civiti.ro. <a class="c-link" routerLink="/auth/register">Creează unul</a></p>
+            <p>Ca să te conectezi, ai nevoie de un cont pe civiti.ro. <a class="c-link" routerLink="/auth/register">Creează-ți unul</a></p>
           </li>
         </ul>
       </div>
@@ -54,8 +54,8 @@
 
     <section class="block" id="prompt" aria-labelledby="prompt-title">
       <div class="block__head">
-        <h2 class="c-h2" id="prompt-title">Lasă asistentul să facă instalarea</h2>
-        <p class="c-lead">Lipește promptul într-o conversație nouă. Unde nu poate singur, îți spune ce să apeși.</p>
+        <h2 class="c-h2" id="prompt-title">Lasă asistentul să instaleze totul</h2>
+        <p class="c-lead">Lipește promptul într-o conversație nouă. Când are nevoie de tine, îți spune ce să apeși.</p>
       </div>
       <app-prompt-card [text]="prompt" />
     </section>
@@ -63,13 +63,13 @@
     <section class="block" id="pas-cu-pas" aria-labelledby="pas-cu-pas-title">
       <div class="block__head">
         <h2 class="c-h2" id="pas-cu-pas-title">Sau pas cu pas</h2>
-        <p class="c-lead">Alege aplicația. Fiecare filă spune ce merge acolo.</p>
+        <p class="c-lead">Alege aplicația pe care o folosești. Fiecare filă arată ce funcționează în ea.</p>
       </div>
       <app-client-setup [clients]="clients" />
     </section>
 
     <section class="block" id="siguranta" aria-labelledby="siguranta-title">
-      <h2 class="c-h2 block__title" id="siguranta-title">Ce rămâne la tine</h2>
+      <h2 class="c-h2 block__title" id="siguranta-title">Tu ai controlul</h2>
       <ul class="c-card points points--card">
         @for (point of safety; track point.icon) {
           <li>
@@ -114,7 +114,7 @@
         </li>
         <li>
           <span nz-icon nzType="github" nzTheme="outline" aria-hidden="true"></span>
-          <p>Pentru dezvoltatori: <a class="c-link" [href]="referenceUrl" target="_blank" rel="noopener">referința tehnică a serverului</a></p>
+          <p>Pentru dezvoltatori: <a class="c-link" [href]="referenceUrl" target="_blank" rel="noopener">documentația tehnică a serverului</a></p>
         </li>
       </ul>
     </section>

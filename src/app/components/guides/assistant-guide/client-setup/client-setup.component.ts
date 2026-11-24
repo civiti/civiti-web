@@ -28,7 +28,7 @@ export class ClientSetupComponent {
       ...client,
       parts: [
         { icon: 'link', title: 'Conectează Civiti', steps: client.connect },
-        { icon: 'file-text', title: 'Adaugă abilitatea', steps: client.skill },
+        { icon: 'file-text', title: 'Adaugă skill-ul', steps: client.skill },
       ],
     })),
   );

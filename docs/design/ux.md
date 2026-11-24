@@ -271,3 +271,6 @@ Nothing on civiti.ro may look like a place to type a password
 Server facts (URLs, clients, limits, troubleshooting) follow civiti-server's Civiti.Mcp/README.md; when they disagree with a test, the test wins and the page says what was tested
 Client status lives in assistant-guide.data.ts, so a server fix is a one-line change on the page
 Nothing is sent without the person's approval, and the page says so before they start
+Weekly follow-ups are optional (the prompt's PART 4): a scheduled task runs the skill's Follow-up cycle, and it sends on its own only if the person says so
+public/skills/civiti-petitions/SKILL.md is the tracked copy of the skill; it ships with an empty Petitioner profile, and the build refuses a filled one
+Copy calls it "skill-ul", the word the apps' Skills menu uses
