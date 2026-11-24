@@ -3,11 +3,11 @@
 
 export const EXPLAINER_TRANSCRIPT: readonly string[] = [
   "Trotuarul din fața blocului e blocat de luni de zile.",
-  "Ai pus problema pe Civiti. Acum e nevoie de o petiție formală.",
+  "Ai raportat problema pe Civiti. Acum e nevoie de o petiție formală.",
   "Conectezi Civiti la asistentul tău AI, cu contul tău de pe civiti.ro.",
-  "Adaugi abilitatea care îl învață să scrie petiții formale.",
+  "Adaugi skill-ul care îl învață să scrie petiții formale.",
   "Îi ceri, iar el scrie câte o petiție pentru fiecare autoritate.",
-  "Tu aprobi. Petiția pleacă din emailul tău.",
-  "Primești un număr de înregistrare. Autoritatea are 30 de zile.",
+  "Tu aprobi, iar petiția se trimite din contul tău de email.",
+  "Primești un număr de înregistrare. Autoritatea are 30 de zile să răspundă.",
   "Promptul și pașii sunt pe civiti.ro/ghid/asistent-ai.",
 ];

@@ -33,7 +33,7 @@ export const SCENES = [
     id: 'issue',
     start: 4,
     end: 8,
-    captions: [{ from: 4.2, to: 7.8, text: 'Ai pus problema pe Civiti. Acum e nevoie de o petiție formală.' }],
+    captions: [{ from: 4.2, to: 7.8, text: 'Ai raportat problema pe Civiti. Acum e nevoie de o petiție formală.' }],
   },
   {
     id: 'connect',
@@ -45,7 +45,7 @@ export const SCENES = [
     id: 'skill',
     start: 14,
     end: 18,
-    captions: [{ from: 14.2, to: 17.8, text: 'Adaugi abilitatea care îl învață să scrie petiții formale.' }],
+    captions: [{ from: 14.2, to: 17.8, text: 'Adaugi skill-ul care îl învață să scrie petiții formale.' }],
   },
   {
     id: 'ask',
@@ -64,13 +64,13 @@ export const SCENES = [
     id: 'send',
     start: 24,
     end: 28,
-    captions: [{ from: 24.2, to: 27.8, text: 'Tu aprobi. Petiția pleacă din emailul tău.' }],
+    captions: [{ from: 24.2, to: 27.8, text: 'Tu aprobi, iar petiția se trimite din contul tău de email.' }],
   },
   {
     id: 'registered',
     start: 28,
     end: 32,
-    captions: [{ from: 28.2, to: 31.8, text: 'Primești un număr de înregistrare. Autoritatea are 30 de zile.' }],
+    captions: [{ from: 28.2, to: 31.8, text: 'Primești un număr de înregistrare. Autoritatea are 30 de zile să răspundă.' }],
   },
   {
     id: 'end',
