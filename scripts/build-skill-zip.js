@@ -13,9 +13,30 @@ const OUTPUT = path.join(SKILL_DIR, 'civiti-petitions.zip');
 // A fixed timestamp keeps the archive byte-identical between builds.
 const STAMP = new Date('2026-01-01T00:00:00Z');
 
+// The skill saves the petitioner's name, address and phone into this block on first
+// use, so a copy brought back from someone's Claude app carries them. The published
+// file must always ship it empty.
+const EMPTY_PROFILE = [
+  'Status: empty',
+  'Name (as written in petitions):',
+  'Form: Subsemnatul / domiciliat | Subsemnata / domiciliată',
+  'Full address:',
+  'Phone (optional):',
+].join('\n');
+
+function assertEmptyProfile(skill) {
+  if (!skill.replace(/\r\n/g, '\n').includes('```\n' + EMPTY_PROFILE + '\n```')) {
+    throw new Error(
+      `${SOURCE} has a filled or changed Petitioner profile. Reset the block to:\n${EMPTY_PROFILE}`,
+    );
+  }
+}
+
 async function buildSkillZip() {
+  const skill = fs.readFileSync(SOURCE);
+  assertEmptyProfile(skill.toString('utf8'));
   const zip = new JSZip();
-  zip.file('civiti-petitions/SKILL.md', fs.readFileSync(SOURCE), { date: STAMP });
+  zip.file('civiti-petitions/SKILL.md', skill, { date: STAMP });
   const bytes = await zip.generateAsync({ type: 'nodebuffer', compression: 'DEFLATE' });
   fs.writeFileSync(OUTPUT, bytes);
   console.log(`[build-skill-zip] ${bytes.length} bytes → ${OUTPUT}`);
