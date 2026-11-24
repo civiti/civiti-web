@@ -2,46 +2,23 @@ import { DOCUMENT } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { NzIconModule } from 'ng-zorro-antd/icon';
-import { CIVITI_MCP_PUBLIC_URL, CIVITI_MCP_URL } from '../../../constants/urls';
 import { GUIDE_ARTICLES } from '../../../generated/guide-data';
 import { SeoService } from '../../../services/seo.service';
 import { guideSocialCard } from '../guide-social-card';
 import {
-  AGENT_PROMPTS,
+  AGENT_PROMPT,
   GUIDE_CLIENTS,
   GUIDE_SLUG,
-  LEGAL_POINTS,
-  PETITION_KINDS,
-  SCREENSHOTS,
+  HOW_IT_WORKS,
+  SAFETY_POINTS,
   SERVER_REFERENCE_URL,
-  SKILL_URL,
-  TEST_ROWS,
-  TOOL_INVENTORY_URL,
   TROUBLESHOOTING,
 } from './assistant-guide.data';
 import { CodeSpansPipe } from './code-spans.pipe';
 import { ClientSetupComponent } from './client-setup/client-setup.component';
-import { ConnectWalkthroughComponent } from './connect-walkthrough/connect-walkthrough.component';
-import { ConnectionDiagramComponent } from './connection-diagram/connection-diagram.component';
 import { CopyButtonComponent } from './copy-button/copy-button.component';
 import { ExplainerPlayerComponent } from './explainer-player/explainer-player.component';
-import { PetitionEmailComponent } from './petition-email/petition-email.component';
-import { PetitionFlowComponent } from './petition-flow/petition-flow.component';
 import { PromptCardComponent } from './prompt-card/prompt-card.component';
-import { ToolCatalogComponent } from './tool-catalog/tool-catalog.component';
-
-const SECTIONS = [
-  { id: 'pe-scurt', label: 'Pe scurt' },
-  { id: 'film', label: 'Film' },
-  { id: 'prompturi', label: 'Prompturi' },
-  { id: 'pas-cu-pas', label: 'Pas cu pas' },
-  { id: 'conectare', label: 'Conectarea' },
-  { id: 'cum-functioneaza', label: 'Cum funcționează' },
-  { id: 'unelte', label: 'Uneltele' },
-  { id: 'petitii', label: 'Petițiile' },
-  { id: 'siguranta', label: 'Siguranță' },
-  { id: 'probleme', label: 'Probleme frecvente' },
-];
 
 @Component({
   selector: 'app-assistant-guide',
@@ -51,14 +28,9 @@ const SECTIONS = [
     NzIconModule,
     ClientSetupComponent,
     CodeSpansPipe,
-    ConnectWalkthroughComponent,
-    ConnectionDiagramComponent,
     CopyButtonComponent,
     ExplainerPlayerComponent,
-    PetitionEmailComponent,
-    PetitionFlowComponent,
     PromptCardComponent,
-    ToolCatalogComponent,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './assistant-guide.component.html',
@@ -72,21 +44,12 @@ export class AssistantGuideComponent implements OnInit {
   // and cover, so the /ghid card and this page cannot disagree.
   readonly article = GUIDE_ARTICLES.find((a) => a.slug === GUIDE_SLUG)!;
 
-  readonly sections = SECTIONS;
-  readonly prompts = AGENT_PROMPTS;
-  readonly fullPrompt = AGENT_PROMPTS[0];
+  readonly prompt = AGENT_PROMPT;
   readonly clients = GUIDE_CLIENTS;
-  readonly kinds = PETITION_KINDS;
-  readonly legal = LEGAL_POINTS;
-  readonly tests = TEST_ROWS;
-  readonly screens = SCREENSHOTS;
+  readonly steps = HOW_IT_WORKS;
+  readonly safety = SAFETY_POINTS;
   readonly troubleshooting = TROUBLESHOOTING;
-
-  readonly mcpUrl = CIVITI_MCP_URL;
-  readonly mcpPublicUrl = CIVITI_MCP_PUBLIC_URL;
-  readonly skillUrl = SKILL_URL;
   readonly referenceUrl = SERVER_REFERENCE_URL;
-  readonly inventoryUrl = TOOL_INVENTORY_URL;
 
   ngOnInit(): void {
     this.seo.updateMetaTags({
@@ -114,6 +77,8 @@ export class AssistantGuideComponent implements OnInit {
     event.preventDefault();
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     target.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' });
-    history.replaceState(history.state, '', `#${id}`);
+    // A bare `#id` would resolve against <base href="/"> and point the URL at the home page.
+    const { pathname, search } = this.document.location;
+    history.replaceState(history.state, '', `${pathname}${search}#${id}`);
   }
 }

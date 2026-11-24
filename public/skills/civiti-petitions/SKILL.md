@@ -116,7 +116,35 @@ When the issue already had petitions:
 6. **Respect redirects.** If an authority answered that it is not competent or pointed elsewhere ("adresați-vă Primăriei", "înaintați petiția către ASB"), do not send it the same request again: send the follow-up to the authority it named, citing the redirect.
 7. **Ask something new**: current status, measures taken since, calendar, responsible department, interim measures — never the identical request (Art. 10).
 8. **Say "situația persistă" only for issues still Active** in Civiti; the user marks an issue Resolved once it is fixed.
-9. **Keep the pressure**: at least 5 weeks after the previous petition to the same authority (so the 30-day term of Art. 8 has passed), and keep going while the issue is Active. No escalation to other bodies unless the user asks.
+9. **Keep the pressure** with the "Follow-up cycle" below, for as long as the issue is Active. No escalation to other bodies unless the user asks.
+
+## Follow-up cycle (what to send, and when)
+
+Decide separately **for each issue and each authority**, at every run (the user's scheduled task runs weekly). *Their emails* are acknowledgments and replies from that authority about this issue (identify the sender by its signature, as in rule 4 above). *The window* is their emails received after our newest email to them for this issue. *Legal reply time* of a registered petition ends at its registration date plus the term stated in the confirmation (30 days per Art. 8 when none is stated; an extension they announce under Art. 9 moves it); for a petition with no known registration, 34 days after sending (30 days plus a few days for registration).
+
+The cycle: once an authority gives a registration number, ask every week for progress on it until the matter is resolved; if it answers without a number, ask for the number every week; only when it stops answering and the legal reply time has elapsed, start again with a new petition. Use the first rule that applies:
+
+1. **HOLD** — the window holds a reply that resolves the matter or needs the user: a final answer (works done, findings and measures presented as the solution, the file closed), a refusal, "not competent" or a redirect (then rule 6 above applies to the authority it named), or a request for documents or information only the user can give. Send nothing more to this authority for this issue; report the reply (quoted) and ask the user how to continue. In an unattended run, keep holding on later runs until the user decides. If the reply says the problem is fixed, also suggest marking the issue Resolved in Civiti. Interim replies — a registration number, a term or an extension, „în curs de soluționare/verificare”, a partial answer while the rest is pending — are **not** HOLD: report them and continue with rule 2 or 3.
+2. **PROGRESS** — a registration number for a petition on this issue is known and tied (rule 4 above), the matter is not resolved, and either its legal reply time has not elapsed or they replied in the window → send a **progress follow-up** citing the number.
+3. **ASKNR** — they acknowledged or answered one of our petitions without giving its registration number, no number has arrived since, and either they replied in the window or 30 days have not passed since that petition → send a **registration-number follow-up**.
+4. **NEW** — we never sent them a petition on this issue; or they never replied to our newest petition, or they stopped answering, and its legal reply time has elapsed → send a **new petition** (in follow-up form, "Revenire – [kind] privind …", when there is history; a first petition otherwise).
+5. **WAIT** — otherwise (no reply yet, and the legal reply time of our newest petition is still running) → send nothing to this authority this run; report the date its legal reply time ends.
+
+Never send two emails to the same authority about the same issue less than 6 days apart.
+
+### Progress follow-up (PROGRESS)
+Short, same form, header, petitioner paragraph and closing as the template, with the issue link and photo box. Subject: "Revenire – [kind] nr. [N] privind [problem/street], Sector [X]". Heading: REVENIRE. Body after the petitioner paragraph:
+- „prin care revin la [sesizarea/cererea/…] privind [problem, one line] de pe [street], înregistrată la dumneavoastră cu nr. [N], conform confirmării primite la data de [date].”
+- If we already sent progress follow-ups on this number: „Am revenit cu solicitări privind stadiul soluționării la datele de [dates]” — followed by „, fără a primi răspuns.” only if they sent nothing after the first of those dates, otherwise by „. Ultima comunicare primită de la dumneavoastră este cea din data de [date].”
+- „Situația semnalată persistă.” only if the issue is still Active.
+- Asks: (1) stadiul soluționării petiției nr. [N] și compartimentul căruia i-a fost repartizată; (2) măsurile dispuse sau efectuate de la înregistrare, cu datele acestora; (3) termenul estimat pentru [the outcome asked in the original petition, re-angled for this authority].
+- Closing line: „Vă rog să îmi comunicați răspunsul în termenul legal prevăzut de art. 8 din O.G. nr. 27/2002.” — no new registration-number request (the number is known).
+
+### Registration-number follow-up (ASKNR)
+Same form. Subject: "Revenire – [kind] privind [problem/street], Sector [X] – solicitare număr de înregistrare". Heading: REVENIRE. Body after the petitioner paragraph:
+- „prin care revin la [sesizarea/…] privind [problem, one line] de pe [street], transmisă la data de [date], la care am primit comunicarea dumneavoastră din data de [date]. Comunicarea nu menționează numărul de înregistrare al petiției.”
+- Asks: (1) numărul și data înregistrării petiției; (2) termenul de soluționare și compartimentul căruia i-a fost repartizată; (3) stadiul soluționării.
+- Closing with the 30-day line of the template.
 
 ## The workflow
 
@@ -158,10 +186,11 @@ Go through this list for each petition and fix what fails. In an unattended run,
 2. **Petitioner** — name, form (Subsemnatul/Subsemnata, domiciliat/domiciliată), address and phone exactly as in the Petitioner profile (or the standing instruction); no brackets or placeholders anywhere.
 3. **Facts** — every specific (street, number, duration, vehicle, plate, date) traces to the issue, an earlier petition in Sent, or a reply; quotes match their source word for word.
 4. **History** — dates of earlier petitions match Sent; registration numbers are cited only when tied by the rule in "Follow-up petitions".
+   (For PROGRESS follow-ups, check 6 needs no new registration-number request.)
 5. **Fit** — heading kind, subject prefix and closing line agree (SESIZARE / "Sesizare privind …" / "prezentei sesizări"); the asks match the authority's row in the table; follow-ups carry "Revenire – ".
 6. **Required content** — OG 27/2002 cited; registration-number request and 30-day line present; the civiti.ro issue link and every photo link from `get_issue` present.
 7. **Form** — Romanian diacritics intact; no Markdown; HTML and plain text say the same; no email address, date line or signature line in the body.
-8. **Timing** — the issue is still Active, and this authority got no petition for this issue in the last 5 weeks.
+8. **Timing** — the issue is still Active, the "Follow-up cycle" calls for exactly this kind of email (PROGRESS, ASKNR or NEW) to this authority today, and this authority got no email about this issue in the last 6 days.
 
 ### Step 6 — Deliver
 Offer the user three paths, their choice:
@@ -319,6 +348,7 @@ Petitions are written in **Romanian only**, in the formal administrative registe
 - DO ask for the registration number in every petition, and cite tied numbers in follow-ups.
 - DO cite Legea 155/2010 art. 7 to a Poliție Locală, and Legea 421/2002 for abandoned vehicles.
 - DO reference earlier petitions and replies in follow-ups, follow redirects, and ask something new (Art. 10).
+- DO follow the "Follow-up cycle" per issue and authority: weekly progress follow-ups once a number is known, weekly requests for the number when they answer without one, a new petition only after they stop answering and the legal reply time elapses; hold and ask the user on a resolving reply.
 - DO run the Step 5 check on every petition before it goes out.
 - DO include the phone number in the body when the profile has one (it isn't in the email header).
 - DO send a formatted HTML email with a plain-text alternative, one authority per email, with the civiti.ro issue link.

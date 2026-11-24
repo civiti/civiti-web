@@ -20,13 +20,13 @@ import { EXPLAINER_TRANSCRIPT } from '../explainer-transcript.generated';
           width="1920"
           height="1080"
           poster="/media/asistent-ai/explainer-poster.jpg"
-          aria-label="Film explicativ de 76 de secunde, fără sunet, cu subtitrări în română: de la un trotuar blocat la o petiție înregistrată și o revenire după cinci săptămâni.">
+          aria-label="Film explicativ de 36 de secunde, cu muzică și subtitrări în română: de la un trotuar blocat la o petiție înregistrată, în trei pași.">
           <source src="/media/asistent-ai/explainer.mp4" type="video/mp4" />
           <track kind="captions" src="/media/asistent-ai/explainer.ro.vtt" srclang="ro" label="Română" default />
           <a href="/media/asistent-ai/explainer.mp4">Descarcă filmul</a>
         </video>
       </div>
-      <figcaption class="c-small c-muted">Film fără sunet, 76 de secunde, cu subtitrări în română. Persoanele, adresele și numerele din film sunt inventate.</figcaption>
+      <figcaption class="c-small c-muted">36 de secunde, cu muzică și subtitrări în română. Persoanele, adresele și numerele din film sunt inventate.</figcaption>
     </figure>
 
     <details class="transcript" [open]="reducedMotion()">

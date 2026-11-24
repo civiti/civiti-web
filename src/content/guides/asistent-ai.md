@@ -1,13 +1,13 @@
 ---
 title: "Conectează Civiti la asistentul tău AI"
 slug: "asistent-ai"
-description: "Conectează Civiti la Claude și instalează abilitatea civiti-petitions: petiții formale, din emailul tău, trimise doar cu aprobarea ta."
+description: "Conectează Civiti la Claude și instalează skill-ul civiti-petitions: petiții formale, trimise din contul tău de email, doar cu aprobarea ta."
 category: "ghid-practic"
 publishedAt: "2026-11-22"
 featured: false
 image: "/guides/asistent-ai.png"
-readingTime: "10 min citire"
+readingTime: "3 min citire"
 dedicated: true
 ---
 
-Acest fișier ține doar metadatele ghidului: cartea din /ghid, sitemapul și etichetele SEO. Pagina are propria componentă, `AssistantGuideComponent`, pentru că are butoane de copiere, file pentru clienți și un film.
+Acest fișier ține doar metadatele ghidului: cartea din /ghid, sitemapul și etichetele SEO. Pagina are propria componentă, `AssistantGuideComponent`, pentru că are un prompt de copiat, file pentru clienți și un film.
