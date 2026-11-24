@@ -9,7 +9,7 @@
 <div id="stage">
 
   <section class="scene" id="street">
-    <h1 class="headline" id="street-title">Un trotuar blocat.</h1>
+    <h1 class="headline" id="street-title"><span class="word">Un</span> <span class="word">trotuar</span> <span class="word">blocat.</span></h1>
     <svg id="street-art" viewBox="0 0 1920 1080" aria-hidden="true">
       <!-- facade -->
       <g fill="#EEEAE2">
@@ -82,15 +82,16 @@
           <div><span class="stat__value" id="issue-votes">0</span><span class="stat__label">voturi</span></div>
           <div><span class="stat__value">3</span><span class="stat__label">autorități legate</span></div>
         </div>
+        <div class="issue-card__next" id="issue-next"><span class="tag tag--signal">Pasul următor: o petiție formală</span></div>
       </div>
     </div>
     <svg id="issue-photo" viewBox="1020 400 760 480" width="720" height="480" aria-hidden="true"></svg>
   </section>
 
   <section class="scene" id="connect">
-    <h1 class="headline">Conectezi Civiti.<small>O singură dată, cu contul tău.</small></h1>
+    <h1 class="headline"><span class="step" id="connect-step">1</span>Conectezi Civiti.<small>Cu contul tău de pe civiti.ro.</small></h1>
     <svg id="connect-art" viewBox="0 0 1920 860" aria-hidden="true">
-      <path id="connect-cable" d="M510 440 C 700 620, 840 300, 960 440 S 1220 620, 1410 440" fill="none" stroke="#F29100" stroke-width="16" stroke-linecap="round"/>
+      <path id="connect-cable" d="M510 520 C 700 700, 840 380, 960 520 S 1220 700, 1410 520" fill="none" stroke="#F29100" stroke-width="16" stroke-linecap="round"/>
     </svg>
     <div class="node node--client">
       <div class="node__tile" aria-hidden="true">
@@ -99,7 +100,7 @@
       <div class="node__label">Asistentul tău AI</div>
     </div>
     <div class="node node--civiti">
-      <div class="node__tile" aria-hidden="true">
+      <div class="node__tile" id="civiti-tile" aria-hidden="true">
         <svg width="140" height="140" viewBox="0 0 64 64">
           <path d="M10 26 L36 13 V51 L10 38 Z" fill="#FFFFFF"/>
           <rect x="16" y="38" width="9" height="14" rx="3" fill="#FFFFFF"/>
@@ -114,24 +115,43 @@
       <h3>Asistentul tău AI <span class="badge">Unverified</span></h3>
       <p>This application is asking to access your Civiti account.</p>
       <ul>
-        <li>Read your civic data<span>Problemele, autoritățile, profilul tău</span></li>
-        <li>Take actions on your behalf<span>Vot, comentarii, probleme noi</span></li>
+        <li>Read your civic data</li>
+        <li>Take actions on your behalf</li>
       </ul>
       <div class="consent__actions"><span class="btn">Deny</span><span class="btn btn--signal" id="consent-approve">Approve</span></div>
     </div>
-    <div class="connected" id="connected"><span class="tag tag--ok">Conectat. Fără chei API.</span></div>
+    <div class="connected" id="connected"><span class="tag tag--ok">✓ Conectat. Fără chei API.</span></div>
+  </section>
+
+  <section class="scene" id="skill">
+    <h1 class="headline"><span class="step" id="skill-step">2</span>Adaugi abilitatea.<small>civiti-petitions îl învață să scrie petiții.</small></h1>
+    <div class="node node--skill">
+      <div class="node__tile" id="skill-tile" aria-hidden="true">
+        <svg width="120" height="120" viewBox="0 0 64 64"><path d="M32 6 C 34 24, 40 30, 58 32 C 40 34, 34 40, 32 58 C 30 40, 24 34, 6 32 C 24 30, 30 24, 32 6 Z" fill="#FCA311"/></svg>
+        <span class="node__badge" id="skill-badge">✓</span>
+      </div>
+      <div class="node__label">Asistentul tău AI</div>
+    </div>
+    <div class="card file" id="skill-file">
+      <svg class="file__icon" viewBox="0 0 48 60" aria-hidden="true">
+        <path d="M4 4 H 30 L 44 18 V 56 H 4 Z" fill="#FFF7E8" stroke="#F29100" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M30 4 V 18 H 44" fill="none" stroke="#F29100" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M12 30 H 36 M12 38 H 36 M12 46 H 28" stroke="#F29100" stroke-width="3" stroke-linecap="round"/>
+      </svg>
+      <div><p class="file__name">SKILL.md</p><p class="file__skill">civiti-petitions</p></div>
+    </div>
+    <ul class="chips">
+      <li id="chip-1"><span class="tick">✓</span>Forma și temeiul legal potrivite</li>
+      <li id="chip-2"><span class="tick">✓</span>Destinatari verificați</li>
+      <li id="chip-3"><span class="tick">✓</span>Verificare înainte de trimitere</li>
+    </ul>
   </section>
 
   <section class="scene" id="ask">
     <div class="card chat">
       <div class="chat__bar"><span class="chat__dot"></span>Asistentul tău AI</div>
       <div class="chat__log">
-        <div class="bubble" id="ask-bubble">Trimite petiții pentru problemele mele active</div>
-        <div class="toolline" id="ask-tool-0"><span class="tick">✓</span>Caut problemele tale active <b>list_my_issues</b></div>
-        <div class="reply" id="ask-reply">Am găsit o problemă activă: <b>Trotuar blocat pe Strada Exemplului</b>.</div>
-        <div class="toolline" id="ask-tool-1"><span class="tick">✓</span>Citesc problema <b>get_issue</b></div>
-        <div class="toolline" id="ask-tool-2"><span class="tick">✓</span>Verific emailurile autorităților <b>list_authorities</b></div>
-        <div class="toolline" id="ask-tool-3"><span class="tick">✓</span>Pregătesc petițiile cu <b>civiti-petitions</b></div>
+        <div class="bubble" id="ask-bubble">Scrie petiții pentru problema mea</div>
       </div>
       <div class="composer" id="ask-composer"><span id="ask-typed"></span><span class="composer__caret" id="ask-caret"></span></div>
     </div>
@@ -140,92 +160,74 @@
   <section class="scene" id="petitions">
     <h1 class="headline">O petiție pentru fiecare autoritate.</h1>
     <svg id="petitions-art" viewBox="0 0 1920 860" aria-hidden="true">
-      <path class="fan" d="M550 450 C 680 450, 700 320, 860 320" fill="none" stroke="#F29100" stroke-width="7" stroke-linecap="round"/>
-      <path class="fan" d="M550 470 C 680 470, 720 540, 860 540" fill="none" stroke="#F29100" stroke-width="7" stroke-linecap="round"/>
-      <path class="fan" d="M550 490 C 660 490, 700 760, 860 760" fill="none" stroke="#F29100" stroke-width="7" stroke-linecap="round"/>
+      <path class="fan" d="M550 500 C 680 500, 700 400, 860 400" fill="none" stroke="#F29100" stroke-width="7" stroke-linecap="round"/>
+      <path class="fan" d="M550 520 C 680 520, 720 570, 860 570" fill="none" stroke="#F29100" stroke-width="7" stroke-linecap="round"/>
+      <path class="fan" d="M550 540 C 660 540, 700 740, 860 740" fill="none" stroke="#F29100" stroke-width="7" stroke-linecap="round"/>
     </svg>
     <div class="card source">
       <span class="tag tag--active">Activă</span>
       <h3>Trotuar blocat de mașini parcate</h3>
       <p>Strada Exemplului nr. 12</p>
     </div>
-    <div class="sheet" id="sheet-1"><span class="sheet__art">art. 2</span><p class="sheet__kind">SESIZARE</p><p class="sheet__to">Poliția Locală Sector 5</p><p class="sheet__ask">Verificare la fața locului și sancțiuni.</p></div>
-    <div class="sheet" id="sheet-2"><span class="sheet__art">art. 2</span><p class="sheet__kind">PROPUNERE</p><p class="sheet__to">Direcția de dezvoltare urbană</p><p class="sheet__ask">Stâlpișori și locuri de parcare marcate.</p></div>
-    <div class="sheet" id="sheet-3"><span class="sheet__art">art. 2</span><p class="sheet__kind">CERERE</p><p class="sheet__to">Primăria Sectorului 5</p><p class="sheet__ask">Măsuri coordonate, responsabil și termene.</p></div>
+    <div class="sheet" id="sheet-1"><p class="sheet__kind">SESIZARE</p><p class="sheet__to">Poliția Locală Sector 5</p></div>
+    <div class="sheet" id="sheet-2"><p class="sheet__kind">PROPUNERE</p><p class="sheet__to">Direcția de dezvoltare urbană</p></div>
+    <div class="sheet" id="sheet-3"><p class="sheet__kind">CERERE</p><p class="sheet__to">Primăria Sectorului 5</p></div>
   </section>
 
-  <section class="scene" id="email">
-    <div class="card mail">
+  <section class="scene" id="send">
+    <h1 class="headline"><span class="step" id="send-step">3</span>Aprobi.<small>Nimic nu pleacă fără acordul tău.</small></h1>
+    <div class="card mail" id="mail">
       <div class="mail__head">
         <div><b>Către:</b> Poliția Locală Sector 5</div>
-        <div><b>Subiect:</b> Sesizare privind trotuarul blocat, Strada Exemplului nr. 12, Sector 5</div>
+        <div><b>Subiect:</b> Sesizare privind trotuarul blocat, Strada Exemplului nr. 12</div>
       </div>
       <div class="mail__body">
-        <p><b>Către: Poliția Locală Sector 5</b></p>
-        <p>Subsemnatul <b>Ion Popescu</b>, domiciliat în Str. Exemplului nr. 1, Sector 5, București, în temeiul O.G. nr. 27/2002, formulez prezenta</p>
+        <p>Subsemnatul <b>Ion Popescu</b>, domiciliat în Str. Exemplului nr. 1, Sector 5, București, formulez prezenta</p>
         <p class="mail__kind">SESIZARE</p>
-        <p>Față de cele expuse, vă solicit respectuos:</p>
-        <p>1. verificarea la fața locului;<br>2. sancționarea încălcărilor constatate.</p>
-        <p class="mail__box"><b>Documentație fotografică</b><br>Pagina sesizării · Foto 1 · Foto 2 · Hartă</p>
-        <p><span class="mail__mark">numărul de înregistrare</span> · <span class="mail__mark">30 de zile, art. 8</span></p>
+        <span class="mail__line"></span><span class="mail__line"></span><span class="mail__line mail__line--short"></span>
       </div>
     </div>
-    <ul class="checks">
-      <li id="check-1"><span class="tick">✓</span>Destinatar verificat</li>
-      <li id="check-2"><span class="tick">✓</span>Datele tale complete</li>
-      <li id="check-3"><span class="tick">✓</span>Fapte din sesizare</li>
-      <li id="check-4"><span class="tick">✓</span>Temei legal citat</li>
-      <li id="check-5"><span class="tick">✓</span>Fără paranteze rămase</li>
-    </ul>
     <div class="approve" id="approve">
       <p>Trimit această petiție?</p>
       <span class="btn btn--signal" id="approve-btn">Da, trimite</span>
     </div>
-    <div class="sent" id="sent">Trimisă din căsuța ta de email.</div>
+    <div class="sent" id="sent"><span class="tag tag--ok">✓ Trimisă din căsuța ta de email</span></div>
   </section>
 
   <section class="scene" id="registered">
     <div class="card ack" id="ack">
       <p class="ack__from">De la: Poliția Locală Sector 5</p>
       <p class="ack__subject">Confirmare înregistrare</p>
-      <p class="ack__body">Adresa dvs. a fost înregistrată cu <span class="ack__num">nr. 1234/07.05.2026</span>.</p>
+      <p class="ack__body">Petiția dvs. a fost înregistrată cu <span class="ack__num">nr. 1234/07.05.2026</span></p>
+      <div class="stamp" id="stamp">Înregistrată</div>
     </div>
     <div class="clock" id="clock">
       <span class="clock__value" id="clock-value">30</span>
       <span class="clock__label">de zile pentru răspuns</span>
-      <span class="clock__law">O.G. nr. 27/2002, art. 8</span>
       <div class="meter"><div class="meter__fill" id="clock-meter"></div></div>
-    </div>
-  </section>
-
-  <section class="scene" id="followup">
-    <h1 class="headline">Cinci săptămâni mai târziu.<small>Problema e tot activă.</small></h1>
-    <div class="weeks">
-      <div class="week" id="week-1"><div class="week__n">Săpt. 1</div><div class="week__label">Trimisă și înregistrată</div></div>
-      <div class="week" id="week-2"><div class="week__n">Săpt. 2</div></div>
-      <div class="week" id="week-3"><div class="week__n">Săpt. 3</div></div>
-      <div class="week" id="week-4"><div class="week__n">Săpt. 4</div></div>
-      <div class="week" id="week-5"><div class="week__n">Săpt. 5</div><div class="week__label">Termen depășit</div></div>
-      <div class="week" id="week-6"><div class="week__n">Săpt. 6</div><div class="week__label">Revenire</div></div>
-    </div>
-    <div class="card revenire" id="revenire">
-      <h3>Revenire – sesizare privind trotuarul blocat</h3>
-      <p>„Revin cu privire la petiția înregistrată cu nr. 1234/07.05.2026. Vă rog să îmi comunicați ce măsuri ați luat de atunci.”</p>
     </div>
   </section>
 
   <section class="scene scene--ink" id="end">
     <div class="endcard">
-      <svg class="endcard__mark" viewBox="0 0 64 64" aria-hidden="true">
+      <svg class="endcard__mark" id="end-mark" viewBox="0 0 64 64" aria-hidden="true">
         <path d="M10 26 L36 13 V51 L10 38 Z" fill="#FFFFFF"/>
         <rect x="16" y="38" width="9" height="14" rx="3" fill="#FFFFFF"/>
         <path d="M44 22 A14 14 0 0 1 44 42" fill="none" stroke="#FCA311" stroke-width="4" stroke-linecap="round"/>
         <path d="M51 15 A24 24 0 0 1 51 49" fill="none" stroke="#FCA311" stroke-width="4" stroke-linecap="round"/>
       </svg>
-      <h2>Conectează Civiti<br>la asistentul tău AI.</h2>
-      <div class="endcard__url">civiti.ro/ghid/asistent-ai</div>
+      <h2 id="end-title">Conectează Civiti<br>la asistentul tău AI.</h2>
+      <div class="endcard__url" id="end-url">civiti.ro/ghid/asistent-ai</div>
     </div>
   </section>
+
+  <!-- Above every scene: the three steps of the guide, and the wipe on each step cut. -->
+  <ol class="rail" id="rail">
+    <li id="rail-1"><span class="rail__n">1</span>Conectezi</li>
+    <li id="rail-2"><span class="rail__n">2</span>Abilitatea</li>
+    <li id="rail-3"><span class="rail__n">3</span>Aprobi</li>
+  </ol>
+  <div class="wipe" id="wipe"></div>
 </div>
 <script type="module" src="./stage.js"></script>
 </body>
